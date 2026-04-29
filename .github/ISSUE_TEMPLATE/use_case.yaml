@@ -1,0 +1,31 @@
+name: A Use Case to Implement
+description: A complete use case we should implement
+title: "[Use Case] "  
+labels: "use case"
+assignees: [ASSIGNEES]
+projects: [DASHBOARD]
+body:
+- type: checkboxes
+  attributes:
+    label: Is there an existing issue for this?
+    description: Please search to see if an issue already exists that is similar to your issue/suggestion.
+    options:
+    - label: I have searched the existing issues
+      required: true
+- type: textarea
+  attributes:
+    label: Use Case Details
+    description: |
+      Please describe:
+      * The "role" of some user who wants to perform the use case.
+      * The possible steps the user might do.
+      * Possible user errors or system failures that the implementation should handle.
+      * Why would this be a valuable thing to do?
+      * Are there any alternative solutions you have considered?
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Additional Context
+    description: |
+      Add any other context or screenshots about the documentation/website change here.

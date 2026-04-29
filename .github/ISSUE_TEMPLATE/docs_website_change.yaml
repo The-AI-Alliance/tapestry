@@ -1,0 +1,44 @@
+name: 📖 Documentation/Website Change  
+description: Request changes to documentation or website content  
+title: "[Docs/Website] "  
+labels: documentation  
+assignees: [ASSIGNEES]
+projects: [DASHBOARD]
+body:
+- type: checkboxes
+  attributes:
+    label: Is there an existing issue for this?
+    description: Please search to see if an issue already exists that is similar to your issue/suggestion.
+    options:
+    - label: I have searched the existing issues
+      required: true
+- type: textarea
+  attributes:
+    label: Description
+    description: |
+      Describe the documentation or website change you're requesting. Include:
+      * What needs to be changed?
+      * Why it needs to be changed?
+      * Any relevant context or references?
+  validations:
+    required: true
+- type: checkboxes
+  attributes:
+    label: Affected Areas
+    description: Check all that apply
+    options:
+    - label: Documentation files (docs/)
+    - label: Website content (website/)
+- type: textarea
+  attributes:
+    label: Proposed Changes
+    description: |
+      Describe your proposed changes in detail:
+      * Specific files to modify
+      * Content to add/remove
+      * Any new files needed
+- type: textarea
+  attributes:
+    label: Additional Context
+    description: |
+      Add any other context or screenshots about the documentation/website change here.

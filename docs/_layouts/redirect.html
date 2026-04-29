@@ -1,0 +1,68 @@
+---
+layout: redirect
+---
+{% comment %}
+The template for relative or absolute redirects. In the pages that use it,
+see for example `docs/example_redirect.markdown`, define either of the following:
+* redirect_rel_url - for relative redirects relative to this site, that is relative
+                     to `{site.url}/{site.baseurl}.
+* redirect_abs_url - for absolute redirects to a different site.
+Define one or the other. The code below will look for `redirect_rel_url` first, so if
+it is defined, `redirect_abs_url` is ignored.
+
+The code also appends the location "search" and "hash" from the initial URL.
+For example, if redirecting form ../foo/bar to ../bip/bop, an input URL like the 
+following will be transformed as shown:
+  /foo/bar/?x=1&y=2#anchor --> /bip/bop/?x=1&y=2#anchor
+
+TIP: Make sure you experiment with the definition for these URLs. Be especially
+careful about relative URLs. Despite the "relative" name, you shouldn't actually 
+use relative constructs like `../`. Use `/foo/bar`, instead, which is the path 
+from the website's root, as defined by site.url in `docs/_config.yml`.
+
+This is the hack we use for reconstructing the full URL, adapted from StackOverflow:
+// Source - https://stackoverflow.com/a/31604335
+// Posted by dakab
+// Retrieved 2026-02-16, License - CC BY-SA 3.0
+{% endcomment %}
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+  <script type="text/javascript">
+
+    {% if page.redirect_rel_url %}
+      {% assign url_prefix = site.url | append: "/" | append: site.baseurl | append: page.redirect_rel_url %}
+    {% elsif page.redirect_abs_url %}
+      {% assign url_prefix = page.redirect_abs_url %}
+    {% else %}
+      {% comment %}Fall back; go to the root of this site.{% endcomment %}
+      {% assign url_prefix = site.url %}
+      console.log("Neither page.redirect_rel_url nor page.redirect_abs_url defined. Falling back to site.url!")
+    {% endif %}
+    newURL = `{{url_prefix}}/${document.location.search}${document.location.hash}`;
+    console.log("{{site.url}}");
+    console.log("{{url_prefix}}");
+    console.log(newURL);
+    // document.location.href = newURL;
+
+    var meta = document.createElement('meta');
+    meta.httpEquiv = "refresh";
+    meta.content = `0;${newURL}`;
+    document.getElementsByTagName('head')[0].appendChild(meta);
+    var link = document.createElement('link');
+    link.rel = "canonical";
+    link.href = newURL;
+    document.getElementsByTagName('head')[0].appendChild(link);
+  </script>
+  </head>
+  <body>
+    <p>
+      If your browser supports Refresh, you'll be transported to the
+      <a href="{{url_prefix}}">correct page</a>
+      immediately.
+    </p>
+    <p>If not, please click the link manually.</p>
+  </body>
+</html>

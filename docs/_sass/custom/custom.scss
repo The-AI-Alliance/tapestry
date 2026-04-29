@@ -1,0 +1,199 @@
+/*
+$nav-width: 16rem;
+$nav-width-md: 15rem;
+$nav-width: 250px !default;
+$nav-width-md: 248px !default;
+*/
+
+/*
+$content-width: 50rem !default;
+$header-height: 3.75rem !default;
+$content-width: 800px !default;
+$header-height: 60px !default;
+*/
+
+@media screen { 
+  .side-bar {
+    width: 15.5rem;
+  }
+}
+
+table {
+  background-color: rgba(222, 196, 172, 0.11);
+  border: solid 1px rgba(222, 196, 172, 0.25); //$blue-100; //#52b1ae;
+}
+
+.table-wrapper {
+  margin-top: 0rem !important;
+  margin-bottom: 0rem !important;
+}
+
+td {
+	vertical-align: top;
+}
+
+th {
+  background-color: rgba(222, 196, 172, 0.11); //#EEECE1;
+  white-space: nowrap;
+  text-align: left;
+  font-weight: bold;
+}
+
+td.project-title {
+  background-color: #F1FBEA; /* #FBF0FA; */
+  text-align: left;
+  font-weight: bold;
+  font-size: 110% !important;
+}
+
+.width-100 {
+  width: 100% !important;
+}
+
+blockquote {
+  border: $border $border-color;
+  /*
+  background-color: rgba(250,250,240,0.5);
+  border: solid 1px $blue-100;
+  border: solid 1px #52b1ae;
+  */
+  background-color: rgba(222, 196, 172, 0.10);
+  border: solid 1px rgba(222, 196, 172, 0.25); 
+  padding: 10px;
+  margin:  0px;
+}
+
+.attention {
+  background-color: lighten($yellow-000, 20%);
+  border: solid 1px $yellow-100;
+}
+.tip {
+  background-color: lighten($green-000, 30%);
+  border: solid 1px $green-100;
+}
+.note {
+  background-color: lighten($purple-000, 30%);
+  border: solid 1px $purple-100;
+}
+.warning {
+  background-color: lighten($red-000, 10%);
+  border: solid 1px $red-100;
+}
+
+.description {
+  width: 100%;
+  font: 0.8rem "Fira Sans" sans-serif; 
+}
+
+/* 
+Based on .site-header, but more flexible. 
+*/
+.site-header-logo {
+  display: inline;
+  vertical-align: top;
+  min-height: 20px;
+  max-width: 250px;
+  align-items: center;
+}
+
+.banner {
+  @include mq(md) {
+    /*
+    height: 60px; 
+    */
+    max-height: 100px;
+  }  
+}
+
+/* Buttons used at the tops of pages. */
+
+.header-btns {
+  display: inline;
+}
+
+.header-btn {
+  @extend .btn;
+  @include btn-color($white, $btn-primary-color);
+  @extend .fs-5;
+  @extend .mb-4;
+  @extend .mb-md-0;
+  @extend .mr-2;
+  @extend .no-glyph;
+  @extend .text-center;
+}
+
+/* 
+Smaller buttons used for "keywords" and "categories" of things.
+See https://the-ai-alliance.github.io/open-trusted-data-initiative/ for an example.
+*/
+.keyword-btn {
+  @extend .btn;
+  @extend .fs-5;
+  @extend .mb-4;
+  @extend .mb-md-0;
+  @extend .mr-2;
+  @extend .no-glyph;
+  @extend .text-center;
+  font: 0.75rem;
+}
+
+.category-btn {
+  @extend .keyword-btn;
+  @extend .btn-green;
+}
+
+.topic-btn {
+  @extend .keyword-btn;
+  @extend .btn-blue;
+}
+
+h3.topic-btn {
+  @extend .topic-btn;
+  @extend .text-left;
+}
+h3.topic {
+  @extend .btn-blue;
+}
+
+
+.resizable {
+  position: relative;
+}
+
+.resizable .resizers {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.resizable .resizers .resizer-line {
+  position: relative;
+}
+
+.resizable .resizers .resizer-line.bottom-line {
+  height: 6px;
+  border-top: 5px solid #6D6F5D; /* #51899C; */
+  cursor: ns-resize;
+}
+.resizable .resizers .resizer-box.bottom-box {
+  height: 10px;
+  border: 5px solid #6D6F5D; /* #51899C; */
+  cursor: ns-resize;
+}
+
+.resizable .resizers .resizer-line.bottom-line:hover {
+  border-top: 5px solid #AD94A2;
+}
+.resizable .resizers .resizer-box.bottom-box:hover {
+  border: 5px solid #AD94A2;
+}
+
+.resizable-content {
+  min-height: 100%;
+  min-width: 30px;
+  resize: both;
+  overflow: auto;
+  max-height: fit-content;
+  max-width: fit-content;
+}
+

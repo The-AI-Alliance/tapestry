@@ -1,0 +1,28 @@
+name: Task/Feature Suggestion or Other Issue
+description: Use to request a feature, etc.
+title: "[Task/Feature/Issue] "  
+assignees: [ASSIGNEES]
+projects: [DASHBOARD]
+body:
+- type: checkboxes
+  attributes:
+    label: Is there an existing issue for this?
+    description: Please search to see if an issue already exists that is similar to your issue/suggestion.
+    options:
+    - label: I have searched the existing issues
+      required: true
+- type: textarea
+  attributes:
+    label: Task/Feature/Issue Details
+    description: |
+      Please describe:
+      * What feature you want implemented that doesn't exist today or what task do you want to see accomplished?
+      * Why would this be a valuable thing to do?
+      * Are there any alternative solutions you have considered?
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Additional Context
+    description: |
+      Add any other context or screenshots about the documentation/website change here.
