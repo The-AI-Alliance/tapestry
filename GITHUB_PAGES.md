@@ -1,6 +1,6 @@
 # Editing and Publishing the GitHub Pages Website
 
-The [published website](https://the-ai-alliance.github.io/REPO_NAME/).
+The [published website](https://the-ai-alliance.github.io/tapestry/).
 
 The documentation for this repo is published using [GitHub Pages](https://pages.github.com/). We welcome contributions as PRs. See the AI Alliance [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) instructions. Also, you'll need to agree with the AI Alliance [Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md) and all contributions will be covered by the [LICENSE](https://github.com/The-AI-Alliance/community/blob/main/LICENSE) (which is also in [this repo](LICENSE)).
 
@@ -30,7 +30,7 @@ Install a recent version of Ruby 3. Note that on MacOS, the default Ruby install
 This project's `Makefile` will attempt to install the remaining dependencies, including `jekyll`, when you run `make all` or `make view-local`.
 
 > [!WARNING]
-> The automatic setup of `jekyll` in the `Makefile` has only been tested on MacOS and it most likely doesn't work on Windows, unless you use the Linux subsystem. If you encounter problems on other platforms, please [post an issue](https://github.com/The-AI-Alliance/REPO_NAME/issues) to get help, or if you can fix the issue, a [pull request](https://github.com/The-AI-Alliance/REPO_NAME/pulls) (PR) is always welcome :nerd_face:. (More details on PRs below.)
+> The automatic setup of `jekyll` in the `Makefile` has only been tested on MacOS and it most likely doesn't work on Windows, unless you use the Linux subsystem. If you encounter problems on other platforms, please [post an issue](https://github.com/The-AI-Alliance/tapestry/issues) to get help, or if you can fix the issue, a [pull request](https://github.com/The-AI-Alliance/tapestry/pulls) (PR) is always welcome :nerd_face:. (More details on PRs below.)
 
 So, try `make view-local` and see if Jekyll is installed successfully and the website is rendered.
 
@@ -98,7 +98,7 @@ While tedious this provides a better experience for users of the website.
 
 > **TIP:** Use the script `check-external-links.sh` to find missing targets.
 
-Furthermore, as a visual clue to the user, [our stylesheet](https://github.com/The-AI-Alliance/REPO_NAME/blob/main/docs/_includes/css/custom.scss.liquid) is configured to put little up-and-to-the-right arrows after every external link. This provides a visual cue that a new tab will be opened.
+Furthermore, as a visual clue to the user, [our stylesheet](https://github.com/The-AI-Alliance/tapestry/blob/main/docs/_includes/css/custom.scss.liquid) is configured to put little up-and-to-the-right arrows after every external link. This provides a visual cue that a new tab will be opened.
 
 > [!NOTE]
 > There is one flaw with using `_blank` everywhere. While Chrome and Safari open a new tab for every URL clicked, Firefox creates one new tab and opens all the URLs in that _one_ tab. If you care about this flaw, you'll have to use unique values for all the `targets`.
@@ -181,7 +181,7 @@ cd docs && bundle exec jekyll serve --port ${JEKYLL_PORT} --baseurl '' --increme
 ```
 
 * `JEKYLL_PORT` for the `--port` flag defaults to `4000`
-* The `--baseurl` flag effectively supports the simple URL, `localhost:$JEKYLL_PORT`. (Without it, the URL would be `localhost:$JEKYLL_PORT/The-AI-Alliance/REPO_NAME/`.)
+* The `--baseurl` flag effectively supports the simple URL, `localhost:$JEKYLL_PORT`. (Without it, the URL would be `localhost:$JEKYLL_PORT/The-AI-Alliance/tapestry/`.)
 * The `--incremental` flag lets you edit the pages and refresh the browser tab to see the updates immediately.
 
 > [!NOTE]
@@ -277,7 +277,7 @@ make clean-jekyll setup-jekyll
 
 Answer "y" (yes) to the prompts and ignore any warnings that you can't uninstall a "default" gem.
 
-Finally, if you are still stuck, please [post an issue](https://github.com/The-AI-Alliance/REPO_NAME/issues) to get help.
+Finally, if you are still stuck, please [post an issue](https://github.com/The-AI-Alliance/tapestry/issues) to get help.
 
 > **Help Needed:**
 >
@@ -303,4 +303,4 @@ gem list | grep jekyll
 
 This section documents the one-time settings necessary to [configure publication of a repo's GitHub Pages](https://docs.github.com/en/enterprise-server@3.1/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site). 
 
-In the repo's [_Settings > Pages_ section](https://github.com/The-AI-Alliance/REPO_NAME/settings/pages), use the menu to select the branch from which you want to publish the website. By default, we assume `main` is the desired branch, so pick that. However, if you want to use a different branch, i.e., `latest` or another one you specified when running `finish-microsite.sh`, then select it. Finally, select the `docs` folder in the dropdown menu to the right, which is the root folder for the pages.
+In the repo's [_Settings > Pages_ section](https://github.com/The-AI-Alliance/tapestry/settings/pages), use the menu to select the branch from which you want to publish the website. By default, we assume `main` is the desired branch, so pick that. However, if you want to use a different branch, i.e., `latest` or another one you specified when running `finish-microsite.sh`, then select it. Finally, select the `docs` folder in the dropdown menu to the right, which is the root folder for the pages.

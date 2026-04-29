@@ -13,11 +13,11 @@
 # you will see them accessed via {{ site.title }}, {{ site.github_repo }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: "MICROSITE_TITLE"
+title: "Tapestry Initiative"
 email: contact@thealliance.ai
 description: >- # this means to ignore newlines until "baseurl:"
-  The website for the AI Alliance project, MICROSITE_TITLE.
-baseurl: "/REPO_NAME" # the subpath of your site.
+  The website for the AI Alliance project, Tapestry Initiative.
+baseurl: "/tapestry" # the subpath of your site.
 url: "https://the-ai-alliance.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 
 permalink: pretty
@@ -74,8 +74,8 @@ aux_links:
     - "https://www.aialliance.org"
 
 nav_external_links:
-  - title: "The AI Alliance repo for MICROSITE_TITLE"
-    url: "https://github.com/The-AI-Alliance/REPO_NAME"
+  - title: "The AI Alliance repo for Tapestry Initiative"
+    url: "https://github.com/The-AI-Alliance/tapestry"
     hide_icon: false
 
 # Makes Aux links open in a new tab. Default is false
@@ -115,7 +115,7 @@ show_footer: side_bar
 # Footer last edited timestamp
 last_edit_timestamp: true # show or hide edit time - page must have `last_modified_date` defined in the frontmatter
 last_edit_time_format: "%Y-%m-%d" # uses ruby's time format: https://ruby-doc.org/stdlib-2.7.0/libdoc/time/rdoc/Time.html
-last_modified_date: TIMESTAMP
+last_modified_date: 2026-04-29 09:44 -0400
 last_version: V0.1.0
 
 # Custom: Add the range of years for the copyright here. This is done here,
@@ -126,8 +126,8 @@ copyright_years: 2025-2026
 # "Edit this page on GitHub" link text
 gh_edit_link: true # show or hide edit this page link
 gh_edit_link_text: "Edit this page on GitHub"
-gh_edit_repository: "https://github.com/The-AI-Alliance/REPO_NAME" # the github URL for your repo
-gh_edit_branch: "PUBLISH_BRANCH" # the branch that your docs are served from
+gh_edit_repository: "https://github.com/The-AI-Alliance/tapestry" # the github URL for your repo
+gh_edit_branch: "main" # the branch that your docs are served from
 gh_edit_source: "docs" # the source that your files originate from
 gh_edit_view_mode: "tree" # "tree" or "edit" if you want the user to jump into the editor immediately
 

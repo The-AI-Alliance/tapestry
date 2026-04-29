@@ -74,8 +74,8 @@ Open the `terminal` application. It will show a command prompt at your home dire
 Type in the following command for your repo:
 
 ```shell
-git clone https://github.com/The-AI-Alliance/REPO_NAME.git
-cd REPO_NAME
+git clone https://github.com/The-AI-Alliance/tapestry.git
+cd tapestry
 ```
 
 Here `cd` is the _change directory_ command that changes your current working directory to be the root directory of the repo you just cloned.
@@ -167,7 +167,7 @@ However, if you don't want to enable discussions, then remove the URL on the `do
 
 On the left-hand side of the _Settings_, click the link for _Pages_. Under _Branch_, select your publication branch, either `main`, `latest`, or a custom branch you specified above. Then select the `/docs` directory and finally, click _Save_.
 
-Your website should be published after a few minutes to `https://the-ai-alliance.github.io/REPO_NAME/``.
+Your website should be published after a few minutes to `https://the-ai-alliance.github.io/tapestry/``.
 
 > [!TIP]
 > At the top of the repo page, click _Actions_ to see the progress of building your website. This action will be executed every time you make a change to a file in your publication branch (i.e., `main` by default). If for some reason building the website fails, this page can provide useful debugging help.

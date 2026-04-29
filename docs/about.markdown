@@ -5,9 +5,9 @@ nav_order: 100
 has_children: false
 ---
 
-# About MICROSITE_TITLE and The AI Alliance
+# About Tapestry Initiative and The AI Alliance
 
-**MICROSITE_TITLE** is a project of the [The AI Alliance](https://www.aialliance.org){:target="aia"}. 
+**Tapestry Initiative** is a project of the [The AI Alliance](https://www.aialliance.org){:target="aia"}. 
 
 Please join us! See our [contributing]({{site.baseurl}}/contributing) page for details.
 
@@ -15,7 +15,7 @@ The AI Alliance is a global collaboration of startups, enterprises, academic, an
 
 You can information about all AI Alliance projects on [our website](https://www.aialliance.org/){:target="aia"} and our [GitHub organization](https://the-ai-alliance.github.io/){:target="aia-github"}.
 
-If you have any questions or concerns about this effort, please contact us at [contact@thealliance.ai](mailto:contact@thealliance.ai?subject=Questions about MICROSITE_TITLE).
+If you have any questions or concerns about this effort, please contact us at [contact@thealliance.ai](mailto:contact@thealliance.ai?subject=Questions about Tapestry Initiative).
 
 
 ## Other AI Alliance Information
