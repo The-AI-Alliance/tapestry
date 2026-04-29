@@ -13,10 +13,10 @@
 # you will see them accessed via {{ site.title }}, {{ site.github_repo }}, and so on.
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
-title: "Tapestry Initiative"
+title: "Project Tapestry"
 email: contact@thealliance.ai
 description: >- # this means to ignore newlines until "baseurl:"
-  The website for the AI Alliance project, Tapestry Initiative.
+  The website for the AI Alliance Project Tapestry.
 baseurl: "/tapestry" # the subpath of your site.
 url: "https://the-ai-alliance.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 
@@ -74,7 +74,7 @@ aux_links:
     - "https://www.aialliance.org"
 
 nav_external_links:
-  - title: "The AI Alliance repo for Tapestry Initiative"
+  - title: "The AI Alliance repo for Project Tapestry"
     url: "https://github.com/The-AI-Alliance/tapestry"
     hide_icon: false
 

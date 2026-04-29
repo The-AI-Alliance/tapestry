@@ -5,78 +5,53 @@ nav_order: 10
 has_children: false
 ---
 
-# Tapestry Initiative
+# Project Tapestry
 
-Welcome to the **The AI Alliance**: **Tapestry Initiative**. 
+Welcome to **The AI Alliance Project Tapestry**. 
 
-{: .tip }
-> **TIPS:** 
-> 1. Use the search box at the top of this page to find specific content.
-> 2. The links for Capitalized Terms go to [this glossary]({{site.glossaryurl}}){:target="_glossary"}.
+The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-project-tapestry-to-build-a-collaborative-foundation-for-open-and-sovereign-ai){:target="blog"} _Project Tapestry_ to build a collaborative foundation for open and sovereign AI. Project Tapestry will be an open-source platform designed to enable globally federated development of frontier open models while preserving sovereignty, local control, and long-term independence.
 
+Turing Award winner [Yann LeCun](https://en.wikipedia.org/wiki/Yann_LeCun){:target="yc"} is the Chief Science Advisor to the AI Alliance and Project Tapestry.
 
 {: .attention }
-> We are looking for collaborators. Please join us! See our [contributing]({{site.baseurl}}/contributing) page for details.
 
 {: .note }
-> **NOTE:** This is a work-in-progress website for the Tapestry Initiative.
+> * **Join Us!** We are looking for collaborators. See our [contributing]({{site.baseurl}}/contributing) page for details.
+> * Use the search box at the top of this page to find specific content.
+> * The links for Capitalized Terms go to [this glossary]({{site.glossaryurl}}){:target="_glossary"}.
+ 
+## Why Project Tapestry?
 
-{: .important }
-> **IMPORTANT:** The "boilerplate" text on this page mixes content you might want to use, as well as tips on writing Markdown. See also the comments in the source files. Make sure you search for and change all TODOs on all the pages!
+Today, open-weight AI models are everywhere. But open weights alone do not make pretraining _participatory_. The infrastructure, data pipelines, and design decisions behind these models remain concentrated in a small number of companies and regions. Most of the world downloads the resulting models, but almost no one shapes the process of building them. Yann LeCun calls this the central challenge of the next era of AI development.
 
-{: .warning }
-> **WARNING!** This is a warning! Don't forgot to clean up the TODOs!
+Project Tapestry offers a new path for advanced AI development, built on advances in distributed training, which have demonstrated that globally federated model development can match synchronous baselines. Project Tapestry enables institutions, industries, and nations to co-train a shared, open-foundation model, while retaining control of their data and the ability to build sovereign derivatives aligned to their own priorities and requirements.
 
-A _generic_ quote:
+With Project Tapestry, the AI Alliance aims to create a new path for advanced AI development, one in which institutions, industries, and nations can join together to contribute to build more capable and open base models, while retaining control of their data and the ability to build on the base models to produce sovereign, derivative models aligned to their own priorities, industries, culture, laws, and values.
 
-> Shakespeare once wrote, "Heavy is the head that wears the crown."
+![Project Tapestry Platform Architecture]({{site.baseurl}}/assets/images/Tapestry-Cube-Graphics.webp)
 
-This site is organized into the following sections [^1] (with an example footnote):
+<center><strong>Figure 1:</strong> Project Tapestry and Yann Lecun.</center>
 
-* [TODO - second top-level page]({{site.baseurl}}/second_page)
-    * [alternative link](second_page)
-* [TODO - nested]({{site.baseurl}}/nested/)
+## Frontier Open Models without Centralizing Data and Compute
 
-Note how relative links are written. For siblings (like the next set of bullets...) or subpages, you don't have to use the `{{site.baseurl}}` prefix (like the `alternative link`), but use `{{site.baseurl}}` instead of relative navigation hacks like `../../foo/bar`.
+Today, the development of the most capable AI models is increasingly concentrated within a small number of companies and regions. Open-weight models have expanded access, but core decisions about training data, model objectives, architecture, and evaluation typically remain concentrated within the institutions that originate them. At the same time, many sovereign AI model efforts face steep barriers in compute, funding, data access, and specialized talent.
 
-## Section Two
+Project Tapestry offers a alternative: a collaborative approach to AI model development in which participants can help build a shared open foundation without surrendering their data, strategic autonomy, or downstream control. Project Tapestry's long-term vision is to develop an open, global model family, a shared open source base foundation model family that can draw on broader pools of expertise, compute, and domain knowledge than any single organization can typically assemble alone, while enabling participants to create sovereign derivative models tailored to their own societal, industrial, scientific, or mission-specific needs, and aligned to their own governance frameworks, languages, values, and priorities.
 
-A Python code block:
+## From Launch to Global Technical Mobilization
 
-```python
-def flibulate_the_ganzinator(how_much):
-  pass
-```
+Over time, the AI Alliance expects Project Tapestry to foster a vibrant and enduring ecosystem of collaborative, sovereignty-preserving model building and application development. The AI Alliance’s 501(c)(3) nonprofit research organization will serve as the community home for Project Tapestry. It will host and support the Project Tapestry platform and open source technical assets including models that the AI Alliance develops with the platform. Project Tapestry will be governed by a board of representatives from major contributing organizations globally.
+
+Watch for announcements over the coming months about Project Tapestry’s architecture, roadmap, and model development priorities. 
 
 ## Additional links
 
-Some additional links.[^2]
+Some additional links.
 
 * [Contributing]({{site.baseurl}}/contributing): We welcome your contributions! Here's how you can contribute.
 * [About Us]({{site.baseurl}}/about): More about the AI Alliance and this project.
 * [Project GitHub Repo](https://github.com/The-AI-Alliance/tapestry){:target="repo"}
 * [The AI Alliance](https://www.aialliance.org){:target="aia"}: The AI Alliance website.
-
-Note our convention that external URLs include a target, specified with `{:target="some_name"}`. Adding these targets means browsers will automatically open external links in a new tab. You will also notice that external links get a little box and arrow adornment. This is done automatically through a clever CSS hack in `docs/_includes/css/custom.scss.liquid`.
-
-A table example using standard Markdown and showing how to set the desired alignment. (The extra whitespace in the source is only for easier readability.):
-
-| Column 1 (Left Aligned) | Column 2 (Centered) | Column 3 (Numbers - Right Aligned) |
-| :------- | :------------------: | -----: |
-| text 1   | centered             | 1      |
-| text 2   | also centered        | 20     |
-| text 3   | and this is centered | 300    |
-
-[^1]: Use `[^N]` (for increasing `N` values) to mark "footnote #N" in text, as shown above. This is an example footnote with a link to it from above, and a link at the end of the footnote to go back to the point in the text (the "curled" arrow). **WARNING**, you must include the colon in the footnote definition as shown here, `[^1]:`.
-[^2]: A second example footnote. Note that you don't need to put a blank line between them; they work like lists.
-
-<!-- 
-Use the following construct anywhere in the page to automatically
-show a table of contents for the sections on the page. This is 
-_different_ than a list of child pages (i.e., separate markdown files).
-That list is always shown at the bottom automatically, as defined in
-the default.html template file.
--->
 
 ---
 

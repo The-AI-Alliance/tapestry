@@ -1,14 +1,12 @@
 ![The AI Alliance banner](https://the-ai-alliance.github.io/assets/images/ai-alliance-logo-horiz-pos-blue-cmyk-trans.png)
 
-# README for Tapestry Initiative
+# README for Project Tapestry
 
-[Published Documentation](https://the-ai-alliance.github.io/tapestry/)
+> [Published website](https://the-ai-alliance.github.io/tapestry/)
 
-This repo contains the code and documentation for the AI Alliance: Tapestry Initiative.
+This repo contains the code and documentation for the AI Alliance, Project Tapestry. See the [published website](https://the-ai-alliance.github.io/tapestry/) for project details. 
 
-TODO - Describe this project
-
-See the [documentation](https://the-ai-alliance.github.io/tapestry/) for details. The rest of this README provides information for contributors, developers, and users of this project repo.
+The rest of this README provides information for contributors, developers, and users of this repository.
 
 ## Getting Involved
 
