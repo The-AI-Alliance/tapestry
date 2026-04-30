@@ -27,6 +27,14 @@ We discuss these steps in more depth [below](#setup-jekyll), but the following s
 
 Install a recent version of Ruby 3. Note that on MacOS, the default Ruby installation is old, version 2.6.10. Installing Ruby will also install the `gem` dependency tool.
 
+> [!WARNING]
+> Ruby version 4+ releases are not supported by GitHub pages. Use the latest version 3 release (3.3.5 at the time of this writing). If you use Homebrew:
+> ```shell
+> brew install ruby@3.3.5
+> ```
+> If you need to use multiple versions of Ruby for your work, consider 
+> using a tool like `chruby` or others discussed on the [Ruby installation](https://www.ruby-lang.org/en/documentation/installation/)web page.
+
 This project's `Makefile` will attempt to install the remaining dependencies, including `jekyll`, when you run `make all` or `make view-local`.
 
 > [!WARNING]
