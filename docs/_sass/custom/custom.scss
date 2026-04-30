@@ -105,6 +105,20 @@ Based on .site-header, but more flexible.
   }  
 }
 
+img.tapestry-image {
+  max-width: 500px;
+  text: center;
+  border: 1px solid grey;
+}
+
+img.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 50%;  
+}
+
+
 /* Buttons used at the tops of pages. */
 
 .header-btns {
