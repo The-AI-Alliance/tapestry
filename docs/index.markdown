@@ -7,42 +7,38 @@ has_children: false
 
 # Project Tapestry
 
-Welcome to **The AI Alliance Project Tapestry**. 
+Welcome to **The AI Alliance Project Tapestry** technical repo, where technical documentation and code for _Project Tapestry_ are managed. 
 
-The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-project-tapestry-to-build-a-collaborative-foundation-for-open-and-sovereign-ai){:target="blog"} _Project Tapestry_ to build a collaborative foundation for open and sovereign AI. Project Tapestry will be an open-source platform designed to enable globally federated development of frontier open models while preserving sovereignty, local control, and long-term independence.
+For a general introduction to Tapestry, including its motivations and goals, see the [AI Alliance website Tapestry page](https://events.thealliance.ai/tapestry){:target="aia-tapestry"}
 
-Turing Award winner [Yann LeCun](https://en.wikipedia.org/wiki/Yann_LeCun){:target="yc"} is the Chief Science Advisor to the AI Alliance and Project Tapestry.
-
-{: .attention }
+The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-project-tapestry-to-build-a-collaborative-foundation-for-open-and-sovereign-ai){:target="blog"} _Project Tapestry_ to build a collaborative foundation for open and sovereign AI. Project Tapestry is an open-source platform designed to enable globally federated development of frontier open models while preserving sovereignty, local control, and long-term independence.
 
 {: .note }
 > * **Join Us!** We are looking for collaborators. See our [contributing]({{site.baseurl}}/contributing) page for details.
 > * Use the search box at the top of this page to find specific content.
 > * The links for Capitalized Terms go to [this glossary]({{site.glossaryurl}}){:target="_glossary"}.
  
-## Why Project Tapestry?
-
-Today, open-weight AI models are everywhere. But open weights alone do not make pretraining _participatory_. The infrastructure, data pipelines, and design decisions behind these models remain concentrated in a small number of companies and regions. Most of the world downloads the resulting models, but almost no one shapes the process of building them. Yann LeCun calls this the central challenge of the next era of AI development.
-
-Project Tapestry offers a new path for advanced AI development, built on advances in distributed training, which have demonstrated that globally federated model development can match synchronous baselines. Project Tapestry enables institutions, industries, and nations to co-train a shared, open-foundation model, while retaining control of their data and the ability to build sovereign derivatives aligned to their own priorities and requirements.
-
-With Project Tapestry, the AI Alliance aims to create a new path for advanced AI development, one in which institutions, industries, and nations can join together to contribute to build more capable and open base models, while retaining control of their data and the ability to build on the base models to produce sovereign, derivative models aligned to their own priorities, industries, culture, laws, and values.
-
-![Project Tapestry Platform Architecture]({{site.baseurl}}/assets/images/Tapestry-Cube-Graphics.webp)
-
-<center><strong>Figure 1:</strong> Project Tapestry and Yann Lecun.</center>
-
-## Frontier Open Models without Centralizing Data and Compute
-
-Today, the development of the most capable AI models is increasingly concentrated within a small number of companies and regions. Open-weight models have expanded access, but core decisions about training data, model objectives, architecture, and evaluation typically remain concentrated within the institutions that originate them. At the same time, many sovereign AI model efforts face steep barriers in compute, funding, data access, and specialized talent.
-
-Project Tapestry offers a alternative: a collaborative approach to AI model development in which participants can help build a shared open foundation without surrendering their data, strategic autonomy, or downstream control. Project Tapestry's long-term vision is to develop an open, global model family, a shared open source base foundation model family that can draw on broader pools of expertise, compute, and domain knowledge than any single organization can typically assemble alone, while enabling participants to create sovereign derivative models tailored to their own societal, industrial, scientific, or mission-specific needs, and aligned to their own governance frameworks, languages, values, and priorities.
-
-## From Launch to Global Technical Mobilization
-
-Over time, the AI Alliance expects Project Tapestry to foster a vibrant and enduring ecosystem of collaborative, sovereignty-preserving model building and application development. The AI Alliance’s 501(c)(3) nonprofit research organization will serve as the community home for Project Tapestry. It will host and support the Project Tapestry platform and open source technical assets including models that the AI Alliance develops with the platform. Project Tapestry will be governed by a board of representatives from major contributing organizations globally.
+This website is for technical contributors. As Project Tapestry evolves, this website will provide links to technical requirements, architecture and design documentation, and implementation source code.
 
 Watch for announcements over the coming months about Project Tapestry’s architecture, roadmap, and model development priorities. 
+
+## Project Tapestry Work Groups
+
+Tapestry is designed with data sovereignty requirements first and foremost, leading to new approaches for distributed model training to build world-class foundation models, as well as support tuning domain-specific models using sensitive data with carefully governed  access. 
+
+The following work groups are being organized to identify the requirements and architectural decisions. [Participation is welcome!]({{site.baseurl}}/contributing)
+
+### Data Sovereignty and Governance Work Group
+
+This work group is identifying the stakeholder requirements for data sovereignty and how data will be governed. For example, many countries have laws preventing &ldquo;exfiltration&rdquo; of sensitive data about citizens outside their borders. How should Project Tapestry support legal use of such data while ensuring legal compliance? This work group will also identify relevant existing technologies and areas where research and development are required.
+
+### Distributed Model Training and Tuning Work Group
+
+There has been a lot of research work on the feasibility of distributed model training. This work group is identifying the requirements for distributed training and tuning, especially unique requirements for preserving sovereignty. This work group will also identify relevant existing technologies and areas where research and development are required.
+
+### Evaluation Work Group
+
+This is a proposed work group to explore requirements for evaluation of conventional performance metrics, as well as compliance with sovereignty requirements. This work group will be responsible for determining how to measure conformance to requirements identified by the other work groups.
 
 ## Additional links
 
