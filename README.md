@@ -4,11 +4,22 @@
 
 > [Published website](https://the-ai-alliance.github.io/tapestry/)
 
-This repo contains the technical documentation and code for the AI Alliance, Project Tapestry. See the [AI Alliance website Tapestry page](https://events.thealliance.ai/tapestry){:target="aia-tapestry"} for an overview of Project Tapestry and this repo's [published website](https://the-ai-alliance.github.io/tapestry/) for project technical details. 
+This repo contains the technical documentation and code for the AI Alliance, Project Tapestry. See the [AI Alliance website Tapestry page](https://events.thealliance.ai/tapestry){:target="aia-tapestry"} for an overview of Project Tapestry and this repo's [technical website](https://the-ai-alliance.github.io/tapestry/) for project technical details. 
 
 The rest of this README provides information for contributors, developers, and users of this repository.
 
 ## Getting Involved
+
+Several work groups are being organized to identify requirements and work on the overall architecture and design vision, followed by implementation of the platform. The [technical website](https://the-ai-alliance.github.io/tapestry/) provides more details. 
+
+* Data Sovereignty and Governance Work Group
+	* Define data sovereignty and the requirements that meet our goals.
+* Distributed Model Training and Tuning Work Group
+	* What distributed training platform is required to build models while meeting sovereignty goals.
+* Evaluation Work Group
+	* How do evaluate conventional performance metrics for models, as well as compliance with sovereignty requirements?
+
+### Ways to Contribute
 
 We welcome contributions as PRs. Please see our [Alliance community repo](https://github.com/The-AI-Alliance/community/) for general information about contributing to any of our projects. This section provides some specific details you need to know.
 
