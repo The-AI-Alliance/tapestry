@@ -4,9 +4,9 @@ Thumbs.db
 tmp/
 temp/
 Gemfile.lock
-docs/.jekyll-metadata
-docs/.sass-cache/
-docs/_site/
+.jekyll-metadata
+.sass-cache/
+_site/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
