@@ -8,7 +8,33 @@ This repo contains the code and technical documentation for the AI Alliance, [Pr
 
 ![Project Tapestry Image](docs/assets/images/03-tapestry-logo-1000x545.png)
 
-The rest of this README provides information for contributors, developers, and users of this repository.
+The rest of this README provides a technical overview of Tapestry and information for contributors, developers, and users of this repository.
+
+## 🏗️ How It Works
+
+```mermaid
+graph LR
+    TG["TAPESTRY-GLOBAL<br/>Base Model"] --> NS["National<br/>Sovereignty"]
+    TG --> CS["Cultural<br/>Sovereignty"]
+    TG --> ES["Enterprise<br/>Sovereignty"]
+    NS --> G7["🇫🇷 🇯🇵 🇰🇷 🇻🇳 🇨🇦<br/>Initial Coalition"]
+    CS --> PA["Performance<br/>Advantage"]
+    ES --> PA
+    style TG fill:#dc2626,stroke:#b91c1c,color:#fff
+    style PA fill:#059669,stroke:#047857,color:#fff
+```
+
+([JPEG]({{site.baseurl}}/assets/images/tapestry-pillars.jpg))
+
+**Federated Training**: Data stays in-country → Encrypted updates improve global model → 15%+ gains on cultural tasks
+
+### What Makes TAPESTRY Unbeatable
+
+- ✅ **Unique Data Access**: Public sector data (healthcare, education, governance) that centralized models cannot legally access.
+- ✅ **Performance Edge**: 15%+ gains on culturally-specific tasks through sovereign data + cultural alignment.
+- ✅ **Federated Architecture**: Encrypted training without centralizing sensitive data.
+- ✅ **Global Coalition**: France, Japan, South Korea, Vietnam, Canada leading initial deployment (not G7-exclusive).
+
 
 ## Getting Involved
 
