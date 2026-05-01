@@ -172,7 +172,6 @@ location and delete uv.
 
 endef
 
-
 .PHONY: view-pages view-local
 .PHONY: setup-jekyll run-jekyll
 
