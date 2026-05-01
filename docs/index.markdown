@@ -7,7 +7,7 @@ has_children: false
 
 # Project Tapestry
 
-Welcome to **The AI Alliance Project Tapestry** technical repo, where technical documentation and code for _Project Tapestry_ are managed. 
+Welcome to **The AI Alliance Project Tapestry** [technical repository](https://github.com/The-AI-Alliance/tapestry){:target="repo"}, where technical documentation and code for [Project Tapestry](https://events.thealliance.ai/tapestry){:target="aia-tapestry"} are managed. 
 
 For a general introduction to Tapestry, including its motivations and goals, see the [AI Alliance website Tapestry page](https://events.thealliance.ai/tapestry){:target="aia-tapestry"}
 
