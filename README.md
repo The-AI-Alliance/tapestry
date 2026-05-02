@@ -174,7 +174,7 @@ uv run ty --watch src
 
 ### Before You Submit a PR...
 
-Please run the tests, format, lint, and type checking commands and makes sure everything passes cleanly! Using `make before-pr`:
+Please run the tests, format, lint, and type checking commands and makes sure everything passes cleanly! Use the convenient command, `make before-pr`, or run the individual commands above:
 
 ```shell
 make before-pr   # Equivalent to 'make tests format lint type-check'
@@ -184,7 +184,7 @@ make before-pr   # Equivalent to 'make tests format lint type-check'
 
 The directory structure is as follows. 
 
-The code is organizaed into major _subsystems_: 
+The code is organized into major _subsystems_: 
 * `data` for all data governance and management capabilities.
 * `training` for all distributed training and tuning capabilities.
 * `infrastructure` for all underlying infrastructure.
