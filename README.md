@@ -10,6 +10,23 @@ This repo contains the code and technical documentation for the AI Alliance, [Pr
 
 The rest of this README provides a technical overview of Tapestry and information for contributors, developers, and users of this repository.
 
+## What Is Project Tapestry?
+
+The vision, motivations, and goals for Project Tapestry are described [here](https://events.thealliance.ai/tapestry). In a nutshell, Project Tapestry seeks to build a globally-distributed effort to train and tune state-of-the-art foundation models with full support for the requirements of three pillars of _sovereignty_:
+
+1. **National Sovereignty** - *Geopolitical Control*
+	* Data stays in-country
+	* Compute and storage nodes operate under national law
+	* Public sector data access
+1. **Cultural Sovereignty** - *Values Alignment*
+	* [Constitutional AI](https://constitutional.ai/) customized per culture
+	* Community participation
+	* Sacred knowledge protection
+3. **Industrial Sovereignty** - *Domain Independence*
+	* 1000+ specialized model variants
+	* On-premise deployment
+	* Institution-specific optimization
+
 ## 🏗️ How It Works
 
 ```mermaid
