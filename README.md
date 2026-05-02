@@ -16,7 +16,7 @@ The vision, motivations, and goals for Project Tapestry are described [here](htt
 
 1. **National Sovereignty** - *Geopolitical Control*
 	* Data stays in-country
-	* Compute and storage nodes operate under national law
+	* Compute and storage _nodes_ operate under national law
 	* Public sector data access
 1. **Cultural Sovereignty** - *Values Alignment*
 	* [Constitutional AI](https://constitutional.ai/) customized per culture
@@ -41,25 +41,29 @@ graph LR
     style PA fill:#059669,stroke:#047857,color:#fff
 ```
 
-([JPEG]({{site.baseurl}}/assets/images/tapestry-pillars.jpg))
+([JPEG](docs/assets/images/tapestry-pillars.jpg))
 
-**Federated Training**: Data stays in-country → Encrypted updates improve global model → 15%+ gains on cultural tasks
+**Federated Training**: Data stays in-country → Encrypted updates improve global model → 15%+ gains on culturally-specific tasks.
 
 ### What Makes TAPESTRY Unbeatable
 
 - ✅ **Unique Data Access**: Public sector data (healthcare, education, governance) that centralized models cannot legally access.
 - ✅ **Performance Edge**: 15%+ gains on culturally-specific tasks through sovereign data + cultural alignment.
 - ✅ **Federated Architecture**: Encrypted training without centralizing sensitive data.
-- ✅ **Global Coalition**: France, Japan, South Korea, Vietnam, Canada leading initial deployment (not G7-exclusive).
+- ✅ **Global Coalition**: Participation of many countries around the world.
 
 
 ## Getting Involved
 
-Several work groups are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are to be announced. The work group documentation is found under the [`work-groups`](work-groups) directory.
+Several work groups are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details will be announced soon.
 
-We welcome contributions as PRs, etc. See [More about Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
+[Use this form](https://events.thealliance.ai/tapestry#Form) to let us know your interests in being involved. We need contributions from ML researchers working on all aspects of federated learning and training, systems engineers with experience with large-scale GPU clusters, compute providers, e.g., cloud, sovereign cloud, or national HPC centers, government and policy leaders responsible for national AI strategies, universities and research labs with multilingual, domain-specific, or institutional datasets, and software engineers to help us implement Project Tapestry.
+
+We also welcome contributions to this repository of code, requirements, etc. using [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [discussion topics](https://github.com/The-AI-Alliance/tapestry/discussions), and [issues](https://github.com/The-AI-Alliance/tapestry/issues). For example, the in-progress documents for the work groups, etc. can found under the [`tech-docs`](tech-docs) directory. See [More About Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
 
 ## Development
+
+If you want to work with the Project Tapestry code, here is how to get started.
 
 ### Setup
 
@@ -79,7 +83,7 @@ On Windows:
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-The rest of the steps are partially automated using `make`. Try the following:
+The rest of the steps are partially automated using `make`, although `make` is not required. Try the following:
 
 ```shell
 make one-time-setup
@@ -165,6 +169,14 @@ make type-check-watch
 uv run ty --watch src
 ```
 
+### Before You Submit a PR...
+
+Please run the tests, format, lint, and type checking commands and makes sure everything passes cleanly! Using `make before-pr`:
+
+```shell
+make before-pr   # Equivalent to 'make tests format lint type-check'
+```
+
 ## Project Structure
 
 The structure is as follows, where three major _subsystems_ are managed: 
@@ -188,11 +200,11 @@ tapestry/
 
 <a id="getting-involved-anchor"></a>
 
-## Getting Involved
+## More About Getting Involved
 
-We welcome contributions as PRs, either to our code examples or our user guide. Please see our [Alliance community repo](https://github.com/The-AI-Alliance/community/) for general information about contributing to any of our projects. This section provides some specific details you need to know.
+We welcome contributions as PRs to this repository. Please see our [Alliance community repo](https://github.com/The-AI-Alliance/community/) for general information about contributing to any of our projects. This section provides some specific details you need to know.
 
-In particular, see the AI Alliance [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) instructions. You will need to agree with the AI Alliance [Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md).
+First, see the AI Alliance [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) instructions. You will need to agree with the AI Alliance [Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md).
 
 ### Licenses
 
@@ -207,13 +219,10 @@ We use the "Developer Certificate of Origin" (DCO).
 > [!WARNING]
 > Before you make any git commits with changes, understand what's required for DCO.
 
-See the Alliance contributing guide [section on DCO](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md#developer-certificate-of-origin) for details. In practical terms, supporting this requirement means you must use the `-s` flag with your `git commit` commands.
+See the Alliance contributing guide [section on DCO](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md#developer-certificate-of-origin) for details. In practical terms, supporting this requirement means you must use the `-s` flag with your `git commit` commands. 
 
 ## About the Technical Website
 
-The website for this repo is found in the `docs` directory. It is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). We use the [Just the Docs](https://just-the-docs.github.io/just-the-docs/) Jekyll theme.
+The website for this repository, where some technical content will be published, is found in the `docs` directory. It is published as [GitHub Pages](https://pages.github.com/) using [Jekyll](https://github.com/jekyll/jekyll).
 
 See [GITHUB_PAGES.md](GITHUB_PAGES.md) for more information.
-
-> [!NOTE]
-> As described above, all documentation is licensed under Creative Commons Attribution 4.0 International. See [LICENSE.CC-BY-4.0](LICENSE.CC-BY-4.0).

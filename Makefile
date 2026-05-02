@@ -55,6 +55,7 @@ make lint               # Lint the Python code with 'ruff' and 'pylint.
 make type-check         # Type check the Python code with 'ty'.
 make type-check-watch   # Type check the Python code with 'ty' in "watch" mode,
                         # so you can fix mistakes and keep it updating.
+make before-pr          # Make tests, format, lint, and type-check. Do this before submitting a PR!
 
 For the documentation website:
 
@@ -107,6 +108,8 @@ print-info:
 	@echo "Website files:       ${DOCS_DIR}"
 	@echo "JEKYLL_PORT:         ${JEKYLL_PORT}"
 
+.PHONY: before-pr
+before-pr:: tests format lint type-check
 
 .PHONY: tests unit-tests
 tests:: unit-tests
