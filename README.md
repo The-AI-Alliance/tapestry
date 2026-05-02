@@ -12,7 +12,7 @@ The rest of this README provides a technical overview of Tapestry and informatio
 
 ## What Is Project Tapestry?
 
-The vision, motivations, and goals for Project Tapestry are described [here](https://events.thealliance.ai/tapestry). In a nutshell, Project Tapestry seeks to build a globally-distributed effort to train and tune state-of-the-art foundation models with full support for the requirements of three pillars of _sovereignty_:
+The vision, motivations, and goals for Project Tapestry are described [here](https://events.thealliance.ai/tapestry). In a nutshell, Project Tapestry is building a collaborative foundation for open and sovereign AI. It is an open-source platform designed to enable globally federated development of frontier, open models while preserving sovereignty, local control, and long-term independence. We identify three pillars of _sovereignty_:
 
 1. **National Sovereignty** - *Geopolitical Control*
 	* Data stays in-country
@@ -27,7 +27,7 @@ The vision, motivations, and goals for Project Tapestry are described [here](htt
 	* On-premise deployment
 	* Institution-specific optimization
 
-## 🏗️ How It Works
+### 🏗️ How It Works
 
 ```mermaid
 graph LR
@@ -120,7 +120,7 @@ uv pip install -e .         # minimum dependencies
 We use [unittest](https://docs.python.org/3/library/unittest.html) and [hypothesis](https://hypothesis.readthedocs.io/en/latest/) for testing. The easiest way to run the test suite is using `make`:
 
 ```shell
-make unit-tests # or just tests; they are currently the same.
+make tests # or unit-tests; they are currently the same.
 ```
 
 This runs the following commands, which you can run yourself if you prefer:
@@ -139,6 +139,7 @@ Use _either_ of the following commands to format the Python code with `black`:
 
 ```shell
 make format
+# or
 uv run black src
 ```
 
@@ -159,6 +160,7 @@ Use _either_ of the following commands to type check the Python code with `ty`:
 
 ```shell
 make type-check
+# or
 uv run ty src
 ```
 
@@ -166,6 +168,7 @@ There is also a "watch" option that keeps `ty` running as you fix mistakes and s
 
 ```shell
 make type-check-watch
+# or
 uv run ty --watch src
 ```
 
@@ -179,23 +182,43 @@ make before-pr   # Equivalent to 'make tests format lint type-check'
 
 ## Project Structure
 
-The structure is as follows, where three major _subsystems_ are managed: 
+The directory structure is as follows. 
+
+The code is organizaed into major _subsystems_: 
 * `data` for all data governance and management capabilities.
 * `training` for all distributed training and tuning capabilities.
 * `infrastructure` for all underlying infrastructure.
+
+The technical documentation is organized into sections on the strategic plan, reference information, and work groups.
+
+The details shown here are preliminary and subject to change:
 
 ```
 tapestry/
 ├── src/
 │   └── tapestry/
 │       └── data/
-│       └── training/
+│       └── evaluation/
+│       └── model-training/
 │       └── infrastructure/
 │   └── tests
 │       └── tapestry/
 │           └── data/
-│           └── training/
+│           └── evaluation/
+│           └── model-training/
 │           └── infrastructure/
+├── tech-docs/
+│   └── strategic-plan/
+│   └── tapestry-reference/
+│   └── work-groups/
+│       └── data-engineering/
+│       └── data-requirements/
+│       └── evaluation-engineering/
+│       └── evaluation-requirements/
+│       └── infrastructure-engineering/
+│       └── infrastructure-requirements/
+│       └── model-training-engineering/
+│       └── model-training-requirements/
 ```
 
 <a id="getting-involved-anchor"></a>

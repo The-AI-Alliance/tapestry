@@ -9,11 +9,12 @@ has_children: false
 
 Welcome to the technical website for **The AI Alliance Project Tapestry**, representing the content from the [technical documentation and code repository](https://github.com/The-AI-Alliance/tapestry){:target="repo"} for [Project Tapestry](https://events.thealliance.ai/tapestry){:target="aia-tapestry"}. 
 
-For a general introduction to Project Tapestry, including its motivations and goals, see the [AI Alliance website Tapestry page](https://events.thealliance.ai/tapestry){:target="aia-tapestry"}
+{: .attention}
+> For a general introduction to Project Tapestry, including its motivations and goals, see the [AI Alliance website Tapestry page](https://events.thealliance.ai/tapestry){:target="aia-tapestry"}
 
 ![Project Tapestry Image]({{site.baseurl}}/assets/images/03-tapestry-logo-1000x545.png){: .tapestry-image .center}
 
-The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-project-tapestry-to-build-a-collaborative-foundation-for-open-and-sovereign-ai){:target="blog"} Project Tapestry to build a collaborative foundation for open and sovereign AI. Project Tapestry is an open-source platform designed to enable globally federated development of frontier open models while preserving sovereignty, local control, and long-term independence.
+The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-project-tapestry-to-build-a-collaborative-foundation-for-open-and-sovereign-ai){:target="blog"} Project Tapestry to build a collaborative foundation for open and sovereign AI. Project Tapestry is an open-source platform designed to enable globally federated development of frontier, open models while preserving sovereignty, local control, and long-term independence.
 
 {: .note }
 > * **Join Us!** We are looking for collaborators. See our [contributing]({{site.baseurl}}/contributing) page for details.
