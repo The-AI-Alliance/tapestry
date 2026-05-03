@@ -10,6 +10,24 @@ This repo contains the code and technical documentation for the AI Alliance, [Pr
 
 The rest of this README provides information for contributors, developers, and users of this repository.
 
+## Why This Matters
+
+Two structural problems define today's AI landscape — and Tapestry exists to solve both simultaneously.
+
+**Performance without trust is a dead end.** Sovereign nations, industries, and communities will not adopt AI systems that underperform on their languages, legal contexts, and domain knowledge. Tapestry's thesis is that sovereignty *is* the performance strategy: access to sovereign public-sector data, cultural alignment, and domain specialization produce advantages that centralized models cannot replicate. A healthcare AI that a French doctor does not trust for French patients will not be adopted, regardless of its benchmark scores.
+
+**AI that can be taken away is not AI you can depend on.** Countries, enterprises, and individuals need AI infrastructure they own and control — with guaranteed data residency, the right to exit, and the ability to operate independently. Tapestry provides this across three sovereignty levels: national (data residency, island mode, 72-hour exit), socio-cultural (constitutional AI, sacred knowledge protections, community review), and industrial (on-premise deployment, proprietary data isolation, domain specialization).
+
+## Where to Start
+
+| If you want to... | Go to |
+|---|---|
+| Understand the vision and goals | [tech-docs/strategic-plan/VISION.md](tech-docs/strategic-plan/VISION.md) |
+| Read the full requirements | [tech-docs/strategic-plan/PRD.md](tech-docs/strategic-plan/PRD.md) |
+| Understand the architecture | [tech-docs/tapestry-reference/ARCHITECTURE.md](tech-docs/tapestry-reference/ARCHITECTURE.md) |
+| Find a work group to join | [tech-docs/work-groups/README.md](tech-docs/work-groups/README.md) |
+| Set up a dev environment | [Development](#development) below |
+
 ## Getting Involved
 
 Several work groups are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are to be announced. The work group documentation is found under the [`work-groups`](work-groups) directory.
