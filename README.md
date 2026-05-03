@@ -1,14 +1,10 @@
 ![The AI Alliance banner](https://the-ai-alliance.github.io/assets/images/ai-alliance-logo-horiz-pos-blue-cmyk-trans.png)
 
-# README for Project Tapestry - Technical Repo
+# Project Tapestry
 
-> [Technical website](https://the-ai-alliance.github.io/tapestry/)
-
-This repo contains the code and technical documentation for the AI Alliance, [Project Tapestry](https://events.thealliance.ai/tapestry). 
+> [Technical website](https://the-ai-alliance.github.io/tapestry/) · [Project page](https://events.thealliance.ai/tapestry)
 
 ![Project Tapestry Image](docs/assets/images/03-tapestry-logo-1000x545.png)
-
-The rest of this README provides information for contributors, developers, and users of this repository.
 
 ## Why This Matters
 
@@ -27,12 +23,6 @@ Two structural problems define today's AI landscape — and Tapestry exists to s
 | Understand the architecture | [tech-docs/tapestry-reference/ARCHITECTURE.md](tech-docs/tapestry-reference/ARCHITECTURE.md) |
 | Find a work group to join | [tech-docs/work-groups/README.md](tech-docs/work-groups/README.md) |
 | Set up a dev environment | [Development](#development) below |
-
-## Getting Involved
-
-Several work groups are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are to be announced. The work group documentation is found under the [`work-groups`](work-groups) directory.
-
-We welcome contributions as PRs, etc. See [More about Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
 
 ## Development
 
