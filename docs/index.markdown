@@ -3,6 +3,7 @@ layout: default
 title: Home
 nav_order: 10
 has_children: false
+work_groups: https://github.com/The-AI-Alliance/tapestry/tree/main/tech-docs/work-groups/
 ---
 
 # Project Tapestry: Technical Website
@@ -39,10 +40,10 @@ These groups identify and prioritize what Tapestry must do.
 
 | Work Group | Focus |
 |---|---|
-| [Data Requirements]({{site.baseurl}}/tech-docs/work-groups/data-requirements/) | Data sovereignty, governance, and management requirements across national, cultural, and industrial sovereignty |
-| [Model Training Requirements]({{site.baseurl}}/tech-docs/work-groups/model-training-requirements/) | Federated and distributed training requirements that satisfy data sovereignty constraints |
-| [Evaluation Requirements]({{site.baseurl}}/tech-docs/work-groups/evaluation-requirements/) | Evaluation frameworks for both performance and sovereignty compliance |
-| [Infrastructure Requirements]({{site.baseurl}}/tech-docs/work-groups/infrastructure-requirements/) | Infrastructure requirements for sovereign node deployment and federated operation |
+| [Data Requirements]({{page.work_groups}}/data-requirements/){:target="repo-tech-docs"} | Data sovereignty, governance, and management requirements across national, cultural, and industrial sovereignty |
+| [Model Training Requirements]({{page.work_groups}}/model-training-requirements/){:target="repo-tech-docs"} | Federated and distributed training requirements that satisfy data sovereignty constraints |
+| [Evaluation Requirements]({{page.work_groups}}/evaluation-requirements/){:target="repo-tech-docs"} | Evaluation frameworks for both performance and sovereignty compliance |
+| [Infrastructure Requirements]({{page.work_groups}}/infrastructure-requirements/){:target="repo-tech-docs"} | Infrastructure requirements for sovereign node deployment and federated operation |
 
 ### Engineering Work Groups
 
@@ -50,10 +51,10 @@ These groups design and implement what the requirements groups specify.
 
 | Work Group | Focus |
 |---|---|
-| [Data Engineering]({{site.baseurl}}/tech-docs/work-groups/data-engineering/) | Data pipelines, sovereignty enforcement, and data management infrastructure |
-| [Model Training Engineering]({{site.baseurl}}/tech-docs/work-groups/model-training-engineering/) | Federated training stack, privacy-preserving aggregation, and distributed training infrastructure |
-| [Evaluation Engineering]({{site.baseurl}}/tech-docs/work-groups/evaluation-engineering/) | Evaluation tooling for domain performance and sovereignty compliance |
-| [Infrastructure Engineering]({{site.baseurl}}/tech-docs/work-groups/infrastructure-engineering/) | Sovereign node infrastructure, deployment tooling, and operational systems |
+| [Data Engineering]({{page.work_groups}}/data-engineering/){:target="repo-tech-docs"} | Data pipelines, sovereignty enforcement, and data management infrastructure |
+| [Model Training Engineering]({{page.work_groups}}/model-training-engineering/){:target="repo-tech-docs"} | Federated training stack, privacy-preserving aggregation, and distributed training infrastructure |
+| [Evaluation Engineering]({{page.work_groups}}/evaluation-engineering/){:target="repo-tech-docs"} | Evaluation tooling for domain performance and sovereignty compliance |
+| [Infrastructure Engineering]({{page.work_groups}}/infrastructure-engineering/){:target="repo-tech-docs"} | Sovereign node infrastructure, deployment tooling, and operational systems |
 
 ## Additional links
 
