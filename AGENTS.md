@@ -4,7 +4,7 @@ Quick-start guidance for AI agents working in this repository.
 
 ## Project snapshot
 
-`tapestry` is the AI Alliance's [Project Tapestry](http://thealliance.ai/projects/tapestry)
+`tapestry` is the AI Alliance's [Project Tapestry](https://thealliance.ai/projects/tapestry)
 technical repo. It is a Python 3 project (managed with [`uv`](https://docs.astral.sh/uv/))
 organized around three subsystems plus a published technical website:
 
