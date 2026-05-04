@@ -145,14 +145,12 @@ make before-pr   # Equivalent to 'make tests format lint type-check'
 
 ## Project Structure
 
-The directory structure is as follows. 
+The directory structure is divided in directories for code and related artifacts, and technical documentation. Both reflect the major _subsystems_: 
 
-The code is organized into major _subsystems_: 
 * `data` for all data governance and management capabilities.
+* `evaluation` for all aspects of evaluating successful implementation of requirements.
 * `training` for all distributed training and tuning capabilities.
 * `infrastructure` for all underlying infrastructure.
-
-The technical documentation is organized into sections on the strategic plan, reference information, and work groups.
 
 The details shown here are preliminary and subject to change:
 
@@ -171,9 +169,10 @@ tapestry/
 │           └── model-training/
 │           └── infrastructure/
 ├── tech-docs/
-│   └── strategic-plan/
-│   └── tapestry-reference/
-│   └── work-groups/
+│   └── adr/                              # Architecture decision records
+│   └── strategic-plan/                   # Vision, PRD, etc.
+│   └── tapestry-reference/               # Overall architecture and design
+│   └── work-groups/                      # Work groups dedicated to each area
 │       └── data-engineering/
 │       └── data-requirements/
 │       └── evaluation-engineering/
@@ -183,6 +182,9 @@ tapestry/
 │       └── model-training-engineering/
 │       └── model-training-requirements/
 ```
+
+The technical documentation is organized into sections on the strategic plan, reference information, and work groups.
+
 
 ## Architectural Decision Records (ADRs)
 
