@@ -3,17 +3,19 @@ layout: default
 title: Home
 nav_order: 10
 has_children: false
+work_groups: https://github.com/The-AI-Alliance/tapestry/tree/main/tech-docs/work-groups/
 ---
 
 # Project Tapestry: Technical Website
 
 Welcome to the technical website for **The AI Alliance Project Tapestry**, representing the content from the [technical documentation and code repository](https://github.com/The-AI-Alliance/tapestry){:target="repo"} for [Project Tapestry](https://events.thealliance.ai/tapestry){:target="aia-tapestry"}. 
 
-For a general introduction to Project Tapestry, including its motivations and goals, see the [AI Alliance website Tapestry page](https://events.thealliance.ai/tapestry){:target="aia-tapestry"}
+{: .attention}
+> For a general introduction to Project Tapestry, including its motivations and goals, see the [AI Alliance website Tapestry page](https://events.thealliance.ai/tapestry){:target="aia-tapestry"}
 
 ![Project Tapestry Image]({{site.baseurl}}/assets/images/03-tapestry-logo-1000x545.png){: .tapestry-image .center}
 
-The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-project-tapestry-to-build-a-collaborative-foundation-for-open-and-sovereign-ai){:target="blog"} Project Tapestry to build a collaborative foundation for open and sovereign AI. Project Tapestry is an open-source platform designed to enable globally federated development of frontier open models while preserving sovereignty, local control, and long-term independence.
+The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-project-tapestry-to-build-a-collaborative-foundation-for-open-and-sovereign-ai){:target="blog"} Project Tapestry to build a collaborative foundation for open and sovereign AI. Project Tapestry is an open-source platform designed to enable globally federated development of frontier, open models while preserving sovereignty, local control, and long-term independence.
 
 **Why this matters:** People will not use models that underperform on their language, legal context, and domain knowledge. And countries, enterprises, and individuals need AI infrastructure they own and control — with guaranteed data residency, the right to exit, and the ability to operate independently. Tapestry addresses both problems simultaneously: sovereignty is the performance strategy, not a trade-off against it.
 
@@ -38,10 +40,10 @@ These groups identify and prioritize what Tapestry must do.
 
 | Work Group | Focus |
 |---|---|
-| [Data Requirements]({{site.baseurl}}/tech-docs/work-groups/data-requirements/) | Data sovereignty, governance, and management requirements across national, cultural, and industrial sovereignty |
-| [Model Training Requirements]({{site.baseurl}}/tech-docs/work-groups/model-training-requirements/) | Federated and distributed training requirements that satisfy data sovereignty constraints |
-| [Evaluation Requirements]({{site.baseurl}}/tech-docs/work-groups/evaluation-requirements/) | Evaluation frameworks for both performance and sovereignty compliance |
-| [Infrastructure Requirements]({{site.baseurl}}/tech-docs/work-groups/infrastructure-requirements/) | Infrastructure requirements for sovereign node deployment and federated operation |
+| [Data Requirements]({{page.work_groups}}/data-requirements/){:target="repo-tech-docs"} | Data sovereignty, governance, and management requirements across national, cultural, and industrial sovereignty |
+| [Model Training Requirements]({{page.work_groups}}/model-training-requirements/){:target="repo-tech-docs"} | Federated and distributed training requirements that satisfy data sovereignty constraints |
+| [Evaluation Requirements]({{page.work_groups}}/evaluation-requirements/){:target="repo-tech-docs"} | Evaluation frameworks for both performance and sovereignty compliance |
+| [Infrastructure Requirements]({{page.work_groups}}/infrastructure-requirements/){:target="repo-tech-docs"} | Infrastructure requirements for sovereign node deployment and federated operation |
 
 ### Engineering Work Groups
 
@@ -49,10 +51,10 @@ These groups design and implement what the requirements groups specify.
 
 | Work Group | Focus |
 |---|---|
-| [Data Engineering]({{site.baseurl}}/tech-docs/work-groups/data-engineering/) | Data pipelines, sovereignty enforcement, and data management infrastructure |
-| [Model Training Engineering]({{site.baseurl}}/tech-docs/work-groups/model-training-engineering/) | Federated training stack, privacy-preserving aggregation, and distributed training infrastructure |
-| [Evaluation Engineering]({{site.baseurl}}/tech-docs/work-groups/evaluation-engineering/) | Evaluation tooling for domain performance and sovereignty compliance |
-| [Infrastructure Engineering]({{site.baseurl}}/tech-docs/work-groups/infrastructure-engineering/) | Sovereign node infrastructure, deployment tooling, and operational systems |
+| [Data Engineering]({{page.work_groups}}/data-engineering/){:target="repo-tech-docs"} | Data pipelines, sovereignty enforcement, and data management infrastructure |
+| [Model Training Engineering]({{page.work_groups}}/model-training-engineering/){:target="repo-tech-docs"} | Federated training stack, privacy-preserving aggregation, and distributed training infrastructure |
+| [Evaluation Engineering]({{page.work_groups}}/evaluation-engineering/){:target="repo-tech-docs"} | Evaluation tooling for domain performance and sovereignty compliance |
+| [Infrastructure Engineering]({{page.work_groups}}/infrastructure-engineering/){:target="repo-tech-docs"} | Sovereign node infrastructure, deployment tooling, and operational systems |
 
 ## Additional links
 
