@@ -30,13 +30,17 @@ Every major AI system in widespread use today is controlled by a small number of
 
 Sovereignty is not a trade-off against performance — it is the source of it.
 
-Three structural advantages sovereign nodes have that no centralized model can replicate:
+Three structural advantages sovereign nodes<sup>[1](#footnote-1)</sup> have that no centralized model can replicate:
 
 | Advantage | Why centralized models can't replicate |
 |---|---|
 | **Public-sector data access** | Healthcare, education, and governance datasets are legally restricted to national jurisdictions. |
 | **Cultural alignment depth** | Community-participatory constitutional AI captures cultural variation that one-size-fits-all training cannot. |
 | **Domain specialization** | Organizations won't share proprietary data with centralized providers; on-premise specialization is inaccessible to cloud models. |
+
+<a id="#footnote-1"></a>
+
+<sup>1</sup>: _Compute and storage nodes that can either participate in the distributed training processes or run standalone. See [here](../tapestry-reference/ARCHITECTURE.md)._
 
 Initial performance targets:
 
@@ -57,7 +61,7 @@ Initial performance targets:
 | Data residency | All data processed within the nation's physical jurisdiction; hardware-level enforcement |
 | Exit capability | Complete model + data export in <72 hours, executable without any external coordination |
 | Island mode | Node operates fully independently with zero external network dependencies |
-| Legal compliance | National legal framework (GDPR, APPI, etc.) configured in the nation's 30% layer |
+| Legal compliance | National legal framework (GDPR, APPI, etc.) configured in the nation's [30% layer](#seventy-thirty) |
 
 ### Level 2 — Socio-Cultural Sovereignty
 
@@ -95,6 +99,8 @@ Users can start at TAPESTRY-GLOBAL (no sovereignty overhead) and migrate upward 
 
 ---
 
+<a id="seventy-thirty"></a>
+
 ## The 70/30 Architecture Principle
 
 The architecture maintains a strict separation:
@@ -109,7 +115,7 @@ This separation is non-negotiable. Any design that bleeds national assumptions i
 
 ## What Tapestry Is Not
 
-- Not competing with GPT-4 on general-purpose English academic benchmarks.
+- Not competing with GPT-4 (or equivalent) on general-purpose English academic benchmarks.
 - Not a single centralized AI product. Tapestry will never be a monolithic vendor offering.
 - Not targeting consumer chat applications. The focus is high-stakes domain applications.
 - Not claiming AGI or superintelligence.
@@ -121,13 +127,13 @@ This separation is non-negotiable. Any design that bleeds national assumptions i
 
 | Metric | Month 6 | Month 18 | Month 36 |
 |---|---|---|---|
-| Sovereign nodes operational | 2 | 7 (all G7) | 50+ |
+| Sovereign nodes operational | 2 | 7+ (all G7, plus...) | 50+ |
 | TAPESTRY-GLOBAL downloads | First release | 500K | 5M+ |
 | Community derivative models | — | 100+ | 10,000+ |
 | Domain performance vs. best centralized model | Baseline established | +15% | Sustained +15% |
 | Cultural appropriateness rate | Baseline set | >99% | >99% |
-| Languages supported | 5 (G7 official) | 100 | 1,000 |
-| Exit verified in <72 hours | 2 nodes | 7 nodes | 50+ nodes |
+| Languages supported | 5 (G7 official, plus...) | 100 | 1,000 |
+| Exit verified in <72 hours | 2 nodes | 7+ nodes | 50+ nodes |
 
 ---
 

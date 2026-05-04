@@ -16,15 +16,17 @@ Two structural problems define today's AI landscape — and Tapestry exists to s
 
 ## Where to Start
 
-| If you want to... | Go to |
-|---|---|
+| If you want to... | Go to... |
+| :--- | :--- |
 | Understand the vision and goals | [tech-docs/strategic-plan/VISION.md](tech-docs/strategic-plan/VISION.md) |
 | Read the full requirements | [tech-docs/strategic-plan/PRD.md](tech-docs/strategic-plan/PRD.md) |
 | Understand the architecture | [tech-docs/tapestry-reference/ARCHITECTURE.md](tech-docs/tapestry-reference/ARCHITECTURE.md) |
 | Find a work group to join | [tech-docs/work-groups/README.md](tech-docs/work-groups/README.md) |
-| Set up a dev environment | [Development](#development) below |
+| Set up a development environment | [Development](#development) below |
 
 ## Development
+
+If you want to work with the Project Tapestry code, here is how to get started.
 
 ### Setup
 
@@ -44,7 +46,7 @@ On Windows:
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-The rest of the steps are partially automated using `make`. Try the following:
+The rest of the steps are partially automated using `make`, although `make` is not required. Try the following:
 
 ```shell
 make one-time-setup
@@ -81,7 +83,7 @@ uv pip install -e .         # minimum dependencies
 We use [unittest](https://docs.python.org/3/library/unittest.html) and [hypothesis](https://hypothesis.readthedocs.io/en/latest/) for testing. The easiest way to run the test suite is using `make`:
 
 ```shell
-make unit-tests # or just tests; they are currently the same.
+make tests # or unit-tests; they are currently the same.
 ```
 
 This runs the following commands, which you can run yourself if you prefer:
@@ -100,6 +102,7 @@ Use _either_ of the following commands to format the Python code with `black`:
 
 ```shell
 make format
+# or
 uv run black src
 ```
 
@@ -120,6 +123,7 @@ Use _either_ of the following commands to type check the Python code with `ty`:
 
 ```shell
 make type-check
+# or
 uv run ty src
 ```
 
@@ -127,29 +131,60 @@ There is also a "watch" option that keeps `ty` running as you fix mistakes and s
 
 ```shell
 make type-check-watch
+# or
 uv run ty --watch src
+```
+
+### Before You Submit a PR...
+
+Please run the tests, format, lint, and type checking commands and makes sure everything passes cleanly! Use the convenient command, `make before-pr`, or run the individual commands above:
+
+```shell
+make before-pr   # Equivalent to 'make tests format lint type-check'
 ```
 
 ## Project Structure
 
-The structure is as follows, where three major _subsystems_ are managed: 
+The directory structure is divided in directories for code and related artifacts, and technical documentation. Both reflect the major _subsystems_: 
+
 * `data` for all data governance and management capabilities.
+* `evaluation` for all aspects of evaluating successful implementation of requirements.
 * `training` for all distributed training and tuning capabilities.
 * `infrastructure` for all underlying infrastructure.
+
+The details shown here are preliminary and subject to change:
 
 ```
 tapestry/
 ├── src/
 │   └── tapestry/
 │       └── data/
-│       └── training/
+│       └── evaluation/
+│       └── model-training/
 │       └── infrastructure/
 │   └── tests
 │       └── tapestry/
 │           └── data/
-│           └── training/
+│           └── evaluation/
+│           └── model-training/
 │           └── infrastructure/
+├── tech-docs/
+│   └── adr/                              # Architecture decision records
+│   └── strategic-plan/                   # Vision, PRD, etc.
+│   └── tapestry-reference/               # Overall architecture and design
+│   └── work-groups/                      # Work groups dedicated to each area
+│       └── data-engineering/
+│       └── data-requirements/
+│       └── evaluation-engineering/
+│       └── evaluation-requirements/
+│       └── infrastructure-engineering/
+│       └── infrastructure-requirements/
+│       └── model-training-engineering/
+│       └── model-training-requirements/
 ```
+
+The technical documentation is organized into sections on the strategic plan, reference information, and work groups.
+
 
 ## Architectural Decision Records (ADRs)
 
@@ -171,11 +206,11 @@ fixes, local refactors, tests, and docs do not need an ADR.
 
 <a id="getting-involved-anchor"></a>
 
-## Getting Involved
+## More About Getting Involved
 
-We welcome contributions as PRs, either to our code examples or our user guide. Please see our [Alliance community repo](https://github.com/The-AI-Alliance/community/) for general information about contributing to any of our projects. This section provides some specific details you need to know.
+We welcome contributions as PRs to this repository. Please see our [Alliance community repo](https://github.com/The-AI-Alliance/community/) for general information about contributing to any of our projects. This section provides some specific details you need to know.
 
-In particular, see the AI Alliance [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) instructions. You will need to agree with the AI Alliance [Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md).
+First, see the AI Alliance [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) instructions. You will need to agree with the AI Alliance [Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md).
 
 ### Licenses
 
@@ -190,13 +225,10 @@ We use the "Developer Certificate of Origin" (DCO).
 > [!WARNING]
 > Before you make any git commits with changes, understand what's required for DCO.
 
-See the Alliance contributing guide [section on DCO](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md#developer-certificate-of-origin) for details. In practical terms, supporting this requirement means you must use the `-s` flag with your `git commit` commands.
+See the Alliance contributing guide [section on DCO](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md#developer-certificate-of-origin) for details. In practical terms, supporting this requirement means you must use the `-s` flag with your `git commit` commands. 
 
 ## About the Technical Website
 
-The website for this repo is found in the `docs` directory. It is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). We use the [Just the Docs](https://just-the-docs.github.io/just-the-docs/) Jekyll theme.
+The website for this repository, where some technical content will be published, is found in the `docs` directory. It is published as [GitHub Pages](https://pages.github.com/) using [Jekyll](https://github.com/jekyll/jekyll).
 
 See [GITHUB_PAGES.md](GITHUB_PAGES.md) for more information.
-
-> [!NOTE]
-> As described above, all documentation is licensed under Creative Commons Attribution 4.0 International. See [LICENSE.CC-BY-4.0](LICENSE.CC-BY-4.0).
