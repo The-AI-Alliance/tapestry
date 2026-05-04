@@ -1,65 +1,28 @@
 ![The AI Alliance banner](https://the-ai-alliance.github.io/assets/images/ai-alliance-logo-horiz-pos-blue-cmyk-trans.png)
 
-# README for Project Tapestry - Technical Repo
+# Project Tapestry
 
-> [Technical website](https://the-ai-alliance.github.io/tapestry/)
-
-This repo contains the code and technical documentation for the AI Alliance, [Project Tapestry](https://events.thealliance.ai/tapestry). 
+> [Technical website](https://the-ai-alliance.github.io/tapestry/) · [Project page](https://events.thealliance.ai/tapestry)
 
 ![Project Tapestry Image](docs/assets/images/03-tapestry-logo-1000x545.png)
 
-The rest of this README provides a technical overview of Tapestry and information for contributors, developers, and users of this repository.
+## Why This Matters
 
-## What Is Project Tapestry?
+Two structural problems define today's AI landscape — and Tapestry exists to solve both simultaneously.
 
-The vision, motivations, and goals for Project Tapestry are described [here](https://events.thealliance.ai/tapestry). In a nutshell, Project Tapestry is building a collaborative foundation for open and sovereign AI. It is an open-source platform designed to enable globally federated development of frontier, open models while preserving sovereignty, local control, and long-term independence. We identify three pillars of _sovereignty_:
+**Performance without trust is a dead end.** Sovereign nations, industries, and communities will not adopt AI systems that underperform on their languages, legal contexts, and domain knowledge. Tapestry's thesis is that sovereignty *is* the performance strategy: access to sovereign public-sector data, cultural alignment, and domain specialization produce advantages that centralized models cannot replicate. A healthcare AI that a French doctor does not trust for French patients will not be adopted, regardless of its benchmark scores.
 
-1. **National Sovereignty** - *Geopolitical Control*
-	* Data stays in-country
-	* Compute and storage _nodes_ operate under national law
-	* Public sector data access
-1. **Cultural Sovereignty** - *Values Alignment*
-	* [Constitutional AI](https://constitutional.ai/) customized per culture
-	* Community participation
-	* Sacred knowledge protection
-3. **Industrial Sovereignty** - *Domain Independence*
-	* 1000+ specialized model variants
-	* On-premise deployment
-	* Institution-specific optimization
+**AI that can be taken away is not AI you can depend on.** Countries, enterprises, and individuals need AI infrastructure they own and control — with guaranteed data residency, the right to exit, and the ability to operate independently. Tapestry provides this across three sovereignty levels: national (data residency, island mode, 72-hour exit), socio-cultural (constitutional AI, sacred knowledge protections, community review), and industrial (on-premise deployment, proprietary data isolation, domain specialization).
 
-### 🏗️ How It Works
+## Where to Start
 
-```mermaid
-graph LR
-    TG["TAPESTRY-GLOBAL<br/>Base Model"] --> NS["National<br/>Sovereignty"]
-    TG --> CS["Cultural<br/>Sovereignty"]
-    TG --> ES["Enterprise<br/>Sovereignty"]
-    NS --> G7["🇫🇷 🇯🇵 🇰🇷 🇻🇳 🇨🇦<br/>Initial Coalition"]
-    CS --> PA["Performance<br/>Advantage"]
-    ES --> PA
-    style TG fill:#dc2626,stroke:#b91c1c,color:#fff
-    style PA fill:#059669,stroke:#047857,color:#fff
-```
-
-([JPEG](docs/assets/images/tapestry-pillars.jpg))
-
-**Federated Training**: Data stays in-country → Encrypted updates improve global model → 15%+ gains on culturally-specific tasks.
-
-### What Makes TAPESTRY Unbeatable
-
-- ✅ **Unique Data Access**: Public sector data (healthcare, education, governance) that centralized models cannot legally access.
-- ✅ **Performance Edge**: 15%+ gains on culturally-specific tasks through sovereign data + cultural alignment.
-- ✅ **Federated Architecture**: Encrypted training without centralizing sensitive data.
-- ✅ **Global Coalition**: Participation of many countries around the world.
-
-
-## Getting Involved
-
-Several work groups are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details will be announced soon.
-
-[Use this form](https://events.thealliance.ai/tapestry#Form) to let us know your interests in being involved. We need contributions from ML researchers working on all aspects of federated learning and training, systems engineers with experience with large-scale GPU clusters, compute providers, e.g., cloud, sovereign cloud, or national HPC centers, government and policy leaders responsible for national AI strategies, universities and research labs with multilingual, domain-specific, or institutional datasets, and software engineers to help us implement Project Tapestry.
-
-We also welcome contributions to this repository of code, requirements, etc. using [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [discussion topics](https://github.com/The-AI-Alliance/tapestry/discussions), and [issues](https://github.com/The-AI-Alliance/tapestry/issues). For example, the in-progress documents for the work groups, etc. can found under the [`tech-docs`](tech-docs) directory. See [More About Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
+| If you want to... | Go to... |
+| :--- | :--- |
+| Understand the vision and goals | [tech-docs/strategic-plan/VISION.md](tech-docs/strategic-plan/VISION.md) |
+| Read the full requirements | [tech-docs/strategic-plan/PRD.md](tech-docs/strategic-plan/PRD.md) |
+| Understand the architecture | [tech-docs/tapestry-reference/ARCHITECTURE.md](tech-docs/tapestry-reference/ARCHITECTURE.md) |
+| Find a work group to join | [tech-docs/work-groups/README.md](tech-docs/work-groups/README.md) |
+| Set up a development environment | [Development](#development) below |
 
 ## Development
 
@@ -220,6 +183,24 @@ tapestry/
 │       └── model-training-engineering/
 │       └── model-training-requirements/
 ```
+
+## Architectural Decision Records (ADRs)
+
+Significant architectural decisions are recorded as ADRs under
+[`tech-docs/adr/`](tech-docs/adr/). The system is two-level:
+
+- **Iterations** (`TAP-YYYY`) are units of work that follow a 5-phase
+  template: SCOPE → PLAN → EXECUTE → VERIFY → CLOSE. SCOPE and PLAN are
+  written *before* implementation begins.
+- **Component decisions** (`XXX-YYYY`) capture specific technical choices
+  within a subsystem and reference their parent iteration. Prefixes:
+  `DAT` (data), `TRN` (training), `INF` (infrastructure), `DOC` (docs site),
+  `WG` (work groups).
+
+Before changing architecture, dependencies, services, schemas, frameworks, or
+durable project conventions, read [`tech-docs/adr/README.md`](tech-docs/adr/README.md)
+for the full convention, file-naming rules, and evidence standard. Routine bug
+fixes, local refactors, tests, and docs do not need an ADR.
 
 <a id="getting-involved-anchor"></a>
 
