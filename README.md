@@ -143,6 +143,24 @@ tapestry/
 │           └── infrastructure/
 ```
 
+## Architectural Decision Records (ADRs)
+
+Significant architectural decisions are recorded as ADRs under
+[`tech-docs/adr/`](tech-docs/adr/). The system is two-level:
+
+- **Iterations** (`TAP-YYYY`) are units of work that follow a 5-phase
+  template: SCOPE → PLAN → EXECUTE → VERIFY → CLOSE. SCOPE and PLAN are
+  written *before* implementation begins.
+- **Component decisions** (`XXX-YYYY`) capture specific technical choices
+  within a subsystem and reference their parent iteration. Prefixes:
+  `DAT` (data), `TRN` (training), `INF` (infrastructure), `DOC` (docs site),
+  `WG` (work groups).
+
+Before changing architecture, dependencies, services, schemas, frameworks, or
+durable project conventions, read [`tech-docs/adr/README.md`](tech-docs/adr/README.md)
+for the full convention, file-naming rules, and evidence standard. Routine bug
+fixes, local refactors, tests, and docs do not need an ADR.
+
 <a id="getting-involved-anchor"></a>
 
 ## Getting Involved
