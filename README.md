@@ -2,7 +2,7 @@
 
 # Project Tapestry
 
-> [Technical website](https://the-ai-alliance.github.io/tapestry/) · [Project page](https://events.thealliance.ai/tapestry)
+> [Technical website](https://the-ai-alliance.github.io/tapestry/) · [Project page](http://thealliance.ai/projects/tapestry)
 
 ![Project Tapestry Image](docs/assets/images/03-tapestry-logo-1000x545.png)
 
