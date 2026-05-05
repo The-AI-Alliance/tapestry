@@ -8,10 +8,10 @@ work_groups: https://github.com/The-AI-Alliance/tapestry/tree/main/tech-docs/wor
 
 # Project Tapestry: Technical Website
 
-Welcome to the technical website for **The AI Alliance Project Tapestry**, representing the content from the [technical documentation and code repository](https://github.com/The-AI-Alliance/tapestry){:target="repo"} for [Project Tapestry](https://events.thealliance.ai/tapestry){:target="aia-tapestry"}. 
+Welcome to the technical website for **The AI Alliance Project Tapestry**, representing the content from the [technical documentation and code repository](https://github.com/The-AI-Alliance/tapestry){:target="repo"} for [Project Tapestry](https://thealliance.ai/projects/tapestry){:target="aia-tapestry"}. 
 
 {: .attention}
-> For a general introduction to Project Tapestry, including its motivations and goals, see the [AI Alliance website Tapestry page](https://events.thealliance.ai/tapestry){:target="aia-tapestry"}
+> For a general introduction to Project Tapestry, including its motivations and goals, see the [AI Alliance website Tapestry page](https://thealliance.ai/projects/tapestry){:target="aia-tapestry"}
 
 ![Project Tapestry Image]({{site.baseurl}}/assets/images/03-tapestry-logo-1000x545.png){: .tapestry-image .center}
 

@@ -500,7 +500,7 @@ Phase 3 — Planetary Scale (Jul 2027 – Dec 2027)
 
 - LeCun, Y. UN Security Council Briefing S/PV.9821 (December 19, 2023)
 - TAPESTRY Strategic Plan: `strategic-plan/` (aitomatic/aia-tapestry)
-- AI Alliance Project Tapestry (public): https://events.thealliance.ai/tapestry
+- AI Alliance Project Tapestry (public): https://thealliance.ai/projects/tapestry
 - AI Alliance Technical Repo: https://github.com/The-AI-Alliance/tapestry
 
 ---
