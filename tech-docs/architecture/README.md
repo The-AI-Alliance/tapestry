@@ -1,6 +1,6 @@
 # Architecture
 
-This directory contains the full design chain for Project Tapestry: the TVA methodology, its phase outputs (stakeholder map through design goals), the Architectural Thesis, and decision records.
+This directory contains the full design chain for Project Tapestry: the TVA methodology, its phase outputs (stakeholder map through design goals), architectural options analysis, and decision records.
 
 | Document | Description |
 | :------- | :---------- |
@@ -9,7 +9,6 @@ This directory contains the full design chain for Project Tapestry: the TVA meth
 | [`2-pain-points.md`](2-pain-points.md) | Phase 2 — what's concretely broken for each layer today |
 | [`3-value-propositions.md`](3-value-propositions.md) | Phase 3 — what Tapestry offers that the status quo doesn't |
 | [`4-design-goals.md`](4-design-goals.md) | Phase 4 — constraints the architecture must satisfy |
-| [`5-architectural-thesis.md`](5-architectural-thesis.md) | The main Tapestry Architectural Thesis |
-| [`sovereignty-assurance-spectrum.md`](sovereignty-assurance-spectrum.md) | Tiered privacy and cryptographic model (Tiers 0–4) |
+| [`5-architectural-options.md`](5-architectural-options.md) | Phase 5 — option space and decision analysis toward an architectural thesis |
 | [`diagrams/`](diagrams/) | System topology, training loop, data governance diagrams |
 | [`decisions/`](decisions/) | Architecture Decision Records (ADRs) |
