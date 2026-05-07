@@ -11,6 +11,17 @@ ADRs are numbered sequentially (`adr-NNN-short-title.md`) and use the following 
 - **superseded** — replaced by a later ADR (link to successor)
 - **rejected** — was proposed, explicitly decided against (records why not)
 
+Use a small metadata table at the top of each ADR:
+
+| Field | Value |
+| :---- | :---- |
+| Status | Proposed |
+| Confidence | High (5/5) |
+| Date | May 7, 2026 |
+| Deciders | Christopher Nguyen (proposed), workshop participants |
+
+Avoid consecutive plain Markdown lines like `**Status:** ...` / `**Date:** ...`; GitHub renders those as one paragraph unless they use explicit hard breaks.
+
 ## Index
 
 | ADR | Title | Status | Confidence |

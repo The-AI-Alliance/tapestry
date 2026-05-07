@@ -33,45 +33,45 @@ graph TD
 
 Ministries, AI agencies, sovereign funds.
 
-**Leverage:** Control compute budgets and state data.
-**Fears:** Infrastructure dependency on foreign platforms. Permanent capability lag.
-**Success criteria:** A credible path to owning frontier models. Data residency guarantees.
-**Strategic interest:** Demonstrable sovereign AI capability. Political credit for delivering frontier technology to citizens.
+- **Leverage:** Control compute budgets and state data.
+- **Fears:** Infrastructure dependency on foreign platforms. Permanent capability lag.
+- **Success criteria:** A credible path to owning frontier models. Data residency guarantees.
+- **Strategic interest:** Demonstrable sovereign AI capability. Political credit for delivering frontier technology to citizens.
 
 ### Socio-cultural
 
 Language communities, knowledge custodians, civil society.
 
-**Leverage:** Control unique corpora that exist nowhere else.
-**Fears:** Cultural homogenization. Extraction without reciprocity.
-**Success criteria:** Cultural parity. Data royalties. Their own alignment layer.
-**Strategic interest:** Preservation and amplification of cultural identity through AI that reflects their values.
+- **Leverage:** Control unique corpora that exist nowhere else.
+- **Fears:** Cultural homogenization. Extraction without reciprocity.
+- **Success criteria:** Cultural parity. Data royalties. Their own alignment layer.
+- **Strategic interest:** Preservation and amplification of cultural identity through AI that reflects their values.
 
 ### Industrial
 
 Health, legal, finance, energy, sovereign cloud, HPC centers.
 
-**Leverage:** Control sensitive domain data and idle compute.
-**Fears:** Data leakage to rivals. Platform deprecation.
-**Success criteria:** Sovereign alignment layers. A compute-for-access model.
-**Strategic interest:** Commercial positioning. An entity like FPT wants to be "the sovereign AI provider for Vietnam." A hardware vendor wants Tapestry nodes running on its platform. A cloud provider wants to host consortium infrastructure. Participation must advance their board-level strategy, not just their technical agenda.
+- **Leverage:** Control sensitive domain data and idle compute.
+- **Fears:** Data leakage to rivals. Platform deprecation.
+- **Success criteria:** Sovereign alignment layers. A compute-for-access model.
+- **Strategic interest:** Commercial positioning. An entity like FPT wants to be "the sovereign AI provider for Vietnam." A hardware vendor wants Tapestry nodes running on its platform. A cloud provider wants to host consortium infrastructure. Participation must advance their board-level strategy, not just their technical agenda.
 
 ### Individual
 
 Citizens, researchers, developers, end users.
 
-**Leverage:** Control personal data in aggregate and adoption/political voice.
-**Fears:** Surveillance, manipulation, AI that ignores their context.
-**Success criteria:** Cultural fit. Privacy. Agency.
+- **Leverage:** Control personal data in aggregate and adoption/political voice.
+- **Fears:** Surveillance, manipulation, AI that ignores their context.
+- **Success criteria:** Cultural fit. Privacy. Agency.
 
 ### Contributor/Participant
 
 ML researchers, systems engineers, HPC nodes, cloud providers, AI Alliance itself.
 
-**Leverage:** Control architecture decisions and training runs.
-**Fears:** Technical failure. Governance capture.
-**Success criteria:** Clear architecture. Credit. A working system.
-**Strategic interest:** Research publication opportunities. Platform validation (for infrastructure contributors). Being recognized as founding participants in a potentially historic initiative.
+- **Leverage:** Control architecture decisions and training runs.
+- **Fears:** Technical failure. Governance capture.
+- **Success criteria:** Clear architecture. Credit. A working system.
+- **Strategic interest:** Research publication opportunities. Platform validation (for infrastructure contributors). Being recognized as founding participants in a potentially historic initiative.
 
 ## Key Tensions
 

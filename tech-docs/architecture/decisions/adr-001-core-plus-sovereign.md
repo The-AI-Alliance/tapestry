@@ -1,9 +1,11 @@
 # ADR-001: Core-Plus-Sovereign Architecture
 
-**Status:** Proposed
-**Confidence:** High (5/5)
-**Date:** May 7, 2026
-**Deciders:** Christopher Nguyen (proposed), workshop participants (to ratify)
+| Field | Value |
+| :---- | :---- |
+| Status | Proposed |
+| Confidence | High (5/5) |
+| Date | May 7, 2026 |
+| Deciders | Christopher Nguyen (proposed), workshop participants (to ratify) |
 
 ## Context
 

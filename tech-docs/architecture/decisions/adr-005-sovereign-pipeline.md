@@ -1,9 +1,11 @@
 # ADR-005: Sovereign Alignment Pipeline
 
-**Status:** Proposed
-**Confidence:** Strong (4/5)
-**Date:** May 7, 2026
-**Deciders:** Christopher Nguyen (proposed), workshop participants (to resolve open questions)
+| Field | Value |
+| :---- | :---- |
+| Status | Proposed |
+| Confidence | Strong (4/5) |
+| Date | May 7, 2026 |
+| Deciders | Christopher Nguyen (proposed), workshop participants (to resolve open questions) |
 
 ## Context
 
