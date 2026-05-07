@@ -14,7 +14,7 @@
   <line x1="80" y1="126" x2="360" y2="126" stroke="#999" stroke-width="0.5" stroke-dasharray="4,3"/>
 
   <rect x="40" y="136" width="360" height="34" rx="6" fill="#e65100" stroke="#bf360c" stroke-width="1.5"/>
-  <text x="220" y="158" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-weight="600">Safety alignment (shared, non-removable)</text>
+  <text x="220" y="158" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-weight="600">Safety alignment (shared — mechanism TBD)</text>
 
   <rect x="40" y="180" width="360" height="56" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="1.5"/>
   <text x="220" y="206" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="14" font-weight="600">Shared frontier base model</text>

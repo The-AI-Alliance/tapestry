@@ -22,7 +22,7 @@ Tapestry adopts a **core-plus-sovereign architecture**: a frontier-competitive s
 | Artifact | Who owns it | What it provides |
 | :------- | :---------- | :--------------- |
 | **Shared base** | Consortium-adopted then consortium-evolved (ADR-006) | Frontier-class starting capability; shared improvement via ADR-004 |
-| **Safety alignment** | Consortium (shared, non-removable) | Baseline safety properties that sovereign layers add to but cannot subtract from (DG6) |
+| **Safety alignment** | Consortium (shared) | Baseline safety properties — mechanism for preservation through continued pretraining is an open question (DG6) |
 | **Sovereign layers** | Each participating node / community | Cultural alignment, domain fit, instruction norms — data and values stay local |
 
 ## Rationale
