@@ -24,6 +24,18 @@ Makes the model deployable as a usable product — chat agent, coding assistant,
 
 All three stages are sovereign — each participant runs them independently on their own data. The *tooling* for all three stages is consortium infrastructure, shared across participants.
 
+![Sovereign alignment pipeline](../diagrams/sovereign-alignment-pipeline.svg)
+
+*Vector figure [`sovereign-alignment-pipeline.svg`](../diagrams/sovereign-alignment-pipeline.svg). Export PNG with `make tech-docs-diagram-pngs` if your preview blocks SVG. Stages A–C change knowledge, behavior, and product shape; tooling is shared consortium infrastructure.*
+
+| Stage | What changes | Examples | Consortium tooling (shared) |
+| :---- | :----------- | :------- | :---------------------------- |
+| **A** — CPT | World knowledge / representations | Culturally grounded corpora (law, medicine, literature, institutions) | Pipelines, data governance hooks |
+| **B** — Alignment | Behavior / values | DPO, RLHF, Constitutional AI, local preference data | Alignment stacks, evaluation |
+| **C** — Instruction | Deployable product | Chat, coding, domain assistants; tone and interaction norms | Instruction / deployment harnesses |
+
+*All three stages execute on **sovereign data** at the participant; tooling is consortium infrastructure.*
+
 ## Rationale
 
 - "Fluent but Foreign" (2026) demonstrates that language-focused continued pretraining fails to shift cultural alignment. Stage A specifically targets culturally *grounded* data to address this.

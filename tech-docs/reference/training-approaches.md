@@ -8,6 +8,22 @@
 
 Three distinct approaches to training large models are relevant to Tapestry's design. They are often conflated. This document defines each, explains when it is appropriate, and clarifies which approach Tapestry uses and why.
 
+## At-a-glance comparison
+
+| Dimension | Centralized training | Federated learning | Consortium training |
+| :-------- | :------------------- | :----------------- | :------------------ |
+| **Typical participants** | One organization, one cluster | Very many small clients (phones, hospitals, …) | Few large nodes (national labs, HPC, sovereign AI programs) |
+| **Data location** | All training data colocated | Small shards per node | Large sovereign corpora per node |
+| **What crosses the network** | Data moves to the compute center | Gradients or frequent small updates | Infrequent **weight deltas** (not raw data) |
+| **Communication pattern** | Fast interconnect; sync every step or few steps | Frequent, bandwidth-sensitive | Periodic; tolerates WAN latency |
+| **Dominant motive** | Throughput and single-owner control | Individual / edge **privacy** | National or institutional **sovereignty** and cultural alignment |
+| **Governance** | Single owner | Aggregator plus clients | Consortium with shared voice and rules |
+| **Model scale (typical)** | Frontier | Often modest | Frontier-class shared model |
+| **Primary goal** | Maximum capability | Learn without centralizing raw data | Frontier capability **and** culturally aligned outcomes |
+| **Tapestry** | Incompatible (colocation, capture) | Wrong fit (scale, motive, update pattern) | **This is Tapestry’s paradigm** ([ADR-002](../architecture/decisions/adr-002-consortium-training.md)) |
+
+The sections below spell out each column in prose. The consortium training loop is specified in [ADR-004](../architecture/decisions/adr-004-training-loop.md).
+
 ---
 
 ## Centralized Training
@@ -73,23 +89,9 @@ The choice of weight deltas over gradients is a design decision within consortiu
 
 **The consortium training loop:**
 
-```mermaid
-graph TD
-    S1["Step 1\nCentralized base training\n(frontier model on global open data)"]
-    S2["Step 2\nDistributed continued pretraining\n(each node trains entire model\non sovereign data)"]
-    S3["Step 3\nWeight delta contribution\n(nodes send weight deltas\nto coordinator)"]
-    S4["Step 4\nCentral integration\n(weight deltas aggregated,\nglobal model updated\nand redistributed)"]
+![Consortium training loop](../architecture/diagrams/consortium-training-loop.svg)
 
-    S1 --> S2
-    S2 --> S3
-    S3 --> S4
-    S4 -->|"iterate"| S2
-
-    style S1 fill:#1565c0,stroke:#0d47a1,color:#fff
-    style S2 fill:#6a1b9a,stroke:#4a148c,color:#fff
-    style S3 fill:#2e7d32,stroke:#1b5e20,color:#fff
-    style S4 fill:#e65100,stroke:#bf360c,color:#fff
-```
+*Same figure as [ADR-004](../architecture/decisions/adr-004-training-loop.md); vector [`consortium-training-loop.svg`](../architecture/diagrams/consortium-training-loop.svg). Export PNG with `make tech-docs-diagram-pngs` if your preview blocks SVG — see [`diagrams/README.md`](../architecture/diagrams/README.md).*
 
 **Key techniques:** DiLoCo-class outer optimization (the weight delta aggregation step is effectively the outer optimizer), continued pretraining, post-training cultural alignment
 
@@ -97,16 +99,9 @@ graph TD
 
 ---
 
-## Summary
+## Related decisions
 
-| | Centralized | Federated Learning | Consortium Training |
-| :--- | :--- | :--- | :--- |
-| **Nodes** | One cluster | Millions of small clients | Dozens of large institutions |
-| **Data** | All in one place | Tiny per-node (user data) | Massive per-node (national/institutional) |
-| **Data movement** | Data moves to compute | Data stays, gradients move | Data stays, weight deltas move |
-| **Communication** | Fast interconnect, every step | Frequent small updates | Infrequent large weight deltas |
-| **Privacy motive** | N/A | Individual data protection | National/institutional sovereignty |
-| **Governance** | Single owner | Aggregator + clients | Consortium with shared ownership |
-| **Model scale** | Frontier | Small to medium | Frontier |
-| **Goal** | Capability | Privacy-preserving learning | Capability + cultural alignment |
-| **Examples** | GPT-4, Llama, Claude | Gboard, hospital FL | **Tapestry** |
+| Document | Role |
+| :------- | :--- |
+| [ADR-002: Consortium training model](../architecture/decisions/adr-002-consortium-training.md) | Names the paradigm and contrasts it with federated and centralized training. |
+| [ADR-004: The consortium training loop](../architecture/decisions/adr-004-training-loop.md) | Defines the four-step loop (base → CPT → deltas → integrate). |

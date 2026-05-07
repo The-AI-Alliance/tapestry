@@ -13,6 +13,15 @@ Tapestry must deliver both frontier-class capability and sovereign cultural alig
 
 Tapestry adopts a **core-plus-sovereign architecture**: a frontier-competitive shared base model enriched by sovereign layers (continued pretraining, post-training alignment, domain adapters) produced by each participating node. The ratio starts at roughly 80/20 centralized-to-sovereign and shifts over time as the consortium matures.
 
+![Core-plus-sovereign stack](../diagrams/core-plus-sovereign-stack.svg)
+
+*Vector figure [`core-plus-sovereign-stack.svg`](../diagrams/core-plus-sovereign-stack.svg). Export [`core-plus-sovereign-stack.png`](../diagrams/core-plus-sovereign-stack.png) with `make tech-docs-diagram-pngs` if your preview blocks SVG. Read top-to-bottom as the deployed stack; the consortium loop ([ADR-004](adr-004-training-loop.md)) improves both layers over time.*
+
+| Artifact | Who owns it | What it provides |
+| :------- | :---------- | :--------------- |
+| **Shared base** | Consortium-adopted then consortium-evolved (ADR-006) | Frontier-class starting capability; shared improvement via ADR-004 |
+| **Sovereign layers** | Each participating node / community | Cultural alignment, domain fit, instruction norms — data and values stay local |
+
 ## Rationale
 
 - Training a frontier model from scratch requires $200M+ and organizational maturity the consortium doesn't yet have. Starting with a strong base delivers value immediately.

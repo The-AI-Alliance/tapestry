@@ -32,7 +32,7 @@ This repository is the technical home for Project Tapestry. Use this file as the
 - `tech-docs/governance/` holds governance design, including the anti-capture principle.
 - `tech-docs/work-groups/` holds work-group-specific requirements and engineering notes.
 - `tech-docs/strategic-plan/` holds higher-level execution strategy.
-- `tech-docs/reference/` is for reference material about deploying and using Tapestry software.
+- `tech-docs/reference/` is for reference material (e.g. training-paradigm comparisons, deployment and usage notes) outside the phased TVA chain under `architecture/`.
 
 Start with `tech-docs/README.md` and `tech-docs/architecture/README.md` when you need the top-level doc taxonomy, then jump into the bucket that matches the task.
 

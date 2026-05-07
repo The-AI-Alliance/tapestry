@@ -19,6 +19,15 @@ Phased approach:
 
 Sovereign contributions (continued pretraining outputs, alignment layers, domain adapters) are designed to be **portable across base models**, so the transition from Phase 1 to Phase 2 does not discard participants' work.
 
+![Phased base model strategy](../diagrams/phased-base-model-strategy.svg)
+
+*Vector figure [`phased-base-model-strategy.svg`](../diagrams/phased-base-model-strategy.svg). Export PNG with `make tech-docs-diagram-pngs` if your preview blocks SVG. Solid path: maturity toward a consortium-trained base. Dashed curve: sovereign artifacts remain portable across base generations.*
+
+| Phase | Base model source | Sovereign work | Sovereignty story |
+| :---- | :---------------- | :------------- | :---------------- |
+| **1** — Now | Adopt best available **open-weights** base | Build portable sovereign layers on top (ADR-005); join loop (ADR-004) | Honest dependency; layers designed to migrate |
+| **2** — When ready | **Consortium-trained** base | Same sovereign layers and tooling; contribution shapes the shared core | Reduced reliance on a single external provider |
+
 ## Rationale
 
 - Training a frontier model from scratch requires $200M+, 12–18 months, and organizational maturity the consortium doesn't yet have.

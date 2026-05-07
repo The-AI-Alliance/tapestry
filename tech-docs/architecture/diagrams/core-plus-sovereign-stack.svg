@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 220" role="img" aria-labelledby="title desc">
+  <title id="title">Core-plus-sovereign stack</title>
+  <desc id="desc">Sovereign layers including continued pretraining and alignment sit above a shared frontier base model.</desc>
+  <rect width="420" height="220" fill="#fafafa"/>
+  <rect x="60" y="40" width="300" height="72" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
+  <text x="210" y="78" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="15" font-weight="600">Sovereign layers (per participant)</text>
+  <text x="210" y="98" text-anchor="middle" fill="#e8f5e9" font-family="system-ui,Segoe UI,sans-serif" font-size="12">CPT - alignment - adapters - instruction</text>
+  <text x="210" y="118" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="11">Participant-owned data and values</text>
+  <rect x="60" y="132" width="300" height="56" rx="8" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+  <text x="210" y="164" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="15" font-weight="600">Shared frontier base model</text>
+  <text x="210" y="182" text-anchor="middle" fill="#e3f2fd" font-family="system-ui,Segoe UI,sans-serif" font-size="12">Consortium-adopted - consortium-evolved</text>
+</svg>

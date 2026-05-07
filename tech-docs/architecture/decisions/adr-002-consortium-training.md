@@ -9,13 +9,23 @@
 
 Tapestry's training involves multiple sovereign nodes contributing to a shared model. The approach must be named and distinguished from existing paradigms (centralized training, federated learning) to avoid confusion and to accurately describe what Tapestry does.
 
-See [`training-approaches.md`](../training-approaches.md) for a full comparison of centralized, federated, and consortium training.
+See [`training-approaches.md`](../../reference/training-approaches.md) for a full comparison of centralized, federated, and consortium training.
 
 ## Decision
 
 Tapestry uses **consortium training**: a small number of large, trusted, heterogeneous nodes collaboratively training a shared model, where data sovereignty is a first-order architectural constraint and cultural alignment is the goal.
 
 This is distinct from federated learning (designed for millions of small edge clients with individual privacy concerns) and from centralized training (all data in one place, one organization controls everything).
+
+![Training paradigms compared](../diagrams/training-paradigms-comparison.svg)
+
+*Vector figure [`training-paradigms-comparison.svg`](../diagrams/training-paradigms-comparison.svg). Export PNG with `make tech-docs-diagram-pngs` if your preview blocks SVG. Tapestry is the third column; see [`training-approaches.md`](../../reference/training-approaches.md) for prose and the full comparison table.*
+
+| Paradigm | Typical participants | Dominant motive | Typical communication |
+| :------- | :------------------- | :-------------- | :-------------------- |
+| Centralized training | One organization, one cluster | Throughput and control; data colocated | Fast interconnect; full batches |
+| Federated learning | Very many small clients | Individual / edge privacy | Frequent small updates (gradients or small deltas) |
+| **Consortium training** | Few large institutional nodes | National or institutional sovereignty; cultural alignment | Infrequent **weight deltas**; WAN-tolerant |
 
 ## Rationale
 

@@ -18,7 +18,18 @@ The consortium training loop operates in four steps:
 3. **Weight delta contribution** — each node computes the difference between its locally-trained model and the global model it started from, and sends these weight deltas to the central coordinator.
 4. **Central integration and redistribution** — the coordinator aggregates weight deltas into an updated global model and redistributes it. Back to Step 2.
 
-Nodes share **weight deltas**, not per-step gradients. Weight deltas aggregate over many training steps, require less bandwidth, tolerate WAN latency, and have better natural privacy properties (the signal from any individual training example is diluted). See [`training-approaches.md`](../training-approaches.md) for the full comparison.
+Nodes share **weight deltas**, not per-step gradients. Weight deltas aggregate over many training steps, require less bandwidth, tolerate WAN latency, and have better natural privacy properties (the signal from any individual training example is diluted). See [`training-approaches.md`](../../reference/training-approaches.md) for the full comparison.
+
+![Consortium training loop](../diagrams/consortium-training-loop.svg)
+
+*Vector figure [`consortium-training-loop.svg`](../diagrams/consortium-training-loop.svg). Export PNG with `make tech-docs-diagram-pngs` if your preview blocks SVG. Step 1 establishes (or refreshes) the global model; the ongoing loop is 2 → 3 → 4 → 2.*
+
+| Step | Where it runs | Sovereign data | What crosses the network |
+| :--- | :-------------- | :------------- | :----------------------- |
+| 1. Base training | Central / global pipeline | N/A (open or consortium-global data) | Global model checkpoint |
+| 2. Continued pretraining | Each sovereign node | Stays on node | Nothing raw |
+| 3. Weight delta | Node → coordinator | Still on node | **Weight deltas only** (not per-step gradients) |
+| 4. Integration | Coordinator | — | Updated global model back to nodes |
 
 ## Rationale
 

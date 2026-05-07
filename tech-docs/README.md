@@ -8,7 +8,7 @@ This directory organizes the technical documentation under development for Proje
 | [`governance/`](governance/README.md) | Anti-capture principle and governance design |
 | [`work-groups/`](work-groups/README.md) | Each work group's documentation |
 | [`strategic-plan/`](strategic-plan/README.md) | Overall strategy for execution |
-| [`reference/`](reference/README.md) | Deploying and using Tapestry software |
+| [`reference/`](reference/README.md) | Reference docs (e.g. training paradigms, deployment and usage material) |
 
 ## Architecture documents
 
@@ -22,8 +22,15 @@ The directory index is [`architecture/README.md`](architecture/README.md). Main 
 | [`architecture/3-value-propositions.md`](architecture/3-value-propositions.md) | Phase 3 — what Tapestry offers that the status quo doesn't |
 | [`architecture/4-design-goals.md`](architecture/4-design-goals.md) | Phase 4 — constraints the architecture must satisfy |
 | [`architecture/5-architectural-options.md`](architecture/5-architectural-options.md) | Phase 5 — option space and decision analysis toward an architectural thesis |
-| [`architecture/training-approaches.md`](architecture/training-approaches.md) | Reference: centralized vs. federated vs. consortium training |
-| [`architecture/diagrams/`](architecture/diagrams/) | System topology, training loop, data governance diagrams |
+| [`architecture/diagrams/README.md`](architecture/diagrams/README.md) | Architecture figures (SVG in Markdown; optional PNG exports) and embedding conventions |
 | [`architecture/decisions/`](architecture/decisions/README.md) | Architecture Decision Records (ADRs) |
+
+## Reference documents
+
+The [`reference/`](reference/README.md) directory holds material outside the TVA phase chain (comparison references, deployment notes, etc.):
+
+| Document | Description |
+| :------- | :---------- |
+| [`reference/training-approaches.md`](reference/training-approaches.md) | Centralized vs. federated vs. consortium training |
 
 Repository root [**`README.md`**](../README.md) and [**`AGENTS.md`**](../AGENTS.md) summarize how `tech-docs/` fits with `docs/`, `src/`, and contributor workflows.

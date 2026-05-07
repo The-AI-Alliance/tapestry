@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 200" role="img" aria-labelledby="title desc">
+  <title id="title">Cultural alignment vs language-first framing</title>
+  <desc id="desc">Language-first framing leads to Fluent but Foreign risk; cultural alignment framing leads to Tapestry target outcomes.</desc>
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#37474f"/>
+    </marker>
+  </defs>
+  <rect width="680" height="200" fill="#fafafa"/>
+  <!-- Row 1 -->
+  <rect x="40" y="36" width="160" height="52" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+  <text x="120" y="68" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Language-first</text>
+  <line x1="200" y1="62" x2="248" y2="62" stroke="#37474f" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="252" y="36" width="200" height="52" rx="6" fill="#ef6c00" stroke="#e65100" stroke-width="2"/>
+  <text x="352" y="68" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Fluent but Foreign</text>
+  <!-- Row 2 -->
+  <rect x="40" y="112" width="160" height="52" rx="6" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
+  <text x="120" y="144" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Cultural alignment</text>
+  <line x1="200" y1="138" x2="248" y2="138" stroke="#37474f" stroke-width="2" marker-end="url(#arr)"/>
+  <rect x="252" y="112" width="240" height="52" rx="6" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
+  <text x="372" y="144" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Tapestry target - sovereign legitimacy</text>
+  <!-- Independent dimensions note -->
+  <text x="560" y="88" text-anchor="middle" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="11">orthogonal</text>
+  <text x="560" y="104" text-anchor="middle" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="11">strategic paths</text>
+</svg>

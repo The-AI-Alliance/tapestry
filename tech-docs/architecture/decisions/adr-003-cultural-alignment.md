@@ -15,6 +15,17 @@ Tapestry's primary differentiator is **sovereign cultural alignment** — the ab
 
 Multilingual capability is explicitly *not* the differentiator. The big labs will solve multilingual problems given sufficient data. A model that speaks Yoruba with Silicon Valley values is not a sovereign model.
 
+![Cultural alignment vs language-first framing](../diagrams/cultural-alignment-framing.svg)
+
+*Vector figure [`cultural-alignment-framing.svg`](../diagrams/cultural-alignment-framing.svg). Export PNG with `make tech-docs-diagram-pngs` if your preview blocks SVG. Left: fragile strategic framing; right: structural moat. Language fluency and cultural legitimacy are independent dimensions.*
+
+| Positioning candidate | Can centralized labs eventually match? | Tapestry stance |
+| :-------------------- | :--------------------------------------- | :---------------- |
+| Multilingual capability | Yes, given scale and data | Useful, **not** the moat |
+| Data sovereignty (residency, legal control) | Partially — commoditized cloud offerings | **Necessary constraint**, not unique value |
+| Shared-training cost reduction | Yes — many pooling models exist | Helps smaller actors; **not** the differentiator |
+| **Sovereign cultural alignment** | **No** — requires local legitimacy and participation | **Primary differentiator** |
+
 ## Rationale
 
 - Cultural alignment requires local value judgments — what is appropriate, authoritative, respectful, true — that only the community itself can make. No external lab can do this for a community it doesn't belong to, no matter how well-intentioned.
