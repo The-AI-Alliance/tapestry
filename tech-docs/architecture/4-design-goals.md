@@ -70,17 +70,17 @@ Tapestry must deliver usable value at each stage of the roadmap, not just at the
 
 **Conflicts with:** Purity of the anti-capture principle. Phase 1 depends on an external base model, creating a temporary dependency. This is acceptable if the architecture ensures the dependency is replaceable (DG3).
 
-### DG5. Make participation economically rational
+### DG5. Make participation strategically rational
 
-**Derives from:** I3 (idle compute has no market), CP4 (unsustainable incentives), N5 (frontier capital requirements), VP-I3 (compute as currency), VP-CP3 (shared economics)
+**Derives from:** I3 (idle compute has no market), I5 (no legitimacy mechanism), CP4 (unsustainable incentives), N5 (frontier capital requirements), VP-I3 (compute as currency), VP-I5 (certification), VP-CP3 (shared economics)
 
-Every participant must receive value commensurate with their contribution. For many participants — Vietnam, Kenya, universities, mid-size enterprises — the value proposition is access to a frontier-class model that they could never afford to train alone. Participation in Tapestry is the only path to frontier capability. This is not "managed fine-tuning that everyone is already doing." It is shared infrastructure that makes the previously unreachable reachable.
+Every participant must receive value commensurate with their contribution — and that value must be legible to their board, their funder, or their government. For many participants, the value proposition is access to frontier capability they could never afford alone. But access alone is not enough. Participants also need strategic positioning: the ability to build commercial offerings, earn certification marks, gain governance voice, and be recognized as founding members of a global initiative.
 
-Contributors of compute, data, expertise, or alignment work must each have a clear answer to "what do I get for this?" The economic model must sustain ongoing operations, not just a single training run.
+Real participants have board-level objectives. FPT wants to be "the sovereign AI provider for Vietnam." NVIDIA wants Tapestry nodes running on its hardware. Current.AI wants to fund infrastructure that proves public-interest AI works. BharatGen wants their $120M investment to produce an actually-adopted model. Tapestry must deliver something each of these boards can justify — not just something their engineers admire.
 
-**Architectural implication:** Compute-for-access model. Governance rights linked to contribution. Transparent accounting of contribution and benefit. Revenue or access-sharing mechanisms for downstream commercial use.
+**Architectural implication:** Compute-for-access model. Certification standards (ISO/UL-style) that participants can earn and market. Governance rights linked to contribution. Transparent accounting of contribution and benefit. Revenue or access-sharing mechanisms for downstream commercial use. The certification framework is a governance design task, not an architectural one, but the architecture must support it (e.g., auditable training provenance, measurable alignment quality).
 
-**Conflicts with:** DG3 (anti-capture). If governance rights are proportional to contribution, the largest contributors have the most influence — which is a capture vector. The resolution is contribution-weighted voice with caps on maximum influence.
+**Conflicts with:** DG3 (anti-capture). Participants who invest the most will expect the most influence. The governance model must reward participation without allowing any single participant to dominate. Certification must be standards-based, not relationship-based — any entity that meets the criteria gets certified, regardless of their relationship to the founding consortium.
 
 ### DG6. Safety in the shared base
 
@@ -114,7 +114,7 @@ All architectural decisions, training runs, data governance actions, and governa
 
 **Derives from:** CP3 (first-mover architecture)
 
-The architecture should not lock the consortium into a single model architecture (transformer, MoE, JEPA, or future alternatives). The federated protocol and sovereignty infrastructure should be modality-agnostic and architecture-agnostic where possible, so that the consortium can adopt better approaches as they emerge.
+The architecture should not lock the consortium into a single model architecture (transformer, MoE, JEPA, or future alternatives). The consortium training protocol and sovereignty infrastructure should be modality-agnostic and architecture-agnostic where possible, so that the consortium can adopt better approaches as they emerge.
 
 ---
 
@@ -126,7 +126,7 @@ graph TD
     DG2["DG2\nArchitectural\nData Sovereignty"]
     DG3["DG3\nAnti-Capture"]
     DG4["DG4\nIncremental Value"]
-    DG5["DG5\nEconomic Rationality"]
+    DG5["DG5\nStrategic Rationality"]
     DG6["DG6\nSafety in\nShared Base"]
 
     DG1 -->|"enables"| DG4

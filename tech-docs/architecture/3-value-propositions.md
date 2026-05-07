@@ -76,6 +76,12 @@ HPC centers and enterprises contribute idle GPU cycles to consortium training ro
 
 Industrial participants in Tapestry don't just fine-tune someone else's model. They participate in decisions about base model architecture, training data composition, and the expert routing that determines how domain knowledge is represented. This is ownership at the architectural level, not the adapter level.
 
+**VP-I5. Certification and strategic positioning.** ← addresses I5 (no legitimacy mechanism)
+
+Tapestry establishes standards for sovereign AI — data governance, cultural alignment quality, safety baselines, interoperability. Participants that meet these standards receive Tapestry certification. This gives a company like FPT the ability to be "Tapestry-certified for Vietnam" — a mark of legitimacy backed by a global consortium, without the AI Alliance choosing national winners. Governments can use certification to evaluate sovereign AI claims. Companies can use it to differentiate commercially. The certification model is ISO/UL-style: define standards, certify compliance, stay neutral on competition.
+
+This is the value proposition that answers the board-level question: "What does our organization get from participation?" Not just access to a model — strategic positioning, a credibility mark, and the ability to build commercial offerings on top of consortium-validated infrastructure.
+
 ---
 
 ## Individual
@@ -114,7 +120,7 @@ No single organization bears the full cost of training or maintaining a frontier
 
 Honesty about limitations strengthens the value proposition. Tapestry does not claim:
 
-- **That federated training at frontier scale is proven.** It is not. DiLoCo-class methods work at small scale. The central open research question is whether they work at 70B+ across heterogeneous, high-latency nodes. The MVP roadmap is designed to deliver value without requiring this to be solved first (by starting with existing open-weights bases).
+- **That consortium training at frontier scale is proven.** It is not. DiLoCo-class methods work at small scale. The central open research question is whether they work at 70B+ across heterogeneous, high-latency nodes. The MVP roadmap is designed to deliver value without requiring this to be solved first (by starting with existing open-weights bases).
 
 - **That sovereignty is free.** Participating in Tapestry requires compute, data curation, alignment work, and governance participation. The cost is lower than training a model alone, but it is not zero. Participants who want sovereignty must invest in it.
 
@@ -142,6 +148,8 @@ graph LR
         I2["I2 Deprecation"]
         I3["I3 Idle compute"]
         I4["I4 Fine-tuning ≠ sovereignty"]
+        I5["I5 No legitimacy"]
+        IN1["IN1 No representation"]
         IN2["IN2 Binary privacy"]
         IN3["IN3 Wrong world"]
         IN4["IN4 No alignment agency"]
@@ -163,6 +171,7 @@ graph LR
         VI2["VP-I2 Portable investment"]
         VI3["VP-I3 Compute as currency"]
         VI4["VP-I4 Architectural voice"]
+        VI5["VP-I5 Certification"]
         VIN1["VP-IN1 Local context"]
         VIN2["VP-IN2 Graduated privacy"]
         VIN3["VP-IN3 Community alignment agency"]
@@ -186,6 +195,8 @@ graph LR
     I2 --> VI2
     I3 --> VI3
     I4 --> VI4
+    I5 --> VI5
+    IN1 --> VIN1
     IN3 --> VIN1
     SC1 --> VIN1
     IN2 --> VIN2

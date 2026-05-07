@@ -16,7 +16,23 @@ TVA runs in six phases, organized into two movements:
 
 **Architecture (Phases 5–6)** explore the option space and commit to decisions, working bottom-up — letting technical realities reshape goals where necessary.
 
-The process is explicitly bidirectional. Phase 4 outputs (design goals) may be revised when Phase 5 reveals that a goal is technically infeasible or that a technical opportunity reshapes what's worth optimizing for. This is intentional, not a failure of the process.
+The process is explicitly bidirectional. Insights from later phases revise earlier ones. This is intentional, not a failure of the process.
+
+## Workflow: Iterate for Consistency
+
+The six phases are not a waterfall. After the initial pass through Phases 1–5, the process requires iterative review:
+
+1. **Forward pass.** Work through Phases 1–5 sequentially, producing draft outputs.
+
+2. **Bottom-up revision.** Architectural choices in Phase 5 create pressure on Phase 4 (design goals). A goal that seemed right in the abstract may be technically infeasible, or a technical opportunity may reshape what's worth optimizing for. When Phase 5 revises Phase 4, the revision must ripple back: does it change what value propositions are credible (Phase 3)? Does it reframe which pain points are primary (Phase 2)? Does it change what success looks like for a stakeholder layer (Phase 1)?
+
+3. **Consistency check.** After each revision, verify bidirectional traceability across all phases. Every pain point should trace forward to a value proposition. Every value proposition should trace to a design goal. Every design goal should have architectural options. Orphaned items — pain points with no value proposition, value propositions with no design goal, architectural features with no traced requirement — are either gaps to fill or features to cut.
+
+4. **Surface tensions.** Where goals conflict, where assumptions are unvalidated, or where participant interests diverge, the tension is named explicitly as an open question — not papered over. Open questions are assigned to specific people or forums for resolution (e.g., the workshop, a work group, a governance vote).
+
+5. **Repeat until stable.** The process converges when a full consistency pass produces no new revisions. In practice, 2–3 iterations are typical.
+
+The diagram below shows the primary forward flow and the revision feedback loops:
 
 ```mermaid
 graph TD
@@ -35,6 +51,9 @@ graph TD
     P1 --> P2 --> P3 --> P4
     P4 --> P5 --> P6
     P5 -.->|"revises"| P4
+    P4 -.->|"ripples back"| P3
+    P3 -.->|"ripples back"| P2
+    P2 -.->|"ripples back"| P1
 
     style P1 fill:#2e7d32,stroke:#1b5e20,color:#fff
     style P2 fill:#2e7d32,stroke:#1b5e20,color:#fff

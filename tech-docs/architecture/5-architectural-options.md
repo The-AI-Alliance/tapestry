@@ -274,7 +274,7 @@ What is the software stack for training?
 ### Options
 
 **Option A: PyTorch-based.**
-Standard PyTorch with distributed training extensions (PyTorch Distributed, FSDP, or DeepSpeed). Federated layer built on top.
+Standard PyTorch with distributed training extensions (PyTorch Distributed, FSDP, or DeepSpeed). Consortium training layer built on top.
 
 - *For:* Largest ecosystem. Most participants already use it. Widest model support. NVIDIA and AMD both support it.
 - *Against:* Python-heavy. Large deployment footprint. Supply chain complexity for sovereign node auditing.
@@ -286,14 +286,14 @@ Core infrastructure in Rust. Training via Burn (hardware-agnostic: CUDA, ROCm, M
 - *Against:* Smaller ecosystem. Fewer pretrained models available. Steeper learning curve for ML researchers. Burn is less mature than PyTorch for frontier-scale training.
 
 **Option C: Dual-path (per Tracel AI proposal).**
-Rust core with a backend abstraction supporting both Burn and PyTorch. Nodes choose their training backend. The federated protocol is backend-agnostic.
+Rust core with a backend abstraction supporting both Burn and PyTorch. Nodes choose their training backend. The consortium protocol is backend-agnostic.
 
 - *For:* Best of both. PyTorch nodes participate with existing infrastructure. Burn nodes get the sovereignty benefits. No participant is excluded by language choice. The consortium handles mixed backends.
 - *Against:* More engineering work. The backend abstraction layer must be carefully designed. Two codepaths to maintain.
 
 ### Recommendation
 
-**Option C, with Option A as the pragmatic starting point.** Build the federated protocol in a way that's backend-agnostic from the start. Initial implementation targets PyTorch (largest ecosystem, fastest to participants). Burn support developed in parallel. Nodes choose their backend.
+**Option C, with Option A as the pragmatic starting point.** Build the consortium protocol in a way that's backend-agnostic from the start. Initial implementation targets PyTorch (largest ecosystem, fastest to participants). Burn support developed in parallel. Nodes choose their backend.
 
 ### Workshop decision needed
 
@@ -478,8 +478,16 @@ These questions are not resolved in this document and are intended for ongoing d
 
 8. **Cycle frequency as sovereignty.** The training loop says "back to Step 2 as often as each node chooses." But if some nodes cycle monthly and others annually, their influence diverges. Is this acceptable, or does the consortium need synchronized cycles?
 
+### Ecosystem and Certification
+
+9. **What does Tapestry certification mean?** If an entity claims to be a "Tapestry-certified sovereign AI provider," what standards must they meet? Data governance, alignment quality (measured how?), safety baselines, interoperability with the consortium? Who audits compliance?
+
+10. **How does certification interact with competition?** Multiple entities in the same country could seek certification. Tapestry stays neutral — it certifies against standards, not against competitors. But participants will ask: "If I invest in building this for my country, does my competitor get the same certification for free?" The answer must be yes (standards-based), but the early-mover advantage of being first to certify is real.
+
+11. **What is the commercial model?** Participants need to build businesses on top of Tapestry. What can they charge for? Sovereign alignment services? Deployment and support? Domain-specific adapters? The consortium needs a clear position on what is shared (the base model, the training loop) and what is proprietary (the participant's sovereign layers, their client relationships, their commercial offerings).
+
 ### Research
 
-9. **Does continued pretraining on culturally grounded data actually work?** This is the foundational hypothesis. The "Fluent but Foreign" paper shows language-focused continued pretraining doesn't shift cultural alignment. We claim culturally *grounded* data is different. This needs an experiment before it's a promise.
+12. **Does continued pretraining on culturally grounded data actually work?** This is the foundational hypothesis. The "Fluent but Foreign" paper shows language-focused continued pretraining doesn't shift cultural alignment. We claim culturally *grounded* data is different. This needs an experiment before it's a promise.
 
-10. **What constitutes "culturally grounded" data?** Legal texts? Literature? Community-authored content? Social media? Religious texts? The answer likely varies by community, but the training pipeline needs to know what to ingest.
+13. **What constitutes "culturally grounded" data?** Legal texts? Literature? Community-authored content? Social media? Religious texts? The answer likely varies by community, but the training pipeline needs to know what to ingest.

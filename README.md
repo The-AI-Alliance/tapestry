@@ -17,7 +17,7 @@ Repository-local technical documentation lives under **`tech-docs/`**. Start her
 | Entry point | Contents |
 | :---------- | :------- |
 | [**`tech-docs/architecture/`**](tech-docs/architecture/README.md) | TVA methodology; phased outputs (stakeholder map through design goals); architectural options / thesis; [**ADRs**](tech-docs/architecture/decisions/); [**diagrams**](tech-docs/architecture/diagrams/) |
-| [**`tech-docs/README.md`**](tech-docs/README.md) | Index of architecture, [**governance**](tech-docs/governance/), [**work-groups**](tech-docs/work-groups/), [**strategic-plan**](tech-docs/strategic-plan/), [**tapestry-reference**](tech-docs/tapestry-reference/) |
+| [**`tech-docs/README.md`**](tech-docs/README.md) | Index of architecture, [**governance**](tech-docs/governance/), [**work-groups**](tech-docs/work-groups/), [**strategic-plan**](tech-docs/strategic-plan/), [**reference**](tech-docs/reference/) |
 | [**`docs/`**](docs/) | Source for the [published technical website](https://the-ai-alliance.github.io/tapestry/) (Jekyll / GitHub Pages) |
 
 For repo layout, conventions, and where to find implementation code, see [**`AGENTS.md`**](AGENTS.md).

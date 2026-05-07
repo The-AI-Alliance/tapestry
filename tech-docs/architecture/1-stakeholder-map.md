@@ -36,6 +36,7 @@ Ministries, AI agencies, sovereign funds.
 **Leverage:** Control compute budgets and state data.
 **Fears:** Infrastructure dependency on foreign platforms. Permanent capability lag.
 **Success criteria:** A credible path to owning frontier models. Data residency guarantees.
+**Strategic interest:** Demonstrable sovereign AI capability. Political credit for delivering frontier technology to citizens.
 
 ### Socio-cultural
 
@@ -44,6 +45,7 @@ Language communities, knowledge custodians, civil society.
 **Leverage:** Control unique corpora that exist nowhere else.
 **Fears:** Cultural homogenization. Extraction without reciprocity.
 **Success criteria:** Cultural parity. Data royalties. Their own alignment layer.
+**Strategic interest:** Preservation and amplification of cultural identity through AI that reflects their values.
 
 ### Industrial
 
@@ -52,6 +54,7 @@ Health, legal, finance, energy, sovereign cloud, HPC centers.
 **Leverage:** Control sensitive domain data and idle compute.
 **Fears:** Data leakage to rivals. Platform deprecation.
 **Success criteria:** Sovereign alignment layers. A compute-for-access model.
+**Strategic interest:** Commercial positioning. An entity like FPT wants to be "the sovereign AI provider for Vietnam." A hardware vendor wants Tapestry nodes running on its platform. A cloud provider wants to host consortium infrastructure. Participation must advance their board-level strategy, not just their technical agenda.
 
 ### Individual
 
@@ -68,9 +71,11 @@ ML researchers, systems engineers, HPC nodes, cloud providers, AI Alliance itsel
 **Leverage:** Control architecture decisions and training runs.
 **Fears:** Technical failure. Governance capture.
 **Success criteria:** Clear architecture. Credit. A working system.
+**Strategic interest:** Research publication opportunities. Platform validation (for infrastructure contributors). Being recognized as founding participants in a potentially historic initiative.
 
 ## Key Tensions
 
 - **National vs. socio-cultural:** Who owns community data?
-- **Industrial:** Most likely to fund early compute, most likely to defect if performance or security fails.
+- **Industrial:** Most likely to fund early compute, most likely to defect if performance or security fails. Their strategic interests are commercial — Tapestry must deliver something a board can justify, not just an engineer can admire.
 - **Contributor layer** has no external forcing function — incentives must be designed explicitly.
+- **Strategic interest vs. anti-capture:** Participants who invest the most will expect the most influence. The governance model must reward participation without allowing any single participant to dominate.

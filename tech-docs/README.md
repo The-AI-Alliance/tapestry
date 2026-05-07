@@ -8,7 +8,7 @@ This directory organizes the technical documentation under development for Proje
 | [`governance/`](governance/README.md) | Anti-capture principle and governance design |
 | [`work-groups/`](work-groups/README.md) | Each work group's documentation |
 | [`strategic-plan/`](strategic-plan/README.md) | Overall strategy for execution |
-| [`tapestry-reference/`](tapestry-reference/README.md) | Deploying and using Tapestry software |
+| [`reference/`](reference/README.md) | Deploying and using Tapestry software |
 
 ## Architecture documents
 
@@ -22,6 +22,7 @@ The directory index is [`architecture/README.md`](architecture/README.md). Main 
 | [`architecture/3-value-propositions.md`](architecture/3-value-propositions.md) | Phase 3 — what Tapestry offers that the status quo doesn't |
 | [`architecture/4-design-goals.md`](architecture/4-design-goals.md) | Phase 4 — constraints the architecture must satisfy |
 | [`architecture/5-architectural-options.md`](architecture/5-architectural-options.md) | Phase 5 — option space and decision analysis toward an architectural thesis |
+| [`architecture/training-approaches.md`](architecture/training-approaches.md) | Reference: centralized vs. federated vs. consortium training |
 | [`architecture/diagrams/`](architecture/diagrams/) | System topology, training loop, data governance diagrams |
 | [`architecture/decisions/`](architecture/decisions/README.md) | Architecture Decision Records (ADRs) |
 

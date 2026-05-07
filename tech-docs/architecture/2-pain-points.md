@@ -56,6 +56,8 @@ For each stakeholder layer identified in Phase 1, this document names the specif
 
 **I4. Fine-tuning is not sovereignty.** An industrial actor fine-tunes an open-weights model on its domain data. The base model was trained by a third party on data the enterprise didn't choose, with alignment it didn't control, using architecture decisions it had no voice in. The fine-tuned model inherits all the biases, failure modes, and architectural limitations of the base. Fine-tuning is customization, not ownership.
 
+**I5. No legitimacy mechanism for sovereign AI providers.** A company that builds sovereign AI capability for its country — training models on local data, aligning to local values, deploying on local infrastructure — has no way to signal that its offering meets any recognized standard. There is no certification, no seal of approval, no independent validation that a sovereign AI deployment is actually sovereign (rather than a thin wrapper around a foreign model). Without this, the entity cannot differentiate itself, and governments cannot evaluate competing claims of sovereignty.
+
 ## Individual
 
 **IN1. Users have no representation in model training.** An individual's data — search history, documents, conversations — contributes to training through various collection mechanisms. The resulting model reflects aggregate patterns, not individual needs. There is no feedback loop where a user's priorities, language preferences, or values influence the model that serves them.
@@ -74,7 +76,7 @@ For each stakeholder layer identified in Phase 1, this document names the specif
 
 **CP2. No infrastructure for consortium training at scale.** Research groups that want to train collaboratively across institutions must build bespoke infrastructure for every project. There is no reusable platform for consortium training that handles gradient aggregation, privacy, fault tolerance, and heterogeneous hardware. Every collaboration starts from scratch.
 
-> **Workshop question for Eric (Petuum), Laurent (INRIA), Erik (Zyphra):** *Has anyone in this room run outer-loop federated training above 7B parameters on heterogeneous, high-latency clusters? What broke? This is the central open research question for Tapestry.*
+> **Workshop question for Eric (Petuum), Laurent (INRIA), Erik (Zyphra):** *Has anyone in this room run outer-loop distributed training above 7B parameters on heterogeneous, high-latency clusters? What broke? This is the central open research question for Tapestry.*
 
 **CP3. Architecture decisions are made by whoever trains first.** The architecture of a widely adopted open model (Llama, Mistral, Qwen) is set by the organization that trained it. Downstream contributors can fine-tune, distill, or extend, but cannot change the fundamental architecture. If the architecture was wrong for their use case — wrong tokenizer, wrong attention mechanism, wrong expert routing — they have no remedy short of training their own model from scratch.
 

@@ -6,12 +6,18 @@ This directory contains Architecture Decision Records (ADRs) for Project Tapestr
 
 ADRs are numbered sequentially (`adr-NNN-short-title.md`) and use the following status values:
 
-- **proposed** — under discussion, not yet accepted
+- **proposed** — under discussion, inviting challenge
 - **accepted** — decision made and in effect
 - **superseded** — replaced by a later ADR (link to successor)
+- **rejected** — was proposed, explicitly decided against (records why not)
 
 ## Index
 
-| ADR | Title | Status |
-| :-- | :---- | :----- |
-| — | *(none yet)* | — |
+| ADR | Title | Status | Confidence |
+| :-- | :---- | :----- | :--------- |
+| [001](adr-001-core-plus-sovereign.md) | Core-plus-sovereign architecture | proposed | 5/5 |
+| [002](adr-002-consortium-training.md) | Consortium training model | proposed | 5/5 |
+| [003](adr-003-cultural-alignment.md) | Cultural alignment as primary differentiator | proposed | 5/5 |
+| [004](adr-004-training-loop.md) | The consortium training loop | proposed | 4/5 |
+| [005](adr-005-sovereign-pipeline.md) | Sovereign alignment pipeline | proposed | 4/5 |
+| [006](adr-006-phased-base-model.md) | Phased base model strategy | proposed | 4/5 |
