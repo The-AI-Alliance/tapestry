@@ -19,8 +19,8 @@ This repository is the technical home for Project Tapestry. Use this file as the
 - For local build and verification commands: `Makefile`
 - For the website structure and pages: `docs/index.markdown`, `docs/contributing.markdown`, `docs/about.markdown`
 - For project-level design docs and technical direction: `tech-docs/README.md`
-- For the current Python implementation surface: `src/tapestry/training/federated/`
-- For the current tests: `src/tests/tapestry/training/federated/`
+- For the current Python implementation surface: `src/tapestry/training/consortium/`
+- For the current tests: `src/tests/tapestry/training/consortium/`
 
 ## `tech-docs/` Map
 
@@ -44,12 +44,13 @@ The Python code is organized around three major subsystems:
 - `training/` for distributed training and tuning
 - `infrastructure/` for supporting infrastructure
 
-The only implemented training slice in this snapshot is `training/federated/`, which contains:
+The only implemented training slice in this snapshot is `training/consortium/`, which contains:
 
-- `aggregator.py` for FedAvg-style aggregation
-- `node.py` for local training nodes and the demo transformer model
-- `privacy.py` for differential privacy helpers
-- `protocols.py` for shared dataclasses and the structural protocol
+- `coordinator.py` for governed shared-base integration
+- `node.py` for sovereign training nodes and participant-owned artifacts
+- `policy.py` for quality-floor and anti-capture contribution weighting
+- `messages.py` for shared dataclasses
+- `model.py` for the tiny demo model
 
 Keep new code aligned with that split. Add tests under the matching `src/tests/tapestry/...` path.
 

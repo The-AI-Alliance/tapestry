@@ -22,7 +22,7 @@ Repository-local technical documentation lives under **`tech-docs/`**. Start her
 
 For repo layout, conventions, and where to find implementation code, see [**`AGENTS.md`**](AGENTS.md).
 
-**Quick paths:** [**`Makefile`**](Makefile) (`make help` — tests, formatting, lint, type-check, local [`docs/`](docs/) preview), [**`GITHUB_PAGES.md`**](GITHUB_PAGES.md) for the Jekyll site, [**`examples/`**](examples/) for runnable demos, [**`src/tapestry/training/federated/README.md`**](src/tapestry/training/federated/README.md) for the consortium-training prototype.
+**Quick paths:** [**`Makefile`**](Makefile) (`make help` — tests, formatting, lint, type-check, local [`docs/`](docs/) preview), [**`GITHUB_PAGES.md`**](GITHUB_PAGES.md) for the Jekyll site, [**`examples/`**](examples/) for runnable demos, [**`src/tapestry/training/consortium/README.md`**](src/tapestry/training/consortium/README.md) for the consortium-training prototype.
 
 For pull requests, see [`.github/PULL_REQUEST_TEMPLATE/`](.github/PULL_REQUEST_TEMPLATE/). The website contributing page is authored from [`docs/contributing.markdown`](docs/contributing.markdown).
 

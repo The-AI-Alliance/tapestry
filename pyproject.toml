@@ -25,17 +25,24 @@ build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 testpaths = ["src/tests"]
+pythonpath = ["src"]
 python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 
 [tool.black]
-line-length = 88
+line-length = 120
 target-version = ['py39']
 
 [tool.ruff]
-line-length = 88
+line-length = 120
 target-version = "py39"
+
+[tool.pylint.format]
+max-line-length = 120
+
+[tool.pylint.main]
+init-hook = "import sys; sys.path.insert(0, 'src')"
 
 [tool.mypy]
 python_version = "3.9"
