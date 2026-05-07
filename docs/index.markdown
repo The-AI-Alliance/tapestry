@@ -3,7 +3,7 @@ layout: default
 title: Home
 nav_order: 10
 has_children: false
-tech_docs: https://github.com/The-AI-Alliance/tapestry/tree/main/tech-docs/work-groups/
+tech_docs: https://github.com/The-AI-Alliance/tapestry/tree/develop/tech-docs
 ---
 
 # Project Tapestry: Technical Website
@@ -32,37 +32,27 @@ Watch for announcements over the coming months about Project Tapestry’s archit
 
 Tapestry is designed with data sovereignty requirements first and foremost, leading to new approaches for distributed model training to build world-class foundation models, as well as support tuning domain-specific models using sensitive data with carefully governed access.
 
-Work groups are organized in two tracks — requirements groups that define what must be built, and engineering groups that build it. [Participation is welcome!]({{site.baseurl}}/contributing)
-
-### Requirements Work Groups
-
-These groups identify and prioritize what Tapestry must do.
+The following work groups are provisional. [Participation is welcome!]({{site.baseurl}}/contributing)
 
 | Work Group | Focus |
-|---|---|
-| [Data Requirements]({{page.tech_docs}}/work-groups/data-requirements/){:target="repo-tech-docs"} | Data sovereignty, governance, and management requirements across national, cultural, and industrial sovereignty |
-| [Model Training Requirements]({{page.tech_docs}}/work-groups/model-training-requirements/){:target="repo-tech-docs"} | Federated and distributed training requirements that satisfy data sovereignty constraints |
-| [Evaluation Requirements]({{page.tech_docs}}/work-groups/evaluation-requirements/){:target="repo-tech-docs"} | Evaluation frameworks for both performance and sovereignty compliance |
-| [Infrastructure Requirements]({{page.tech_docs}}/work-groups/infrastructure-requirements/){:target="repo-tech-docs"} | Infrastructure requirements for sovereign node deployment and federated operation |
-
-### Engineering Work Groups
-
-These groups design and implement what the requirements groups specify.
-
-| Work Group | Focus |
-|---|---|
-| [Data Engineering]({{page.tech_docs}}/work-groups/data-engineering/){:target="repo-tech-docs"} | Data pipelines, sovereignty enforcement, and data management infrastructure |
-| [Model Training Engineering]({{page.tech_docs}}/work-groups/model-training-engineering/){:target="repo-tech-docs"} | Federated training stack, privacy-preserving aggregation, and distributed training infrastructure |
-| [Evaluation Engineering]({{page.tech_docs}}/work-groups/evaluation-engineering/){:target="repo-tech-docs"} | Evaluation tooling for domain performance and sovereignty compliance |
-| [Infrastructure Engineering]({{page.tech_docs}}/work-groups/infrastructure-engineering/){:target="repo-tech-docs"} | Sovereign node infrastructure, deployment tooling, and operational systems |
+| :--------- | :---- |
+| [Base Model Training]({{page.tech_docs}}/work-groups/base-model-training/){:target="repo-tech-docs"} | Own the shared model capability path: selecting or adopting an initial open-weights base, defining how consortium training improves shared weights, and planning the transition toward consortium-owned base models when the project has sufficient compute, data, and operational maturity. |
+| [Data Governance]({{page.tech_docs}}/work-groups/data-governance/){:target="repo-tech-docs"} | Define how sovereign data can participate in Tapestry without surrendering control. This group owns data sourcing, licensing, stewardship, residency constraints, provenance, contribution rights, and data-quality expectations for national, cultural, industrial, and institutional participants. |
+| [Deployment and Adoption]({{page.tech_docs}}/work-groups/deployment-adoption/){:target="repo-tech-docs"} | Ensure Tapestry-derived models become usable systems, not just trained weights. This group owns serving patterns, product harnesses, integration guidance, participant rollout, developer experience, and adoption feedback loops. |
+| [Evaluation Certification]({{page.tech_docs}}/work-groups/evaluation-certification/){:target="repo-tech-docs"} | Define the evidence that Tapestry models, pipelines, and participants must produce before claims of capability, sovereignty, cultural alignment, safety, or certification are accepted. |
+| [Governance and Participation]({{page.tech_docs}}/work-groups/governance-participation/){:target="repo-tech-docs"} | Translate Tapestry's governance principles into operating mechanics for work groups, participants, contributions, decisions, certification processes, and anti-capture safeguards. |
+| [Infrastructure and Operations]({{page.tech_docs}}/work-groups/infrastructure-operations/){:target="repo-tech-docs"} | Own the platform and operating model that lets participants run Tapestry workloads across heterogeneous compute, networks, security regimes, and organizational boundaries. |
+| [Security and Privacy]({{page.tech_docs}}/work-groups/security-privacy/){:target="repo-tech-docs"} | Define the technical guarantees that make Tapestry sovereignty enforceable: privacy tiers, secure aggregation, differential privacy, trusted execution, threat models, model-update leakage analysis, and safety-preservation constraints. |
+| [Sovereign Alignment]({{page.tech_docs}}/work-groups/sovereign-alignment/){:target="repo-tech-docs"} | Own the participant-specific pipeline that turns a shared capable base into models that reflect local knowledge, values, institutions, domains, and interaction norms. This includes culturally grounded continued pretraining, post-training alignment, instruction tuning, and portability of sovereign contributions. |
 
 ## Other Technical Documentation
 
 See also the following sections in the technical documentation:
 
-* [Architectural Decision Records]({{page.tech_docs}}/adr/){:target="repo-tech-docs"}
+* [Architecture]({{page.tech_docs}}/architecture/){:target="repo-tech-docs"}:
+* [Governance]({{page.tech_docs}}/governance/){:target="repo-tech-docs"}:
+* [Reference]({{page.tech_docs}}/reference/){:target="repo-tech-docs"}:
 * [Strategic Plan]({{page.tech_docs}}/strategic-plan/){:target="repo-tech-docs"}
-* [Tapestry Reference]({{page.tech_docs}}/tapestry-reference/){:target="repo-tech-docs"}
 
 ## Additional links
 
