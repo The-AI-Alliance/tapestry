@@ -55,6 +55,11 @@ make type-check         # Type check the Python code with 'ty'.
 make type-check-watch   # Type check the Python code with 'ty' in "watch" mode,
                         # so you can fix mistakes and keep it updating.
 
+For the consortium-training prototype:
+
+make consortium-demo    # Run the N+1 consortium-training proof-of-concept demo.
+make consortium-tests   # Run only the consortium-training prototype tests.
+
 For the documentation website:
 
 make view-pages         # View the published GitHub pages in a browser.
@@ -113,10 +118,17 @@ tests:: unit-tests
 unit-tests::
 	@echo "${INFO}Running the unit tests...${_END}"
 	cd ${SRC_DIR} && \
-	  uv run python -m unittest discover \
-	    --pattern 'test_*.py' \
-	    --start-directory tests \
-	    --top-level-directory .
+	  uv run pytest tests -q
+
+.PHONY: consortium-demo consortium-tests
+
+consortium-demo::
+	@echo "${INFO}Running the consortium-training demo...${_END}"
+	uv run python examples/consortium_training_demo.py
+
+consortium-tests::
+	@echo "${INFO}Running the consortium-training tests...${_END}"
+	uv run pytest ${SRC_DIR}/tests/tapestry/training/consortium -q
 
 .PHONY: format lint type-check type-check-watch
 
