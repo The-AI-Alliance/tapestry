@@ -44,3 +44,8 @@ This is the foundational architectural choice. All subsequent decisions assume i
 - Creates a temporary dependency on an external base model provider (tension with DG3 anti-capture). Mitigated by designing sovereign layers to be portable across bases.
 - Requires a credible roadmap to consortium-trained bases, or the dependency becomes permanent.
 - The "80/20" framing may understate the sovereign contribution's importance — alignment is what makes the model usable for each community, even if it's 20% of the compute.
+
+## References
+
+- ["Fluent but Foreign: Even Regional LLMs Lack Cultural Alignment." arXiv:2505.21548, 2026.](https://arxiv.org/html/2505.21548)
+- ["Buy versus Build an LLM: A Decision Framework for Governments." arXiv:2602.13033, 2026.](https://arxiv.org/abs/2602.13033)

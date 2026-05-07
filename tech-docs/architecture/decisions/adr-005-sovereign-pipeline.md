@@ -64,3 +64,10 @@ The overall shape — pretraining for knowledge, alignment for behavior, instruc
 - Continued pretraining on the full model requires meaningful compute (5–10% of base pretraining). Smaller participants may need compute support from the consortium.
 - The alignment tooling (value elicitation, alignment data pipelines, cultural evaluation frameworks) is novel infrastructure that doesn't exist yet. This is the area requiring the most original work.
 - Safety properties from the base model may be affected by continued pretraining (unlike adapters, which leave the base frozen). Mechanisms for preserving safety through continued pretraining are an open design question.
+
+## References
+
+- ["Fluent but Foreign: Even Regional LLMs Lack Cultural Alignment." arXiv:2505.21548, 2026.](https://arxiv.org/html/2505.21548)
+- [Rafailov et al. "Direct Preference Optimization: Your Language Model is Secretly a Reward Model." NeurIPS 2023.](https://arxiv.org/abs/2305.18290)
+- [Bai et al. "Constitutional AI: Harmlessness from AI Feedback." arXiv:2212.08073, 2022.](https://arxiv.org/abs/2212.08073)
+- [Inglehart & Welzel. "The WVS Cultural Map of the World." World Values Survey, 2005-2022.](https://www.worldvaluessurvey.org)

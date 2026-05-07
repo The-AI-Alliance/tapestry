@@ -30,7 +30,7 @@ This repository is the technical home for Project Tapestry. Use this file as the
 - `tech-docs/architecture/5-architectural-options.md` is the option-space / decision analysis stage.
 - `tech-docs/architecture/decisions/` holds the numbered ADRs.
 - `tech-docs/governance/` holds governance design, including the anti-capture principle.
-- `tech-docs/work-groups/` holds work-group-specific requirements and engineering notes.
+- `tech-docs/work-groups/` holds lifecycle work-group charters (data governance, base training, sovereign alignment, evaluation/certification, security/privacy, infrastructure, deployment, and governance participation).
 - `tech-docs/strategic-plan/` holds higher-level execution strategy.
 - `tech-docs/reference/` is for reference material (e.g. training-paradigm comparisons, deployment and usage notes) outside the phased TVA chain under `architecture/`.
 

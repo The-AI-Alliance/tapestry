@@ -61,3 +61,12 @@ The loop itself is unlikely to be challenged. The open questions are about param
 - Requires a central coordinator for aggregation. The coordinator is a governed role, not a power center (see Phase 5, Decision 7).
 - The compute cost per cycle for each node is estimated at 5–10% of original base pretraining cost. This must be validated empirically.
 - A consortium training prototype demonstrating this loop across 2–3 real nodes is the MVP deliverable, not a generic fine-tuning system.
+
+## References
+
+- [Douillard et al. "DiLoCo: Distributed Low-Communication Training of Language Models." arXiv:2311.08105, 2023.](https://arxiv.org/abs/2311.08105)
+- [Jaghouar et al. "OpenDiLoCo: An Open-Source Framework for Globally Distributed Low-Communication Training." arXiv:2407.07852, 2024.](https://arxiv.org/abs/2407.07852)
+- ["Communication-Efficient Language Model Training Scales Reliably and Robustly: Scaling Laws for DiLoCo." arXiv:2503.09799, 2025.](https://arxiv.org/abs/2503.09799)
+- [McMahan et al. "Communication-Efficient Learning of Deep Networks from Decentralized Data." AISTATS 2017.](https://arxiv.org/abs/1602.05629)
+- [Zhu et al. "Deep Leakage from Gradients." NeurIPS 2019.]()
+- [Geiping et al. "Inverting Gradients: How easy is it to break privacy in federated learning?" NeurIPS 2020.]()

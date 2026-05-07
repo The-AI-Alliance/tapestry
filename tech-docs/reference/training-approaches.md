@@ -97,9 +97,43 @@ The choice of weight deltas over gradients is a design decision within consortiu
 
 ---
 
+## Comparison
+
+| | Centralized Training | Federated Learning | Consortium Training |
+| :--- | :--- | :--- | :--- |
+| **Participants** | One organization, one cluster | Many clients (phones, hospitals, edge) | Dozens of large institutional nodes |
+| **Data per node** | All data centralized | Small (one user's or site's data) | Massive (national/institutional corpora) |
+| **Sovereignty motive** | N/A — one owner | Individual / site-level data protection | National/institutional sovereignty + cultural alignment |
+| **What crosses the network** | N/A — internal interconnect | Gradients, weight updates, or deltas (varies by method) | Weight deltas (aggregated over many steps) |
+| **Communication** | Every step; fast interconnect | Varies: frequent (FedAvg) to infrequent (DiLoCo) | Infrequent; WAN-tolerant |
+| **Model scale** | Frontier | Typically small to medium | Frontier |
+| **Governance** | Single owner decides all | Aggregator-driven; clients have no architectural voice | Consortium with shared ownership and governance rights |
+| **Each node's outcome** | N/A — one model | Same global model (or personalized variant in PFL) | Sovereign model: shared base + community-specific alignment |
+
+Consortium training borrows techniques from the federated learning literature — including DiLoCo (infrequent sync) and ideas from Personalized Federated Learning (per-node model variants). The distinction is not technical novelty in the optimization algorithm but in the *context*: who participates, at what scale, with what governance, and toward what goal.
+
+---
+
 ## Related decisions
 
 | Document | Role |
 | :------- | :--- |
 | [ADR-002: Consortium training model](../architecture/decisions/adr-002-consortium-training.md) | Names the paradigm and contrasts it with federated and centralized training. |
 | [ADR-004: The consortium training loop](../architecture/decisions/adr-004-training-loop.md) | Defines the four-step loop (base → CPT → deltas → integrate). |
+
+## References
+
+**Centralized training** — no single foundational paper; standard practice across OpenAI (GPT-4), Anthropic (Claude), Meta (Llama), Google (Gemini).
+
+**Federated learning:**
+- [McMahan et al. "Communication-Efficient Learning of Deep Networks from Decentralized Data." AISTATS 2017.](https://arxiv.org/abs/1602.05629) — foundational FedAvg paper.
+- [Tan et al. "Towards Personalized Federated Learning." IEEE Trans. Neural Networks, 2023.]() — survey of Personalized FL approaches.
+
+**DiLoCo (infrequent-sync distributed training):**
+- [Douillard et al. "DiLoCo: Distributed Low-Communication Training of Language Models." arXiv:2311.08105, 2023.](https://arxiv.org/abs/2311.08105) — the method Tapestry's weight-delta communication builds on.
+- [Jaghouar et al. "OpenDiLoCo: An Open-Source Framework for Globally Distributed Low-Communication Training." arXiv:2407.07852, 2024.](https://arxiv.org/abs/2407.07852) — open-source implementation, cross-continent validation.
+- ["Communication-Efficient Language Model Training Scales Reliably and Robustly: Scaling Laws for DiLoCo." arXiv:2503.09799, 2025.](https://arxiv.org/abs/2503.09799) — scaling behavior at larger model sizes.
+
+**Gradient privacy:**
+- [Zhu et al. "Deep Leakage from Gradients." NeurIPS 2019.]() — demonstrates training data reconstruction from per-step gradients.
+- [Geiping et al. "Inverting Gradients: How easy is it to break privacy in federated learning?" NeurIPS 2020.]() — improved gradient inversion attacks.

@@ -28,7 +28,7 @@ For a country like Vietnam — or dozens of others — a frontier-class model th
 
 **Architectural implication:** Core-plus-sovereign architecture. A frontier-competitive base (initially from existing open weights, eventually consortium-trained) with modular sovereign alignment layers produced by each participating community. The alignment pipeline is as well-engineered as the training pipeline — it is a core architectural component, not a downstream fine-tuning step. Tooling for alignment data collection, training pipelines for alignment layers, and evaluation frameworks that test cultural appropriateness (not just accuracy) are first-class infrastructure.
 
-**Success test:** For each participating community, the Tapestry-derived model outperforms both (a) the base model alone on culturally and domain-specific tasks, and (b) any locally-trained sovereign alternative on general capability tasks. Users in that community prefer it over commercial alternatives for tasks where cultural context matters.
+**Success test:** For each participating community, the Tapestry-derived model outperforms both (a) the base model alone on culturally and domain-specific tasks, and (b) any locally-trained sovereign alternative on general capability tasks. Users in that community prefer it over commercial alternatives for tasks where cultural context matters. Cultural alignment is measured using frameworks like the [Inglehart-Welzel Cultural Map](https://www.worldvaluessurvey.org/WVSContents.jsp?CMSID=Findings) (World Values Survey): a model's cultural positioning should match its target community, not cluster with the base model's culture of origin.
 
 ### DG2. Sovereignty through architecture, not just policy
 

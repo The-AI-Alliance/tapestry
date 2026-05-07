@@ -53,3 +53,8 @@ The phased approach is pragmatic and likely uncontested. The 4/5 confidence refl
 - Phase 1 creates a dependency on the chosen base model's provider. This must be acknowledged in all communications — not hidden.
 - The portability requirement constrains how sovereign layers are implemented. They must use standard interfaces and formats, not provider-specific APIs.
 - Criteria for triggering Phase 2 should be defined at the workshop or shortly after — this prevents the "never" problem.
+
+## References
+
+- [Douillard et al. "DiLoCo: Distributed Low-Communication Training of Language Models." arXiv:2311.08105, 2023.](https://arxiv.org/abs/2311.08105)
+- ["Buy versus Build an LLM: A Decision Framework for Governments." arXiv:2602.13033, 2026.](https://arxiv.org/abs/2602.13033)

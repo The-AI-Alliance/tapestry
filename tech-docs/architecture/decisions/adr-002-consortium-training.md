@@ -21,11 +21,18 @@ This is distinct from federated learning (designed for millions of small edge cl
 
 *Tapestry is the third column; see [`training-approaches.md`](../../reference/training-approaches.md) for prose and the full comparison table.*
 
-| Paradigm | Typical participants | Dominant motive | Typical communication |
-| :------- | :------------------- | :-------------- | :-------------------- |
-| Centralized training | One organization, one cluster | Throughput and control; data colocated | Fast interconnect; full batches |
-| Federated learning | Very many small clients | Individual / edge privacy | Frequent small updates (gradients or small deltas) |
-| **Consortium training** | Few large institutional nodes | National or institutional sovereignty; cultural alignment | Infrequent **weight deltas**; WAN-tolerant |
+| | Centralized Training | Federated Learning | Consortium Training |
+| :--- | :--- | :--- | :--- |
+| **Participants** | One organization, one cluster | Many clients (phones, hospitals, edge) | Dozens of large institutional nodes |
+| **Data per node** | All data centralized | Small (one user's or site's data) | Massive (national/institutional corpora) |
+| **Sovereignty motive** | N/A — one owner | Individual / site-level data protection | National/institutional sovereignty + cultural alignment |
+| **What crosses the network** | N/A — internal interconnect | Gradients, weight updates, or deltas (varies by method) | Weight deltas (aggregated over many steps) |
+| **Communication** | Every step; fast interconnect | Varies: frequent (FedAvg) to infrequent (DiLoCo) | Infrequent; WAN-tolerant |
+| **Model scale** | Frontier | Typically small to medium | Frontier |
+| **Governance** | Single owner decides all | Aggregator-driven; clients have no architectural voice | Consortium with shared ownership and governance rights |
+| **Each node's outcome** | N/A — one model | Same global model (or personalized variant in PFL) | Sovereign model: shared base + community-specific alignment |
+
+Consortium training borrows techniques from the federated learning literature — including DiLoCo (infrequent sync) and ideas from Personalized Federated Learning (per-node model variants). The distinction is not technical novelty in the optimization algorithm but in the *context*: who participates, at what scale, with what governance, and toward what goal. FL optimizes for privacy across many small clients. Consortium training optimizes for cultural sovereignty across few large institutions with shared governance.
 
 ## Rationale
 
@@ -48,3 +55,9 @@ This is a framing and communication decision as much as a technical one. The ter
 - Requires updating all documentation and communications from "federated" to "consortium" when referring to Tapestry's own approach. (Largely complete as of May 2026.)
 - The term "consortium training" is novel — it doesn't have an established literature. This is a feature (we define what it means) and a risk (no prior art to reference). DiLoCo is the closest technical precedent for the communication mechanism.
 - References to federated learning techniques (FedAvg, DiLoCo, etc.) remain valid as technical building blocks. The distinction is between the paradigm (consortium) and the techniques it may use.
+
+## References
+
+- [Douillard et al. "DiLoCo: Distributed Low-Communication Training of Language Models." arXiv:2311.08105, 2023.](https://arxiv.org/abs/2311.08105)
+- [McMahan et al. "Communication-Efficient Learning of Deep Networks from Decentralized Data." AISTATS 2017.](https://arxiv.org/abs/1602.05629)
+- [Tan et al. "Towards Personalized Federated Learning." IEEE Trans. Neural Networks, 2023.]()
