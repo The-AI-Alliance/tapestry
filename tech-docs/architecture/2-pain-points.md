@@ -32,10 +32,13 @@ For each stakeholder layer identified in Phase 1, this document names the specif
 
 The [Inglehart-Welzel Cultural Map](https://www.worldvaluessurvey.org/WVSContents.jsp?CMSID=Findings) (World Values Survey & European Values Study, 2005–2022) makes this measurable: it plots countries on two axes — traditional vs. secular-rational values, survival vs. self-expression values — and shows that geographically close countries can be culturally distant. Japan and Vietnam are both "Asian" but sit in completely different cultural clusters. A model aligned to one cluster's values is systematically wrong for another.
 
+![Inglehart-Welzel Cultural Map 2023](diagrams/inglehart-welzel-cultural-map-2023.png)
+*The Inglehart-Welzel Cultural Map. Source: [World Values Survey & European Values Study (2005–2022)](https://www.worldvaluessurvey.org/WVSContents.jsp?CMSID=Findings).*
+
 This has been empirically confirmed: [Tao et al. (2024)](https://academic.oup.com/pnasnexus/article/3/9/pgae346/7756548) tested five GPT models against the World Values Survey across 107 countries and found that **all models cluster with English-speaking and Protestant European countries on the Inglehart-Welzel map** — most aligned with the Anglosphere, most distant from African-Islamic countries. This is not a bug in one model; it is a structural property of centralized training.
 
 ![GPT models plotted on the Inglehart-Welzel Cultural Map](diagrams/tao2024-gpt-cultural-map.jpg)
-*All five GPT models land in the Protestant Europe / English-speaking cluster. Source: Tao et al., "Cultural Bias and Cultural Alignment of Large Language Models," [PNAS Nexus 3(9), 2024](https://academic.oup.com/pnasnexus/article/3/9/pgae346/7756548). Used under CC BY 4.0.* (See also: ["Fluent but Foreign"](https://arxiv.org/html/2505.21548), 2026, which shows that even regional LLMs trained on local language data still reflect the base model's cultural values.)
+*All five GPT models land in the Protestant Europe / English-speaking cluster. Source: Tao et al., "Cultural Bias and Cultural Alignment of Large Language Models," [PNAS Nexus 3(9), 2024](https://academic.oup.com/pnasnexus/article/3/9/pgae346/7756548).* (See also: ["Fluent but Foreign"](https://arxiv.org/html/2505.21548), 2026, which shows that even regional LLMs trained on local language data still reflect the base model's cultural values.)
 
 > **Workshop question (open floor):** *Can you give a concrete example where a frontier model's alignment — not its language capability — was wrong for your community in a way that could not be fixed by fine-tuning or prompting? These examples are what make the case for sovereign alignment layers.*
 

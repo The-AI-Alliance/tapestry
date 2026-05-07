@@ -31,8 +31,11 @@ Multilingual capability is explicitly *not* the differentiator. The big labs wil
 - Cultural alignment requires local value judgments — what is appropriate, authoritative, respectful, true — that only the community itself can make. No external lab can do this for a community it doesn't belong to, no matter how well-intentioned.
 - Tao et al. (2024) tested five GPT models against the World Values Survey across 107 countries and found that **all models cluster with English-speaking and Protestant European countries on the Inglehart-Welzel map**. This is the empirical proof: today's frontier models are culturally aligned to one cluster and structurally misaligned to most of the world.
 
+![Inglehart-Welzel Cultural Map 2023](../diagrams/inglehart-welzel-cultural-map-2023.png)
+*The Inglehart-Welzel Cultural Map. Source: [World Values Survey & European Values Study (2005–2022)](https://www.worldvaluessurvey.org/WVSContents.jsp?CMSID=Findings).*
+
 ![GPT models plotted on the Inglehart-Welzel Cultural Map](../diagrams/tao2024-gpt-cultural-map.jpg)
-*All five GPT models land in the Protestant Europe / English-speaking cluster. Source: Tao et al., [PNAS Nexus 3(9), 2024](https://academic.oup.com/pnasnexus/article/3/9/pgae346/7756548). Used under CC BY 4.0.*
+*All five GPT models land in the Protestant Europe / English-speaking cluster. Source: Tao et al., [PNAS Nexus 3(9), 2024](https://academic.oup.com/pnasnexus/article/3/9/pgae346/7756548).*
 - The "Fluent but Foreign" paper (2026) demonstrates that regional LLMs trained on local language data still reflect the base model's cultural values. Language fluency and cultural alignment are independent dimensions. Solving one does not solve the other.
 - Framing around multilingual capability makes Tapestry's value proposition fragile — it can be undercut any time a big lab adds better support for another language. Cultural alignment cannot be undercut this way because it requires structural participation by the community.
 - The Inglehart-Welzel Cultural Map (World Values Survey) provides a measurable evaluation framework for cultural alignment, making this differentiator testable rather than aspirational.
