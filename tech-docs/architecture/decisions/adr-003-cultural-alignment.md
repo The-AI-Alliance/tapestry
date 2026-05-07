@@ -17,7 +17,7 @@ Multilingual capability is explicitly *not* the differentiator. The big labs wil
 
 ![Cultural alignment vs language-first framing](../diagrams/cultural-alignment-framing.svg)
 
-*Vector figure [`cultural-alignment-framing.svg`](../diagrams/cultural-alignment-framing.svg). Export PNG with `make tech-docs-diagram-pngs` if your preview blocks SVG. Left: fragile strategic framing; right: structural moat. Language fluency and cultural legitimacy are independent dimensions.*
+*Left: fragile strategic framing; right: structural moat. Language fluency and cultural legitimacy are independent dimensions.*
 
 | Positioning candidate | Can centralized labs eventually match? | Tapestry stance |
 | :-------------------- | :--------------------------------------- | :---------------- |

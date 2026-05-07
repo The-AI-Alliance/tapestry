@@ -26,7 +26,7 @@ All three stages are sovereign — each participant runs them independently on t
 
 ![Sovereign alignment pipeline](../diagrams/sovereign-alignment-pipeline.svg)
 
-*Vector figure [`sovereign-alignment-pipeline.svg`](../diagrams/sovereign-alignment-pipeline.svg). Export PNG with `make tech-docs-diagram-pngs` if your preview blocks SVG. Stages A–C change knowledge, behavior, and product shape; tooling is shared consortium infrastructure.*
+*Stages A–C change knowledge, behavior, and product shape; tooling is shared consortium infrastructure.*
 
 | Stage | What changes | Examples | Consortium tooling (shared) |
 | :---- | :----------- | :------- | :---------------------------- |

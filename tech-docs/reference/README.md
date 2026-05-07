@@ -4,4 +4,4 @@ Long-lived reference material that supports Tapestry design and operations: conc
 
 | Document | Description |
 | :------- | :---------- |
-| [`training-approaches.md`](training-approaches.md) | Centralized vs. federated vs. **consortium** training — comparison table, shared [`consortium-training-loop.svg`](../architecture/diagrams/consortium-training-loop.svg) (PNG optional via `make tech-docs-diagram-pngs`), links to ADRs |
+| [`training-approaches.md`](training-approaches.md) | Centralized vs. federated vs. **consortium** training — comparison table, shared [`consortium-training-loop.svg`](../architecture/diagrams/consortium-training-loop.svg), links to ADRs |

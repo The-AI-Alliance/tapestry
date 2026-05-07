@@ -17,12 +17,12 @@ Repository-local technical documentation lives under **`tech-docs/`**. Start her
 | Entry point | Contents |
 | :---------- | :------- |
 | [**`tech-docs/architecture/`**](tech-docs/architecture/README.md) | TVA methodology; phased outputs (stakeholder map through design goals); architectural options / thesis; [**ADRs**](tech-docs/architecture/decisions/); [**diagrams**](tech-docs/architecture/diagrams/) |
-| [**`tech-docs/README.md`**](tech-docs/README.md) | Index of architecture, [**governance**](tech-docs/governance/), [**work-groups**](tech-docs/work-groups/), [**strategic-plan**](tech-docs/strategic-plan/), [**reference**](tech-docs/reference/) |
+| [**`tech-docs/README.md`**](tech-docs/README.md) | Hub for [**architecture**](tech-docs/architecture/README.md), [**governance**](tech-docs/governance/), [**work-groups**](tech-docs/work-groups/), [**strategic-plan**](tech-docs/strategic-plan/), [**reference**](tech-docs/reference/) (e.g. [**training paradigms**](tech-docs/reference/training-approaches.md)) |
 | [**`docs/`**](docs/) | Source for the [published technical website](https://the-ai-alliance.github.io/tapestry/) (Jekyll / GitHub Pages) |
 
 For repo layout, conventions, and where to find implementation code, see [**`AGENTS.md`**](AGENTS.md).
 
-**Quick paths:** [**`Makefile`**](Makefile) (`make help` lists tests, formatting, lint, type-check, local docs preview), [**`GITHUB_PAGES.md`**](GITHUB_PAGES.md) for building or previewing the `docs/` site, [**`examples/`**](examples/) for runnable demos, and [**`src/tapestry/training/federated/README.md`**](src/tapestry/training/federated/README.md) for the current federated training slice.
+**Quick paths:** [**`Makefile`**](Makefile) (`make help` — tests, formatting, lint, type-check, local [`docs/`](docs/) preview), [**`GITHUB_PAGES.md`**](GITHUB_PAGES.md) for the Jekyll site, [**`examples/`**](examples/) for runnable demos, [**`src/tapestry/training/federated/README.md`**](src/tapestry/training/federated/README.md) for the consortium-training prototype.
 
 For pull requests, see [`.github/PULL_REQUEST_TEMPLATE/`](.github/PULL_REQUEST_TEMPLATE/). The website contributing page is authored from [`docs/contributing.markdown`](docs/contributing.markdown).
 

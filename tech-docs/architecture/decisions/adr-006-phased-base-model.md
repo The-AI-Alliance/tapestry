@@ -21,7 +21,7 @@ Sovereign contributions (continued pretraining outputs, alignment layers, domain
 
 ![Phased base model strategy](../diagrams/phased-base-model-strategy.svg)
 
-*Vector figure [`phased-base-model-strategy.svg`](../diagrams/phased-base-model-strategy.svg). Export PNG with `make tech-docs-diagram-pngs` if your preview blocks SVG. Solid path: maturity toward a consortium-trained base. Dashed curve: sovereign artifacts remain portable across base generations.*
+*Solid path: maturity toward a consortium-trained base. Dashed curve: sovereign artifacts remain portable across base generations.*
 
 | Phase | Base model source | Sovereign work | Sovereignty story |
 | :---- | :---------------- | :------------- | :---------------- |

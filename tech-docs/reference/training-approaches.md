@@ -91,8 +91,6 @@ The choice of weight deltas over gradients is a design decision within consortiu
 
 ![Consortium training loop](../architecture/diagrams/consortium-training-loop.svg)
 
-*Same figure as [ADR-004](../architecture/decisions/adr-004-training-loop.md); vector [`consortium-training-loop.svg`](../architecture/diagrams/consortium-training-loop.svg). Export PNG with `make tech-docs-diagram-pngs` if your preview blocks SVG — see [`diagrams/README.md`](../architecture/diagrams/README.md).*
-
 **Key techniques:** DiLoCo-class outer optimization (the weight delta aggregation step is effectively the outer optimizer), continued pretraining, post-training cultural alignment
 
 **This is what Tapestry uses.**

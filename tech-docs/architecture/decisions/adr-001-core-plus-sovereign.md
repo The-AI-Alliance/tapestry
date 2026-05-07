@@ -15,7 +15,7 @@ Tapestry adopts a **core-plus-sovereign architecture**: a frontier-competitive s
 
 ![Core-plus-sovereign stack](../diagrams/core-plus-sovereign-stack.svg)
 
-*Vector figure [`core-plus-sovereign-stack.svg`](../diagrams/core-plus-sovereign-stack.svg). Export [`core-plus-sovereign-stack.png`](../diagrams/core-plus-sovereign-stack.png) with `make tech-docs-diagram-pngs` if your preview blocks SVG. Read top-to-bottom as the deployed stack; the consortium loop ([ADR-004](adr-004-training-loop.md)) improves both layers over time.*
+*Read top-to-bottom as the deployed stack; the consortium loop ([ADR-004](adr-004-training-loop.md)) improves both layers over time.*
 
 | Artifact | Who owns it | What it provides |
 | :------- | :---------- | :--------------- |

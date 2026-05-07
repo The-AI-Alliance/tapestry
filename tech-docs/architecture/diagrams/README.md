@@ -14,7 +14,7 @@ Avoid dumping every inline diagram here unless there is no shared asset yet.
 
 ## Canonical figures (SVG in Markdown; PNG optional)
 
-ADRs and [`training-approaches.md`](../../reference/training-approaches.md) embed **`![…](../diagrams/name.svg)`**. The **`*.svg`** is the maintained vector; **`*.png`** is generated for editors whose Markdown preview blocks SVG or for slides.
+ADRs and [`training-approaches.md`](../../reference/training-approaches.md) embed **`![…](../diagrams/name.svg)`**. The **`*.svg`** is the maintained vector; **`*.png`** is an optional export (e.g. slides or tooling without SVG) via **`make tech-docs-diagram-pngs`**.
 
 Commit **`*.svg`** whenever the graphic changes; commit regenerated **`*.png`** when you rely on raster preview or external decks.
 

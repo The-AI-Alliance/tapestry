@@ -22,7 +22,7 @@ Nodes share **weight deltas**, not per-step gradients. Weight deltas aggregate o
 
 ![Consortium training loop](../diagrams/consortium-training-loop.svg)
 
-*Vector figure [`consortium-training-loop.svg`](../diagrams/consortium-training-loop.svg). Export PNG with `make tech-docs-diagram-pngs` if your preview blocks SVG. Step 1 establishes (or refreshes) the global model; the ongoing loop is 2 → 3 → 4 → 2.*
+*Step 1 establishes (or refreshes) the global model; the ongoing loop is 2 → 3 → 4 → 2.*
 
 | Step | Where it runs | Sovereign data | What crosses the network |
 | :--- | :-------------- | :------------- | :----------------------- |

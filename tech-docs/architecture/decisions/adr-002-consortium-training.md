@@ -19,7 +19,7 @@ This is distinct from federated learning (designed for millions of small edge cl
 
 ![Training paradigms compared](../diagrams/training-paradigms-comparison.svg)
 
-*Vector figure [`training-paradigms-comparison.svg`](../diagrams/training-paradigms-comparison.svg). Export PNG with `make tech-docs-diagram-pngs` if your preview blocks SVG. Tapestry is the third column; see [`training-approaches.md`](../../reference/training-approaches.md) for prose and the full comparison table.*
+*Tapestry is the third column; see [`training-approaches.md`](../../reference/training-approaches.md) for prose and the full comparison table.*
 
 | Paradigm | Typical participants | Dominant motive | Typical communication |
 | :------- | :------------------- | :-------------- | :-------------------- |
