@@ -6,7 +6,7 @@ Own the participant-specific pipeline that turns a shared capable base into mode
 
 ## Why it exists
 
-Sovereign alignment is Tapestry's primary differentiator in [Design Goal 1](../../architecture/4-design-goals.md) and [ADR-003](../../architecture/decisions/adr-003-cultural-alignment.md). [ADR-005](../../architecture/decisions/adr-005-sovereign-pipeline.md) makes post-training and instruction tuning first-class stages rather than downstream polish.
+Sovereign alignment is Tapestry's primary differentiator in [Design Goal 1](../../architecture/4-design-goals.md) and [TAP-003](../../architecture/decisions/adr-003-cultural-alignment.md). [TAP-005](../../architecture/decisions/adr-005-sovereign-pipeline.md) makes post-training and instruction tuning first-class stages rather than downstream polish.
 
 ## Scope
 

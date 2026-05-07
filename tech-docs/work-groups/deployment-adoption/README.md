@@ -6,7 +6,7 @@ Ensure Tapestry-derived models become usable systems, not just trained weights. 
 
 ## Why it exists
 
-One of the central pain points is that sovereign models may exist but see little adoption. [Design Goal 4](../../architecture/4-design-goals.md) requires incremental value, and [ADR-005](../../architecture/decisions/adr-005-sovereign-pipeline.md) treats instruction tuning and chat readiness as part of the sovereign pipeline rather than an afterthought.
+One of the central pain points is that sovereign models may exist but see little adoption. [Design Goal 4](../../architecture/4-design-goals.md) requires incremental value, and [TAP-005](../../architecture/decisions/adr-005-sovereign-pipeline.md) treats instruction tuning and chat readiness as part of the sovereign pipeline rather than an afterthought.
 
 ## Scope
 

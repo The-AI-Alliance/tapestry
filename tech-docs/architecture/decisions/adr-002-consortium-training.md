@@ -1,4 +1,4 @@
-# ADR-002: Consortium Training Model
+# TAP-002: Consortium Training Model
 
 | Field | Value |
 | :---- | :---- |

@@ -6,7 +6,7 @@ Own the platform and operating model that lets participants run Tapestry workloa
 
 ## Why it exists
 
-The architecture depends on reusable consortium training infrastructure, heterogeneous hardware support, reliable node operations, transparent accounting, and operational auditability. This work group supports [Design Goal 7](../../architecture/4-design-goals.md), [Design Goal 8](../../architecture/4-design-goals.md), and the operational requirements implied by [ADR-004](../../architecture/decisions/adr-004-training-loop.md).
+The architecture depends on reusable consortium training infrastructure, heterogeneous hardware support, reliable node operations, transparent accounting, and operational auditability. This work group supports [Design Goal 7](../../architecture/4-design-goals.md), [Design Goal 8](../../architecture/4-design-goals.md), and the operational requirements implied by [TAP-004](../../architecture/decisions/adr-004-training-loop.md).
 
 ## Scope
 

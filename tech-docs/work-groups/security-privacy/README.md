@@ -6,7 +6,7 @@ Define the technical guarantees that make Tapestry sovereignty enforceable: priv
 
 ## Why it exists
 
-Tapestry promises that data contributes without leaving and that sovereignty is enforced by architecture, not only by policy. This work group is grounded in [Design Goal 2](../../architecture/4-design-goals.md), [Design Goal 6](../../architecture/4-design-goals.md), and the privacy/security implications of the consortium training loop in [ADR-004](../../architecture/decisions/adr-004-training-loop.md).
+Tapestry promises that data contributes without leaving and that sovereignty is enforced by architecture, not only by policy. This work group is grounded in [Design Goal 2](../../architecture/4-design-goals.md), [Design Goal 6](../../architecture/4-design-goals.md), and the privacy/security implications of the consortium training loop in [TAP-004](../../architecture/decisions/adr-004-training-loop.md).
 
 ## Scope
 

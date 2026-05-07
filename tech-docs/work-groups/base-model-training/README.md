@@ -6,7 +6,7 @@ Own the shared model capability path: selecting or adopting an initial open-weig
 
 ## Why it exists
 
-This work group implements the training-side implications of [ADR-002](../../architecture/decisions/adr-002-consortium-training.md), [ADR-004](../../architecture/decisions/adr-004-training-loop.md), and [ADR-006](../../architecture/decisions/adr-006-phased-base-model.md). It addresses pain points around frontier cost, reusable consortium training infrastructure, hardware heterogeneity, and dependency without recourse.
+This work group implements the training-side implications of [TAP-002](../../architecture/decisions/adr-002-consortium-training.md), [TAP-004](../../architecture/decisions/adr-004-training-loop.md), and [TAP-006](../../architecture/decisions/adr-006-phased-base-model.md). It addresses pain points around frontier cost, reusable consortium training infrastructure, hardware heterogeneity, and dependency without recourse.
 
 ## Scope
 

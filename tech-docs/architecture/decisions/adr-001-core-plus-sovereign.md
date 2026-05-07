@@ -1,4 +1,4 @@
-# ADR-001: Core-Plus-Sovereign Architecture
+# TAP-001: Core-Plus-Sovereign Architecture
 
 | Field | Value |
 | :---- | :---- |
@@ -17,11 +17,11 @@ Tapestry adopts a **core-plus-sovereign architecture**: a frontier-competitive s
 
 ![Core-plus-sovereign stack](../diagrams/core-plus-sovereign-stack.svg)
 
-*Read top-to-bottom as the deployed stack; the consortium loop ([ADR-004](adr-004-training-loop.md)) improves both layers over time.*
+*Read top-to-bottom as the deployed stack; the consortium loop ([TAP-004](adr-004-training-loop.md)) improves both layers over time.*
 
 | Artifact | Who owns it | What it provides |
 | :------- | :---------- | :--------------- |
-| **Shared base** | Consortium-adopted then consortium-evolved (ADR-006) | Frontier-class starting capability; shared improvement via ADR-004 |
+| **Shared base** | Consortium-adopted then consortium-evolved (TAP-006) | Frontier-class starting capability; shared improvement via TAP-004 |
 | **Safety alignment** | Consortium (shared) | Baseline safety properties — mechanism for preservation through continued pretraining is an open question (DG6) |
 | **Sovereign layers** | Each participating node / community | Cultural alignment, domain fit, instruction norms — data and values stay local |
 

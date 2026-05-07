@@ -1,4 +1,4 @@
-# ADR-006: Phased Base Model Strategy
+# TAP-006: Phased Base Model Strategy
 
 | Field | Value |
 | :---- | :---- |
@@ -9,7 +9,7 @@
 
 ## Context
 
-The core-plus-sovereign architecture (ADR-001) requires a frontier-competitive base model. The question is where it comes from.
+The core-plus-sovereign architecture (TAP-001) requires a frontier-competitive base model. The question is where it comes from.
 
 ## Decision
 
@@ -27,13 +27,13 @@ Sovereign contributions (continued pretraining outputs, alignment layers, domain
 
 | Phase | Base model source | Sovereign work | Sovereignty story |
 | :---- | :---------------- | :------------- | :---------------- |
-| **1** — Now | Adopt best available **open-weights** base | Build portable sovereign layers on top (ADR-005); join loop (ADR-004) | Honest dependency; layers designed to migrate |
+| **1** — Now | Adopt best available **open-weights** base | Build portable sovereign layers on top (TAP-005); join loop (TAP-004) | Honest dependency; layers designed to migrate |
 | **2** — When ready | **Consortium-trained** base | Same sovereign layers and tooling; contribution shapes the shared core | Reduced reliance on a single external provider |
 
 ## Rationale
 
 - Training a frontier model from scratch requires $200M+, 12–18 months, and organizational maturity the consortium doesn't yet have.
-- Adopting an existing base delivers frontier capability immediately, enabling participants to start the consortium training loop (ADR-004) and sovereign alignment pipeline (ADR-005) now.
+- Adopting an existing base delivers frontier capability immediately, enabling participants to start the consortium training loop (TAP-004) and sovereign alignment pipeline (TAP-005) now.
 - Portability of sovereign layers across bases makes the dependency replaceable — the anti-capture principle (DG3) is satisfied in the temporal sense ("we can switch") even if not in the instantaneous sense ("we're currently independent").
 - This is the honest version of sovereignty: acknowledge the dependency, design it to be replaceable, commit to a timeline for independence.
 

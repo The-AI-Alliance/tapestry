@@ -1,4 +1,4 @@
-# ADR-004: The Consortium Training Loop
+# TAP-004: The Consortium Training Loop
 
 | Field | Value |
 | :---- | :---- |
@@ -9,7 +9,7 @@
 
 ## Context
 
-Given the core-plus-sovereign architecture (ADR-001) and the consortium training model (ADR-002), the specific training loop — how the global model improves over time — must be defined.
+Given the core-plus-sovereign architecture (TAP-001) and the consortium training model (TAP-002), the specific training loop — how the global model improves over time — must be defined.
 
 ## Decision
 
@@ -42,7 +42,7 @@ Nodes share **weight deltas**, not per-step gradients. Weight deltas aggregate o
 
 ## Confidence assessment
 
-The loop structure is sound and follows naturally from ADR-001 and ADR-002. The 4/5 confidence reflects three open questions:
+The loop structure is sound and follows naturally from TAP-001 and TAP-002. The 4/5 confidence reflects three open questions:
 
 1. **Cycle frequency.** How often do nodes contribute? Monthly? Quarterly? Per-node choice? If some nodes cycle monthly and others annually, their influence on the global model diverges. The workshop should discuss whether synchronized or asynchronous cycling is preferable.
 

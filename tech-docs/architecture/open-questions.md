@@ -12,9 +12,9 @@
 |:--|:---------|:-------|:----|:-------|
 | T1 | Has anyone run outer-loop distributed training above 7B parameters on heterogeneous, high-latency clusters? What broke? | [2-pain-points.md](2-pain-points.md) (CP2) | Workshop | Eric (Petuum), Laurent (INRIA), Erik (Zyphra) |
 | T2 | Is the proposed four-step consortium training loop accepted? What is the target cycle frequency — monthly, quarterly, per-node choice? | [5-architectural-options.md](5-architectural-options.md) (Decision 3) | Workshop | Eric Xing, Laurent Massoulie |
-| T3 | What are the convergence properties of the training loop when nodes have radically different (non-IID) data distributions? | [ADR-004](decisions/adr-004-training-loop.md) | Research | |
-| T4 | Compute cost per cycle is estimated at 5-10% of base pretraining. Is this validated empirically? | [ADR-004](decisions/adr-004-training-loop.md) | Research | |
-| T5 | Should the consortium use synchronized or asynchronous cycling? If some nodes cycle monthly and others annually, their influence diverges — is this acceptable? | [ADR-004](decisions/adr-004-training-loop.md), [5-architectural-options.md](5-architectural-options.md) (Q8) | Workshop | |
+| T3 | What are the convergence properties of the training loop when nodes have radically different (non-IID) data distributions? | [TAP-004](decisions/adr-004-training-loop.md) | Research | |
+| T4 | Compute cost per cycle is estimated at 5-10% of base pretraining. Is this validated empirically? | [TAP-004](decisions/adr-004-training-loop.md) | Research | |
+| T5 | Should the consortium use synchronized or asynchronous cycling? If some nodes cycle monthly and others annually, their influence diverges — is this acceptable? | [TAP-004](decisions/adr-004-training-loop.md), [5-architectural-options.md](5-architectural-options.md) (Q8) | Workshop | |
 | T6 | Should the Tracel/Burn proposal be formally adopted as the target architecture? What is the timeline for Burn backend support? | [5-architectural-options.md](5-architectural-options.md) (Decision 5) | Workshop | Erik Norden, Ziv (NVIDIA), Niles (AMD) |
 | T7 | What does hardware-agnostic consortium training look like? Can a consortium include both NVIDIA and AMD nodes in the same training run today, and what breaks? | [2-pain-points.md](2-pain-points.md) (N3) | Workshop | Ziv (NVIDIA), Niles (AMD) |
 
@@ -22,16 +22,16 @@
 
 | # | Question | Source | Tag | People |
 |:--|:---------|:-------|:----|:-------|
-| B1 | Which open-weights base model family to start with? (Llama, Mistral, Qwen — each carries geopolitical signal.) | [5-architectural-options.md](5-architectural-options.md) (Decision 1), [ADR-006](decisions/adr-006-phased-base-model.md) | Workshop | Eric Xing, Jie Tang, Thomas Wolf |
-| B2 | Under what conditions does the consortium commit to training its own base (Phase 2 trigger criteria)? How do we prevent "eventually" from becoming "never"? | [5-architectural-options.md](5-architectural-options.md) (Decision 1), [ADR-006](decisions/adr-006-phased-base-model.md) | Workshop | |
+| B1 | Which open-weights base model family to start with? (Llama, Mistral, Qwen — each carries geopolitical signal.) | [5-architectural-options.md](5-architectural-options.md) (Decision 1), [TAP-006](decisions/adr-006-phased-base-model.md) | Workshop | Eric Xing, Jie Tang, Thomas Wolf |
+| B2 | Under what conditions does the consortium commit to training its own base (Phase 2 trigger criteria)? How do we prevent "eventually" from becoming "never"? | [5-architectural-options.md](5-architectural-options.md) (Decision 1), [TAP-006](decisions/adr-006-phased-base-model.md) | Workshop | |
 | B3 | What is the actual minimum viable investment for a sovereign model that people will use — not just one that exists? Does pooling via consortium training cross the adoption threshold? | [2-pain-points.md](2-pain-points.md) (N5) | Workshop | Ayah (Current AI), Arno (Elysee), Hideki (IPA Japan) |
 
 ## Cultural Alignment
 
 | # | Question | Source | Tag | People |
 |:--|:---------|:-------|:----|:-------|
-| C1 | Does continued pretraining on culturally *grounded* data (not just linguistically local data) measurably shift cultural alignment? This is the foundational hypothesis — unvalidated. | [5-architectural-options.md](5-architectural-options.md) (Q12), [ADR-003](decisions/adr-003-cultural-alignment.md), [ADR-005](decisions/adr-005-sovereign-pipeline.md) | Research | |
-| C2 | What constitutes "culturally grounded" data? Legal texts? Literature? Community-authored content? Social media? Religious texts? Varies by community. | [5-architectural-options.md](5-architectural-options.md) (Q13), [ADR-005](decisions/adr-005-sovereign-pipeline.md) | Research | |
+| C1 | Does continued pretraining on culturally *grounded* data (not just linguistically local data) measurably shift cultural alignment? This is the foundational hypothesis — unvalidated. | [5-architectural-options.md](5-architectural-options.md) (Q12), [TAP-003](decisions/adr-003-cultural-alignment.md), [TAP-005](decisions/adr-005-sovereign-pipeline.md) | Research | |
+| C2 | What constitutes "culturally grounded" data? Legal texts? Literature? Community-authored content? Social media? Religious texts? Varies by community. | [5-architectural-options.md](5-architectural-options.md) (Q13), [TAP-005](decisions/adr-005-sovereign-pipeline.md) | Research | |
 | C3 | Is continued pretraining + post-training alignment accepted as the sovereign approach (not just adapters)? What evaluation framework does the consortium adopt for cultural alignment? | [5-architectural-options.md](5-architectural-options.md) (Decision 2) | Workshop | Ganesh (BharatGen), Antoine (Swiss AI/Apertus), Jian Gang (SEA-LION) |
 | C4 | What adoption rates are sovereign model builders seeing? What would it take for domestic users to prefer a sovereign model over a commercial alternative? | [2-pain-points.md](2-pain-points.md) (N4) | Workshop | Ganesh (BharatGen), Antoine (Swiss AI/Apertus), Jian Gang (SEA-LION), Da-shan (MediaTek) |
 | C5 | Can you give a concrete example where a frontier model's alignment — not its language capability — was wrong for your community in a way that could not be fixed by fine-tuning or prompting? | [2-pain-points.md](2-pain-points.md) (SC1) | Workshop | Open floor |
@@ -45,7 +45,7 @@
 |:--|:---------|:-------|:----|:-------|
 | S1 | Is modular alignment technically sound, or does it create models that can be trivially de-aligned? Some safety researchers argue alignment must be baked into pretraining. | [2-pain-points.md](2-pain-points.md) (IN4) | Workshop | Open floor |
 | S2 | Who defines "safety" when the whole point is that different communities have different values? The line between "safety" (universal) and "alignment" (sovereign) is itself culturally contested. | [4-design-goals.md](4-design-goals.md) (DG6 vs DG1) | Workshop | |
-| S3 | What mechanisms preserve safety through continued pretraining? Frozen layers? Regularization? Evaluation gates? (Different from and harder than preserving safety through post-training alignment.) | [5-architectural-options.md](5-architectural-options.md) (Q2), [ADR-005](decisions/adr-005-sovereign-pipeline.md) | Research | |
+| S3 | What mechanisms preserve safety through continued pretraining? Frozen layers? Regularization? Evaluation gates? (Different from and harder than preserving safety through post-training alignment.) | [5-architectural-options.md](5-architectural-options.md) (Q2), [TAP-005](decisions/adr-005-sovereign-pipeline.md) | Research | |
 
 ## Data Sovereignty & Privacy
 

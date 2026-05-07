@@ -1,4 +1,4 @@
-# ADR-003: Cultural Alignment as the Primary Differentiator
+# TAP-003: Cultural Alignment as the Primary Differentiator
 
 | Field | Value |
 | :---- | :---- |

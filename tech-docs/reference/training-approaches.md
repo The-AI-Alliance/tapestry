@@ -20,9 +20,9 @@ Three distinct approaches to training large models are relevant to Tapestry's de
 | **Governance** | Single owner | Aggregator plus clients | Consortium with shared voice and rules |
 | **Model scale (typical)** | Frontier | Often modest | Frontier-class shared model |
 | **Primary goal** | Maximum capability | Learn without centralizing raw data | Frontier capability **and** culturally aligned outcomes |
-| **Tapestry** | Incompatible (colocation, capture) | Wrong fit (scale, motive, update pattern) | **This is Tapestry’s paradigm** ([ADR-002](../architecture/decisions/adr-002-consortium-training.md)) |
+| **Tapestry** | Incompatible (colocation, capture) | Wrong fit (scale, motive, update pattern) | **This is Tapestry’s paradigm** ([TAP-002](../architecture/decisions/adr-002-consortium-training.md)) |
 
-The sections below spell out each column in prose. The consortium training loop is specified in [ADR-004](../architecture/decisions/adr-004-training-loop.md).
+The sections below spell out each column in prose. The consortium training loop is specified in [TAP-004](../architecture/decisions/adr-004-training-loop.md).
 
 ---
 
@@ -118,8 +118,8 @@ Consortium training borrows techniques from the federated learning literature �
 
 | Document | Role |
 | :------- | :--- |
-| [ADR-002: Consortium training model](../architecture/decisions/adr-002-consortium-training.md) | Names the paradigm and contrasts it with federated and centralized training. |
-| [ADR-004: The consortium training loop](../architecture/decisions/adr-004-training-loop.md) | Defines the four-step loop (base → CPT → deltas → integrate). |
+| [TAP-002: Consortium training model](../architecture/decisions/adr-002-consortium-training.md) | Names the paradigm and contrasts it with federated and centralized training. |
+| [TAP-004: The consortium training loop](../architecture/decisions/adr-004-training-loop.md) | Defines the four-step loop (base → CPT → deltas → integrate). |
 
 ## References
 

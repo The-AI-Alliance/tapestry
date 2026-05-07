@@ -6,7 +6,7 @@ Define how sovereign data can participate in Tapestry without surrendering contr
 
 ## Why it exists
 
-This work group traces to [Phase 2 pain points](../../architecture/2-pain-points.md) around data residency, cultural extraction, locked corpora, and enterprise compliance walls. It is also a prerequisite for the core-plus-sovereign architecture in [ADR-001](../../architecture/decisions/adr-001-core-plus-sovereign.md) and the consortium training model in [ADR-002](../../architecture/decisions/adr-002-consortium-training.md).
+This work group traces to [Phase 2 pain points](../../architecture/2-pain-points.md) around data residency, cultural extraction, locked corpora, and enterprise compliance walls. It is also a prerequisite for the core-plus-sovereign architecture in [TAP-001](../../architecture/decisions/adr-001-core-plus-sovereign.md) and the consortium training model in [TAP-002](../../architecture/decisions/adr-002-consortium-training.md).
 
 ## Scope
 
