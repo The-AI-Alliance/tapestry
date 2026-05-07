@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 200" role="img" aria-labelledby="title desc">
+  <title id="title">Training paradigms compared</title>
+  <desc id="desc">Three columns: centralized training, federated learning, and consortium training as used by Tapestry.</desc>
+  <rect width="780" height="200" fill="#fafafa"/>
+  <!-- Centralized -->
+  <rect x="24" y="28" width="228" height="144" rx="8" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+  <text x="138" y="58" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="15" font-weight="700">Centralized</text>
+  <text x="138" y="84" text-anchor="middle" fill="#e3f2fd" font-family="system-ui,Segoe UI,sans-serif" font-size="12">One cluster - data colocated</text>
+  <text x="138" y="106" text-anchor="middle" fill="#bbdefb" font-family="system-ui,Segoe UI,sans-serif" font-size="11">Fast interconnect - every step</text>
+  <text x="138" y="132" text-anchor="middle" fill="#90caf9" font-family="system-ui,Segoe UI,sans-serif" font-size="11">Single owner</text>
+  <!-- Federated -->
+  <rect x="276" y="28" width="228" height="144" rx="8" fill="#6d4c41" stroke="#3e2723" stroke-width="2"/>
+  <text x="390" y="58" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="15" font-weight="700">Federated learning</text>
+  <text x="390" y="84" text-anchor="middle" fill="#efebe9" font-family="system-ui,Segoe UI,sans-serif" font-size="12">Many small clients</text>
+  <text x="390" y="106" text-anchor="middle" fill="#d7ccc8" font-family="system-ui,Segoe UI,sans-serif" font-size="11">Frequent updates - privacy motive</text>
+  <text x="390" y="132" text-anchor="middle" fill="#bcaaa4" font-family="system-ui,Segoe UI,sans-serif" font-size="11">Edge / mobile connotations</text>
+  <!-- Consortium -->
+  <rect x="528" y="28" width="228" height="144" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
+  <text x="642" y="58" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="15" font-weight="700">Consortium training</text>
+  <text x="642" y="84" text-anchor="middle" fill="#e8f5e9" font-family="system-ui,Segoe UI,sans-serif" font-size="12">Few large institutional nodes</text>
+  <text x="642" y="106" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="11">Weight deltas - sovereignty</text>
+  <text x="642" y="132" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-weight="700">Tapestry</text>
+</svg>

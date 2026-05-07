@@ -5,7 +5,6 @@ PAGES_URL    := https://the-ai-alliance.github.io/tapestry/
 DOCS_DIR     := docs
 SITE_DIR     := ${DOCS_DIR}/_site
 CLEAN_DIRS   := ${SITE_DIR} ${DOCS_DIR}/.sass-cache
-
 # Environment variables
 MAKEFLAGS            = --warn-undefined-variables
 UNAME               ?= $(shell uname)

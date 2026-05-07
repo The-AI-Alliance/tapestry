@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" role="img" aria-labelledby="title desc">
+  <title id="title">Consortium training loop</title>
+  <desc id="desc">Four steps: base training, continued pretraining on sovereign data, weight deltas to coordinator, integrate and redistribute global model, cycling back to step two.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#37474f"/>
+    </marker>
+  </defs>
+  <rect width="760" height="320" fill="#fafafa"/>
+  <!-- Step boxes -->
+  <rect x="40" y="36" width="168" height="64" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+  <text x="124" y="66" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">1 - Base training</text>
+  <text x="124" y="86" text-anchor="middle" fill="#e3f2fd" font-family="system-ui,Segoe UI,sans-serif" font-size="11">or adopt global model</text>
+  <rect x="228" y="36" width="168" height="64" rx="6" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
+  <text x="312" y="66" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">2 - Continued pretraining</text>
+  <text x="312" y="86" text-anchor="middle" fill="#e8f5e9" font-family="system-ui,Segoe UI,sans-serif" font-size="11">sovereign data (local)</text>
+  <rect x="416" y="36" width="168" height="64" rx="6" fill="#ef6c00" stroke="#e65100" stroke-width="2"/>
+  <text x="500" y="66" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">3 - Weight deltas</text>
+  <text x="500" y="86" text-anchor="middle" fill="#fff3e0" font-family="system-ui,Segoe UI,sans-serif" font-size="11">to coordinator</text>
+  <rect x="604" y="36" width="116" height="64" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+  <text x="662" y="72" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">4 - Integrate</text>
+  <text x="662" y="90" text-anchor="middle" fill="#e3f2fd" font-family="system-ui,Segoe UI,sans-serif" font-size="11">updated global</text>
+  <!-- Arrows forward -->
+  <line x1="208" y1="68" x2="222" y2="68" stroke="#37474f" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="396" y1="68" x2="410" y2="68" stroke="#37474f" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="584" y1="68" x2="598" y2="68" stroke="#37474f" stroke-width="2" marker-end="url(#arrow)"/>
+  <!-- Loop back: step 4 down, along bottom, up to step 2 -->
+  <path d="M 662 100 L 662 140 Q 662 170 620 170 L 312 170 Q 270 170 270 140 L 270 108" fill="none" stroke="#37474f" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="480" y="198" text-anchor="middle" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-style="italic">next cycle - step 2</text>
+  <text x="124" y="130" text-anchor="middle" fill="#2e7d32" font-family="system-ui,Segoe UI,sans-serif" font-size="11">Step 1 seeds or refreshes the global model</text>
+</svg>

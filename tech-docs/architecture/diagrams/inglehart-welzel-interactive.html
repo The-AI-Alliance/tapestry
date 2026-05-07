@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head><title>Inglehart-Welzel Cultural Map - Interactive</title></head>
+<body style="margin:0;padding:1rem;font-family:system-ui,sans-serif;background:#fff;">
+<h2 style="font-size:16px;font-weight:500;margin:0 0 8px;">Inglehart-Welzel cultural map (interactive view)</h2>
+<p style="font-size:12px;color:#666;margin:0 0 12px;">Approximate positions from WVS Wave 7. Hover for country names. Cultural clusters after Inglehart & Welzel.</p>
+<div style="width:100%;max-width:700px;height:520px;position:relative;"><canvas id="c" role="img" aria-label="Scatter plot of countries on survival-self expression vs traditional-secular axes"></canvas></div>
+<p style="font-size:11px;color:#999;margin:8px 0 0;">Source: World Values Survey & European Values Study (2005–2022). <a href="https://www.worldvaluessurvey.org/WVSContents.jsp?CMSID=Findings">worldvaluessurvey.org</a> · <a href="https://europeanvaluesstudy.eu">europeanvaluesstudy.eu</a></p>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const cl={
+'Protestant Europe':{c:'#3266ad',d:[{x:2.1,y:1.8,l:'Sweden'},{x:1.8,y:1.7,l:'Denmark'},{x:1.6,y:1.5,l:'Norway'},{x:1.5,y:1.6,l:'Netherlands'},{x:1.3,y:1.4,l:'Finland'},{x:1.0,y:1.5,l:'Germany'},{x:0.8,y:0.9,l:'Switzerland'}]},
+'English-speaking':{c:'#5DCAA5',d:[{x:1.4,y:0.2,l:'USA'},{x:1.3,y:0.4,l:'Australia'},{x:1.5,y:0.5,l:'New Zealand'},{x:1.2,y:0.3,l:'Canada'},{x:1.0,y:0.1,l:'UK'},{x:0.6,y:-0.1,l:'Ireland'}]},
+'Catholic Europe':{c:'#7F77DD',d:[{x:1.0,y:0.8,l:'France'},{x:0.7,y:0.6,l:'Spain'},{x:0.5,y:0.5,l:'Italy'},{x:0.3,y:0.9,l:'Czech Rep.'},{x:0.2,y:0.5,l:'Portugal'},{x:0.6,y:1.0,l:'Austria'},{x:0.4,y:0.7,l:'Belgium'}]},
+'Confucian':{c:'#D85A30',d:[{x:-0.2,y:1.8,l:'Japan'},{x:0.0,y:1.5,l:'S. Korea'},{x:-0.5,y:1.2,l:'China'},{x:0.3,y:1.0,l:'Taiwan'},{x:-0.8,y:0.6,l:'Vietnam'}]},
+'South Asia':{c:'#EF9F27',d:[{x:-1.0,y:-0.3,l:'India'},{x:-1.2,y:-0.5,l:'Bangladesh'},{x:-0.8,y:-0.2,l:'Indonesia'},{x:-0.3,y:0.0,l:'Thailand'},{x:-0.5,y:0.2,l:'Singapore'},{x:-0.6,y:-0.1,l:'Philippines'},{x:-0.4,y:-0.4,l:'Malaysia'}]},
+'Latin America':{c:'#ED93B1',d:[{x:-0.3,y:-0.8,l:'Mexico'},{x:0.1,y:-0.6,l:'Brazil'},{x:0.0,y:-0.4,l:'Argentina'},{x:-0.5,y:-0.7,l:'Colombia'},{x:0.2,y:-0.3,l:'Chile'},{x:-0.6,y:-1.0,l:'Peru'}]},
+'Orthodox Europe':{c:'#888780',d:[{x:-1.0,y:0.8,l:'Russia'},{x:-0.8,y:0.5,l:'Ukraine'},{x:-0.6,y:0.6,l:'Serbia'},{x:-0.5,y:0.3,l:'Romania'},{x:-0.3,y:0.4,l:'Bulgaria'}]},
+'African-Islamic':{c:'#E24B4A',d:[{x:-1.5,y:-1.2,l:'Nigeria'},{x:-1.3,y:-1.5,l:'Ethiopia'},{x:-1.6,y:-0.8,l:'Egypt'},{x:-1.4,y:-0.5,l:'Morocco'},{x:-1.8,y:-1.0,l:'Pakistan'},{x:-1.1,y:-0.9,l:'Kenya'},{x:-1.2,y:-0.3,l:'Turkey'},{x:-0.9,y:-0.6,l:'Iraq'}]},
+'West & South Asia':{c:'#BA7517',d:[{x:-1.0,y:0.1,l:'UAE'},{x:-1.3,y:-0.2,l:'Saudi Arabia'}]}
+};
+const ds=Object.entries(cl).map(([n,c])=>({label:n,data:c.d.map(p=>({x:p.x,y:p.y,l:p.l})),backgroundColor:c.c+'99',borderColor:c.c,borderWidth:1.5,pointRadius:5,pointHoverRadius:7}));
+new Chart(document.getElementById('c'),{type:'scatter',data:{datasets:ds},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:10,right:20,bottom:10,left:10}},scales:{x:{min:-2.2,max:2.5,title:{display:true,text:'Survival values  ←→  Self-expression values',font:{size:13,weight:'500'}},grid:{color:'rgba(0,0,0,0.06)'},ticks:{display:false}},y:{min:-1.8,max:2.2,title:{display:true,text:'Traditional values  ←→  Secular-rational values',font:{size:13,weight:'500'}},grid:{color:'rgba(0,0,0,0.06)'},ticks:{display:false}}},plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>ctx.raw.l},titleFont:{size:0},bodyFont:{size:13}}}},plugins:[{afterDraw(chart){const ctx=chart.ctx;ctx.font='11px system-ui,sans-serif';ctx.fillStyle='rgba(0,0,0,0.6)';ctx.textAlign='left';chart.data.datasets.forEach(ds=>{const meta=chart.getDatasetMeta(chart.data.datasets.indexOf(ds));meta.data.forEach((pt,i)=>{ctx.fillText(ds.data[i].l,pt.x+7,pt.y+3)})})}}]});
+</script>
+</body></html>
