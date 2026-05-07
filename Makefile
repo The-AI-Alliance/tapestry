@@ -5,8 +5,6 @@ PAGES_URL    := https://the-ai-alliance.github.io/tapestry/
 DOCS_DIR     := docs
 SITE_DIR     := ${DOCS_DIR}/_site
 CLEAN_DIRS   := ${SITE_DIR} ${DOCS_DIR}/.sass-cache
-TECH_DIAGRAMS_DIR := tech-docs/architecture/diagrams
-
 # Environment variables
 MAKEFLAGS            = --warn-undefined-variables
 UNAME               ?= $(shell uname)
@@ -68,10 +66,6 @@ make setup-jekyll       # Install Jekyll. Make sure Ruby is installed.
 make run-jekyll         # Used by "view-local"; assumes everything is already built.
                         # Tip: Build this target instead of 'view-local' to avoid repeating 'setup-jekyll'.
                         # Tip: "JEKYLL_PORT=8000 make run-jekyll" uses port 8000 instead of 4000!
-
-For tech-docs architecture figures (SVG sources with PNG for Markdown preview):
-
-make tech-docs-diagram-pngs  # Regenerate *.png from *.svg in ${TECH_DIAGRAMS_DIR} (needs rsvg-convert; e.g. brew install librsvg)
 
 Help, etc.:
 
@@ -141,13 +135,6 @@ type-check::
 type-check-watch::
 	@echo "${INFO}$@: Running 'ty' to type check the code in 'watch' mode.${_END}"
 	uv run ty check --watch ${SRC_DIR} 
-
-.PHONY: tech-docs-diagram-pngs
-tech-docs-diagram-pngs::
-	@command -v rsvg-convert >/dev/null 2>&1 || (echo "${ERROR} rsvg-convert not found. Install librsvg (e.g. brew install librsvg).${_END}" && false)
-	@echo "${INFO}Regenerating PNGs in ${TECH_DIAGRAMS_DIR}...${_END}"
-	cd ${TECH_DIAGRAMS_DIR} && for f in *.svg; do rsvg-convert -w 1400 "$$f" -o "$${f%.svg}.png"; done
-	@echo "${INFO}Done.${_END}"
 
 .PHONY: one-time-setup clean-setup 
 .PHONY: install-uv uv-venv install-dev-dependencies command-check-uv

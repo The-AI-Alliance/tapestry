@@ -22,7 +22,7 @@ The directory index is [`architecture/README.md`](architecture/README.md). Main 
 | [`architecture/3-value-propositions.md`](architecture/3-value-propositions.md) | Phase 3 — what Tapestry offers that the status quo doesn't |
 | [`architecture/4-design-goals.md`](architecture/4-design-goals.md) | Phase 4 — constraints the architecture must satisfy |
 | [`architecture/5-architectural-options.md`](architecture/5-architectural-options.md) | Phase 5 — option space and decision analysis toward an architectural thesis |
-| [`architecture/diagrams/README.md`](architecture/diagrams/README.md) | Architecture figures (SVG in Markdown; optional PNG exports) and embedding conventions |
+| [`architecture/diagrams/README.md`](architecture/diagrams/README.md) | Architecture figures (SVG in Markdown) and embedding conventions |
 | [`architecture/decisions/`](architecture/decisions/README.md) | Architecture Decision Records (ADRs) |
 
 ## Reference documents
