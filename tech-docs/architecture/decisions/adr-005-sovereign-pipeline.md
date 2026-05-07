@@ -22,8 +22,8 @@ Tapestry's pipeline stages map to standard industry terms as follows:
 | :------------- | :--------------- | :------------- |
 | **Stage 0** — Data Preparation | Data curation, corpus construction, data governance | Pre-training preparation |
 | **Stage A** — Continued Pre-training | CPT, domain-adaptive pre-training (DAPT) | Pre-training (continued) |
-| **Stage B** — Alignment | Post-training alignment: RLHF, DPO, Constitutional AI | Post-training |
-| **Stage C** — Instruction Tuning | Supervised fine-tuning (SFT), instruction tuning, chat tuning | Post-training |
+| **Stage B** — Instruction Tuning | Supervised fine-tuning (SFT), instruction tuning, chat tuning | Post-training |
+| **Stage C** — Alignment | Post-training alignment: RLHF, DPO, Constitutional AI | Post-training |
 | **Evaluation** | Benchmarking, red-teaming, cultural alignment measurement | Cross-cutting |
 
 In standard usage, "pre-training" refers to the initial large-scale unsupervised training of a model from scratch, and "post-training" covers everything after: alignment, instruction tuning, and safety tuning. Our Stage A is *continued* pre-training — additional pre-training-style learning on a targeted corpus after the base model exists. Stages B and C are both forms of post-training. We distinguish them because they serve different sovereign purposes and may be performed by different teams within a participant's organization.
@@ -44,7 +44,7 @@ The sovereign model pipeline has four stages plus evaluation as a cross-cutting 
 
 **Why it's sovereign:** The choice of what data represents a culture — which legal traditions, which literary canon, which medical practices, which institutional knowledge — is itself a cultural judgment. No external entity can make this choice for a community.
 
-Activities include corpus curation (selecting culturally grounded data), quality filtering (deduplication, language identification, content quality), data governance (provenance tracking, licensing, consent, attribution), format preparation (converting diverse sources to training-ready formats), preference data creation (for Stage B, encoding cultural values as preference pairs), and instruction data creation (for Stage C, reflecting local interaction norms).
+Activities include corpus curation (selecting culturally grounded data), quality filtering (deduplication, language identification, content quality), data governance (provenance tracking, licensing, consent, attribution), format preparation (converting diverse sources to training-ready formats), instruction data creation (for Stage B, reflecting local interaction norms), and preference data creation (for Stage C, encoding cultural values as preference pairs).
 
 This is likely the most time-intensive stage. Communities will spend more human effort on data than on training.
 
@@ -56,17 +56,17 @@ Training data is not just linguistically local but culturally grounded: local le
 
 Estimated compute: 5–10% of base pretraining cost per cycle (Phase 1). See *Roadmap* above for Phase 2 evolution.
 
-### Stage B: Post-training Alignment (DPO / RLHF / Constitutional AI)
+### Stage B: Instruction Tuning / Supervised Fine-Tuning (SFT)
 
-**What it changes:** The model's *behavior* — how it responds and what it treats as appropriate.
+**What it changes:** The model's *product shape* — making it capable of following instructions and producing useful responses.
 
-The community decides what is appropriate, authoritative, respectful, and true in their context. This is where cultural value judgments are encoded. Techniques include Direct Preference Optimization (DPO), Reinforcement Learning from Human Feedback (RLHF), and Constitutional AI (using community-authored constitutions).
+Creates the foundation for chat agents, coding assistants, domain-specific tools. The model learns to follow instructions, format answers, and produce coherent responses. Instruction tuning is itself culturally loaded — formality, directness, deference to authority, humor, response length — and therefore belongs in the sovereign pipeline, not the shared base. This stage must come before alignment (Stage C) because preference optimization requires a model that already produces reasonable instruction-following outputs.
 
-### Stage C: Instruction Tuning and Chat Readiness
+### Stage C: Alignment (DPO / RLHF / Constitutional AI)
 
-**What it changes:** The model's *product shape* — making it deployable as a usable product.
+**What it changes:** The model's *behavior and values* — refining how it responds based on community preferences.
 
-Creates chat agents, coding assistants, domain-specific tools. Instruction tuning is itself culturally loaded — formality, directness, deference to authority, humor, response length — and therefore belongs in the sovereign pipeline, not the shared base.
+Building on the instruction-tuned model from Stage B, the community applies preference optimization to encode what is appropriate, authoritative, respectful, and true in their context. This is where cultural value judgments are encoded. Techniques include Direct Preference Optimization (DPO), Reinforcement Learning from Human Feedback (RLHF), and Constitutional AI (using community-authored constitutions). This stage is more effective — and more stable — when applied to an already instruction-tuned model.
 
 ### Cross-cutting: Evaluation
 
@@ -76,9 +76,9 @@ Evaluation is not a final step but a continuous activity that runs after every s
 
 **After Stage A (CPT):** Did the model acquire the target cultural knowledge? Did it maintain frontier capability? Did safety properties survive continued pretraining? Measured using standard benchmarks (MMLU, etc.) for capability, WVS-based benchmarks for cultural alignment, and safety evaluation suites.
 
-**After Stage B (Alignment):** Does the model behave according to community values? Is it safe? Red-teaming for cultural blind spots. Evaluated using Inglehart-Welzel Cultural Map positioning, community-specific value surveys, and adversarial testing.
+**After Stage B (SFT):** Is the model usable? Does it follow instructions? Does it interact according to community norms? User testing, task-specific benchmarks, interaction quality assessment.
 
-**After Stage C (Instruction):** Is the model usable? Does it interact according to community norms? User testing, task-specific benchmarks, interaction quality assessment.
+**After Stage C (Alignment):** Does the model behave according to community values? Is it safe? Red-teaming for cultural blind spots. Evaluated using Inglehart-Welzel Cultural Map positioning, community-specific value surveys, and adversarial testing.
 
 Evaluation tooling — especially cultural alignment benchmarks — is novel infrastructure that does not exist yet. This is arguably the area requiring the most original work in the entire Tapestry project.
 
@@ -92,8 +92,8 @@ Evaluation tooling — especially cultural alignment benchmarks — is novel inf
 | :---- | :----------- | :----------------- | :-------------------------- |
 | **0** — Data | Training corpora | What data represents our culture? | Pipelines, governance, provenance |
 | **A** — CPT | World knowledge / representations | What should the model know about our world? | Training pipelines, checkpoint mgmt |
-| **B** — Alignment | Behavior / values | What is appropriate, respectful, true for us? | Alignment stacks, value elicitation |
-| **C** — Instruction | Deployable product | How should the model interact with our users? | Instruction harnesses, deployment |
+| **B** — SFT | Instruction-following / product shape | How should the model interact with our users? | Instruction harnesses, SFT pipelines |
+| **C** — Alignment | Behavior / values | What is appropriate, respectful, true for us? | Alignment stacks, value elicitation |
 | **Eval** | Validation (cross-cutting) | Did it work? Is it safe? Is it ours? | Benchmarks, red-teaming, cultural eval |
 
 *All stages execute on **sovereign data** at the participant; tooling is consortium infrastructure.*
