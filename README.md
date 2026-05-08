@@ -2,7 +2,7 @@
 
 # Welcome to Project Tapestry
 
-_Project Tapestry is creating a global frontier foundation model with a new "consortium training" platform harnessing data, compute and contributors from around the world to enable sovereign AI._
+> _Project Tapestry is creating a global frontier foundation model with a new "consortium training" platform harnessing data, compute and contributors from around the world to enable sovereign AI._
 
 This repo contains the code and technical documentation for the AI Alliance, [Project Tapestry](https://events.thealliance.ai/tapestry).
 
