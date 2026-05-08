@@ -173,7 +173,7 @@ tapestry/
 
 ## More about Getting Involved
 
-We welcome source code and technical documentation contributions. Use [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), or [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). See [More about Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
+We welcome source code and technical documentation contributions. Use [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), or [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). 
 
 In particular, see the AI Alliance [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) instructions. You will need to agree with the AI Alliance [Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md).
 
