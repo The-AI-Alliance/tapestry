@@ -2,9 +2,9 @@
 
 # Welcome to Project Tapestry
 
-Project Tapestry is creating a global frontier foundation model with a new "consortium training" platform harnessing data, compute and contributors from around the world to enable sovereign AI.
+> _Project Tapestry is creating a global frontier foundation model with a new "consortium training" platform harnessing data, compute and contributors from around the world to enable sovereign AI._
 
-This repo contains the code and technical documentation for the project. Check out the [Project Tapestry](https://thealliance.ai/projects/tapestry/) website for more information about partnering, events and more. 
+This repo contains the code and technical documentation for the AI Alliance, [Project Tapestry](https://events.thealliance.ai/tapestry).
 
 ![Project Tapestry Image](docs/assets/images/03-tapestry-logo-1000x545.png)
 
@@ -38,7 +38,7 @@ For repo layout, conventions, and where to find implementation code, see [**`AGE
 
 Several work groups are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are to be announced. The work group documentation is found under [**`tech-docs/work-groups/`**](tech-docs/work-groups/).
 
-We welcome contributions as PRs, etc. See [More about Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
+We welcome contributions as [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), and [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). See [More about Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
 
 <a id="development-anchor"></a>
 
@@ -160,20 +160,20 @@ tapestry/
 ├── src/
 │   └── tapestry/
 │       └── data/
-│       └── training/
 │       └── infrastructure/
+│       └── training/
 │   └── tests
 │       └── tapestry/
 │           └── data/
-│           └── training/
 │           └── infrastructure/
+│           └── training/
 ```
 
 <a id="getting-involved-anchor"></a>
 
 ## Getting Involved
 
-We welcome contributions as PRs, either to our code examples or our user guide. Please see our [Alliance community repo](https://github.com/The-AI-Alliance/community/) for general information about contributing to any of our projects. This section provides some specific details you need to know.
+We welcome source code and technical documentation contributions. Use [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), or [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). See [More about Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
 
 In particular, see the AI Alliance [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) instructions. You will need to agree with the AI Alliance [Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md).
 
@@ -194,9 +194,6 @@ See the Alliance contributing guide [section on DCO](https://github.com/The-AI-A
 
 ## About the Technical Website
 
-The website for this repo is found in the `docs` directory. It is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). We use the [Just the Docs](https://just-the-docs.github.io/just-the-docs/) Jekyll theme.
+The website for this repo is found in the `docs` directory. It provides another way to navigate the content of [`tech-docs`](/tech-docs). The website is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). We use the [Just the Docs](https://just-the-docs.github.io/just-the-docs/) Jekyll theme.
 
 See [GITHUB_PAGES.md](GITHUB_PAGES.md) for more information.
-
-> [!NOTE]
-> As described above, all documentation is licensed under Creative Commons Attribution 4.0 International. See [LICENSE.CC-BY-4.0](LICENSE.CC-BY-4.0).
