@@ -10,27 +10,37 @@ This repo contains the code and technical documentation for the AI Alliance, [Pr
 
 The rest of this README provides information for contributors, developers, and users of this repository.
 
+## Quick Paths
+
+* Working with the [source code](/src):
+	* Use the [**`Makefile`**](Makefile) targets, e.g., `make help`. See also the details in [**Development**](#development-anchor) below.
+	* Runnable demos in [**`examples/`**](examples/)
+	* Consortium training prototype in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md)
+
 ## Documentation
 
-Repository-local technical documentation lives under **`tech-docs/`**. Start here:
+The technical documentation lives under [**`tech-docs`**](tech-docs/README.md):
 
-| Entry point | Contents |
-| :---------- | :------- |
-| [**`tech-docs/architecture/`**](tech-docs/architecture/README.md) | TVA methodology; phased outputs (stakeholder map through design goals); architectural options / thesis; [**ADRs**](tech-docs/architecture/decisions/); [**diagrams**](tech-docs/architecture/diagrams/) |
-| [**`tech-docs/README.md`**](tech-docs/README.md) | Hub for [**architecture**](tech-docs/architecture/README.md), [**governance**](tech-docs/governance/), [**work-groups**](tech-docs/work-groups/), [**strategic-plan**](tech-docs/strategic-plan/), [**reference**](tech-docs/reference/) (e.g. [**training paradigms**](tech-docs/reference/training-approaches.md)) |
-| [**`docs/`**](docs/) | Source for the [published technical website](https://the-ai-alliance.github.io/tapestry/) (Jekyll / GitHub Pages) |
+* [**Architecture**](tech-docs/architecture/README.md)
+	* The _TVA methodology_: phased outputs (stakeholder map through design goals), architectural options and core thesis, plus:
+		* [**Architectural Decision Records**](tech-docs/architecture/decisions/)
+		* [**Diagrams**](tech-docs/architecture/diagrams/) 
+* [**Governance**](tech-docs/governance/)
+* [**Work Groups**](tech-docs/work-groups/)
+* [**Strategic Plan**](tech-docs/strategic-plan/)
+* [**Reference Materials**](tech-docs/reference/) (e.g. [**training paradigms**](tech-docs/reference/training-approaches.md))
+
+The [published technical website](https://the-ai-alliance.github.io/tapestry/) provides another way to navigate the technical documentation. The sources for this GitHub Pages website are found in [**`docs/`**](docs/).
 
 For repo layout, conventions, and where to find implementation code, see [**`AGENTS.md`**](AGENTS.md).
-
-**Quick paths:** [**`Makefile`**](Makefile) (`make help` — tests, formatting, lint, type-check, local [`docs/`](docs/) preview), [**`GITHUB_PAGES.md`**](GITHUB_PAGES.md) for the Jekyll site, [**`examples/`**](examples/) for runnable demos, [**`src/tapestry/training/consortium/README.md`**](src/tapestry/training/consortium/README.md) for the consortium-training prototype.
-
-For pull requests, see [`.github/PULL_REQUEST_TEMPLATE/`](.github/PULL_REQUEST_TEMPLATE/). The website contributing page is authored from [`docs/contributing.markdown`](docs/contributing.markdown).
 
 ## Getting Involved
 
 Several work groups are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are to be announced. The work group documentation is found under [**`tech-docs/work-groups/`**](tech-docs/work-groups/).
 
-We welcome contributions as PRs, etc. See [More about Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
+We welcome contributions as [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), and [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). See [More about Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
+
+<a id="development-anchor"></a>
 
 ## Development
 
@@ -150,20 +160,20 @@ tapestry/
 ├── src/
 │   └── tapestry/
 │       └── data/
-│       └── training/
 │       └── infrastructure/
+│       └── training/
 │   └── tests
 │       └── tapestry/
 │           └── data/
-│           └── training/
 │           └── infrastructure/
+│           └── training/
 ```
 
 <a id="getting-involved-anchor"></a>
 
 ## Getting Involved
 
-We welcome contributions as PRs, either to our code examples or our user guide. Please see our [Alliance community repo](https://github.com/The-AI-Alliance/community/) for general information about contributing to any of our projects. This section provides some specific details you need to know.
+We welcome source code and technical documentation contributions. Use [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), or [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). See [More about Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
 
 In particular, see the AI Alliance [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) instructions. You will need to agree with the AI Alliance [Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md).
 
@@ -184,9 +194,6 @@ See the Alliance contributing guide [section on DCO](https://github.com/The-AI-A
 
 ## About the Technical Website
 
-The website for this repo is found in the `docs` directory. It is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). We use the [Just the Docs](https://just-the-docs.github.io/just-the-docs/) Jekyll theme.
+The website for this repo is found in the `docs` directory. It provides another way to navigate the content of [`tech-docs`](/tech-docs). The website is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). We use the [Just the Docs](https://just-the-docs.github.io/just-the-docs/) Jekyll theme.
 
 See [GITHUB_PAGES.md](GITHUB_PAGES.md) for more information.
-
-> [!NOTE]
-> As described above, all documentation is licensed under Creative Commons Attribution 4.0 International. See [LICENSE.CC-BY-4.0](LICENSE.CC-BY-4.0).
