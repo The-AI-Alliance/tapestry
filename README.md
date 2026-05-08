@@ -3,9 +3,7 @@
 # Welcome to Project Tapestry
 Project Tapestry is creating a global frontier foundation model with a new "consortium training" platfrom harnessing data, compute and contributors from around the world to enable sovereign AI.
 
-[Website](https://thealliance.ai/projects/tapestry/)
-
-This repo contains the code and technical documentation for the AI Alliance, [Project Tapestry](https://events.thealliance.ai/tapestry). 
+This repo contains the code and technical documentation for the AI Alliance, [Project Tapestry](https://thealliance.ai/projects/tapestry/). 
 
 ![Project Tapestry Image](docs/assets/images/03-tapestry-logo-1000x545.png)
 
