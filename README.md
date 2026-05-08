@@ -1,8 +1,9 @@
 ![The AI Alliance banner](https://the-ai-alliance.github.io/assets/images/ai-alliance-logo-horiz-pos-blue-cmyk-trans.png)
 
-# README for Project Tapestry - Technical Repo
+# Welcome to Project Tapestry
+Project Tapestry is creating a global frontier foundation model with a new "consortium training" platfrom harnessing data, compute and contributors from around the world to enable sovereign AI.
 
-> [Technical website](https://the-ai-alliance.github.io/tapestry/)
+> [Website](https://thealliance.ai/projects/tapestry/)
 
 This repo contains the code and technical documentation for the AI Alliance, [Project Tapestry](https://events.thealliance.ai/tapestry). 
 
