@@ -171,7 +171,7 @@ tapestry/
 
 <a id="getting-involved-anchor"></a>
 
-## Getting Involved
+## More about Getting Involved
 
 We welcome source code and technical documentation contributions. Use [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), or [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). See [More about Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
 
