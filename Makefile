@@ -54,8 +54,8 @@ make format-lint-type-check
 make flt                # Synonym for format-lint-type-check.
 make format             # Format the Python code with 'black'.
 make lint               # Lint the Python code by making the ruff and pylint targets.
-make ruff               # Lint the Python code 'ruff'.
-make pylint             # Lint the Python code 'pylint'.
+make ruff               # Lint the Python code with 'ruff'.
+make pylint             # Lint the Python code with 'pylint'.
 make type-check         # Type check the Python code with 'ty'.
 make type-check-watch   # Type check the Python code with 'ty' in "watch" mode,
                         # so you can fix mistakes and keep it updating.
