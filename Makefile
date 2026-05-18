@@ -49,12 +49,18 @@ make all                # Makes the 'help' and 'print-info' targets (see below).
 make tests              # Run the test suite.
 make clean              # Remove built artifacts, etc.
 
+make format-lint-type-check
+                        # Do formating, linting, and type checking.
+make flt                # Synonym for format-lint-type-check.
 make format             # Format the Python code with 'black'.
-make lint               # Lint the Python code with 'ruff' and 'pylint.
+make lint               # Lint the Python code by making the ruff and pylint targets.
+make ruff               # Lint the Python code 'ruff'.
+make pylint             # Lint the Python code 'pylint'.
 make type-check         # Type check the Python code with 'ty'.
 make type-check-watch   # Type check the Python code with 'ty' in "watch" mode,
                         # so you can fix mistakes and keep it updating.
-make before-pr          # Make tests, format, lint, and type-check. Do this before submitting a PR!
+make before-pr          # Make format-lint-type-check and tests. 
+                        # DO THIS BEFORE SUBMITTING A PR!
 
 For the consortium-training prototype:
 
@@ -112,9 +118,6 @@ print-info:
 	@echo "Website files:       ${DOCS_DIR}"
 	@echo "JEKYLL_PORT:         ${JEKYLL_PORT}"
 
-.PHONY: before-pr
-before-pr:: tests format lint type-check
-
 .PHONY: tests unit-tests
 tests:: unit-tests
 
@@ -133,15 +136,24 @@ consortium-tests::
 	@echo "${INFO}Running the consortium-training tests...${_END}"
 	uv run pytest ${SRC_DIR}/tests/tapestry/training/consortium -q
 
-.PHONY: format lint type-check type-check-watch
+.PHONY: before-pr format-lint-type-check flt
+before-pr:: format-lint-type-check tests
+format-lint-type-check flt:: format lint type-check
+
+.PHONY: format lint ruff pylint type-check type-check-watch
 
 format::
 	@echo "${INFO}$@: Running 'black' on the code.${_END}"
 	uv run black ${SRC_DIR}
 
-lint::
-	@echo "${INFO}$@: Running 'ruff' and 'pylint' on the code.${_END}"
-	uv run ruff check ${SRC_DIR}
+lint:: ruff pylint
+
+ruff::
+	@echo "${INFO}$@: Running 'ruff' to lint the code.${_END}"
+	uv run ruff check --fix ${SRC_DIR}
+
+pylint::
+	@echo "${INFO}$@: Running 'pylint' on the code.${_END} (configuration in pylintrc.toml)"
 	uv run pylint ${SRC_DIR}
 
 type-check::
