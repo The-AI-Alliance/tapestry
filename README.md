@@ -148,6 +148,15 @@ make type-check-watch
 uv run ty --watch src
 ```
 
+### Before You Submit a PR...
+
+Before submitting a PR, please run the tests, format, lint, and type checking commands. Make sure everything passes cleanly! Use the convenient `make` target `before-pr`, or run the individual commands above:
+
+```shell
+make before-pr               # Equivalent to 'make format lint type-check tests'
+make format-lint-type-check  # Equivalent to 'make format lint type-check'
+```
+
 ## Project Structure
 
 The structure is as follows, where three major _subsystems_ are managed: 
