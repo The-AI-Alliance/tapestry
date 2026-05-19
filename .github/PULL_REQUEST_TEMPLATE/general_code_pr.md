@@ -36,10 +36,10 @@ Confirm that the following have been completed, where applicable:
 
 - [ ] I have read and understood the [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) guide.
 
-For documentation changes:
+For general documentation changes:
 
 - [ ] I have followed the documentation style guide.
-- [ ] I have included appropriate screenshots, example code, etc.
+- [ ] I have included appropriate screenshots, example code, etc., where applicable.
 
 For changes to the GitHub Pages website in the `docs/` directory:
 
