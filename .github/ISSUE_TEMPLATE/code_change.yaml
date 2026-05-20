@@ -1,8 +1,8 @@
-name: A Use Case to Implement
-description: A complete use case we should implement
-title: "[Use Case] "  
-labels: "use case"
-assignees: [deanwampler,adampingel,jolson-ibm]
+name: Code Change to Make
+description: A change to the project source code
+title: "[Code] "  
+labels: "code"
+assignees: [deanwampler,ctn,adampingel,jolson-ibm]
 projects: [The-AI-Alliance/50]
 body:
 - type: checkboxes
@@ -14,13 +14,14 @@ body:
       required: true
 - type: textarea
   attributes:
-    label: Use Case Details
+    label: Details
     description: |
       Please describe:
-      * The "role" of some user who wants to perform the use case.
-      * The possible steps the user might do.
+      * The general idea you are proposing. (Use as much detail as you think is necessary.)
+      * The "role" of some user who will benefit from having this change implemented.
+      * The possible sequence of steps the user might do.
       * Possible user errors or system failures that the implementation should handle.
-      * Why would this be a valuable thing to do?
+      * Why would this change be a valuable thing to implement?
       * Are there any alternative solutions you have considered?
   validations:
     required: true
@@ -28,4 +29,4 @@ body:
   attributes:
     label: Additional Context
     description: |
-      Add any other context or screenshots about the documentation/website change here.
+      Add any other context or screenshots about the proposal here.
