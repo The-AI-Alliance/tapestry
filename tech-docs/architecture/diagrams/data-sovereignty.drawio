@@ -1,6 +1,6 @@
 <mxfile host="Electron">
   <diagram name="Page-1" id="5GKT-VihkCmrRgoHBOGI">
-    <mxGraphModel dx="1328" dy="832" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1926" dy="1206" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -46,7 +46,7 @@
         <mxCell id="syFpzNw0Nt3ccXYTVD9k-12" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#f8cecc;strokeColor=#b85450;" value="Data with details that can be revealed, even to a model training process (because of the risk of memorization)." vertex="1">
           <mxGeometry height="130" width="120" x="60" y="100" as="geometry" />
         </mxCell>
-        <mxCell id="syFpzNw0Nt3ccXYTVD9k-13" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#fff2cc;strokeColor=#d6b656;" value="Data that is not private, but can&#39;t leave the sovereign bundaries." vertex="1">
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-13" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#fff2cc;strokeColor=#d6b656;" value="Data that is not private, but can&#39;t leave a sovereign boundary." vertex="1">
           <mxGeometry height="130" width="120" x="200" y="100" as="geometry" />
         </mxCell>
         <mxCell id="syFpzNw0Nt3ccXYTVD9k-14" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="Unique data available to the partner, which could potentially move to the core training data corpus." vertex="1">
