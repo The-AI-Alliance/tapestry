@@ -7,7 +7,7 @@ has_children: false
 
 # About Project Tapestry and The AI Alliance
 
-The [AI Alliance](https://www.aialliance.org){:target="aia"} created and develops [Project Tapestry](https://thealliance.ai/projects/tapestry){:target="aia-tapestry"}.
+The [AI Alliance](https://www.aialliance.org){:target="aia"} created and develops [Project Tapestry]({{site.tapestryurl}}){:target="aia-tapestry"}.
 
 The [AI Alliance](https://aialliance.org){:target="aia"} is a global collaboration of startups, enterprises, academic, and other research institutions interested in advancing the state of the art, the availability, and the safety of AI technology and uses. The AI Alliance's core projects seek to address substantial cross-community challenges and are an opportunity for contributors to collaborate, build, and make an impact on the future of AI. Core Projects are managed directly by the AI Alliance and governed as described in our [community GitHub repository](https://github.com/The-AI-Alliance/community){:target="community"}. 
 
