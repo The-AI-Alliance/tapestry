@@ -56,13 +56,13 @@ flowchart TD
     style align fill:#FAECE7,stroke:#993C1D,color:#712B13
     style evalg fill:#E1F5EE,stroke:#0F6E56,color:#085041
 
-    classDef data fill:#ffffff,stroke:#333,color:#111
-    classDef process fill:#f5f5f5,stroke:#555,color:#111
+    classDef data fill:#E6F1FB,stroke:#185FA5,color:#0C447C
+    classDef process fill:#EEEDFE,stroke:#534AB7,color:#3C3489
     class RAW,PREP,PRETRAIN,SFT_DATA,PREF,VERIF,EVAL data
     class PREP_PROC,TOKENIZE,TRAIN_MODEL,FINETUNE,PREF_OPT,RL_VERIFY process
 ```
 
-*Diagram convention: cylinders are data artifacts; double-bordered boxes are pipeline steps.*
+*Diagram convention: **blue cylinders** = data artifacts; **violet double-bordered boxes** = pipeline steps. Phase bands (green, amber, peach, teal) group stages only.*
 
 The pipeline is not strictly linear. Evaluation data is used throughout (not just at the end). Alignment may loop back through SFT. And in Tapestry's consortium model, the pipeline forks — some stages happen at individual nodes, others at the coordinator, and post-training may diverge into sovereign branches. These dynamics are discussed in [Implications for Tapestry](#implications-for-tapestry).
 
