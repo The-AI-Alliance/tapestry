@@ -47,9 +47,10 @@ The following work groups are provisional. [Participation is welcome!]({{site.ba
 
 ## Other Technical Documentation
 
-See also the following sections in the technical documentation:
+The rest of the technical documentation is currently maintained in the project repository [`tech-docs`]({{page.tech_docs}}/){:target="repo-tech-docs"}:
 
 * [Architecture]({{page.tech_docs}}/architecture/){:target="repo-tech-docs"}:
+  * [Architecture Decision Records]({{page.tech_docs}}/architecture/decisions/){:target="repo-tech-docs"}:
 * [Governance]({{page.tech_docs}}/governance/){:target="repo-tech-docs"}:
 * [Reference]({{page.tech_docs}}/reference/){:target="repo-tech-docs"}:
 * [Strategic Plan]({{page.tech_docs}}/strategic-plan/){:target="repo-tech-docs"}
