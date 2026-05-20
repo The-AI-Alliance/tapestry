@@ -71,11 +71,17 @@ It is possible that privacy preserving techniques will be necessary for some of 
 
 This is the familiar category of data that has been properly curated and licensed for unrestricted, open use.
 
-#### Other Considerations for Data that Isn't Fully Open
+### Other Considerations for Data that Isn't Fully Open
+
+#### What Do We Describe about the Data Sets Used?
 
 In a perfect world, _every_ Tapestry data set, model, tool, and process would be open-sourced. In practice, Tapestry will use some data that is restricted in some way and therefore not public. (We plan to open source all models, tools, and processes.)
 
 Tapestry will need to publicly document the _metadata_ for all data sets used, even when the data itself can't be published.
+
+#### Who Enforces the Requirements?
+
+It is the responsibility of each _node_ in the consortium to enforce the requirements for the data it manages. It must audit enforcement so the Tapestry oversight teams can trust that enforcement was properly performed.
 
 ### Data Exchange in Consortium vs. Local Training?
 
