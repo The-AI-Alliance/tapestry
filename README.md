@@ -12,18 +12,20 @@ The rest of this README provides information for contributors, developers, and u
 
 ## Quick Paths
 
-* Working with the [source code](/src):
+* Working with the [source code](src/):
 	* Use the [**`Makefile`**](Makefile) targets, e.g., `make help`. See also the details in [**Development**](#development-anchor) below.
-	* Runnable demos in [**`examples/`**](examples/)
-	* Consortium training prototype in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md)
+	* See the runnable demos in [**`examples/`**](examples/) (try `make consortium-demo`).
+	* Consortium training prototype in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md) (try `make consortium-demo` and `make consortium-tests`).
+* Working with the [technical documentation](tech-docs/) is discussed in the next section.
+* Working with the GitHub Pages [website](https://the-ai-alliance.github.io/tapestry/) is discussed in [About the Technical Website](#about-the-technical-website).
 
-## Documentation
+## Technical Documentation
 
 The technical documentation lives under [**`tech-docs`**](tech-docs/README.md):
 
 * [**Architecture**](tech-docs/architecture/README.md)
 	* The _TVA methodology_: phased outputs (stakeholder map through design goals), architectural options and core thesis, plus:
-		* [**Architectural Decision Records**](tech-docs/architecture/decisions/)
+		* [**Architecture Decision Records**](tech-docs/architecture/decisions/)
 		* [**Diagrams**](tech-docs/architecture/diagrams/) 
 * [**Governance**](tech-docs/governance/)
 * [**Work Groups**](tech-docs/work-groups/)
@@ -157,7 +159,7 @@ make before-pr               # Equivalent to 'make format lint type-check tests'
 make format-lint-type-check  # Equivalent to 'make format lint type-check'
 ```
 
-## Project Structure
+## Project Code Structure
 
 The structure is as follows, where three major _subsystems_ are managed: 
 * `data` for all data governance and management capabilities.
@@ -203,6 +205,6 @@ See the Alliance contributing guide [section on DCO](https://github.com/The-AI-A
 
 ## About the Technical Website
 
-The website for this repo is found in the `docs` directory. It provides another way to navigate the content of [`tech-docs`](/tech-docs). The website is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). We use the [Just the Docs](https://just-the-docs.github.io/just-the-docs/) Jekyll theme.
+The website for this repo is found in the `docs` directory. It provides another way to discover and navigate the content of [`tech-docs`](/tech-docs). However, at this time, it mostly just points to the content in the [technical documentation](tech-docs/) section of the repo.
 
-See [GITHUB_PAGES.md](GITHUB_PAGES.md) for more information.
+The website is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). See [GITHUB_PAGES.md](GITHUB_PAGES.md) for more information.
