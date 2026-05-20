@@ -25,9 +25,9 @@ exclude: ["node_modules/", "*.gemspec", "*.gem", "Gemfile", "Gemfile.lock", "pac
 , "docs/tests/", "notes.md", "vendor"
 ]
 
-# Added by AI Alliance: a glossary URL, which in this case is internal
-# to this site!
+# Added by AI Alliance: our glossary URL and the main tapestry page URL.
 glossaryurl: https://the-ai-alliance.github.io/glossary
+tapestryurl: https://thealliance.ai/projects/tapestry
 
 # Regression tests
 # By default, the pages in /docs/tests are excluded when the site is built.
