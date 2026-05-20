@@ -21,34 +21,48 @@ The modern LLM training pipeline has six stages. Data enters as messy, heterogen
 flowchart TD
     subgraph ingest ["1–2 · Data ingestion"]
         direction LR
-        RAW["🗄️ 1 · Raw data<br/><i>WARC, PDF, source files</i>"] -->|"clean, filter,<br/>deduplicate"| PREP["📋 2 · Prepared data<br/><i>Clean JSONL / Parquet</i>"]
+        RAW[(🗄️ 1 · Raw data<br/><i>WARC, PDF, source files</i>)] --> PREP_PROC[["clean, filter,<br/>deduplicate"]] --> PREP[(📋 2 · Prepared data<br/><i>Clean JSONL / Parquet</i>)]
     end
+
+    TOKENIZE[["tokenize,<br/>pack sequences"]]
 
     subgraph train ["3–4 · Model training"]
         direction LR
-        PRETRAIN["🔢 3 · Pre-training data<br/><i>Token ID arrays</i>"] -->|"pre-train<br/>base model"| SFT_DATA["💬 4 · Instruction data<br/><i>Chat-structured JSONL</i>"]
+        PRETRAIN[(🔢 3 · Pre-training data<br/><i>Token ID arrays</i>)] --> TRAIN_MODEL[["pre-train<br/>base model"]] --> SFT_DATA[(💬 4 · Instruction data<br/><i>Chat-structured JSONL</i>)]
     end
+
+    FINETUNE[["fine-tune on<br/>instructions"]]
 
     subgraph align ["5 · Alignment"]
         direction LR
-        PREF["⚖️ Preference data<br/><i>Chosen / rejected pairs</i>"] ~~~ VERIF["✅ Verifiable rewards<br/><i>Problems + verifiers</i>"]
+        PREF[(⚖️ Preference data<br/><i>Chosen / rejected pairs</i>)] ~~~ VERIF[(✅ Verifiable rewards<br/><i>Problems + verifiers</i>)]
     end
+
+    PREF_OPT[["optimize<br/>preferences"]]
+    RL_VERIFY[["RL with<br/>verification"]]
 
     subgraph evalg ["6 · Evaluation"]
         direction LR
-        EVAL["📊 Eval data<br/><i>Benchmarks, held-out sets</i>"]
+        EVAL[(📊 Eval data<br/><i>Benchmarks, held-out sets</i>)]
     end
 
-    ingest -->|"tokenize,<br/>pack sequences"| train
-    train -->|"fine-tune on<br/>instructions"| align
-    align -->|"optimize<br/>preferences"| evalg
-    align -->|"RL with<br/>verification"| evalg
+    ingest --> TOKENIZE --> train
+    train --> FINETUNE --> align
+    align --> PREF_OPT --> evalg
+    align --> RL_VERIFY --> evalg
 
     style ingest fill:#EAF3DE,stroke:#3B6D11,color:#27500A
     style train fill:#FAEEDA,stroke:#854F0B,color:#633806
     style align fill:#FAECE7,stroke:#993C1D,color:#712B13
     style evalg fill:#E1F5EE,stroke:#0F6E56,color:#085041
+
+    classDef data fill:#ffffff,stroke:#333,color:#111
+    classDef process fill:#f5f5f5,stroke:#555,color:#111
+    class RAW,PREP,PRETRAIN,SFT_DATA,PREF,VERIF,EVAL data
+    class PREP_PROC,TOKENIZE,TRAIN_MODEL,FINETUNE,PREF_OPT,RL_VERIFY process
 ```
+
+*Diagram convention: cylinders are data artifacts; double-bordered boxes are pipeline steps.*
 
 The pipeline is not strictly linear. Evaluation data is used throughout (not just at the end). Alignment may loop back through SFT. And in Tapestry's consortium model, the pipeline forks — some stages happen at individual nodes, others at the coordinator, and post-training may diverge into sovereign branches. These dynamics are discussed in [Implications for Tapestry](#implications-for-tapestry).
 
