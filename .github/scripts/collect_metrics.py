@@ -10,7 +10,13 @@ import json
 
 # --- GraphQL Helper ---  
 def run_graphql_query(token, query, variables=None):  
-    """Runs a GraphQL query against the GitHub API."""  
+    """
+    Runs a GraphQL query against the GitHub API.
+    Configured by ../workflows/collect_metrics.yaml
+    NOTE: Currently disabled in the YAML file because recently
+    (early 2026...) these workflows started failing regularly
+    for reasons we were unable to diagnose!
+    """  
     graphql_url = "https://api.github.com/graphql"  
     headers = {  
         "Authorization": f"bearer {token}",  
