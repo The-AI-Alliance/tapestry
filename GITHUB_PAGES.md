@@ -6,7 +6,8 @@ The documentation for this repo is published using [GitHub Pages](https://pages.
 
 > [!NOTE]
 > The documentation in this repo is licensed under Creative Commons Attribution 4.0 International. To view a copy of this license, see [LICENSE.CC-BY-4.0](LICENSE.CC-BY-4.0) or visit https://creativecommons.org/licenses/by/4.0/legalcode. All code uses the [Apache 2.0](LICENSE.Apache-2.0) license. All data uses the [CDLA 2.0](LICENSE.CDLA-2.0) license.
-
+>
+> This file is based on the version found in the [`microsite-template` repo](https://github.com/The-AI-Alliance/microsite-template/blob/main/GITHUB_PAGES.md), with some changes for local customizations.
 
 ## Quick Setup
 
@@ -67,7 +68,7 @@ Here are some things you should know.
 
 ### Using the Correct Branch
 
-Issue PRs for the `main` branch. Note that some of our microsite repos are configured to publish the website from another branch, usually `latest`, not `main`. For those repos, it will be necessary to merge from `main` to `latest` after merging the PR.
+Issue PRs for the `develop` branch, which is the default project branch (not `main`) and also the branch used to publish the website. (Most of our repos use the `main` branch for both purposes.)
 
 > [!NOTE]
 > If you are curious, the details of how the publication process is configured are discussed [below](#configuring-github-pages-in-the-repo-settings).
@@ -311,4 +312,6 @@ gem list | grep jekyll
 
 This section documents the one-time settings necessary to [configure publication of a repo's GitHub Pages](https://docs.github.com/en/enterprise-server@3.1/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site). 
 
-In the repo's [_Settings > Pages_ section](https://github.com/The-AI-Alliance/tapestry/settings/pages), use the menu to select the branch from which you want to publish the website. By default, we assume `main` is the desired branch, so pick that. However, if you want to use a different branch, i.e., `latest` or another one you specified when running `finish-microsite.sh`, then select it. Finally, select the `docs` folder in the dropdown menu to the right, which is the root folder for the pages.
+In the repo's [_Settings > Pages_ section](https://github.com/The-AI-Alliance/tapestry/settings/pages), use the menu to select the branch from which you want to publish the website. By default, we use `main` is the desired branch in most of our repos, but this repo uses `develop`.
+
+Finally, select the `docs` folder in the drop-down menu to the right, which is the root folder for the pages.
