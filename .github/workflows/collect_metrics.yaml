@@ -7,6 +7,9 @@ on:
   
 jobs:  
   collect-and-upload-metrics:  
+    # Disable the workflow, because started failing regularly in early 2026
+    # for reasons we were unable to diagnose!
+    if: false  
     runs-on: ubuntu-latest  
     permissions:  
       contents: read  # Read repo content (needed for repo object)  
