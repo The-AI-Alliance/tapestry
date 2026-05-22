@@ -15,7 +15,7 @@ The rest of this README provides information for contributors, developers, and u
 * Working with the [source code](src/):
 	* Use the [**`Makefile`**](Makefile) targets, e.g., `make help`. See also the details in [**Development**](#development-anchor) below.
 	* See the runnable demos in [**`examples/`**](examples/) (try `make consortium-demo`).
-	* Consortium training prototype in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md) (try `make consortium-demo` and `make consortium-tests`).
+	* Consortium training prototype in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md) (try `make consortium-demo` and also `make consortium-tests`).
 * Working with the [technical documentation](tech-docs/) is discussed in the next section.
 * Working with the GitHub Pages [website](https://the-ai-alliance.github.io/tapestry/) is discussed in [About the Technical Website](#about-the-technical-website).
 
