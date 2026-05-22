@@ -20,6 +20,7 @@ ADRs and [`training-approaches.md`](../../reference/training-approaches.md) embe
 | :------------------------------------ | :-------------- |
 | [`consortium-training-loop.svg`](consortium-training-loop.svg) | [TAP-004](../decisions/adr-004-training-loop.md), [`training-approaches.md`](../../reference/training-approaches.md) |
 | [`core-plus-sovereign-stack.svg`](core-plus-sovereign-stack.svg) | [TAP-001](../decisions/adr-001-core-plus-sovereign.md) |
+| [`data-sovereignty.svg`](data-sovereignty.svg) ([draw.io](data-sovereignty.drawio)) | [TAP-008](../decisions/adr-008-data-sovereignty.md) |
 | [`training-paradigms-comparison.svg`](training-paradigms-comparison.svg) | [TAP-002](../decisions/adr-002-consortium-training.md) |
 | [`cultural-alignment-framing.svg`](cultural-alignment-framing.svg) | [TAP-003](../decisions/adr-003-cultural-alignment.md) |
 | [`sovereign-alignment-pipeline.svg`](sovereign-alignment-pipeline.svg) | [TAP-005](../decisions/adr-005-sovereign-pipeline.md) |
