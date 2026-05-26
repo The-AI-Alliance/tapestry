@@ -12,14 +12,26 @@ The rest of this README provides information for contributors, developers, and u
 
 ## Quick Paths
 
-* Working with the [source code](src/):
-	* Use the [**`Makefile`**](Makefile) targets, e.g., `make help`. See also the details in [**Development**](#development-anchor) below.
-	* See the runnable demos in [**`examples/`**](examples/) (try `make consortium-demo`).
-	* Consortium training prototype in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md) (try `make consortium-demo` and also `make consortium-tests`).
-* Working with the [technical documentation](tech-docs/) is discussed in the next section.
-* Working with the GitHub Pages [website](https://the-ai-alliance.github.io/tapestry/) is discussed in [About the Technical Website](#about-the-technical-website).
+> [!NOTE]
+> Make sure to read [**Getting Involved**](#getting-involved-anchor) below for information on contribution guidelines, etc.
 
-## Technical Documentation
+### Tasks Happening Now
+
+Please join us!
+
+* [Help us build a PoC exploring cultural alignment](https://github.com/The-AI-Alliance/tapestry/issues/22) based on the [Ingelhart-Wenzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric. This task will implement a corresponding evaluation and do a small model tuning exercise to see if improvement can be observed. Prior expertise in evaluation and tuning technologies are especially welcome.
+* [Help us flesh out the details of _consortium training_](https://github.com/The-AI-Alliance/tapestry/issues/24), the adaptation of federated learning that meets the unique requirements and constraints of Tapestry. Prior expertise in LLM training and federated learning technologies are especially welcome.
+* [Tell us about your data sets.](https://thealliance.ai/projects/tapestry/training-data-proposals) What unique datasets do you have that could contribute to Tapestry model training? They don't have to be fully open; we will work with you to define and enforce appropriate handling.
+
+### Working with the Source Code
+
+The source code is under the [`src`](src/) directory.
+
+* Use the [**`Makefile`**](Makefile) targets, e.g., `make help`. More details are in [**Development**](#development-anchor) below.
+* Runnable demos in [**`examples/`**](examples/) (try `make consortium-demo`).
+* Consortium training prototype in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md) (try `make consortium-demo` and also `make consortium-tests`).
+
+### Working with the Technical Documentation
 
 The technical documentation lives under [**`tech-docs`**](tech-docs/README.md):
 
@@ -32,15 +44,7 @@ The technical documentation lives under [**`tech-docs`**](tech-docs/README.md):
 * [**Strategic Plan**](tech-docs/strategic-plan/)
 * [**Reference Materials**](tech-docs/reference/) (e.g. [**training paradigms**](tech-docs/reference/training-approaches.md))
 
-The [published technical website](https://the-ai-alliance.github.io/tapestry/) provides another way to navigate the technical documentation. The sources for this GitHub Pages website are found in [**`docs/`**](docs/).
-
 For repo layout, conventions, and where to find implementation code, see [**`AGENTS.md`**](AGENTS.md).
-
-## Getting Involved
-
-Several work groups are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are to be announced. The work group documentation is found under [**`tech-docs/work-groups/`**](tech-docs/work-groups/).
-
-We welcome contributions as [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), and [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). See [More about Getting Involved](#getting-involved-anchor) below for details about AI Alliance contribution guidelines, licenses, etc.
 
 <a id="development-anchor"></a>
 
@@ -64,7 +68,7 @@ On Windows:
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-The rest of the steps are partially automated using `make`. Try the following:
+The rest of the steps discussed next are automated using `make`. Try the following:
 
 ```shell
 make one-time-setup
@@ -72,7 +76,7 @@ make one-time-setup
 
 #### Create a Virtual Environment
 
-If `make one-time-setup` didn't work or you want to set up the virtual environment manually:
+The `one-time-setup` target runs the following command (but it only works on macOS or Linux). You can also do this manually:
 
 On macOS/Linux:
 
@@ -89,7 +93,7 @@ uv venv
 
 #### Install Dependencies
 
-If `make one-time-setup` didn't work or you want to install the dependencies yourself run _one_ of the following commands:
+The `one-time-setup` target runs the first of the following commands (but it only works on macOS or Linux). You can also run either command manually:
 
 ```shell
 uv pip install -e ".[dev]"  # full development dependencies
@@ -120,6 +124,7 @@ Use _either_ of the following commands to format the Python code with `black`:
 
 ```shell
 make format
+# or
 uv run black src
 ```
 
@@ -140,6 +145,7 @@ Use _either_ of the following commands to type check the Python code with `ty`:
 
 ```shell
 make type-check
+# or
 uv run ty src
 ```
 
@@ -147,21 +153,26 @@ There is also a "watch" option that keeps `ty` running as you fix mistakes and s
 
 ```shell
 make type-check-watch
+# or
 uv run ty --watch src
 ```
 
 ### Before You Submit a PR...
 
-Before submitting a PR, please run the tests, format, lint, and type checking commands. Make sure everything passes cleanly! Use the convenient `make` target `before-pr`, or run the individual commands above:
+Before submitting a PR, please run the format, lint, and type checking commands, then run the tests. Make sure everything passes cleanly! Use the convenient `make` target `before-pr`, or run the individual commands above:
 
 ```shell
 make before-pr               # Equivalent to 'make format lint type-check tests'
 make format-lint-type-check  # Equivalent to 'make format lint type-check'
 ```
 
+> [!NOTE]
+> Make sure to read [**Getting Involved**](#getting-involved-anchor) below before submitting a PR.
+
 ## Project Code Structure
 
-The structure is as follows, where three major _subsystems_ are managed: 
+In addition to the top-level directories `tech-docs`, discussed above, and `docs`, discussed below, the code structure is as follows. At this time, there are three major _subsystems_:
+
 * `data` for all data governance and management capabilities.
 * `training` for all distributed training and tuning capabilities.
 * `infrastructure` for all underlying infrastructure.
@@ -182,11 +193,14 @@ tapestry/
 
 <a id="getting-involved-anchor"></a>
 
-## More about Getting Involved
+## Getting Involved
 
-We welcome source code and technical documentation contributions. Use [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), or [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). 
+We welcome contributions as [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), and [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). 
 
-In particular, see the AI Alliance [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) instructions. You will need to agree with the AI Alliance [Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md).
+You can also join one or more work groups that are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are are being documented in [**`tech-docs/work-groups/`**](tech-docs/work-groups/).
+
+See the AI Alliance [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) guidelines. You will need to agree with the AI Alliance [Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md).
+
 
 ### Licenses
 
@@ -203,8 +217,8 @@ We use the "Developer Certificate of Origin" (DCO).
 
 See the Alliance contributing guide [section on DCO](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md#developer-certificate-of-origin) for details. In practical terms, supporting this requirement means you must use the `-s` flag with your `git commit` commands.
 
-## About the Technical Website
+## About the Technical Website (GitHub Pages)
 
-The website for this repo is found in the `docs` directory. It provides another way to discover and navigate the content of [`tech-docs`](/tech-docs). However, at this time, it mostly just points to the content in the [technical documentation](tech-docs/) section of the repo.
+The [website](https://the-ai-alliance.github.io/tapestry/) for this repository provides another way to discover and navigate the technical documentation content in [`tech-docs`](/tech-docs). However, at this time, the site mostly just points to the content in [`tech-docs`](tech-docs/). The website sources are in the [`docs`](docs/) directory.
 
-The website is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). See [GITHUB_PAGES.md](GITHUB_PAGES.md) for more information.
+The website is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). See [GITHUB_PAGES.md](GITHUB_PAGES.md) for all the details.
