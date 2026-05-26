@@ -43,7 +43,7 @@
             <mxPoint x="660" y="470" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="syFpzNw0Nt3ccXYTVD9k-12" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#f8cecc;strokeColor=#b85450;" value="Data with details that can be revealed, even to a model training process (because of the risk of memorization)." vertex="1">
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-12" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#f8cecc;strokeColor=#b85450;" value="Data with details that can&#39;t be revealed (e.g., PII), but some information can be used in model training, etc." vertex="1">
           <mxGeometry height="130" width="120" x="60" y="100" as="geometry" />
         </mxCell>
         <mxCell id="syFpzNw0Nt3ccXYTVD9k-13" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#fff2cc;strokeColor=#d6b656;" value="Data that is not private, but can&#39;t leave a sovereign boundary." vertex="1">
