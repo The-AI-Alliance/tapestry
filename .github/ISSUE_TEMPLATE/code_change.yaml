@@ -2,7 +2,7 @@ name: Code Change to Make
 description: A change to the project source code
 title: "[Code] "  
 labels: "code"
-assignees: [deanwampler,ctn,adampingel,jolson-ibm]
+assignees: [deanwampler,ctn,jolson-ibm]
 projects: [The-AI-Alliance/50]
 body:
 - type: checkboxes
