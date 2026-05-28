@@ -36,13 +36,6 @@ Confirm that the following have been completed, where applicable:
 
 - [ ] I have read and understood the [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) guide.
 
-For "microsite" and other documentation changes:
-
-- [ ] I have followed the documentation style guide.
-- [ ] I have included appropriate screenshots, example code, etc.
-- [ ] I have verified the microsite builds successfully, i.e., `make view-local` runs without errors.
-- [ ] I have checked that external links have `target="..."` specifications by running `./check-external-links.sh` and fixed any missing cases. (This tool doesn't add missing links nor does it verify the links are valid.)
-
 For code changes:
 
 - [ ] I have tested the code changes in my local development environment.
@@ -50,3 +43,14 @@ For code changes:
 - [ ] I have followed the existing code styles and conventions.
 - [ ] I have removed all API keys and other sensitive information.
 - [ ] I have updated any related documentation.
+
+For documentation changes, including `tech-docs` and the "microsite" `docs` content:
+
+- [ ] I have followed the documentation style guide.
+- [ ] I have included appropriate screenshots, example code, etc.
+- [ ] (For `docs` modifications) 
+
+For "microsite" `docs` changes specifically:
+
+- [ ] I have verified the microsite `make view-local` runs without errors and the changes render as expected.
+- [ ] I have checked that external links have `target="..."` specifications by running `./check-external-links.sh` and fixed any missing cases. (This tool doesn't add missing links nor does it verify the links are valid.)
