@@ -46,3 +46,13 @@ Out of scope: participant-specific alignment layers, serving/product integration
 - **Security & Privacy:** leakage analysis for weight deltas and aggregation.
 - **Infrastructure & Operations:** training orchestration, node operations, and fault tolerance.
 - **Governance & Participation:** contribution weighting and decision rights.
+
+## Skills Needed
+
+This work group needs people with the following research or engineering skills:
+
+* LLM training with PyTorch (or possibly [Rust tools](https://github.com/The-AI-Alliance/tapestry/issues/9)).
+* Federated Learning, which is similar to consortium learning.
+* The ability to research and evaluation distributed training algorithms, including those discussed in the ADRs listed in [Why it exists](#why-it-exists) above.
+* Evaluation of LLMs with popular and custom benchmarks.
+* Engineering and administration of large-scale, distributed training clusters.
