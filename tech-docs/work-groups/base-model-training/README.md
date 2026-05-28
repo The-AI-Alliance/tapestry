@@ -36,7 +36,7 @@ Out of scope: participant-specific alignment layers, serving/product integration
 
 - Base-model selection criteria for the MVP. ([Issue #25](https://github.com/The-AI-Alliance/tapestry/issues/25))
 - A consortium training experiment plan with target model sizes and node assumptions. ([Issue #24](https://github.com/The-AI-Alliance/tapestry/issues/24))
-- Aggregation-policy options for workshop review.
+- Aggregation-policy options for technical review.
 - Infrastructure requirements for heterogeneous compute and observability. ([Issue #26](https://github.com/The-AI-Alliance/tapestry/issues/26))
 
 ## Interfaces
@@ -49,7 +49,7 @@ Out of scope: participant-specific alignment layers, serving/product integration
 
 ## Skills Needed
 
-This work group needs people with the following research or engineering skills:
+This work group needs people with the following research and engineering skills:
 
 * LLM training with PyTorch (or possibly [Rust tools](https://github.com/The-AI-Alliance/tapestry/issues/9)).
 * Federated Learning, which is similar to consortium learning.
