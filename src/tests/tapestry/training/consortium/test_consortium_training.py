@@ -56,10 +56,7 @@ def test_sovereign_node_returns_artifact_and_weight_delta() -> None:
     assert result.contribution.round_num == 1
     assert result.contribution.quality_score == pytest.approx(0.82)
     assert set(result.contribution.weight_delta) == set(base_state)
-    assert any(
-        torch.norm(delta).item() > 0
-        for delta in result.contribution.weight_delta.values()
-    )
+    assert any(torch.norm(delta).item() > 0 for delta in result.contribution.weight_delta.values())
 
 
 def test_contribution_policy_applies_quality_floor_and_capture_cap() -> None:
