@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" role="img" aria-labelledby="title desc">
   <title id="title">Consortium training loop</title>
-  <desc id="desc">Four steps: base training, continued pretraining on sovereign data, weight deltas to coordinator, integrate and redistribute global model, cycling back to step two.</desc>
+  <desc id="desc">Four steps: base training, continued pretraining on sovereign data, local model weights to coordinator, integrate and redistribute global model, cycling back to step two.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
       <path d="M0,0 L0,6 L9,3 z" fill="#37474f"/>
@@ -16,7 +16,7 @@
   <text x="312" y="66" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">2 - Continued pretraining</text>
   <text x="312" y="86" text-anchor="middle" fill="#e8f5e9" font-family="system-ui,Segoe UI,sans-serif" font-size="11">sovereign data (local)</text>
   <rect x="416" y="36" width="168" height="64" rx="6" fill="#ef6c00" stroke="#e65100" stroke-width="2"/>
-  <text x="500" y="66" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">3 - Weight deltas</text>
+  <text x="500" y="66" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">3 - Local weights</text>
   <text x="500" y="86" text-anchor="middle" fill="#fff3e0" font-family="system-ui,Segoe UI,sans-serif" font-size="11">to coordinator</text>
   <rect x="604" y="36" width="116" height="64" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
   <text x="662" y="72" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">4 - Integrate</text>

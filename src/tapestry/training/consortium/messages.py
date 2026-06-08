@@ -26,7 +26,7 @@ class SovereignContribution:
 
     node_id: str
     round_num: int
-    weight_delta: ModelState
+    local_model_state: ModelState
     quality_score: float
     token_count: int
     metrics: dict[str, float] = field(default_factory=dict)

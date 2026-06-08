@@ -29,7 +29,7 @@ Out of scope: participant-specific alignment layers, serving/product integration
 
 - Which open-weights base should Tapestry start from, and what makes it replaceable?
 - What is the first credible scale target for consortium training experiments?
-- How often should nodes contribute weight deltas, and who decides the cadence?
+- How often should nodes contribute local model weight vectors, and who decides the cadence?
 - How are contributions weighted without creating a governance capture vector?
 
 ## Early deliverables
@@ -43,7 +43,7 @@ Out of scope: participant-specific alignment layers, serving/product integration
 
 - **Data Governance:** which data can affect shared weights.
 - **Sovereign Alignment:** portability of sovereign work across base changes.
-- **Security & Privacy:** leakage analysis for weight deltas and aggregation.
+- **Security & Privacy:** leakage analysis for contributed model weights and aggregation.
 - **Infrastructure & Operations:** training orchestration, node operations, and fault tolerance.
 - **Governance & Participation:** contribution weighting and decision rights.
 

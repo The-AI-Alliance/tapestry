@@ -52,8 +52,10 @@ class ConsortiumCoordinator:
         rejected = [contribution.node_id for contribution in contributions if contribution.node_id not in weights]
 
         if weights:
-            deltas_by_node = {contribution.node_id: contribution.weight_delta for contribution in contributions}
-            integrated_state = self._apply_weighted_deltas(previous_state, deltas_by_node, weights)
+            local_states_by_node = {
+                contribution.node_id: contribution.local_model_state for contribution in contributions
+            }
+            integrated_state = self._apply_weighted_average(local_states_by_node, weights)
             self.base_model.load_state_dict(integrated_state)
 
         return ConsortiumRoundResult(
@@ -66,15 +68,16 @@ class ConsortiumCoordinator:
         )
 
     @staticmethod
-    def _apply_weighted_deltas(
-        base_state: ModelState,
-        deltas_by_node: dict[str, ModelState],
+    def _apply_weighted_average(
+        local_states_by_node: dict[str, ModelState],
         weights: dict[str, float],
     ) -> ModelState:
+        """FedAvg-class weighted average of contributed local model weight vectors."""
+        sample_state = next(iter(local_states_by_node.values()))
         next_state: ModelState = {}
-        for name, base_tensor in base_state.items():
-            delta = torch.zeros_like(base_tensor)
+        for name, _base_tensor in sample_state.items():
+            averaged = torch.zeros_like(sample_state[name])
             for node_id, weight in weights.items():
-                delta = delta + deltas_by_node[node_id][name] * weight
-            next_state[name] = base_tensor + delta
+                averaged = averaged + local_states_by_node[node_id][name] * weight
+            next_state[name] = averaged
         return next_state

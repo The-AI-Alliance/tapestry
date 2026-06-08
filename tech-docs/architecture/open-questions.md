@@ -53,7 +53,7 @@
 |:--|:---------|:-------|:----|:-------|
 | D1 | If a sovereign node trains on GDPR-covered data and sends weight updates to an aggregator, does that constitute a data transfer under EU law? What technical guarantees (DP, secure aggregation) make it legally defensible? | [2-pain-points.md](2-pain-points.md) (I1) | Workshop | Dave (OpenMined), Arno (Elysee) |
 | D2 | Is Tier 0-1 (legal/provenance) sufficient for Phase 1, or do participants require Tier 2 (DP) as a minimum before contributing sovereign data? | [5-architectural-options.md](5-architectural-options.md) (Decision 4) | Workshop | Dave (OpenMined), Arno (Elysee) |
-| D3 | What is the actual reconstruction risk from weight deltas after N steps of continued pretraining? At what N does the risk become acceptable without formal DP? | [5-architectural-options.md](5-architectural-options.md) (Q3) | Research | |
+| D3 | What is the actual reconstruction risk from contributed model weights after N local CPT steps? At what N does the risk become acceptable without formal DP? | [5-architectural-options.md](5-architectural-options.md) (Q3) | Research | |
 | D4 | What is the actual privacy-utility tradeoff for DP-SGD at frontier model scale? If DP destroys model quality, Tier 2 is not viable for pretraining contributions. | [5-architectural-options.md](5-architectural-options.md) (Decision 4) | Research | |
 | D5 | What governance model lets institutional data contribute to training without leaving its institution? | [2-pain-points.md](2-pain-points.md) (SC4) | Workshop | Roberto (Software Heritage), Slava (CODATA) |
 | D6 | Is there a working model — technical or legal — for data royalties or attribution at training scale? | [2-pain-points.md](2-pain-points.md) (SC2) | Workshop | Anastasia (Pleias/Common Corpus), Sebastian (EleutherAI/SUCHO) |
@@ -65,7 +65,7 @@
 | G1 | Who operates the initial coordinator? What transparency and audit requirements does it have? | [5-architectural-options.md](5-architectural-options.md) (Decision 7) | Workshop | AI Alliance, Rick Stevens, open |
 | G2 | Who defines the quality floor benchmark for contribution weighting? How is it reviewed for cultural bias? | [5-architectural-options.md](5-architectural-options.md) (Q5) | Workshop | |
 | G3 | Is uniform-with-quality-floor weighting accepted for Phase 1? | [5-architectural-options.md](5-architectural-options.md) (Decision 8) | Workshop | Open floor |
-| G4 | Can a node opt to contribute weight deltas for some training cycles and keep weights private for others (selective participation)? | [5-architectural-options.md](5-architectural-options.md) (Q6) | Post-workshop | |
+| G4 | Can a node opt to contribute weight vectors for some training cycles and keep weights private for others (selective participation)? | [5-architectural-options.md](5-architectural-options.md) (Q6) | Post-workshop | |
 | G5 | What are the criteria for a new node to join the consortium? What happens to a node's historical contributions if it leaves? | [5-architectural-options.md](5-architectural-options.md) (Q7) | Post-workshop | |
 | G6 | Should nodes be able to see how their contribution was weighted? (Transparency vs. gaming.) | [5-architectural-options.md](5-architectural-options.md) (Q3, Decision 8) | Post-workshop | |
 | G7 | Does the weighting policy need to be the same for all nodes, or can it vary by contribution type? | [5-architectural-options.md](5-architectural-options.md) (Q5, Decision 8) | Post-workshop | |

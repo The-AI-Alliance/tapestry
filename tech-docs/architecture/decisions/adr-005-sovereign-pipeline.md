@@ -107,6 +107,8 @@ At any point in time, the consortium produces **N+1 models**:
 
 The sovereign models are the value. The global base is the substrate. Each sovereign model reflects the cultural knowledge, values, and interaction norms of its community while retaining frontier capability from the shared base.
 
+**Consortium loop boundary:** Only **Stage A (CPT)** outputs are contributed to the shared global base via the consortium training loop ([TAP-004](adr-004-training-loop.md)). Stages B and C produce each participant's deployable sovereign model locally and are not averaged into the global base.
+
 This is analogous to Personalized Federated Learning (PFL) but at institutional and national scale. Where PFL produces a "personal" model for each edge device, Tapestry produces a sovereign model for each nation, institution, or cultural community. The "personalization" is not about individual preferences but about deep cultural alignment — knowledge, values, and norms that are collective and institutional.
 
 The N+1 structure is the mechanism by which Tapestry delivers on DG1 (frontier capability with sovereign alignment): frontier capability comes from the shared base (the "1"), sovereign alignment comes from the sovereign pipeline (the "N"). See TAP-007 for a diagrammatic treatment of the full training architecture and comparison with alternatives.
@@ -114,7 +116,7 @@ The N+1 structure is the mechanism by which Tapestry delivers on DG1 (frontier c
 ## Rationale
 
 - "Fluent but Foreign" (2026) demonstrates that language-focused continued pretraining fails to shift cultural alignment. Stage A specifically targets culturally *grounded* data.
-- Post-training alignment alone (Stage B without Stage A) fights the model's own world model — it can change surface behavior but underlying cultural dispositions leak through in edge cases.
+- Post-training alignment alone (Stage C without Stage A) fights the model's own world model — it can change surface behavior but underlying cultural dispositions leak through in edge cases.
 - Without Stage C, the model is not deployable. Participants will ask "when do I get a chatbot?" and the answer must be part of the pipeline, not an afterthought.
 - Data preparation (Stage 0) is the foundation. Communities will spend more time curating data than running training, and the curation itself is a sovereign act.
 - Evaluation is cross-cutting because the foundational research question — "does culturally grounded CPT actually shift cultural alignment?" — must be answered at every stage, not just at the end. It is also the accountability mechanism: how participants know the investment is working.
