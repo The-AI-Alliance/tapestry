@@ -6,7 +6,7 @@
 
 This repo contains the code and technical documentation for the project. Check out the [Project Tapestry](https://thealliance.ai/projects/tapestry/) website for more information about partnering, events, and more.
 
-![Project Tapestry Image](docs/assets/images/03-tapestry-logo-1000x545.png)
+![Project Tapestry Image](docs/assets/images/03-tapestry-logo-cropped.png)
 
 The rest of this README provides information for contributors, developers, and users of this repository.
 
