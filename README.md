@@ -8,7 +8,7 @@ This repo contains the code and technical documentation for the project. Check o
 
 ![Project Tapestry Image](docs/assets/images/03-tapestry-logo-cropped-630x555.png)
 
-The rest of this README provides information for contributors, developers, and users of this repository.
+The rest of this README provides information for contributors and users of this repository.
 
 ## Quick Paths
 
@@ -195,9 +195,9 @@ tapestry/
 
 We welcome contributions as [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), and [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). 
 
-You can also join one or more work groups that are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are are being documented in [**`tech-docs/work-groups/`**](tech-docs/work-groups/).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. In particular, [read this section](CONTRIBUTING.md#developer-certificate-of-origin-dco) on using _DCO_ with any commits.
 
-See the AI Alliance [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) guidelines. You will need to agree with the AI Alliance [Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md).
+You can also join one or more work groups that are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are are being documented in [**`tech-docs/work-groups/`**](tech-docs/work-groups/).
 
 
 ### Licenses
@@ -213,7 +213,7 @@ We use the "Developer Certificate of Origin" (DCO).
 > [!WARNING]
 > Before you make any git commits with changes, understand what's required for DCO.
 
-See the Alliance contributing guide [section on DCO](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md#developer-certificate-of-origin) for details. In practical terms, supporting this requirement means you must use the `-s` flag with your `git commit` commands.
+See the contributing guide [section on DCO](CONTRIBUTING.md#developer-certificate-of-origin-dco) for details. In practical terms, supporting this requirement means you must use the `-s` flag with your `git commit` commands.
 
 ## About the Technical Website (GitHub Pages)
 
