@@ -23,7 +23,7 @@ ADRs and [`training-approaches.md`](../../reference/training-approaches.md) embe
 | [`data-sovereignty.svg`](data-sovereignty.svg) ([draw.io](data-sovereignty.drawio)) | [TAP-008](../decisions/adr-008-data-sovereignty.md) |
 | [`training-paradigms-comparison.svg`](training-paradigms-comparison.svg) | [TAP-002](../decisions/adr-002-consortium-training.md) |
 | [`cultural-alignment-framing.svg`](cultural-alignment-framing.svg) | [TAP-003](../decisions/adr-003-cultural-alignment.md) |
-| [`sovereign-alignment-pipeline.svg`](sovereign-alignment-pipeline.svg) | [TAP-005](../decisions/adr-005-sovereign-pipeline.md) |
+| [`sovereign-model-pipeline.svg`](sovereign-model-pipeline.svg) | [TAP-005](../decisions/adr-005-sovereign-pipeline.md) |
 | [`phased-base-model-strategy.svg`](phased-base-model-strategy.svg) | [TAP-006](../decisions/adr-006-phased-base-model.md) |
 
 Phase docs (`0-tva-methodology.md`, …) may keep **inline Mermaid** where figures are tightly coupled to narrative and not reused.

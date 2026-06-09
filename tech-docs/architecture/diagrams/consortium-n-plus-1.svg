@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 580" role="img" aria-labelledby="title desc">
   <title id="title">Consortium training: N+1 model architecture</title>
-  <desc id="desc">Central hub trains global base model (~80% compute), distributes weights to N sovereign nodes. Each node runs sovereign pipeline on shared plus sovereign data, sends weight deltas back. Coordinator integrates deltas. Cycle repeats. Outcome: 1 global base + N sovereign models.</desc>
+  <desc id="desc">Central hub trains global base model (~80% compute), distributes weights to N sovereign nodes. Each node runs sovereign pipeline; Stage A weights return to coordinator for averaging. Cycle repeats. Outcome: 1 global base + N sovereign models.</desc>
   <defs>
     <marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
       <path d="M0,0 L0,6 L9,3 z" fill="#37474f"/>
@@ -25,7 +25,7 @@
   <rect x="280" y="50" width="280" height="86" rx="10" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
   <text x="420" y="78" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="14" font-weight="600">Central Coordinator</text>
   <text x="420" y="96" text-anchor="middle" fill="#e3f2fd" font-family="system-ui,Segoe UI,sans-serif" font-size="11">Global base training (~80% compute)</text>
-  <text x="420" y="112" text-anchor="middle" fill="#bbdefb" font-family="system-ui,Segoe UI,sans-serif" font-size="11">All shared/open data · weight delta integration</text>
+  <text x="420" y="112" text-anchor="middle" fill="#bbdefb" font-family="system-ui,Segoe UI,sans-serif" font-size="11">All shared/open data · FedAvg-class integration</text>
 
   <!-- ==================== SOVEREIGN NODES ==================== -->
   <!-- Node 1 (left) -->
@@ -67,7 +67,7 @@
   <path d="M 620 210 L 480 142" fill="none" stroke="#ef6c00" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#arrOrange)"/>
 
   <!-- Label for return arrows -->
-  <text x="243" y="158" text-anchor="middle" fill="#ef6c00" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-weight="600">weight deltas only</text>
+  <text x="243" y="158" text-anchor="middle" fill="#ef6c00" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-weight="600">Stage A weights only</text>
 
   <!-- ==================== LOOP ANNOTATION ==================== -->
   <path d="M 560 93 Q 590 93 590 60 Q 590 47 570 47 L 565 47" fill="none" stroke="#546e7a" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr)"/>
@@ -75,7 +75,7 @@
 
   <!-- ==================== DATA SOVEREIGNTY NOTE ==================== -->
   <rect x="40" y="340" width="760" height="36" rx="6" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
-  <text x="420" y="362" text-anchor="middle" fill="#e65100" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-weight="600">Raw sovereign data never leaves the node. Only weight deltas cross the network. (DG2)</text>
+  <text x="420" y="362" text-anchor="middle" fill="#e65100" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-weight="600">Raw sovereign data never leaves the node. Only local model weights (Stage A) cross the network. (DG2)</text>
 
   <!-- ==================== N+1 OUTCOME ==================== -->
   <text x="420" y="412" text-anchor="middle" fill="#263238" font-family="system-ui,Segoe UI,sans-serif" font-size="14" font-weight="700">Outcome: N+1 Models</text>

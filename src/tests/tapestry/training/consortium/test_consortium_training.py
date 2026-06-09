@@ -33,8 +33,8 @@ def _corpus(offset: int = 0) -> list[list[int]]:
     ]
 
 
-def test_sovereign_node_returns_artifact_and_weight_delta() -> None:
-    """A node keeps a sovereign model artifact and shares only a delta."""
+def test_sovereign_node_returns_artifact_and_local_model_state() -> None:
+    """A node keeps a sovereign model artifact and shares its local weight vector."""
     torch.manual_seed(0)
     node = SovereignTrainingNode(
         node_id="vn-node",
@@ -55,8 +55,11 @@ def test_sovereign_node_returns_artifact_and_weight_delta() -> None:
     assert result.contribution.node_id == "vn-node"
     assert result.contribution.round_num == 1
     assert result.contribution.quality_score == pytest.approx(0.82)
-    assert set(result.contribution.weight_delta) == set(base_state)
-    assert any(torch.norm(delta).item() > 0 for delta in result.contribution.weight_delta.values())
+    assert set(result.contribution.local_model_state) == set(base_state)
+    assert any(
+        not torch.equal(result.contribution.local_model_state[name], base_state[name])
+        for name in base_state
+    )
 
 
 def test_contribution_policy_applies_quality_floor_and_capture_cap() -> None:

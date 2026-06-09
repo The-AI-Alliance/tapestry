@@ -2,8 +2,8 @@
 
 This package models the Tapestry-specific training loop described in the ADRs:
 one governed shared base plus N participant-owned sovereign model artifacts.
-Nodes train locally on sovereign corpora and share only weight deltas for
-governed integration back into the shared base.
+Nodes train locally on sovereign corpora (Stage A CPT) and share local model
+weight vectors for FedAvg-class integration back into the shared base.
 """
 
 from .coordinator import ConsortiumCoordinator
