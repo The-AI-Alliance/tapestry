@@ -119,8 +119,8 @@ How does the global model improve over time while preserving sovereignty? What i
 graph TD
     S1["Step 1: Centralized base training\n(frontier model on global open data)"]
     S2["Step 2: Distributed continued pretraining\n(each node trains entire model\non sovereign data)"]
-    S3["Step 3: Weight contribution\n(nodes send weight deltas\nback to central)"]
-    S4["Step 4: Central integration\n(weight deltas aggregated,\nglobal model updated)"]
+    S3["Step 3: Weight contribution\n(nodes send local model\nweights after Stage A)"]
+    S4["Step 4: Central integration\n(weight vectors averaged,\nglobal model updated)"]
 
     S1 --> S2
     S2 --> S3
@@ -137,9 +137,11 @@ graph TD
 
 **Step 2 — Distributed continued pretraining.** Each node receives the current global model and does continued pretraining on its sovereign data — culturally grounded corpora, domain-specific institutional knowledge, community-authored content. This changes the model's deep representations, not just its behavior. Each node trains the *entire model*, not just adapters. Estimated compute: 5–10% of original pretraining cost per node per cycle.
 
-**Step 3 — Weight contribution.** Each node computes the delta between its locally-trained model and the global model it started from, and sends these weight deltas to the central coordinator. *Not* gradients — weight deltas aggregate over many training steps, carry less information about individual training examples, and tolerate high-latency WAN connections. This is the DiLoCo-style outer communication step.
+**Step 3 — Weight contribution.** Each node sends its **locally trained model weight vector** (post–Stage A CPT) to the central coordinator. *Not* per-step gradients — local training completes before sync. Sync cadence is an operational choice: frequent (cluster-like) or less often (geo-distributed).
 
-**Step 4 — Central integration.** The coordinator aggregates weight deltas from all contributing nodes into an updated global model. The weighting policy (see Decision 8) determines how contributions are combined. The updated global model is redistributed to all nodes.
+**Step 4 — Central integration.** The coordinator aggregates contributed weight vectors into an updated global model (FedAvg-class weighted averaging by default; outer optimizer swappable). The weighting policy (see Decision 8) determines how contributions are combined. The updated global model is redistributed to all nodes.
+
+**Scope:** Stages B (instruction tuning) and C (alignment) run locally for each sovereign deployable model and do **not** feed the global base.
 
 **Then back to Step 2.** Each node does another round of continued pretraining, now starting from a better base that incorporates sovereign knowledge from all other nodes. The model gets more culturally informed with each cycle.
 
@@ -149,7 +151,7 @@ graph TD
 
 **Why not pure peer-to-peer?** (No centralized base, all nodes start from initialization.) Much harder to reach frontier quality. The cold-start problem is brutal. And it doesn't match the 80/20 reality — most capability comes from the centralized base.
 
-**Why weight deltas, not gradients?** (Yann LeCun's correction.) Gradients require syncing every step, high bandwidth, and leak more about individual training examples. Weight deltas sync infrequently, tolerate WAN latency, and have better natural privacy properties because the signal from any individual data point is diluted across many training steps.
+**Why weight vectors, not per-step gradients?** (Yann LeCun.) Nodes train locally on sovereign data, then send their updated model weights. The coordinator averages them (FedAvg-class). No raw data and no per-step gradients cross the wire. Sync cadence — frequent or infrequent — is a deployment choice, not fixed by the architecture.
 
 ### Key distinction: consortium training vs. federated training
 
@@ -161,8 +163,8 @@ This loop differs from traditional federated learning in important ways:
 | **Data per node** | Tiny (user's local data) | Massive (national/institutional corpora) |
 | **Model scale** | Small, often fine-tuning | Frontier-scale (7B–70B+) |
 | **Privacy motive** | Individual data protection | National/institutional sovereignty |
-| **What's shared** | Gradients (per-step) | Weight deltas (over many steps) |
-| **Communication** | Frequent | Infrequent (per node's choice) |
+| **What's shared** | Per-step gradients (FedSGD) or local model weight vectors after local training (FedAvg) | Local model weight vectors after Stage A CPT |
+| **Communication cadence** | Varies by method and deployment | Operational choice — frequent or infrequent |
 | **Heterogeneity** | Hardware (phone vs. tablet) | Hardware, data, culture, policy |
 
 The term "consortium training" more accurately describes what Tapestry does: a small number of large, trusted, heterogeneous nodes collaboratively improving a shared model, where data sovereignty is a first-order architectural constraint and cultural alignment is the goal.
@@ -179,12 +181,12 @@ Whether this training loop is accepted as the architectural model, and what the 
 
 ### The question
 
-When the central coordinator aggregates weight deltas from multiple nodes, how should each node's contribution be weighted? This is simultaneously an optimization problem (produce the best global model) and a governance problem (who has the most influence over the global model's character).
+When the central coordinator aggregates weight vectors from multiple nodes, how should each node's contribution be weighted? This is simultaneously an optimization problem (produce the best global model) and a governance problem (who has the most influence over the global model's character).
 
 ### Options
 
 **Option A: Uniform weighting.**
-Every node's weight delta counts equally, regardless of data size, compute contributed, or any quality metric.
+Every node's weight vector counts equally, regardless of data size, compute contributed, or any quality metric.
 
 - *For:* Simple. Democratic. Strongly anti-capture — no node dominates.
 - *Against:* A node with 10M tokens of low-quality web scrape gets the same influence as a node with 100M tokens of curated institutional text. May degrade global model quality. Does not incentivize high-quality contributions.
@@ -196,7 +198,7 @@ Weight by volume of training data or compute contributed.
 - *Against:* Direct capture vector. The largest node dominates the global model's character. Violates DG3. Replicates the existing power structure where resource-rich actors set the terms.
 
 **Option C: Quality-weighted via held-out evaluation.**
-Each node's weight delta is evaluated against a shared benchmark set before integration. Contributions that improve benchmark performance get higher weight.
+Each node's weight vector is evaluated against a shared benchmark set before integration. Contributions that improve benchmark performance get higher weight.
 
 - *For:* Meritocratic. Rewards quality over volume. Prevents degradation.
 - *Against:* Who designs the benchmarks? Standard benchmarks (MMLU, etc.) are culturally biased toward English-speaking, Western contexts. Quality-weighting on biased benchmarks systematically downweights contributions from the communities Tapestry exists to serve.
@@ -399,7 +401,7 @@ graph TD
     BM --> SF --> CP --> AL
     CP --> AD
     CP --> SE
-    CP -->|"weight deltas"| CO
+    CP -->|"Stage A weights"| CO
     CO --> WP
     WP -->|"updated global model"| CP
     FP --> CO
@@ -422,19 +424,20 @@ graph TD
 ### What ships in Phase 1
 
 1. Adopted open-weights base with safety layer
-2. Continued pretraining on culturally localized data (sovereign world model)
-3. Post-training cultural alignment (DPO/RLHF/constitutional AI)
-4. Domain adapters (LoRA) for industrial specialization
-5. Consortium training protocol (PyTorch-based)
-6. Privacy Tiers 0–2
-7. Governed central coordinator
-8. Cultural alignment evaluation framework (Inglehart-Welzel / WVS-based)
+2. Continued pretraining on culturally localized data (Stage A — sovereign world model)
+3. Instruction tuning (Stage B — SFT)
+4. Post-training cultural alignment (Stage C — DPO/RLHF/constitutional AI)
+5. Optional domain adapters (LoRA) for industrial specialization — *not* for cultural alignment
+6. Consortium training protocol (PyTorch-based; FedAvg-class aggregation by default)
+7. Privacy Tiers 0–2
+8. Governed central coordinator
+9. Cultural alignment evaluation framework (Inglehart-Welzel / WVS-based)
 
 ### What's on the roadmap
 
 1. MoE with sovereign expert modules
 2. Burn backend support (dual-path)
-3. DiLoCo-class consortium pretraining experiments
+3. FedAvg-class model averaging experiments (optional DiLoCo outer-optimizer variant)
 4. Privacy Tiers 3–4
 5. Peer-to-peer consortium topology
 6. Consortium-trained base model
@@ -464,7 +467,7 @@ These questions are not resolved in this document and are intended for ongoing d
 
 2. **Safety preservation through continued pretraining.** Continued pretraining can shift a model's deep representations, potentially eroding safety properties embedded in the original training. What mechanisms preserve safety through continued pretraining? Frozen layers? Regularization? Evaluation gates? This is different from (and harder than) preserving safety through modular post-training alignment.
 
-3. **Weight delta privacy properties.** Weight deltas have better natural privacy than per-step gradients, but "better" is not "sufficient." What is the actual reconstruction risk from weight deltas after N steps of continued pretraining? At what N does the risk become acceptable without formal DP?
+3. **Contributed model weight privacy properties.** Local model weights after CPT have different leakage properties than per-step gradients, but "different" is not "sufficient." What is the actual reconstruction risk from contributed weights after N local CPT steps? At what N does the risk become acceptable without formal DP?
 
 4. **Convergence with culturally non-IID data.** Each node's data is deliberately non-IID — that's the point. What are the convergence properties of the training loop when nodes have radically different data distributions (e.g., Vietnamese legal texts vs. Kenyan agricultural knowledge vs. French literary criticism)?
 
@@ -472,7 +475,7 @@ These questions are not resolved in this document and are intended for ongoing d
 
 5. **Who defines the quality floor?** The uniform-with-quality-floor weighting policy requires a benchmark. Any benchmark embeds assumptions. Who designs it, and how is it reviewed for cultural bias?
 
-6. **Selective participation.** Can a node contribute weight deltas for some training cycles and keep its weights private for others? What are the implications for the global model's stability?
+6. **Selective participation.** Can a node contribute weight vectors for some training cycles and keep weights private for others? What are the implications for the global model's stability?
 
 7. **Node admission and exit.** What are the criteria for a new node to join the consortium? What happens to a node's historical contributions if it leaves?
 

@@ -22,9 +22,9 @@ from .messages import (
 class SovereignTrainingNode:
     """Institutional node that produces a sovereign model and contribution.
 
-    A node receives the current shared base, runs a local sovereign pipeline
-    stage on its own corpus, keeps the resulting model artifact, and shares
-    only a weight delta with the coordinator.
+    A node receives the current shared base, runs Stage A continued pretraining
+    on its own corpus, keeps the resulting model artifact, and shares its local
+    model weight vector with the coordinator.
     """
 
     def __init__(
@@ -49,13 +49,12 @@ class SovereignTrainingNode:
         self._dataloader = self._build_dataloader(sovereign_corpus)
 
     def run_sovereign_cycle(self, round_num: int, base_state: ModelState) -> SovereignCycleResult:
-        """Run local continued pretraining and return artifact plus delta."""
+        """Run local Stage A CPT and return artifact plus weight vector contribution."""
         starting_state = {name: tensor.clone() for name, tensor in base_state.items()}
         self.model.load_state_dict(starting_state)
 
         avg_loss = self._train_locally()
         sovereign_state = {name: tensor.clone() for name, tensor in self.model.state_dict().items()}
-        delta = {name: sovereign_state[name] - starting_state[name] for name in starting_state}
 
         metrics = {"loss": avg_loss}
         artifact = SovereignModelArtifact(
@@ -70,7 +69,7 @@ class SovereignTrainingNode:
         contribution = SovereignContribution(
             node_id=self.node_id,
             round_num=round_num,
-            weight_delta=delta,
+            local_model_state=sovereign_state,
             quality_score=self.quality_score,
             token_count=sum(input_ids.numel() for input_ids, _target_ids in self._dataloader),
             metrics=metrics,
