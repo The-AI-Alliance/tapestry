@@ -48,7 +48,6 @@ For documentation changes, including `tech-docs` and the "microsite" `docs` cont
 
 - [ ] I have followed the documentation style guide.
 - [ ] I have included appropriate screenshots, example code, etc.
-- [ ] (For `docs` modifications) 
 
 For "microsite" `docs` changes specifically:
 
