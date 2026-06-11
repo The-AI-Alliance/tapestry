@@ -82,7 +82,7 @@ We don't require models to be the very best at all the common, general-purpose b
 
 ### BMS-R5: Can Be Culturally Aligned
 
-The work of [Issue #22: PoC for alignment based on Ingelhart-Wenzel Cultural Map](https://github.com/The-AI-Alliance/tapestry/issues/22) (part of [TAP-003: Cultural Alignment as the Primary Differentiator]( ../../architecture/decisions/adr-003-cultural-alignment.md)), is exploring the feasibility of tuning for cultural alignment. We anticipate that some model families or architectures will respond better than others at this form of post-training alignment that is a key capability for Project Tapestry.
+The work of [Issue #22: PoC for alignment based on Inglehart-Welzel Cultural Map](https://github.com/The-AI-Alliance/tapestry/issues/22) (part of [TAP-003: Cultural Alignment as the Primary Differentiator]( ../../architecture/decisions/adr-003-cultural-alignment.md)), is exploring the feasibility of tuning for cultural alignment. We anticipate that some model families or architectures will respond better than others at this form of post-training alignment that is a key capability for Project Tapestry.
  
 ## Candidate Model Families
 
@@ -110,7 +110,7 @@ Key for icons:
 
 ## Feasibility Study on Cultural Alignment Shift
 
-[Issue #22: PoC for alignment based on Ingelhart-Wenzel Cultural Map](https://github.com/The-AI-Alliance/tapestry/issues/22), part of 
+[Issue #22: PoC for alignment based on Inglehart-Welzel Cultural Map](https://github.com/The-AI-Alliance/tapestry/issues/22), part of 
 [TAP-003: Cultural Alignment as the Primary Differentiator](../../architecture/decisions/adr-003-cultural-alignment.md), is using Llama 3 models for its experiments, with the goal of producing a feasibility study paper that demonstrates simultaneous (a) socio-cultural alignment shift and (b) no performance (e.g., MMLU) shift. They chose Llama simply because it is available and is simple to post-train, due to its permissive license, it is a densce model (not MoE - mixture of experts), etc.
 
 More generally, we want to iterate on the model choice based on what gives us the lowest resistance path towards the strategic objectives of (a) high/leading performance while (b) affording sovereignty (national, socio-cultural,industrial). Medium-term, we aim to perform CPT (continued pre-training) and ultimately PT from scratch.
