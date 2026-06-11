@@ -16,7 +16,7 @@ The directory index is [`architecture/README.md`](architecture/README.md). Main 
 
 | Document | Description |
 | :------- | :---------- |
-| [`architecture/0-tva-methodology.md`](architecture/0-tva-methodology.md) | TVA design process — phases and current status |
+| [`architecture/0-tva-methodology.md`](architecture/0-tva-methodology.md) | TVA design process — phases, design principles, current status |
 | [`architecture/1-stakeholder-map.md`](architecture/1-stakeholder-map.md) | Phase 1 — who we serve, what they control, what they fear |
 | [`architecture/2-pain-points.md`](architecture/2-pain-points.md) | Phase 2 — what's concretely broken for each layer today |
 | [`architecture/3-value-propositions.md`](architecture/3-value-propositions.md) | Phase 3 — what Tapestry offers that the status quo doesn't |

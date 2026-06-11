@@ -30,15 +30,17 @@ For a country like Vietnam — or dozens of others — a frontier-class model th
 
 **Success test:** For each participating community, the Tapestry-derived model outperforms both (a) the base model alone on culturally and domain-specific tasks, and (b) any locally-trained sovereign alternative on general capability tasks. Users in that community prefer it over commercial alternatives for tasks where cultural context matters. Cultural alignment is measured using frameworks like the [Inglehart-Welzel Cultural Map](https://www.worldvaluessurvey.org/WVSContents.jsp?CMSID=Findings) (World Values Survey): a model's cultural positioning should match its target community, not cluster with the base model's culture of origin.
 
-### DG2. Sovereignty through architecture, not just policy
+### DG2. Sovereignty enforced where it matters
 
 **Derives from:** N2 (data residency unenforceable), SC2 (cultural extraction), SC4 (locked corpora), I1 (compliance walls), VP-N3 (data stays), VP-SC2 (architectural data sovereignty)
 
-Data sovereignty must be enforced by the system architecture, not just by contracts or governance documents. Data that a participant designates as sovereign must never leave the participant's infrastructure in raw form. The guarantees must be technically verifiable, not just legally promised.
+Data sovereignty must be real and enforceable — not merely promised. The appropriate mix of **technical, legal, and organizational** mechanisms depends on the dataset, the participant, and the threat model. Tapestry does not require maximum technical overhead for every sovereignty claim when collaborative agreements and governance suffice (see [Design principles for architecture work](0-tva-methodology.md#design-principles-for-architecture-work)).
 
-**Architectural implication:** Consortium training where nodes share model updates (gradients, weight deltas, adapter parameters), not data. Tiered sovereignty spectrum from provenance-only (Tier 0) through TEE-based full privacy (Tier 4). The tier is a per-node, per-dataset property.
+Where technical guarantees are required, they must be verifiable under a clearly stated threat model. Data that a participant designates as sovereign must not leave the participant's infrastructure in raw form unless an explicit, governed exception applies.
 
-**Success test:** A participant's sovereign data cannot be reconstructed from the information that leaves their node, at the privacy tier they selected, under a clearly stated threat model.
+**Architectural implication:** Consortium training where nodes share local model weight vectors (Stage A CPT) or optional domain adapter parameters, not data. Tiered sovereignty spectrum from provenance-only (Tier 0) through TEE-based full privacy (Tier 4). The tier is a per-node, per-dataset property — matched to need, not maximized by default.
+
+**Success test:** For each dataset at its assigned tier, sovereignty requirements are met by the chosen mechanism (agreement, operational control, or technical guarantee). Where a technical tier applies, a participant's sovereign data cannot be reconstructed from the information that leaves their node under the stated threat model.
 
 ### DG3. Anti-capture
 

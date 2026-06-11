@@ -8,6 +8,37 @@
 
 TVA is the structured requirements-to-architecture methodology used to develop Tapestry's design. It exists because Tapestry is not a conventional system with a known problem space — it is an attempt to build a global consortium-trained, frontier-class, open foundation model that preserves sovereignty for participating nations, cultures, industries, and individuals. The design space is wide, the stakeholders are heterogeneous, and premature architectural commitment is the primary risk. TVA is how we avoid that.
 
+## Design principles for architecture work
+
+Before choosing mechanisms, be explicit about **objectives and assumptions**. Tapestry's architecture should follow the **least-resistance path** to stated goals: prefer simpler, collaborative arrangements over heavy technical defenses unless a documented requirement or threat model demands otherwise.
+
+### Collaborative consortium, not adversarial federation
+
+Consortium training involves a **small number of large, institutional participants** who choose to collaborate on a shared frontier model while retaining sovereign outcomes. They are **not singularly governed** (see [Design Goal 3](4-design-goals.md) — anti-capture), but they are also **not assumed to be mutually adversarial**.
+
+Design accordingly:
+
+- Do not default to federated-learning threat models built for millions of untrusted edge clients when describing or building Tapestry's consortium loop.
+- Governance, contribution weighting, auditability, and transparency address power balance without treating every node as a potential attacker.
+- Stronger technical privacy (differential privacy, secure aggregation, TEEs) remains available where participants require it — it is not the baseline assumption for every interaction.
+
+### Layered sovereignty: technical, legal, and organizational
+
+Data sovereignty is a first-order constraint ([Design Goal 2](4-design-goals.md)), but it need not be **purely technical** in every case. Many participants can satisfy sovereignty requirements through **collaborative legal and organizational agreements** — data-use contracts, residency commitments, audit rights, benefit-sharing, and governance participation — without requiring the strongest technical envelope for every dataset.
+
+Engineer technical controls where they are necessary (high-sensitivity data, regulatory mandates, weak trust, or the need for verifiable guarantees independent of organizational goodwill). Prefer agreements and operational process where they suffice. The tiered sovereignty model in [TAP-008](decisions/adr-008-data-sovereignty.md) exists to match mechanism to need, not to mandate maximum technical overhead universally.
+
+### Least-resistance engineering
+
+When multiple paths satisfy the design goals, prefer the path that:
+
+- Delivers incremental value sooner ([Design Goal 4](4-design-goals.md))
+- Minimizes unnecessary coupling and operational burden
+- Matches actual participant relationships and stated threat models
+- Can be strengthened later if assumptions change
+
+If objectives or assumptions shift, revise the architecture — and document the change — rather than carrying defensive complexity forward without a traced requirement.
+
 ## Structure
 
 TVA runs in six phases, organized into two movements:

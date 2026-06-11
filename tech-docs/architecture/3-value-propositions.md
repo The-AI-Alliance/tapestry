@@ -32,7 +32,7 @@ Tapestry's architecture is base-model-agnostic. The sovereign layers (alignment,
 
 **VP-N3. Data contributes without leaving.** ← addresses N2 (data residency unenforceable at model level)
 
-Sovereign nodes train locally on their data. Only model updates — gradients, weight deltas, adapter parameters — leave the node, and these can be protected with differential privacy, secure aggregation, or TEE-based computation depending on the node's sensitivity tier. The data residency law is satisfied in substance, not just on paper.
+Sovereign nodes train locally on their data. Only model updates — local weight vectors after CPT, or optional domain adapter parameters — leave the node for consortium integration, and these can be protected with differential privacy, secure aggregation, or TEE-based computation depending on the node's sensitivity tier. The data residency law is satisfied in substance, not just on paper.
 
 **VP-N4. Hardware flexibility for sovereign procurement.** ← addresses N3 (hardware heterogeneity)
 

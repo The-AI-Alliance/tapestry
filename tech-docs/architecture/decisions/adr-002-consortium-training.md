@@ -28,17 +28,17 @@ This is distinct from federated learning (designed for millions of small edge cl
 | **Participants** | One organization, one cluster | Many clients (phones, hospitals, edge) | Dozens of large institutional nodes |
 | **Data per node** | All data centralized | Small (one user's or site's data) | Massive (national/institutional corpora) |
 | **Sovereignty motive** | N/A — one owner | Individual / site-level data protection | National/institutional sovereignty + cultural alignment |
-| **What crosses the network** | N/A — internal interconnect | Gradients, weight updates, or deltas (varies by method) | Weight deltas (aggregated over many steps) |
-| **Communication** | Every step; fast interconnect | Varies: frequent (FedAvg) to infrequent (DiLoCo) | Infrequent; WAN-tolerant |
+| **What crosses the network** | N/A — internal interconnect | FedSGD: per-step gradients; FedAvg: local model weight vectors after local training | Local model weight vectors after Stage A CPT |
+| **Communication cadence** | Every step; fast interconnect | Varies by method and deployment | Operational choice — frequent (cluster-like) or infrequent (geo-distributed) |
 | **Model scale** | Frontier | Typically small to medium | Frontier |
 | **Governance** | Single owner decides all | Aggregator-driven; clients have no architectural voice | Consortium with shared ownership and governance rights |
 | **Each node's outcome** | N/A — one model | Same global model (or personalized variant in PFL) | Sovereign model: shared base + community-specific alignment |
 
-Consortium training borrows techniques from the federated learning literature — including DiLoCo (infrequent sync) and ideas from Personalized Federated Learning (per-node model variants). The distinction is not technical novelty in the optimization algorithm but in the *context*: who participates, at what scale, with what governance, and toward what goal. FL optimizes for privacy across many small clients. Consortium training optimizes for cultural sovereignty across few large institutions with shared governance.
+Consortium training borrows techniques from the federated learning literature — FedAvg-class model averaging (default), ideas from Personalized Federated Learning (per-node model variants), and optionally DiLoCo (outer-optimizer variant). The distinction is not technical novelty in the optimization algorithm but in the *context*: who participates, at what scale, with what governance, and toward what goal. FL optimizes for privacy across many small clients. Consortium training optimizes for cultural sovereignty across few large institutions with shared governance.
 
 ## Rationale
 
-- Tapestry's nodes are few (dozens), large (national GPU clusters), and trusted (institutional participants with governance voice). This is fundamentally different from federated learning's millions of untrusted small clients.
+- Tapestry's nodes are few (dozens), large (national GPU clusters), and **collaborating institutions with governance voice** — not millions of mutually untrusted edge clients. See [Design principles for architecture work](../0-tva-methodology.md#design-principles-for-architecture-work).
 - The sovereignty motive is national/institutional, not individual data protection. The governance model, trust assumptions, and communication patterns all differ.
 - Using "federated" to describe Tapestry borrows the right principle (data stays put) but the wrong connotations (edge devices, FedAvg, cross-silo averaging). "Consortium training" accurately describes the participants, the purpose, and the governance.
 
@@ -55,7 +55,7 @@ This is a framing and communication decision as much as a technical one. The ter
 ## Consequences
 
 - Requires updating all documentation and communications from "federated" to "consortium" when referring to Tapestry's own approach. (Largely complete as of May 2026.)
-- The term "consortium training" is novel — it doesn't have an established literature. This is a feature (we define what it means) and a risk (no prior art to reference). DiLoCo is the closest technical precedent for the communication mechanism.
+- The term "consortium training" is novel — it doesn't have an established literature. This is a feature (we define what it means) and a risk (no prior art to reference). FedAvg is the closest technical precedent for the default aggregation mechanism; DiLoCo is an optional outer-optimizer variant.
 - References to federated learning techniques (FedAvg, DiLoCo, etc.) remain valid as technical building blocks. The distinction is between the paradigm (consortium) and the techniques it may use.
 
 ## References
