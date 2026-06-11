@@ -16,7 +16,7 @@ It addresses pain points around frontier cost, reusable consortium training infr
 
 ## Scope
 
-- Initial base-model selection criteria and replaceability requirements. ([Issue #25](https://github.com/The-AI-Alliance/tapestry/issues/25) - see [TAP-006: Phased Base Model Strategy](../../architecture/decisions/adr-006-phased-base-model.md))
+- Initial base-model selection criteria and replaceability requirements. See [Base Model Selection](base-model-selection.md). ([Issue #25](https://github.com/The-AI-Alliance/tapestry/issues/25), part of [TAP-006: Phased Base Model Strategy](../../architecture/decisions/adr-006-phased-base-model.md)) 
 - Consortium training loop design, including outer-loop synchronization and aggregation.
 	- For example, experiments are required to understand the differences required for consortium training vs. other forms of federated learning (of which it is a special case). (Initial work: [Issue #24](https://github.com/The-AI-Alliance/tapestry/issues/24) - part of [TAP-004: The Consortium Training Loop](../../architecture/decisions/adr-004-training-loop.md). Additional issues will be created as needed.)
 - Shared-base continued pretraining on eligible participant contributions.
@@ -27,14 +27,14 @@ Out of scope: participant-specific alignment layers, serving/product integration
 
 ## Initial questions
 
-- Which open-weights base should Tapestry start from, and what makes it replaceable?
+- Which open-weights base should Tapestry start from, and what makes it replaceable? Discussed further in [Base Model Selection](base-model-selection.md).
 - What is the first credible scale target for consortium training experiments?
 - How often should nodes contribute weight deltas, and who decides the cadence?
 - How are contributions weighted without creating a governance capture vector?
 
 ## Early deliverables
 
-- Base-model selection criteria for the MVP. ([Issue #25](https://github.com/The-AI-Alliance/tapestry/issues/25))
+- Base-model selection criteria for the MVP. ([Issue #25](https://github.com/The-AI-Alliance/tapestry/issues/25) and [Base Model Selection](base-model-selection.md).)
 - A consortium training experiment plan with target model sizes and node assumptions. ([Issue #24](https://github.com/The-AI-Alliance/tapestry/issues/24))
 - Aggregation-policy options for technical review.
 - Infrastructure requirements for heterogeneous compute and observability. ([Issue #26](https://github.com/The-AI-Alliance/tapestry/issues/26))
