@@ -20,7 +20,7 @@ The rest of this README provides information for contributors and users of this 
 * [Cultural Alignment: help us develop techniques for cultural alignment](https://github.com/The-AI-Alliance/tapestry/issues/22) based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric. This task will implement a corresponding evaluation and do a small model tuning exercise to see if improvement can be observed. Prior expertise in evaluation and tuning technologies are especially welcome.
 * [Building Blocks of _consortium training_](https://github.com/The-AI-Alliance/tapestry/issues/24), the adaptation of federated learning that meets the unique requirements and constraints of Tapestry. Prior expertise in LLM training and federated learning technologies are especially welcome.
 * [Global Training Data Corpus](https://thealliance.ai/projects/tapestry/training-data-proposals) What unique datasets exist that could be brought to Tapestry model training? They don't have to be fully open; we will work with you to define and enforce appropriate handling.
-* [Model Development Roadmap] Coming soon.
+* A Model Development Roadmap - Coming soon.
 
 ### Working with the Source Code
 
