@@ -96,11 +96,11 @@ For _internal_ cross-references, use the conventional `[title]({{site.baseurl}}/
 For _external_ links (those that start with `http` or `https`), add `{:target="_blank"}` to every external link in Markdown and `target="_blank"` for every HTML anchor tag, e.g.,
 
 ```markdown
-[AI Alliance website](https://aialliance.org){:target="_blank"}
+[AI Alliance website](https://thealliance.ai){:target="_blank"}
 ```
 
 ```html
-<a href="https://aialliance.org" target="_blank">AI Alliance website</a>
+<a href="https://thealliance.ai" target="_blank">AI Alliance website</a>
 ```
 
 While tedious this provides a better experience for users of the website.

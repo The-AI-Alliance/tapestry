@@ -62,7 +62,7 @@ Some additional links.
 * [Contributing]({{site.baseurl}}/contributing): We welcome your contributions! Here's how you can contribute.
 * [About Us]({{site.baseurl}}/about): More about the AI Alliance and this project.
 * [Project GitHub Repo](https://github.com/The-AI-Alliance/tapestry){:target="repo"}
-* [The AI Alliance](https://www.aialliance.org){:target="aia"}: The AI Alliance website.
+* [The AI Alliance](https://www.thealliance.ai){:target="aia"}: The AI Alliance website.
 
 ---
 
