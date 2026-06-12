@@ -47,9 +47,9 @@ The technical documentation lives under [**`tech-docs`**](tech-docs/README.md):
 		* [**Architecture Decision Records**](tech-docs/architecture/decisions/)
 		* [**Diagrams**](tech-docs/architecture/diagrams/) 
 * [**Governance**](tech-docs/governance/)
-  <!-- * [**Work Groups**](tech-docs/work-groups/) -->
 * [**Strategic Plan**](tech-docs/strategic-plan/)
 * [**Reference Materials**](tech-docs/reference/) (e.g. [**training paradigms**](tech-docs/reference/training-approaches.md))
+* [**Work Groups**](tech-docs/work-groups/)
 
 For repo layout, conventions, and where to find implementation code, see [**`AGENTS.md`**](AGENTS.md).
 
