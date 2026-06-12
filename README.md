@@ -170,7 +170,7 @@ make format-lint-type-check  # Equivalent to 'make format lint type-check'
 
 ## Project Code Structure
 
-In addition to the top-level directories `tech-docs`, discussed above, and `docs`, discussed below, the code structure is as follows. At this time, there are three major _subsystems_:
+In addition to the top-level directories `tech-docs`, discussed above, `docs`, discussed below, and [`contrib`](contrib/README.md), the staging area for contributed ideas and techniques, the code structure is as follows. At this time, there are three major _subsystems_:
 
 * `data` for all data governance and management capabilities.
 * `training` for all distributed training and tuning capabilities.
@@ -178,6 +178,7 @@ In addition to the top-level directories `tech-docs`, discussed above, and `docs
 
 ```
 tapestry/
+├── contrib/        # Contributed ideas & techniques, proposed via PR
 ├── src/
 │   └── tapestry/
 │       └── data/
@@ -197,6 +198,8 @@ tapestry/
 We welcome contributions as [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), and [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). 
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. In particular, [read this section](CONTRIBUTING.md#developer-certificate-of-origin-dco) on using _DCO_ with any commits.
+
+Have an idea, technique, or experiment you'd like the project to consider? The [**`contrib/`**](contrib/README.md) directory is a lightweight staging area where contributors can propose work via a PR into their own subdirectory. See [**`contrib/README.md`**](contrib/README.md) for the simple workflow and contribution policy.
 
 You can also join one or more work groups that are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are are being documented in [**`tech-docs/work-groups/`**](tech-docs/work-groups/).
 
