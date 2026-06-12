@@ -2,7 +2,7 @@
 
 # Welcome to Project Tapestry
 
-> _Project Tapestry is creating a global frontier foundation model with a new "consortium training" platform harnessing data, compute and contributors from around the world to enable sovereign AI._
+_Project Tapestry is creating a global frontier foundation model with a new "consortium training" approach harnessing data, compute and contributors from around the world to enable sovereign AI._
 
 This repo contains the code and technical documentation for the project. Check out the [Project Tapestry](https://thealliance.ai/projects/tapestry/) website for more information about partnering, events, and more.
 
@@ -39,7 +39,7 @@ The technical documentation lives under [**`tech-docs`**](tech-docs/README.md):
 		* [**Architecture Decision Records**](tech-docs/architecture/decisions/)
 		* [**Diagrams**](tech-docs/architecture/diagrams/) 
 * [**Governance**](tech-docs/governance/)
-* [**Work Groups**](tech-docs/work-groups/)
+  <!-- * [**Work Groups**](tech-docs/work-groups/) -->
 * [**Strategic Plan**](tech-docs/strategic-plan/)
 * [**Reference Materials**](tech-docs/reference/) (e.g. [**training paradigms**](tech-docs/reference/training-approaches.md))
 
