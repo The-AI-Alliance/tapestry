@@ -18,6 +18,8 @@ LANG_CODE="${LANG_CODE:-ar}"
 EPOCHS="${EPOCHS:-6}"
 PER_DOMAIN="${PER_DOMAIN:-8}"
 MAX_WORDS="${MAX_WORDS:-0}"
+CAT_LIMIT="${CAT_LIMIT:-0}"
+MAX_TOKENS="${MAX_TOKENS:-0}"
 SEED="${SEED:-0}"
 SEEDS="${SEEDS:-}"
 DTYPE="${DTYPE:-bfloat16}"
@@ -45,7 +47,8 @@ echo "== regenerate the $CULTURE corpus from the committed titles file =="
 python "$CC/fetch_corpus.py" \
   --culture "$CULTURE" --lang "$LANG_CODE" \
   --titles-file "$CC/titles/${CULTURE}.${LANG_CODE}.json" \
-  --per-domain "$PER_DOMAIN" --full $MAXW_ARG
+  --per-domain "$PER_DOMAIN" --full $MAXW_ARG \
+  --cat-limit "$CAT_LIMIT" --max-tokens "$MAX_TOKENS"
 
 if [ -n "$SEEDS" ]; then
   OUT="$REPO/runs/${CULTURE}_stats"

@@ -105,13 +105,57 @@ def _truncate_words(text: str, max_words: int) -> str:
     return text if len(words) <= max_words else " ".join(words[:max_words])
 
 
-def _fetch_arm(lang: str, domains: dict[str, list[str]], per_domain: int, *, full: bool, max_words: int = 0) -> list[dict]:
+def _category_members(lang: str, category: str, limit: int) -> list[str]:
+    """Article titles in a Wikipedia category (pages only), via the action API.
+
+    Used to scale a domain past hand-curated titles. Categories are chosen narrow
+    (e.g. fiqh, ethics, worship) so the value-laden vs neutral contrast survives;
+    off-topic members are diluted by the law of large numbers + decontamination.
+    """
+    params = {
+        "action": "query",
+        "format": "json",
+        "list": "categorymembers",
+        "cmtitle": category,
+        "cmlimit": str(min(limit, 500)),
+        "cmtype": "page",
+    }
+    url = f"https://{lang}.wikipedia.org/w/api.php?" + urllib.parse.urlencode(params)
+    req = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310
+            data = json.loads(resp.read().decode("utf-8"))
+    except Exception as exc:
+        print(f"  ! category {category}: {exc}", file=sys.stderr)
+        return []
+    members = data.get("query", {}).get("categorymembers", [])
+    return [m["title"] for m in members][:limit]
+
+
+def _fetch_arm(
+    lang: str,
+    domains: dict[str, list[str]],
+    per_domain: int,
+    *,
+    full: bool,
+    max_words: int = 0,
+    categories: dict[str, list[str]] | None = None,
+    cat_limit: int = 0,
+) -> list[dict]:
     cap = (max_words or _FULL_CAP) if full else _INTRO_CAP
     docs: list[dict] = []
     for domain, titles in domains.items():
+        # Candidate titles: curated, then category members (deduped, order kept).
+        candidates = list(titles)
+        if cat_limit and categories:
+            for cat in categories.get(domain, []):
+                candidates += _category_members(lang, cat, cat_limit)
+        seen: set[str] = set()
+        candidates = [t for t in candidates if not (t in seen or seen.add(t))]
+        budget = per_domain if not (cat_limit and categories) else len(candidates)
         taken = 0
-        for title in titles:
-            if taken >= per_domain:
+        for title in candidates:
+            if taken >= budget:
                 break
             try:
                 got = _wiki_text(lang, title, full=full)
@@ -173,6 +217,27 @@ def _balance_twin(grounded: list[dict], matched: list[dict], tol: float) -> None
         longest["text"] = " ".join(words[: int(len(words) * 0.9)])
 
 
+def _cap_tokens(docs: list[dict], max_tokens: int, *, seed: int = 0) -> list[dict]:
+    """Subsample an arm's docs to a token budget (deterministic), so corpus size
+    -- and therefore training time -- is predictable regardless of how many
+    category members were pulled. Shuffled first so the cap keeps a domain mix."""
+    if not max_tokens:
+        return docs
+    import random as _random
+
+    shuffled = docs[:]
+    _random.Random(seed).shuffle(shuffled)
+    out: list[dict] = []
+    total = 0
+    for d in shuffled:
+        n = len(dataset._normalize(d["text"]))
+        if total + n > max_tokens and out:
+            break
+        out.append(d)
+        total += n
+    return out
+
+
 def _write_jsonl(path: Path, docs: list[dict]) -> None:
     path.write_text("".join(json.dumps(d, ensure_ascii=False) + "\n" for d in docs), encoding="utf-8")
 
@@ -231,6 +296,18 @@ def main() -> int:
         help=f"override the per-article word cap in --full mode (default {_FULL_CAP})",
     )
     parser.add_argument("--titles-file", default="", help="JSON {arm: {domain: [titles]}} for a real culture")
+    parser.add_argument(
+        "--cat-limit",
+        type=int,
+        default=0,
+        help="also pull up to N article(s) per category from the titles file's 'categories' block (0 = off)",
+    )
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=0,
+        help="per-arm token budget; subsample to this so corpus size / training time is predictable (0 = no cap)",
+    )
     parser.add_argument("--tol", type=float, default=0.20, help="twin token-ratio tolerance")
     parser.add_argument("--out", default="", help="output root (default: data/<culture>)")
     parser.add_argument("--validate", default="", help="validate an existing root and exit")
@@ -249,20 +326,39 @@ def main() -> int:
     root = Path(args.out) if args.out else Path(__file__).resolve().parent / "data" / args.culture
     root.mkdir(parents=True, exist_ok=True)
 
+    cats = titles.get("categories", {}) if isinstance(titles, dict) else {}
     print(f"fetching grounded arm ({args.lang}{', full' if args.full else ''})…")
     grounded = _decontaminate(
-        _fetch_arm(args.lang, titles["grounded"], args.per_domain, full=args.full, max_words=args.max_words),
+        _fetch_arm(
+            args.lang,
+            titles["grounded"],
+            args.per_domain,
+            full=args.full,
+            max_words=args.max_words,
+            categories=cats.get("grounded"),
+            cat_limit=args.cat_limit,
+        ),
         "grounded",
     )
     print(f"fetching language_matched arm ({args.lang}{', full' if args.full else ''})…")
     matched = _decontaminate(
-        _fetch_arm(args.lang, titles["language_matched"], args.per_domain, full=args.full, max_words=args.max_words),
+        _fetch_arm(
+            args.lang,
+            titles["language_matched"],
+            args.per_domain,
+            full=args.full,
+            max_words=args.max_words,
+            categories=cats.get("language_matched"),
+            cat_limit=args.cat_limit,
+        ),
         "language_matched",
     )
     if not grounded or not matched:
         print("error: one or both arms came back empty (network? titles?)", file=sys.stderr)
         return 1
 
+    grounded = _cap_tokens(grounded, args.max_tokens)
+    matched = _cap_tokens(matched, args.max_tokens)
     _balance_twin(grounded, matched, args.tol)
     _write_jsonl(root / "grounded.jsonl", grounded)
     _write_jsonl(root / "language_matched.jsonl", matched)
