@@ -2,26 +2,34 @@
 
 # Welcome to Project Tapestry
 
-_Project Tapestry is creating a global frontier foundation model with a new "consortium training" approach harnessing data, compute and contributors from around the world to enable sovereign AI._
+#### Project Tapestry is bringing together talented people, data, and compute from a global consortium of partners to build a new foundation model system trained on a larger and more diverse corpus than ever before. 
 
-This repo contains the code and technical documentation for the project. Check out the [Project Tapestry](https://thealliance.ai/projects/tapestry/) website for more information about partnering, events, and more.
+#### Tapestry will enable sovereign AI by ensuring ownership of data and compute remains with partners, and that partners can continue to train sovereign derivatives of the consortium-trained base model that they own using the Tapestry open source training platform.
 
-![Project Tapestry Image](docs/assets/images/03-tapestry-logo-cropped-630x555.png)
+Learn more from our [Kickoff Workshop Blog](https://thealliance.ai/blog/project-tapestry-the-path-to-frontier-sovereign-ai) and check out the [Project Tapestry](https://thealliance.ai/projects/tapestry/) website for more information about partnering, events, and how to support Project Tapestry.
+
+This repo contains the code and technical documentation for the project. We invite you to jump in and help!
+<p align="center">
+  <img src="docs/assets/images/03-tapestry-logo-cropped-630x555.png" alt="Project Tapestry Logo" width="600">
+</p>
+
+<!-- ![Project Tapestry Image](docs/assets/images/03-tapestry-logo-cropped-630x555.png) -->
 
 The rest of this README provides information for contributors and users of this repository.
 
-## Quick Paths
+## Contribute to Our First Milestones
+Project Tapestry has big plans, and we're starting with some fundamental building blocks.
+
+* [LLM Cultural Alignment and Re-alignment](https://github.com/The-AI-Alliance/tapestry/issues/22) _repository coming soon_ - help us develop techniques for cultural alignment, initially based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric. This task will implement a corresponding evaluation and implement tuning experiments to understand how to shift alignment without compromising general model performance. Prior expertise in evaluation and tuning technologies are especially welcome.
+* [Consortium Training](https://github.com/The-AI-Alliance/tapestry/issues/24) _repository coming soon_ - Tapestry's approach to global model development relies on a balance between centralized and distributed training that preserves use and privacy requirements for data sets. Help us adapt and develop optimal techniqes with ideas from both federated learning and the latest LLM pre-training and post-training methods. Prior expertise in large scale LLM training, distributed infrastructure, and federated learning are especially welcome.
+* [Global Training Data Corpus](https://thealliance.ai/projects/tapestry/training-data-proposals) A core thesis of project Tapestry is that bringing together a much more diverse set of data can provide a path to a better frontier base model for all. What unique datasets exist that could be brought to Tapestry model training? They don't have to be fully open; we will work with you to define and enforce appropriate requirements.
+* Tapestry Model Development Roadmap - _coming soon_ - we want your input!
+
+### Quick Paths
 
 > [!NOTE]
 > Make sure to read [**Getting Involved**](#getting-involved-anchor) below for information on contribution guidelines, etc.
-
-### Our First Milestones
-
-* [Cultural Alignment: help us develop techniques for cultural alignment](https://github.com/The-AI-Alliance/tapestry/issues/22) based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric. This task will implement a corresponding evaluation and do a small model tuning exercise to see if improvement can be observed. Prior expertise in evaluation and tuning technologies are especially welcome.
-* [Building Blocks of _consortium training_](https://github.com/The-AI-Alliance/tapestry/issues/24), the adaptation of federated learning that meets the unique requirements and constraints of Tapestry. Prior expertise in LLM training and federated learning technologies are especially welcome.
-* [Global Training Data Corpus](https://thealliance.ai/projects/tapestry/training-data-proposals) What unique datasets exist that could be brought to Tapestry model training? They don't have to be fully open; we will work with you to define and enforce appropriate handling.
-* A Model Development Roadmap - Coming soon.
-
+> 
 ### Working with the Source Code
 
 The source code is under the [`src`](src/) directory.
