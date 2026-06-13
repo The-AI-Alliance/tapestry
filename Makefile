@@ -67,6 +67,11 @@ For the consortium-training prototype:
 make consortium-demo    # Run the N+1 consortium-training proof-of-concept demo.
 make consortium-tests   # Run only the consortium-training prototype tests.
 
+For the EXP-001 cultural-CPT validation harness (contrib):
+
+make cultural-cpt-validation  # Run the 3-arm go/no-go (smoke mode).
+make cultural-cpt-tests       # Run the cultural-CPT harness tests.
+
 For the documentation website:
 
 make view-pages         # View the published GitHub pages in a browser.
@@ -126,7 +131,9 @@ unit-tests::
 	cd ${SRC_DIR} && \
 	  uv run pytest tests -q
 
-.PHONY: consortium-demo consortium-tests
+.PHONY: consortium-demo consortium-tests cultural-cpt-validation cultural-cpt-tests
+
+CULTURAL_CPT_DIR := contrib/cultural-cpt-validation
 
 consortium-demo::
 	@echo "${INFO}Running the consortium-training demo...${_END}"
@@ -135,6 +142,16 @@ consortium-demo::
 consortium-tests::
 	@echo "${INFO}Running the consortium-training tests...${_END}"
 	uv run pytest ${SRC_DIR}/tests/tapestry/training/consortium -q
+
+cultural-cpt-validation::
+	@echo "${INFO}Running the EXP-001 cultural-CPT validation (smoke mode)...${_END}"
+	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
+		uv run python ${CULTURAL_CPT_DIR}/run.py
+
+cultural-cpt-tests::
+	@echo "${INFO}Running the cultural-CPT validation tests...${_END}"
+	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
+		uv run pytest ${CULTURAL_CPT_DIR}/tests -q
 
 .PHONY: before-pr format-lint-type-check flt
 before-pr:: format-lint-type-check tests

@@ -158,3 +158,6 @@ uv.lock
 *.swp
 *.swo
 *~
+
+# Experiment run outputs
+runs/
