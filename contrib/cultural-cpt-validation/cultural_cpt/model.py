@@ -136,10 +136,16 @@ class HFCausalModel:
     corpora. A small model (e.g. ``distilgpt2``) is enough to validate wiring.
     """
 
-    def __init__(self, model_name: str, device: str = "cpu", dtype: str = "float32") -> None:
+    def __init__(
+        self, model_name: str, device: str = "cpu", dtype: str = "float32", max_length: int = 1024
+    ) -> None:
         self.model_name = model_name
         self.device = device
         self.dtype = dtype
+        # CPT context window. Long documents are chunked into windows of this
+        # many tokens; bounds activation memory (a whole Wikipedia article in one
+        # backward pass OOMs even a 32GB GPU on a 1.5B model).
+        self.max_length = max_length
         try:
             from transformers import AutoModelForCausalLM, AutoTokenizer
         except ImportError as exc:  # pragma: no cover - depends on env
@@ -158,6 +164,7 @@ class HFCausalModel:
         twin.model_name = self.model_name
         twin.device = self.device
         twin.dtype = self.dtype
+        twin.max_length = self.max_length
         twin._tokenizer = tokenizer
         twin._model = model
         return twin
@@ -171,12 +178,25 @@ class HFCausalModel:
         return self._tokenizer.encode(text, add_special_tokens=False)
 
     def train_on_texts(self, texts: Sequence[str], *, epochs: int, lr: float) -> float:
-        sequences = [self._encode(t) for t in texts if t.strip()]
-        sequences = [s for s in sequences if len(s) >= 2]
+        # Chunk each document into max_length windows so long articles become
+        # several training sequences instead of one OOM-inducing pass.
+        sequences: list[list[int]] = []
+        for text in texts:
+            if not text.strip():
+                continue
+            toks = self._encode(text)
+            for start in range(0, len(toks), self.max_length):
+                window = toks[start : start + self.max_length]
+                if len(window) >= 2:
+                    sequences.append(window)
         if not sequences:
             raise ValueError("no usable training text")
 
+        # Gradient checkpointing trades compute for memory (recomputes
+        # activations in the backward pass); needs use_cache off.
         self._model.train()
+        self._model.config.use_cache = False
+        self._model.gradient_checkpointing_enable()
         optimizer = torch.optim.AdamW(self._model.parameters(), lr=lr)
         total, steps = 0.0, 0
         for _ in range(epochs):
@@ -188,6 +208,8 @@ class HFCausalModel:
                 optimizer.step()
                 total += loss.item()
                 steps += 1
+        self._model.gradient_checkpointing_disable()
+        self._model.config.use_cache = True
         self._model.eval()
         return total / max(steps, 1)
 

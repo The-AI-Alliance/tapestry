@@ -21,6 +21,7 @@ LR="${LR:-2e-5}"
 
 CC="$REPO/contrib/cultural-cpt-validation"
 export PYTHONPATH="$REPO/src:$CC"
+export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 
 echo "== environment =="
 python -c "import torch; print('torch', torch.__version__, '| cuda', torch.cuda.is_available(), '|', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'no gpu')"
