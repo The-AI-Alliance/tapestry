@@ -161,3 +161,10 @@ uv.lock
 
 # Experiment run outputs
 runs/
+
+# EXP-001 corpora: bulk corpora are large and regenerated locally from the
+# manifest sources (see contrib/cultural-cpt-validation/fetch_corpus.py). Only
+# the README and the small committed demonstration seed travel with the repo.
+/contrib/cultural-cpt-validation/data/*
+!/contrib/cultural-cpt-validation/data/README.md
+!/contrib/cultural-cpt-validation/data/seed-example/

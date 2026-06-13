@@ -65,9 +65,19 @@ uv pip install --python .venv/bin/python transformers   # optional dep, not in c
 uv run python contrib/cultural-cpt-validation/run.py \
   --mode hf --model-name distilgpt2 --culture vietnam
 
-# a real EXP-001 run additionally needs real corpora:
-#   ... --corpus-path <grounded + language-matched data source>
+# a real EXP-001 run additionally needs real corpora (loaded + validated from a
+# corpus root; see data/README.md and fetch_corpus.py):
+#   ... --corpus-path contrib/cultural-cpt-validation/data/<culture>
 ```
+
+Corpus loading, the permissive-license allowlist, WVS decontamination, and the
+matched-twin control now live in [`cultural_cpt/dataset.py`](cultural_cpt/dataset.py);
+[`fetch_corpus.py`](fetch_corpus.py) assembles a corpus from permissive sources
+and re-validates it. A real, attributed demonstration seed
+([`data/seed-example/`](data/seed-example)) ships with the repo so the real-data
+path is exercised end to end (`make cultural-cpt-validate-corpus`). What remains
+for a real *result* is a high-WVS-distance target culture's corpus in its own
+language and a real instruct base — see [`data/README.md`](data/README.md).
 
 `distilgpt2` is fine for wiring; a proper base/instruct model is needed for real
 signal. `transformers` is lazily imported and intentionally **not** added to the
@@ -110,10 +120,18 @@ Or directly, e.g. `uv run python contrib/cultural-cpt-validation/run.py
   log-prob answer selection;
 - the `LanguageModel` protocol and the smoke backend.
 
+**Real and reusable (added):**
+- `cultural_cpt/dataset.py` — real JSONL corpus loader that *enforces* the
+  validity controls (permissive licensing, language/register/recency match,
+  matched-twin token budget, WVS decontamination) and fails loudly otherwise.
+- `fetch_corpus.py` + `data/seed-example/` — a fetcher and a committed real seed.
+
 **Placeholder — must be replaced for a real result (see the spec):**
-- `cultural_cpt/corpora.py` — tiny illustrative text. Real run loads a genuinely
-  *grounded* corpus and its *language-matched neutral twin*. **Validity depends
-  on these differing only in cultural grounding.**
+- `cultural_cpt/corpora.py` — tiny illustrative text for *smoke* mode only. With
+  `--corpus-path` the run loads a genuinely *grounded* corpus and its
+  *language-matched neutral twin* via `dataset.py`. **Validity depends on these
+  differing only in cultural grounding — which `dataset.py` now checks.** The
+  remaining data work is assembling a high-WVS-distance culture's real corpus.
 - `cultural_cpt/wvs.py` — abbreviated item battery and approximate national
   coordinates. Real run uses the full WVS items + published factor loadings
   (Tao et al. 2024; Sukiennik 2025).

@@ -28,11 +28,18 @@ def main() -> None:
     parser.add_argument("--rounds", type=int, default=4)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--epochs", type=int, default=3)
+    parser.add_argument(
+        "--corpus-path",
+        default="",
+        help="real data root; expects <path>/<culture>/ per culture (empty = placeholder)",
+    )
     parser.add_argument("--out", default="runs/cultural_cpt_aggregation")
     args = parser.parse_args()
 
     cultures = tuple(c.strip() for c in args.cultures.split(",") if c.strip())
-    config = AggregationConfig(cultures=cultures, rounds=args.rounds, seed=args.seed, epochs=args.epochs)
+    config = AggregationConfig(
+        cultures=cultures, rounds=args.rounds, seed=args.seed, epochs=args.epochs, corpus_path=args.corpus_path
+    )
     result = run_aggregation(config)
 
     out_dir = Path(args.out)

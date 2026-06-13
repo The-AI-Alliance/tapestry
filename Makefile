@@ -133,7 +133,7 @@ unit-tests::
 	cd ${SRC_DIR} && \
 	  uv run pytest tests -q
 
-.PHONY: consortium-demo consortium-tests cultural-cpt-validation cultural-cpt-aggregation cultural-cpt-stats cultural-cpt-tests
+.PHONY: consortium-demo consortium-tests cultural-cpt-validation cultural-cpt-aggregation cultural-cpt-stats cultural-cpt-tests cultural-cpt-fetch-seed cultural-cpt-validate-corpus
 
 CULTURAL_CPT_DIR := contrib/cultural-cpt-validation
 
@@ -164,6 +164,19 @@ cultural-cpt-tests::
 	@echo "${INFO}Running the cultural-CPT validation tests...${_END}"
 	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
 		uv run pytest ${CULTURAL_CPT_DIR}/tests -q
+
+# CORPUS=<path> selects the root to validate (default: the committed seed).
+CORPUS ?= ${CULTURAL_CPT_DIR}/data/seed-example
+
+cultural-cpt-fetch-seed::
+	@echo "${INFO}Fetching the real EXP-001 demonstration seed corpus (needs network)...${_END}"
+	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
+		uv run python ${CULTURAL_CPT_DIR}/fetch_corpus.py --culture seed-example --lang en --per-domain 4
+
+cultural-cpt-validate-corpus::
+	@echo "${INFO}Validating corpus ${CORPUS} against the EXP-001 controls...${_END}"
+	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
+		uv run python ${CULTURAL_CPT_DIR}/fetch_corpus.py --validate ${CORPUS}
 
 .PHONY: before-pr format-lint-type-check flt
 before-pr:: format-lint-type-check tests

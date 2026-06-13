@@ -144,12 +144,25 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
         model_name=config.model_name,
     )
 
+    # With a real corpus, only run CPT arms the corpus actually provides. The
+    # spec's recommended first run is the minimal twin (grounded + language_
+    # matched); a corpus need not declare grounded_translated. Arms without a
+    # corpus (base, surface_only) always run.
+    specs = ARM_SPECS
+    skipped_arms: list[str] = []
+    if config.corpus_path:
+        from .dataset import declared_arms
+
+        available = declared_arms(config.corpus_path)
+        specs = tuple(s for s in ARM_SPECS if s.corpus is None or s.corpus in available)
+        skipped_arms = [s.name for s in ARM_SPECS if s not in specs]
+
     results: list[ArmResult] = []
     base_survey_distance: float | None = None
     base_behavior_distance: float | None = None
     shift_by_arm: dict[str, float] = {}
 
-    for spec in ARM_SPECS:
+    for spec in specs:
         model = base.clone()
         train_loss: float | None = None
         if spec.corpus is not None:
@@ -185,10 +198,16 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
             )
         )
 
+    # A decisive comparison is only meaningful when both arms actually ran; a
+    # skipped arm must not masquerade as a tie (0.0).
     grounded_shift = shift_by_arm.get("grounded", 0.0)
-    decisive = grounded_shift - shift_by_arm.get("language_matched", 0.0)
-    decisive_translated = grounded_shift - shift_by_arm.get("grounded_translated", 0.0)
-    decisive_surface = grounded_shift - shift_by_arm.get("surface_only", 0.0)
+
+    def _decisive(other: str) -> float:
+        return grounded_shift - shift_by_arm[other] if other in shift_by_arm else 0.0
+
+    decisive = _decisive("language_matched")
+    decisive_translated = _decisive("grounded_translated")
+    decisive_surface = _decisive("surface_only")
     # A result is only meaningful with BOTH a real model and real corpora.
     flags = []
     if config.mode == "smoke":
@@ -203,6 +222,12 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
             "EXP-001 signal needs --mode hf AND --corpus-path with real grounded + "
             "language-matched corpora."
         )
+    if skipped_arms:
+        note = (
+            f"Arms not run (no corpus in manifest): {', '.join(skipped_arms)}; their "
+            f"decisive comparisons are reported as 0.0 and should be ignored."
+        )
+        caveat = f"{caveat} {note}" if caveat else note
 
     return ExperimentResult(
         mode=config.mode,

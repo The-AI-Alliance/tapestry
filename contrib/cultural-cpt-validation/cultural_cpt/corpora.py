@@ -20,6 +20,7 @@ Wire `load_corpus` to a real data path / HF dataset for real mode.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 
 
 @dataclass(frozen=True)
@@ -88,13 +89,19 @@ _CULTURE_GROUNDED: dict[str, tuple[str, ...]] = {
 }
 
 
-def load_culture_corpus(culture: str, *, mode: str = "smoke", path: str = "") -> Corpus:
-    """Return a culture-specific grounded corpus for the aggregation experiment."""
-    if mode == "hf":
-        raise NotImplementedError(
-            f"real grounded corpus for culture {culture!r} is not wired up "
-            f"(got path={path!r})"
-        )
+def load_culture_corpus(culture: str, *, path: str = "") -> Corpus:
+    """Return a culture-specific grounded corpus for the aggregation experiment.
+
+    With a ``path`` (real data), ``<path>/<culture>/`` is treated as that
+    culture's corpus root and its ``grounded`` arm is loaded and validated via
+    :mod:`cultural_cpt.dataset`. With no ``path`` it returns placeholder text.
+    """
+    if path:
+        from . import dataset
+
+        root = Path(path) / culture
+        docs = dataset.load_arm_documents(root, "grounded")
+        return Corpus(name=f"grounded:{culture}", documents=tuple(d.text for d in docs))
     if culture not in _CULTURE_GROUNDED:
         raise ValueError(f"no placeholder corpus for culture {culture!r}; known: {sorted(_CULTURE_GROUNDED)}")
     return Corpus(name=f"grounded:{culture}", documents=_CULTURE_GROUNDED[culture])
@@ -109,9 +116,10 @@ def load_corpus(arm_name: str, *, path: str = "") -> Corpus:
     a directory or dataset id; left as a seam.
     """
     if path:
-        raise NotImplementedError(
-            f"real corpus loading from {path!r} for arm {arm_name!r} is not wired up"
-        )
+        from . import dataset
+
+        docs = dataset.load_arm_documents(Path(path), arm_name)
+        return Corpus(name=arm_name, documents=tuple(d.text for d in docs))
     if arm_name == "grounded":
         return Corpus(name="grounded", documents=_GROUNDED)
     if arm_name == "language_matched":

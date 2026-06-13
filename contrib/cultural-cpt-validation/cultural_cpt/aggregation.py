@@ -83,6 +83,7 @@ class AggregationConfig:
     seed: int = 0
     paraphrase_passes: int = 2
     model_name: str = ""
+    corpus_path: str = ""  # empty = placeholder corpora; else per-culture real data root
 
 
 def _fedavg(states: list[dict[str, torch.Tensor]]) -> dict[str, torch.Tensor]:
@@ -121,7 +122,7 @@ def run_aggregation(config: AggregationConfig) -> AggregationResult:
     if global_state is None:  # pragma: no cover - smoke only
         raise RuntimeError("smoke mode expected a ByteCausalModel base")
 
-    corpora = {c: load_culture_corpus(c, mode=config.mode) for c in config.cultures}
+    corpora = {c: load_culture_corpus(c, path=config.corpus_path) for c in config.cultures}
 
     round_metrics: list[RoundMetric] = []
     for round_num in range(1, config.rounds + 1):
