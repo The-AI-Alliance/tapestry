@@ -82,6 +82,47 @@ checkpointing.
 
 ### VERDICT: **FAIL** — shift +0.023 (≥0.05? no); z=0.75 (≥2? no); capability fine.
 
+## Run 4 — Qwen3-4B, **survey administered in Arabic**
+
+Identical to Run 3 (same model, same ~151k/189k-token corpus, 3 seeds, 4 epochs)
+except the survey + behavior probe are administered in **Arabic** instead of
+English (`--instrument-lang ar`), removing the content-vs-language confound: the
+corpus is Arabic, so measure in Arabic.
+
+| arm | survey shift → Egypt | behavior shift | capability |
+| :-- | --: | --: | --: |
+| base | — | — | 0.75 |
+| language_matched | **−0.105 ± 0.043** | −0.200 | 0.75 |
+| **grounded** | **+0.035 ± 0.048** | −0.232 | 0.83 |
+| surface_only (prompt) | +0.063 ± 0.010 | +0.047 | 0.75 |
+
+| comparison | mean ± std | z |
+| :-- | --: | --: |
+| grounded − language | **+0.140 ± 0.091** | **+1.54** |
+| grounded − surface | −0.028 ± 0.056 | −0.50 |
+
+### VERDICT: **FAIL** — shift +0.035 (≥0.05? no); z=1.54 (≥2? no). But the closest yet.
+
+### Language of measurement matters a lot (Run 3 EN vs Run 4 AR, all else equal)
+
+| survey lang | grounded shift | grounded − language | grounded − surface |
+| :-- | --: | --: | --: |
+| English (Run 3) | +0.023 | +0.028 (z=0.75) | **−0.163 (z=−2.16)** |
+| Arabic (Run 4) | +0.035 | **+0.140 (z=1.54)** | −0.028 (z=−0.50) |
+
+Two clean shifts from measuring in the corpus's own language:
+1. **The decisive grounding-beyond-language effect grew ~5×** (+0.028 → +0.140).
+   In Arabic, neutral text pushes *away* from Egypt (−0.105) while grounded text
+   pushes *toward* it (+0.035) — the H1(b) contrast, much sharper.
+2. **Prompting stops beating CPT.** In English the persona prompt dominated
+   (z=−2.16); in Arabic that advantage evaporates (z=−0.50). The earlier
+   "cheap prompting beats expensive CPT" result was partly an English-measurement
+   artifact — important for the depth-over-shallow architectural bet.
+
+Still FAIL (effect grew but so did variance; z=1.54 < 2, shift < 0.05), but this
+is the first run where the *decisive* comparison is clearly the largest signal,
+and where CPT is no longer dominated by prompting.
+
 ## Trend across scale (the encouraging part)
 
 |  | grounded survey shift | grounded − language | beaten by prompt? |
