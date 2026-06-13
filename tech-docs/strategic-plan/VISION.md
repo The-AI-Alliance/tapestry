@@ -38,9 +38,9 @@ Three structural advantages sovereign nodes<sup>[1](#footnote-1)</sup> have that
 | **Cultural alignment depth** | Community-participatory constitutional AI captures cultural variation that one-size-fits-all training cannot. |
 | **Domain specialization** | Organizations won't share proprietary data with centralized providers; on-premise specialization is inaccessible to cloud models. |
 
-<a id="#footnote-1"></a>
+<a id="footnote-1"></a>
 
-<sup>1</sup>: _Compute and storage nodes that can either participate in the distributed training processes or run standalone. See [here](../tapestry-reference/ARCHITECTURE.md)._
+<sup>1</sup>: _Compute and storage nodes that can either participate in the distributed training processes or run standalone. See the [architecture docs](../architecture/README.md)._
 
 Initial performance targets:
 
@@ -139,15 +139,15 @@ This separation is non-negotiable. Any design that bleeds national assumptions i
 
 ## Work Group Map
 
-| What needs defining | Who defines it |
+| What it owns | Work group |
 |---|---|
-| Data sovereignty requirements | [Data Requirements Work Group](../work-groups/data-requirements/) |
-| Federated training requirements | [Model Training Requirements Work Group](../work-groups/model-training-requirements/) |
-| Evaluation requirements | [Evaluation Requirements Work Group](../work-groups/evaluation-requirements/) |
-| Infrastructure requirements | [Infrastructure Requirements Work Group](../work-groups/infrastructure-requirements/) |
-| Data infrastructure implementation | [Data Engineering Work Group](../work-groups/data-engineering/) |
-| Training stack implementation | [Model Training Engineering Work Group](../work-groups/model-training-engineering/) |
-| Evaluation tooling | [Evaluation Engineering Work Group](../work-groups/evaluation-engineering/) |
-| Sovereign node infrastructure | [Infrastructure Engineering Work Group](../work-groups/infrastructure-engineering/) |
+| Sovereign data sourcing, licensing, residency, provenance | [Data Governance](../work-groups/data-governance/) |
+| Adopted-base strategy, consortium training loop, aggregation | [Base Model Training](../work-groups/base-model-training/) |
+| Participant-owned alignment, post-training, sovereign-layer portability | [Sovereign Alignment](../work-groups/sovereign-alignment/) |
+| Benchmarks, cultural-alignment metrics, certification, release gates | [Evaluation & Certification](../work-groups/evaluation-certification/) |
+| Privacy tiers, secure aggregation, differential privacy, threat models | [Security & Privacy](../work-groups/security-privacy/) |
+| Compute, orchestration, node operations, fault tolerance | [Infrastructure & Operations](../work-groups/infrastructure-operations/) |
+| Serving, integration patterns, participant rollout, developer experience | [Deployment & Adoption](../work-groups/deployment-adoption/) |
+| Anti-capture mechanics, contribution credit, decision rights | [Governance & Participation](../work-groups/governance-participation/) |
 
 For detailed requirements, acceptance criteria, and milestones, see the [PRD](PRD.md).

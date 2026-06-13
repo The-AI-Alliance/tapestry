@@ -1,4 +1,6 @@
-# OS and other things.
+ctn.local
+
+# OS and other miscellaneous files and directories to ignore.
 .DS_Store
 Thumbs.db
 tmp/
@@ -7,6 +9,7 @@ Gemfile.lock
 .jekyll-metadata
 .sass-cache/
 _site/
+*.drawio.bkp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -155,5 +158,3 @@ uv.lock
 *.swp
 *.swo
 *~
-
-# Made with Bob

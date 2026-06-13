@@ -71,7 +71,7 @@ heading_anchors: true
 # Aux links for the upper right navigation
 aux_links:
   "The AI Alliance":
-    - "https://www.aialliance.org"
+    - "https://www.thealliance.ai"
 
 nav_external_links:
   - title: "The AI Alliance technical repo for Project Tapestry"

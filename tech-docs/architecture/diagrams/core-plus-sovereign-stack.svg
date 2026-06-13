@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 260" role="img" aria-labelledby="title desc">
+  <title id="title">Core-plus-sovereign stack</title>
+  <desc id="desc">Sovereign layers including continued pretraining, alignment, and instruction tuning sit above a shared frontier base model with safety layer.</desc>
+  <rect width="440" height="260" fill="none"/>
+
+  <rect x="40" y="16" width="360" height="100" rx="6" fill="#2e7d32" stroke="#1b5e20" stroke-width="1.5"/>
+  <text x="220" y="44" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="14" font-weight="600">Sovereign layers (per participant)</text>
+  <text x="220" y="66" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="11">A: Continued pretraining on culturally grounded data</text>
+  <text x="220" y="82" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="11">B: Post-training alignment (DPO / RLHF / Constitutional AI)</text>
+  <text x="220" y="98" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="11">C: Instruction tuning and chat readiness</text>
+  <text x="400" y="108" text-anchor="end" fill="#a5d6a7" font-family="system-ui,Segoe UI,sans-serif" font-size="9" font-style="italic">Participant-owned</text>
+
+  <line x1="80" y1="126" x2="360" y2="126" stroke="#999" stroke-width="0.5" stroke-dasharray="4,3"/>
+
+  <rect x="40" y="136" width="360" height="34" rx="6" fill="#e65100" stroke="#bf360c" stroke-width="1.5"/>
+  <text x="220" y="158" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-weight="600">Safety alignment (shared — mechanism TBD)</text>
+
+  <rect x="40" y="180" width="360" height="56" rx="6" fill="#1565c0" stroke="#0d47a1" stroke-width="1.5"/>
+  <text x="220" y="206" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="14" font-weight="600">Shared frontier base model</text>
+  <text x="220" y="224" text-anchor="middle" fill="#bbdefb" font-family="system-ui,Segoe UI,sans-serif" font-size="11">Consortium-adopted, then consortium-evolved (TAP-006)</text>
+  <text x="400" y="232" text-anchor="end" fill="#90caf9" font-family="system-ui,Segoe UI,sans-serif" font-size="9" font-style="italic">Consortium-owned</text>
+</svg>

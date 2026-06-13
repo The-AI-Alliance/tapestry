@@ -1,0 +1,106 @@
+<mxfile host="Electron">
+  <diagram name="Page-1" id="5GKT-VihkCmrRgoHBOGI">
+    <mxGraphModel dx="1926" dy="1206" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-30" edge="1" parent="1" source="syFpzNw0Nt3ccXYTVD9k-2" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0;exitDx=0;exitDy=0;entryX=1;entryY=0;entryDx=0;entryDy=0;strokeWidth=2;" target="syFpzNw0Nt3ccXYTVD9k-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-2" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="Core Operator Training/RL Processes" vertex="1">
+          <mxGeometry height="80" width="120" x="580" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-3" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" value="Sovereign Partner Training/RL Processes" vertex="1">
+          <mxGeometry height="80" width="120" x="200" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-4" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f8cecc;strokeColor=#b85450;" value="Private&lt;div&gt;Data&lt;/div&gt;" vertex="1">
+          <mxGeometry height="80" width="60" x="90" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-6" edge="1" parent="1" source="syFpzNw0Nt3ccXYTVD9k-3" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;strokeWidth=2;" target="syFpzNw0Nt3ccXYTVD9k-4" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="420" y="500" as="sourcePoint" />
+            <mxPoint x="470" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-5" parent="1" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#f8cecc;strokeColor=#b85450;" value="Differential Privacy" vertex="1">
+          <mxGeometry height="40" width="80" x="120" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-7" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Sovereign Data" vertex="1">
+          <mxGeometry height="80" width="60" x="230" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-8" edge="1" parent="1" source="syFpzNw0Nt3ccXYTVD9k-3" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;strokeWidth=2;" target="syFpzNw0Nt3ccXYTVD9k-7" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="260" y="440" as="sourcePoint" />
+            <mxPoint x="570" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-10" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="Unique, Open Data" vertex="1">
+          <mxGeometry height="80" width="60" x="370" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-11" edge="1" parent="1" source="syFpzNw0Nt3ccXYTVD9k-3" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;strokeWidth=2;" target="syFpzNw0Nt3ccXYTVD9k-10" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="310" y="460" as="sourcePoint" />
+            <mxPoint x="660" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-12" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#f8cecc;strokeColor=#b85450;" value="Data with details that can&#39;t be revealed (e.g., PII), but some information can be used in model training, etc." vertex="1">
+          <mxGeometry height="130" width="120" x="60" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-13" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#fff2cc;strokeColor=#d6b656;" value="Data that is not private, but can&#39;t leave a sovereign boundary." vertex="1">
+          <mxGeometry height="130" width="120" x="200" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-14" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="Unique data available to the partner, which could potentially move to the core training data corpus." vertex="1">
+          <mxGeometry height="130" width="120" x="340" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-15" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="Fully- Open Data" vertex="1">
+          <mxGeometry height="80" width="60" x="681" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-16" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;" value="Ethically sourced, open data sets with no restrictions on use." vertex="1">
+          <mxGeometry height="130" width="120" x="651" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-17" parent="1" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;fillColor=#ffe6cc;strokeColor=#d79b00;" value="Controlled Data" vertex="1">
+          <mxGeometry height="80" width="60" x="540" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-18" edge="1" parent="1" source="syFpzNw0Nt3ccXYTVD9k-2" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;strokeWidth=2;" target="syFpzNw0Nt3ccXYTVD9k-17" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="550" y="400" as="sourcePoint" />
+            <mxPoint x="860" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-19" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#fff2cc;strokeColor=#d6b656;" value="Licensed data sets that can live in the core environment, but have restrictions on allowed uses." vertex="1">
+          <mxGeometry height="130" width="120" x="510" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-20" edge="1" parent="1" source="syFpzNw0Nt3ccXYTVD9k-2" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;strokeWidth=2;" target="syFpzNw0Nt3ccXYTVD9k-15" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <mxPoint x="780" y="420" as="sourcePoint" />
+            <mxPoint x="710" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-21" parent="1" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Governance Enforcement" vertex="1">
+          <mxGeometry height="40" width="180" x="170" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-22" parent="1" style="shape=process;whiteSpace=wrap;html=1;backgroundOutline=1;fillColor=#fff2cc;strokeColor=#d6b656;" value="Governance Enforcement" vertex="1">
+          <mxGeometry height="40" width="100" x="590" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-24" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;autosize=1;resizable=0;" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;Categories of Data Sovereignty Supported by Tapestry&lt;/font&gt;" vertex="1">
+          <mxGeometry height="40" width="460" x="225" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-31" edge="1" parent="1" source="syFpzNw0Nt3ccXYTVD9k-3" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=1;entryDx=0;entryDy=0;strokeWidth=2;" target="syFpzNw0Nt3ccXYTVD9k-2">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="676" y="580" as="sourcePoint" />
+            <mxPoint x="360" y="580" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-33" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#f9f7ed;strokeColor=#36393d;" value="&lt;span style=&quot;color: rgb(0, 0, 0);&quot;&gt;Weights, not data, exchanged when&lt;/span&gt;&lt;div style=&quot;color: rgb(0, 0, 0);&quot;&gt;jointly training models. No exchanges when tuning local, custom models.&lt;/div&gt;" vertex="1">
+          <mxGeometry height="130" width="130" x="391" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-35" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;position2=0.54;direction=north;size=30;position=0.42;fillColor=#f9f7ed;strokeColor=#36393d;base=25;" value="Collaborate with Core for foundation models. Work in isolation for local custom models" vertex="1">
+          <mxGeometry height="90" width="140" x="70" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="syFpzNw0Nt3ccXYTVD9k-36" parent="1" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;position2=0.54;direction=south;size=30;position=0.43;fillColor=#f9f7ed;strokeColor=#36393d;base=20;" value="Collaborate with Partners for foundation models." vertex="1">
+          <mxGeometry height="80" width="110" x="690" y="480" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

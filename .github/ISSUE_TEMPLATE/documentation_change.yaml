@@ -1,0 +1,37 @@
+name: 📖 Documentation Change  
+description: Request changes to documentation  
+title: "[Docs] "  
+labels: documentation  
+assignees: [deanwampler,ctn,jolson-allianceai]
+projects: [The-AI-Alliance/50]
+body:
+- type: checkboxes
+  attributes:
+    label: Is there an existing issue for this?
+    description: Please search to see if an issue already exists that is similar to your issue/suggestion.
+    options:
+    - label: I have searched the existing issues
+      required: true
+- type: textarea
+  attributes:
+    label: Description
+    description: |
+      Describe the documentation change you are requesting. Include:
+      * What needs to be changed?
+      * Why it needs to be changed?
+      * Any relevant context or references?
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Proposed Changes
+    description: |
+      Describe your proposed changes:
+      * Specific files to modify
+      * Content to add/remove
+      * Any new files needed
+- type: textarea
+  attributes:
+    label: Additional Context
+    description: |
+      Add any other context or screenshots about the documentation change here.
