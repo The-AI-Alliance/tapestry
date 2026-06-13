@@ -105,8 +105,8 @@ def _truncate_words(text: str, max_words: int) -> str:
     return text if len(words) <= max_words else " ".join(words[:max_words])
 
 
-def _fetch_arm(lang: str, domains: dict[str, list[str]], per_domain: int, *, full: bool) -> list[dict]:
-    cap = _FULL_CAP if full else _INTRO_CAP
+def _fetch_arm(lang: str, domains: dict[str, list[str]], per_domain: int, *, full: bool, max_words: int = 0) -> list[dict]:
+    cap = (max_words or _FULL_CAP) if full else _INTRO_CAP
     docs: list[dict] = []
     for domain, titles in domains.items():
         taken = 0
@@ -224,6 +224,12 @@ def main() -> int:
         action="store_true",
         help=f"fetch full articles (cap {_FULL_CAP} words) for a real-sized corpus, not just intros",
     )
+    parser.add_argument(
+        "--max-words",
+        type=int,
+        default=0,
+        help=f"override the per-article word cap in --full mode (default {_FULL_CAP})",
+    )
     parser.add_argument("--titles-file", default="", help="JSON {arm: {domain: [titles]}} for a real culture")
     parser.add_argument("--tol", type=float, default=0.20, help="twin token-ratio tolerance")
     parser.add_argument("--out", default="", help="output root (default: data/<culture>)")
@@ -244,10 +250,14 @@ def main() -> int:
     root.mkdir(parents=True, exist_ok=True)
 
     print(f"fetching grounded arm ({args.lang}{', full' if args.full else ''})…")
-    grounded = _decontaminate(_fetch_arm(args.lang, titles["grounded"], args.per_domain, full=args.full), "grounded")
+    grounded = _decontaminate(
+        _fetch_arm(args.lang, titles["grounded"], args.per_domain, full=args.full, max_words=args.max_words),
+        "grounded",
+    )
     print(f"fetching language_matched arm ({args.lang}{', full' if args.full else ''})…")
     matched = _decontaminate(
-        _fetch_arm(args.lang, titles["language_matched"], args.per_domain, full=args.full), "language_matched"
+        _fetch_arm(args.lang, titles["language_matched"], args.per_domain, full=args.full, max_words=args.max_words),
+        "language_matched",
     )
     if not grounded or not matched:
         print("error: one or both arms came back empty (network? titles?)", file=sys.stderr)

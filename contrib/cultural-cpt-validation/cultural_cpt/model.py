@@ -26,6 +26,23 @@ from tapestry.training.consortium import TinyCausalModel
 _BYTE_VOCAB = 256
 
 
+def _make_adamw(params, *, lr: float):
+    """AdamW optimizer, preferring bitsandbytes 8-bit when available.
+
+    8-bit Adam keeps the optimizer moments in int8 (~2 bytes/param vs. 8 for
+    fp32), which is what lets a ~4B full fine-tune fit a single 32GB GPU. It is
+    still full-parameter training (every weight gets a gradient) -- not LoRA --
+    so the depth-over-shallow test is unchanged. Falls back to torch AdamW (e.g.
+    on CPU / smoke) when bitsandbytes is absent.
+    """
+    try:
+        import bitsandbytes as bnb
+
+        return bnb.optim.AdamW8bit(params, lr=lr)
+    except Exception:  # pragma: no cover - depends on optional dep / GPU
+        return torch.optim.AdamW(params, lr=lr)
+
+
 @runtime_checkable
 class LanguageModel(Protocol):
     """Minimal interface the experiment needs from any model backend."""
@@ -154,9 +171,14 @@ class HFCausalModel:
                 "`uv pip install transformers`) or use --mode smoke."
             ) from exc
         # bf16 halves the memory of a full-parameter CPT run (params + grads),
-        # the difference between fitting a ~1.5-3B base on a single GPU or not.
+        # the difference between fitting a ~4B base on a single GPU or not.
+        #
+        # The base stays on the CPU; only the per-arm clones move to the compute
+        # device (see clone()). The experiment never computes on the base
+        # directly (every arm clones it), so this keeps just ONE model copy in
+        # VRAM at a time -- essential to fit a 4B full fine-tune in 32GB.
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self._model = AutoModelForCausalLM.from_pretrained(model_name, dtype=getattr(torch, dtype)).to(device)
+        self._model = AutoModelForCausalLM.from_pretrained(model_name, dtype=getattr(torch, dtype))
         self._model.eval()
 
     def _shared_init(self, tokenizer, model) -> "HFCausalModel":
@@ -171,8 +193,17 @@ class HFCausalModel:
 
     def clone(self) -> "HFCausalModel":
         # Tokenizer is stateless and shared; the model weights are copied so each
-        # arm trains independently from the same base.
-        return self._shared_init(self._tokenizer, copy.deepcopy(self._model))
+        # arm trains independently from the same base. The base lives on CPU; the
+        # copy is moved to the compute device so only one model occupies VRAM.
+        # empty_cache first releases the previous arm's freed allocations.
+        if self.device != "cpu" and torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        twin_model = copy.deepcopy(self._model).to(self.device)
+        return self._shared_init(self._tokenizer, twin_model)
+
+    def _device(self) -> "torch.device":
+        """The device the weights actually live on (CPU for base, GPU for clones)."""
+        return next(self._model.parameters()).device
 
     def _encode(self, text: str) -> list[int]:
         return self._tokenizer.encode(text, add_special_tokens=False)
@@ -194,23 +225,27 @@ class HFCausalModel:
 
         # Gradient checkpointing trades compute for memory (recomputes
         # activations in the backward pass); needs use_cache off.
+        dev = self._device()
         self._model.train()
         self._model.config.use_cache = False
         self._model.gradient_checkpointing_enable()
-        optimizer = torch.optim.AdamW(self._model.parameters(), lr=lr)
+        optimizer = _make_adamw(self._model.parameters(), lr=lr)
         total, steps = 0.0, 0
         for _ in range(epochs):
             for seq in sequences:
-                ids = torch.tensor([seq], dtype=torch.long, device=self.device)
+                ids = torch.tensor([seq], dtype=torch.long, device=dev)
                 optimizer.zero_grad()
                 loss = self._model(input_ids=ids, labels=ids).loss
                 loss.backward()
                 optimizer.step()
                 total += loss.item()
                 steps += 1
+        del optimizer
         self._model.gradient_checkpointing_disable()
         self._model.config.use_cache = True
         self._model.eval()
+        if dev.type == "cuda":
+            torch.cuda.empty_cache()
         return total / max(steps, 1)
 
     @torch.no_grad()
@@ -220,7 +255,7 @@ class HFCausalModel:
         if not cont_ids:
             return float("-inf")
         full = prompt_ids + cont_ids
-        ids = torch.tensor([full], dtype=torch.long, device=self.device)
+        ids = torch.tensor([full], dtype=torch.long, device=self._device())
         log_probs = torch.log_softmax(self._model(input_ids=ids).logits[0], dim=-1)
         total = 0.0
         # Token at position j is predicted by logits at j-1.

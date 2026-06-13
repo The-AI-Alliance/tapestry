@@ -17,6 +17,7 @@ CULTURE="${CULTURE:-egypt}"
 LANG_CODE="${LANG_CODE:-ar}"
 EPOCHS="${EPOCHS:-6}"
 PER_DOMAIN="${PER_DOMAIN:-8}"
+MAX_WORDS="${MAX_WORDS:-0}"
 SEED="${SEED:-0}"
 SEEDS="${SEEDS:-}"
 DTYPE="${DTYPE:-bfloat16}"
@@ -29,12 +30,16 @@ export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:T
 echo "== environment =="
 python -c "import torch; print('torch', torch.__version__, '| cuda', torch.cuda.is_available(), '|', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'no gpu')"
 python -c "import transformers; print('transformers', transformers.__version__)" || pip install -q transformers
+# 8-bit Adam (bitsandbytes) lets a ~4B full fine-tune fit a single 32GB GPU.
+python -c "import bitsandbytes" 2>/dev/null || pip install -q bitsandbytes
 
+MAXW_ARG=""
+[ "$MAX_WORDS" != "0" ] && MAXW_ARG="--max-words $MAX_WORDS"
 echo "== regenerate the $CULTURE corpus from the committed titles file =="
 python "$CC/fetch_corpus.py" \
   --culture "$CULTURE" --lang "$LANG_CODE" \
   --titles-file "$CC/titles/${CULTURE}.${LANG_CODE}.json" \
-  --per-domain "$PER_DOMAIN" --full
+  --per-domain "$PER_DOMAIN" --full $MAXW_ARG
 
 if [ -n "$SEEDS" ]; then
   OUT="$REPO/runs/${CULTURE}_stats"
