@@ -1,9 +1,5 @@
 # Work Groups
 
-Coming soon! In the meantime please check out our first milestiones.
-
-<details>
-
 This directory organizes Project Tapestry work groups by durable lifecycle responsibility, not by a repeated requirements/engineering split. Each work group owns its requirements discovery, technical exploration, implementation notes, open questions, and delivery artifacts in one place.
 
 The structure is meant to be necessary and sufficient for the current architecture: sovereign data enters the system; base models and sovereign alignment pipelines transform it; evaluation, security, and governance constrain what can ship; infrastructure and deployment make it usable.
@@ -58,7 +54,4 @@ Each work-group README should stay short and concrete:
 - **Scope:** responsibilities included and explicitly out of scope.
 - **Initial questions:** workshop or research questions the group must resolve.
 - **Early deliverables:** artifacts expected before the work group can be considered operational.
-
-your comment here -->- **Interfaces:** other work groups it must coordinate with.
-
-</details>
+- **Interfaces:** other work groups it must coordinate with.
