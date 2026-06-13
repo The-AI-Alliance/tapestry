@@ -35,6 +35,9 @@ def main() -> None:
     parser.add_argument(
         "--dtype", default="float32", choices=("float32", "bfloat16"), help="hf model dtype"
     )
+    parser.add_argument(
+        "--instrument-lang", default="en", choices=("en", "ar"), help="language to administer the survey in"
+    )
     parser.add_argument("--seeds", default="0,1,2,3,4", help="comma-separated seeds")
     parser.add_argument("--min-shift", type=float, default=0.05, help="pre-registered X")
     parser.add_argument("--sigma", type=float, default=2.0, help="pre-registered sigma multiple")
@@ -54,6 +57,7 @@ def main() -> None:
             lr=lr,
             device=args.device,
             dtype=args.dtype,
+            instrument_lang=args.instrument_lang,
         ),
         seeds=seeds,
         min_grounded_shift=args.min_shift,

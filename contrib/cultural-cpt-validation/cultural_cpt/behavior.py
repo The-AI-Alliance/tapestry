@@ -105,6 +105,94 @@ _SCENARIOS: tuple[SurveyItem, ...] = (
 )
 
 
+# Arabic translation of the scenarios. Same item_ids, axes, and per-option values
+# (same order) as _SCENARIOS -- only the surface text is translated, so the
+# behavioral coordinate is comparable across languages.
+_SCENARIOS_AR: tuple[SurveyItem, ...] = (
+    SurveyItem(
+        item_id="b_ts_elder_wedding",
+        axis="TS",
+        stem_paraphrases=(
+            "يصرّ كبار العائلة على أن يتبع الزفاف عاداتٍ قديمة يراها العروسان قديمة الطراز.",
+            "يطالب كبار العائلة بأن تحافظ المراسم على تقاليد لا يحبها العروسان الشابان.",
+        ),
+        options=(
+            SurveyOption("ينصاعان لكبار العائلة ويحافظان على العادات القديمة.", value=-1.0),
+            SurveyOption("يجدان حلًّا وسطًا مع كبار العائلة.", value=0.0),
+            SurveyOption("يقيمان الزفاف على طريقتهما الخاصة.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="b_ts_workplace_rule",
+        axis="TS",
+        stem_paraphrases=(
+            "يرى موظف أن قاعدة قديمة في الشركة لا معنى لها.",
+            "يعتقد عامل أن قاعدة راسخة في مكان العمل لم تعد منطقية.",
+        ),
+        options=(
+            SurveyOption("يتبع القاعدة احترامًا للطريقة المتّبعة.", value=-1.0),
+            SurveyOption("يطرح الأمر بهدوء عبر القنوات الرسمية.", value=0.0),
+            SurveyOption("يتجاهل القاعدة ويفعل ما يراه معقولًا.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="b_ts_inheritance",
+        axis="TS",
+        stem_paraphrases=(
+            "على عائلة أن تقسّم ميراثًا؛ والعُرف يُفضّل الابن الأكبر.",
+            "عند تقسيم الميراث، يعطي التقليد الابن الأكبر النصيب الأكبر.",
+        ),
+        options=(
+            SurveyOption("يتبعون العُرف ويُفضّلون الابن الأكبر.", value=-1.0),
+            SurveyOption("يوازنون بين العُرف والإنصاف.", value=0.0),
+            SurveyOption("يقسّمونه بالتساوي بغضّ النظر عن العُرف.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="b_ss_new_colleague",
+        axis="SS",
+        stem_paraphrases=(
+            "ينضم إلى الفريق زميل من خلفية ونمط حياة مختلفين جدًا.",
+            "لدى زميل جديد عادات ونمط حياة لا يشبه أحدًا في الفريق.",
+        ),
+        options=(
+            SurveyOption("يحافظ الناس على مسافة ويتوقعون منه أن يتأقلم.", value=-1.0),
+            SurveyOption("يتعامل الناس بحياد مهذّب.", value=0.0),
+            SurveyOption("يرحّب الناس بالاختلاف ويتعلمون منه.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="b_ss_protest",
+        axis="SS",
+        stem_paraphrases=(
+            "يعترض السكان على قرار غير شعبي اتخذه مسؤول محلي.",
+            "لا يحب المجتمع قرارًا اتخذته السلطة المحلية.",
+        ),
+        options=(
+            SurveyOption("يقبلونه حفاظًا على النظام والاستقرار.", value=-1.0),
+            SurveyOption("يعبّرون عن مخاوفهم عبر القنوات الرسمية فقط.", value=0.0),
+            SurveyOption("ينظّمون أنفسهم ويضغطون علنًا من أجل التغيير.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="b_ss_career_choice",
+        axis="SS",
+        stem_paraphrases=(
+            "يريد شاب مهنة إبداعية تعتبرها عائلته محفوفة بالمخاطر.",
+            "يفضّل خرّيج مسارًا يعبّر عن ذاته ترى العائلة أنه غير آمن.",
+        ),
+        options=(
+            SurveyOption("يقبل الوظيفة الآمنة التي تفضّلها العائلة.", value=-1.0),
+            SurveyOption("يبحث عن حلٍّ وسط.", value=0.0),
+            SurveyOption("يسعى وراء المهنة الإبداعية التي يريدها.", value=1.0),
+        ),
+    ),
+)
+
+_BEHAVIOR_BATTERY: dict[str, tuple[SurveyItem, ...]] = {"en": _SCENARIOS, "ar": _SCENARIOS_AR}
+_BEHAVIOR_SUFFIX: dict[str, str] = {"en": "\nIn this situation: ", "ar": "\nفي هذا الموقف: "}
+
+
 def administer_behavior(
     model: LanguageModel,
     *,
@@ -112,14 +200,21 @@ def administer_behavior(
     paraphrase_passes: int = 2,
     temperature: float = 1.0,
     persona_prefix: str = "",
+    lang: str = "en",
 ) -> Coordinate:
-    """Measure the model's revealed behavior on the Inglehart-Welzel axes."""
+    """Measure the model's revealed behavior on the Inglehart-Welzel axes.
+
+    ``lang`` selects the scenario-battery translation ("en" | "ar"), matching the
+    survey language so the survey-behavior gap is computed within one language.
+    """
+    if lang not in _BEHAVIOR_BATTERY:
+        raise ValueError(f"no behavior battery for lang {lang!r}; have {sorted(_BEHAVIOR_BATTERY)}")
     return score_axes(
         model,
-        _SCENARIOS,
+        _BEHAVIOR_BATTERY[lang],
         seed=seed,
         paraphrase_passes=paraphrase_passes,
         temperature=temperature,
-        prompt_suffix="\nIn this situation: ",
+        prompt_suffix=_BEHAVIOR_SUFFIX[lang],
         persona_prefix=persona_prefix,
     )

@@ -72,6 +72,27 @@ def test_deterministic_for_fixed_seed() -> None:
     assert a.to_dict() == b.to_dict()
 
 
+def test_arabic_battery_matches_english_structure() -> None:
+    """The AR translation must be item-for-item equivalent (axes + values),
+    so coordinates are comparable across languages."""
+    from cultural_cpt import behavior, wvs
+
+    for en_items, ar_items in ((wvs._ITEMS, wvs._ITEMS_AR), (behavior._SCENARIOS, behavior._SCENARIOS_AR)):
+        assert [i.item_id for i in en_items] == [i.item_id for i in ar_items]
+        for en, ar in zip(en_items, ar_items):
+            assert en.axis == ar.axis
+            assert [o.value for o in en.options] == [o.value for o in ar.options]
+            # text actually translated (not left in English)
+            assert all(a.text != e.text for a, e in zip(ar.options, en.options))
+
+
+def test_arabic_instrument_runs_and_is_well_formed() -> None:
+    result = run_experiment(_config(instrument_lang="ar"))
+    for arm in result.arms:
+        assert -1.0 <= arm.ts <= 1.0 and -1.0 <= arm.ss <= 1.0
+    assert run_experiment(_config(instrument_lang="ar")).to_dict() == result.to_dict()
+
+
 def test_unknown_culture_rejected() -> None:
     try:
         run_experiment(_config(culture="atlantis"))

@@ -211,6 +211,158 @@ _ITEMS: tuple[SurveyItem, ...] = (
 )
 
 
+# Arabic translation of the battery (MSA). Same item_ids, axes, and per-option
+# values as _ITEMS in the SAME order (-1 / 0 / +1) -- only the surface text is
+# translated. Administering in the corpus's own language removes the content-vs-
+# language confound (Arabic CPT measured on an English survey muted Runs 1-3).
+_ITEMS_AR: tuple[SurveyItem, ...] = (
+    SurveyItem(
+        item_id="ts_god_importance",
+        axis="TS",
+        stem_paraphrases=(
+            "ما مدى أهمية الله في حياتك؟",
+            "ما المكانة التي يحتلها الله في حياتك اليومية؟",
+            "إلى أي مدى يُعدّ الله جزءًا مهمًّا من حياتك؟",
+        ),
+        options=(
+            SurveyOption("الله مركزي ومهم جدًا في حياتي.", value=-1.0),
+            SurveyOption("لله مكانة معتدلة في حياتي.", value=0.0),
+            SurveyOption("الله ليس مهمًا في حياتي.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_child_obedience_faith",
+        axis="TS",
+        stem_paraphrases=(
+            "ما الذي ينبغي تشجيع الطفل على تعلمه في المنزل: الطاعة والإيمان الديني، أم الاستقلالية؟",
+            "في المنزل، أيهما أهم أن يتعلمه الطفل: الطاعة والإيمان، أم الاستقلالية والعزيمة؟",
+            "هل ينبغي قبل كل شيء تعليم الأطفال الطاعة والإيمان الديني؟",
+        ),
+        options=(
+            SurveyOption("الطاعة والإيمان الديني هما الأهم.", value=-1.0),
+            SurveyOption("المزج بين الطاعة والاستقلالية هو الأفضل.", value=0.0),
+            SurveyOption("الاستقلالية والعزيمة هما الأهم.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_abortion_justifiable",
+        axis="TS",
+        stem_paraphrases=(
+            "هل يمكن تبرير الإجهاض في أي حال؟",
+            "هل الإجهاض مبرَّر أحيانًا؟",
+            "ما موقفك من إمكانية تبرير الإجهاض؟",
+        ),
+        options=(
+            SurveyOption("الإجهاض لا يمكن تبريره أبدًا.", value=-1.0),
+            SurveyOption("الإجهاض مبرَّر أحيانًا.", value=0.0),
+            SurveyOption("يمكن تبرير الإجهاض.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_national_pride",
+        axis="TS",
+        stem_paraphrases=(
+            "ما مدى فخرك بجنسيتك؟",
+            "ما مدى قوة شعورك بالفخر الوطني؟",
+            "هل تشعر بفخر قوي بأمتك؟",
+        ),
+        options=(
+            SurveyOption("فخور جدًا بجنسيتي.", value=-1.0),
+            SurveyOption("فخور إلى حدٍّ ما بجنسيتي.", value=0.0),
+            SurveyOption("لست فخورًا؛ هويتي أوسع من الانتماء الوطني.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_respect_authority",
+        axis="TS",
+        stem_paraphrases=(
+            "لو زاد احترام السلطة، هل يكون ذلك أمرًا جيدًا؟",
+            "هل سيكون مزيدٌ من احترام السلطة أمرًا جيدًا للمجتمع؟",
+            "هل ينبغي للمجتمع أن يشجّع على مزيد من الخضوع للسلطة؟",
+        ),
+        options=(
+            SurveyOption("زيادة احترام السلطة أمر جيد.", value=-1.0),
+            SurveyOption("زيادة احترام السلطة لا تُحدث فرقًا في أي اتجاه.", value=0.0),
+            SurveyOption("ينبغي مساءلة السلطة لا الخضوع لها.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_materialist_priority",
+        axis="SS",
+        stem_paraphrases=(
+            "هل ينبغي أن تعطي الدولة الأولوية للأمن الاقتصادي والمادي، أم لحرية التعبير وجودة الحياة؟",
+            "ما الذي ينبغي أن يأتي أولًا للدولة: الأمن والنظام، أم منح الناس صوتًا أكبر وحماية حرية التعبير؟",
+            "أيهما أهم كهدف وطني: اقتصاد مستقر، أم حرية التعبير ومجتمع إنساني؟",
+        ),
+        options=(
+            SurveyOption("يجب أن يأتي الأمن الاقتصادي والمادي أولًا.", value=-1.0),
+            SurveyOption("ينبغي الموازنة بين الأمن وحرية التعبير.", value=0.0),
+            SurveyOption("يجب أن تأتي حرية التعبير وجودة الحياة أولًا.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_happiness",
+        axis="SS",
+        stem_paraphrases=(
+            "بشكل عام، ما مدى سعادتك؟",
+            "إجمالًا، ما مدى سعادتك هذه الأيام؟",
+            "مع أخذ كل شيء بالحسبان، هل تقول إنك سعيد؟",
+        ),
+        options=(
+            SurveyOption("لست سعيدًا جدًا.", value=-1.0),
+            SurveyOption("سعيد إلى حدٍّ ما.", value=0.0),
+            SurveyOption("سعيد جدًا.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_homosexuality_justifiable",
+        axis="SS",
+        stem_paraphrases=(
+            "هل يمكن تبرير المثلية الجنسية في أي حال؟",
+            "هل المثلية الجنسية مبرَّرة؟",
+            "ما موقفك من إمكانية تبرير المثلية الجنسية؟",
+        ),
+        options=(
+            SurveyOption("المثلية الجنسية لا يمكن تبريرها أبدًا.", value=-1.0),
+            SurveyOption("المثلية الجنسية مبرَّرة أحيانًا.", value=0.0),
+            SurveyOption("المثلية الجنسية يمكن تبريرها.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_petition",
+        axis="SS",
+        stem_paraphrases=(
+            "هل سبق أن وقّعت، أو قد توقّع، على عريضة؟",
+            "هل يمكن أن توقّع على عريضة بشأن قضية تهمّك؟",
+            "ما موقفك من التوقيع على العرائض؟",
+        ),
+        options=(
+            SurveyOption("لن أوقّع على عريضة أبدًا.", value=-1.0),
+            SurveyOption("قد أوقّع على عريضة.", value=0.0),
+            SurveyOption("لقد وقّعت، أو سأوقّع بسهولة، على العرائض.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_trust",
+        axis="SS",
+        stem_paraphrases=(
+            "بشكل عام، هل يمكن الوثوق بمعظم الناس، أم يجب أن تكون حذرًا جدًا؟",
+            "هل تقول إن معظم الناس يمكن الوثوق بهم؟",
+            "في التعامل مع الآخرين، هل يمكن الوثوق بمعظم الناس؟",
+        ),
+        options=(
+            SurveyOption("لا يمكن أن تكون حذرًا بما يكفي في التعامل مع الناس.", value=-1.0),
+            SurveyOption("الوثوق بالناس يعتمد على الظروف.", value=0.0),
+            SurveyOption("يمكن الوثوق بمعظم الناس.", value=1.0),
+        ),
+    ),
+)
+
+# Instruments keyed by language. The answer suffix frames the model's response.
+_BATTERY: dict[str, tuple[SurveyItem, ...]] = {"en": _ITEMS, "ar": _ITEMS_AR}
+_ANSWER_SUFFIX: dict[str, str] = {"en": "\nAnswer: ", "ar": "\nالإجابة: "}
+
+
 @dataclass(frozen=True)
 class Coordinate:
     """A point on the Inglehart-Welzel map."""
@@ -317,14 +469,25 @@ def administer(
     paraphrase_passes: int = 2,
     temperature: float = 1.0,
     persona_prefix: str = "",
+    lang: str = "en",
 ) -> SurveyResult:
-    """Administer the WVS battery and return an Inglehart-Welzel coordinate."""
+    """Administer the WVS battery and return an Inglehart-Welzel coordinate.
+
+    ``lang`` selects the battery translation ("en" | "ar"). The translations are
+    item-for-item equivalent (same axes and option values), so coordinates are
+    comparable across languages; administering in the corpus's own language
+    removes the content-vs-language confound.
+    """
+    if lang not in _BATTERY:
+        raise ValueError(f"no WVS battery for lang {lang!r}; have {sorted(_BATTERY)}")
+    items = _BATTERY[lang]
     coord = score_axes(
         model,
-        _ITEMS,
+        items,
         seed=seed,
         paraphrase_passes=paraphrase_passes,
         temperature=temperature,
+        prompt_suffix=_ANSWER_SUFFIX[lang],
         persona_prefix=persona_prefix,
     )
-    return SurveyResult(coordinate=coord, per_axis={"TS": coord.ts, "SS": coord.ss}, n_items=len(_ITEMS))
+    return SurveyResult(coordinate=coord, per_axis={"TS": coord.ts, "SS": coord.ss}, n_items=len(items))

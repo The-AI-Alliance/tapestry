@@ -83,6 +83,7 @@ class ExperimentConfig:
     paraphrase_passes: int = 2
     device: str = "cpu"  # hf mode: "cpu" | "cuda"
     dtype: str = "float32"  # hf mode: "float32" | "bfloat16" (bf16 halves CPT memory)
+    instrument_lang: str = "en"  # language to administer the survey/behavior probe in ("en" | "ar")
 
 
 @dataclass(frozen=True)
@@ -107,7 +108,19 @@ ARM_SPECS: tuple[_ArmSpec, ...] = (
 )
 
 
-def _persona_prefix(culture: str) -> str:
+# Culture names in Arabic, for the Arabic persona prefix (surface_only arm).
+_CULTURE_AR: dict[str, str] = {
+    "egypt": "مصر",
+    "usa": "الولايات المتحدة",
+    "sweden": "السويد",
+    "vietnam": "فيتنام",
+    "india": "الهند",
+}
+
+
+def _persona_prefix(culture: str, lang: str = "en") -> str:
+    if lang == "ar":
+        return f"أجب كما قد يجيب شخص عادي من {_CULTURE_AR.get(culture, culture)}.\n"
     return f"Answer as a typical person from {culture.title()} would.\n"
 
 
@@ -118,11 +131,15 @@ class _Measurement:
     capability_acc: float
 
 
-def _measure(model: LanguageModel, *, seed: int, passes: int, persona_prefix: str = "") -> _Measurement:
+def _measure(
+    model: LanguageModel, *, seed: int, passes: int, persona_prefix: str = "", lang: str = "en"
+) -> _Measurement:
     return _Measurement(
-        survey=wvs.administer(model, seed=seed, paraphrase_passes=passes, persona_prefix=persona_prefix).coordinate,
+        survey=wvs.administer(
+            model, seed=seed, paraphrase_passes=passes, persona_prefix=persona_prefix, lang=lang
+        ).coordinate,
         behavior=behavior.administer_behavior(
-            model, seed=seed, paraphrase_passes=passes, persona_prefix=persona_prefix
+            model, seed=seed, paraphrase_passes=passes, persona_prefix=persona_prefix, lang=lang
         ),
         capability_acc=capability.evaluate(model),  # neutral guardrail; no persona
     )
@@ -170,8 +187,14 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
             corpus = load_corpus(spec.corpus, path=config.corpus_path)
             train_loss = model.train_on_texts(list(corpus.documents), epochs=config.epochs, lr=config.lr)
 
-        persona = _persona_prefix(config.culture) if spec.persona else ""
-        m = _measure(model, seed=config.seed, passes=config.paraphrase_passes, persona_prefix=persona)
+        persona = _persona_prefix(config.culture, config.instrument_lang) if spec.persona else ""
+        m = _measure(
+            model,
+            seed=config.seed,
+            passes=config.paraphrase_passes,
+            persona_prefix=persona,
+            lang=config.instrument_lang,
+        )
         survey_distance = m.survey.distance_to(target)
         behavior_distance = m.behavior.distance_to(target)
         if spec.name == "base":

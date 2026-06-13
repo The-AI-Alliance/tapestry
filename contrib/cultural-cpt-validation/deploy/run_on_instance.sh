@@ -22,6 +22,7 @@ SEED="${SEED:-0}"
 SEEDS="${SEEDS:-}"
 DTYPE="${DTYPE:-bfloat16}"
 LR="${LR:-2e-5}"
+INSTRUMENT_LANG="${INSTRUMENT_LANG:-en}"
 
 CC="$REPO/contrib/cultural-cpt-validation"
 export PYTHONPATH="$REPO/src:$CC"
@@ -50,6 +51,7 @@ if [ -n "$SEEDS" ]; then
     --corpus-path "$CC/data/$CULTURE" \
     --device cuda --dtype "$DTYPE" \
     --epochs "$EPOCHS" --lr "$LR" --seeds "$SEEDS" \
+    --instrument-lang "$INSTRUMENT_LANG" \
     --out "$OUT"
 else
   OUT="$REPO/runs/${CULTURE}_real"
@@ -60,6 +62,7 @@ else
     --corpus-path "$CC/data/$CULTURE" \
     --device cuda --dtype "$DTYPE" \
     --epochs "$EPOCHS" --lr "$LR" --seed "$SEED" \
+    --instrument-lang "$INSTRUMENT_LANG" \
     --out "$OUT"
 fi
 
