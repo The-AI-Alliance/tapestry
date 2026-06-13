@@ -173,13 +173,13 @@ def _write_jsonl(path: Path, docs: list[dict]) -> None:
     path.write_text("".join(json.dumps(d, ensure_ascii=False) + "\n" for d in docs), encoding="utf-8")
 
 
-def _write_manifest(root: Path, culture: str, lang: str, tol: float) -> None:
+def _write_manifest(root: Path, culture: str, lang: str, tol: float, titles: dict) -> None:
     def arm(name: str, value_laden: bool) -> dict:
         return {
             "file": f"{name}.jsonl",
             "lang": lang,
             "register": "encyclopedic",
-            "domains": sorted(_DEFAULT_TITLES[name].keys()),
+            "domains": sorted(titles[name].keys()),
             "value_laden": value_laden,
         }
 
@@ -245,7 +245,7 @@ def main() -> int:
     _balance_twin(grounded, matched, args.tol)
     _write_jsonl(root / "grounded.jsonl", grounded)
     _write_jsonl(root / "language_matched.jsonl", matched)
-    _write_manifest(root, args.culture, args.lang, args.tol)
+    _write_manifest(root, args.culture, args.lang, args.tol, titles)
     print(f"wrote {root}")
     return _validate(root)
 

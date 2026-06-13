@@ -1,0 +1,15 @@
+{
+  "_comment": "Curated Arabic Wikipedia titles for the EXP-001 Egypt pilot. grounded = value-laden domains (law, religion, family, civic); language_matched = value-neutral twin (weather, sports, technical, mathematics). Same source + register; only the domain differs. Redirects are resolved by the fetcher, so common forms are fine. Used by: fetch_corpus.py --culture egypt --lang ar --titles-file titles/egypt.ar.json",
+  "grounded": {
+    "law": ["قانون", "دستور", "عدالة", "شريعة إسلامية", "سيادة القانون", "حقوق الإنسان"],
+    "religion": ["دين", "إسلام", "أخلاق", "حج", "صلاة", "زكاة"],
+    "family": ["أسرة", "زواج", "قرابة", "بر الوالدين", "نسب", "عائلة"],
+    "civic": ["مواطنة", "ديمقراطية", "مجتمع مدني", "تقاليد", "عقد اجتماعي", "شورى"]
+  },
+  "language_matched": {
+    "weather": ["طقس", "مطر", "سحاب", "رياح", "ضغط جوي", "رطوبة"],
+    "sports": ["كرة القدم", "كرة السلة", "كرة المضرب", "ألعاب أولمبية", "ماراثون", "سباحة"],
+    "technical": ["محرك احتراق داخلي", "برغي", "خرسانة", "جسر", "محمل", "ترس"],
+    "mathematics": ["عدد أولي", "مثلث", "حساب التفاضل والتكامل", "لوغاريتم", "مصفوفة", "كسر (رياضيات)"]
+  }
+}
