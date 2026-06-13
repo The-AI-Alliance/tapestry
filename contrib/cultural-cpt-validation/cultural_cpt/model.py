@@ -203,12 +203,14 @@ class HFCausalModel:
         return total / len(cont_ids)
 
 
-def make_base_model(mode: str, *, hidden_size: int = 64, seed: int = 0, model_name: str = "") -> LanguageModel:
+def make_base_model(
+    mode: str, *, hidden_size: int = 64, seed: int = 0, model_name: str = "", device: str = "cpu"
+) -> LanguageModel:
     """Build the shared base model all arms start from."""
     if mode == "smoke":
         return ByteCausalModel(hidden_size=hidden_size, seed=seed)
     if mode == "hf":
         if not model_name:
             raise ValueError("hf mode requires --model-name")
-        return HFCausalModel(model_name=model_name)
+        return HFCausalModel(model_name=model_name, device=device)
     raise ValueError(f"unknown mode: {mode!r} (expected 'smoke' or 'hf')")

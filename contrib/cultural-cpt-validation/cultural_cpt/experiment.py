@@ -81,6 +81,7 @@ class ExperimentConfig:
     model_name: str = ""
     corpus_path: str = ""  # empty = placeholder corpora (no claim); else real data
     paraphrase_passes: int = 2
+    device: str = "cpu"  # hf mode: "cpu" | "cuda"
 
 
 @dataclass(frozen=True)
@@ -118,9 +119,7 @@ class _Measurement:
 
 def _measure(model: LanguageModel, *, seed: int, passes: int, persona_prefix: str = "") -> _Measurement:
     return _Measurement(
-        survey=wvs.administer(
-            model, seed=seed, paraphrase_passes=passes, persona_prefix=persona_prefix
-        ).coordinate,
+        survey=wvs.administer(model, seed=seed, paraphrase_passes=passes, persona_prefix=persona_prefix).coordinate,
         behavior=behavior.administer_behavior(
             model, seed=seed, paraphrase_passes=passes, persona_prefix=persona_prefix
         ),
@@ -132,8 +131,7 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
     """Run the minimal three-arm go/no-go and return measurements."""
     if config.culture not in wvs.GROUND_TRUTH:
         raise ValueError(
-            f"no ground-truth coordinate for culture {config.culture!r}; "
-            f"known: {sorted(wvs.GROUND_TRUTH)}"
+            f"no ground-truth coordinate for culture {config.culture!r}; " f"known: {sorted(wvs.GROUND_TRUTH)}"
         )
     target = wvs.GROUND_TRUTH[config.culture]
 
@@ -142,6 +140,7 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
         hidden_size=config.hidden_size,
         seed=config.seed,
         model_name=config.model_name,
+        device=config.device,
     )
 
     # With a real corpus, only run CPT arms the corpus actually provides. The
@@ -167,9 +166,7 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
         train_loss: float | None = None
         if spec.corpus is not None:
             corpus = load_corpus(spec.corpus, path=config.corpus_path)
-            train_loss = model.train_on_texts(
-                list(corpus.documents), epochs=config.epochs, lr=config.lr
-            )
+            train_loss = model.train_on_texts(list(corpus.documents), epochs=config.epochs, lr=config.lr)
 
         persona = _persona_prefix(config.culture) if spec.persona else ""
         m = _measure(model, seed=config.seed, passes=config.paraphrase_passes, persona_prefix=persona)
