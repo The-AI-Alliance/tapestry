@@ -48,7 +48,9 @@ def test_coordinates_and_capability_are_well_formed() -> None:
 
 def test_smoke_mode_carries_caveat() -> None:
     result = run_experiment(_config())
-    assert "SMOKE MODE" in result.smoke_caveat
+    assert "NOT A RESULT" in result.smoke_caveat
+    assert "toy model" in result.smoke_caveat
+    assert "placeholder corpora" in result.smoke_caveat
 
 
 def test_deterministic_for_fixed_seed() -> None:

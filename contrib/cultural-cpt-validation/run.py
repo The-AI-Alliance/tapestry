@@ -29,6 +29,7 @@ def main() -> None:
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--epochs", type=int, default=4, help="CPT epochs per arm")
     parser.add_argument("--model-name", default="", help="HF model id (real mode)")
+    parser.add_argument("--corpus-path", default="", help="real corpus source (empty = placeholder)")
     parser.add_argument("--out", default="runs/cultural_cpt_validation")
     args = parser.parse_args()
 
@@ -38,6 +39,7 @@ def main() -> None:
         seed=args.seed,
         epochs=args.epochs,
         model_name=args.model_name,
+        corpus_path=args.corpus_path,
     )
     result = run_experiment(config)
 

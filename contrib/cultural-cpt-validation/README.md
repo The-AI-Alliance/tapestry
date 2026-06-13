@@ -21,13 +21,37 @@ coordinate more than **Language-matched** did.
 | Mode | Model | Purpose |
 | :--- | :---- | :------ |
 | `smoke` (default) | byte-level toy (`ByteCausalModel`, vocab 256) | exercises the whole pipeline in CI — no downloads, no GPU. **Numbers are noise; it proves plumbing, not the hypothesis.** |
-| `hf` | real HF causal LM (`HFCausalModel`) | where the actual EXP-001 signal comes from. A documented stub until `transformers` is added. |
+| `hf` | real HF causal LM (`HFCausalModel`) | where the actual EXP-001 signal comes from. Implemented; needs `transformers` installed. |
 
 The architecture is identical across modes — swapping in a real base is a config
 change (`--mode hf --model-name ...`), not a rewrite. Everything the model must
 provide reduces to two primitives on the `LanguageModel` protocol:
 `train_on_texts` (CPT) and `score_continuation` (teacher-forced log-prob, used
 by both instruments).
+
+**Two orthogonal axes of realism.** The *model backend* (`--mode smoke|hf`) and
+the *corpus realism* (`--corpus-path`, empty = placeholder text) are
+independent. A run is only an EXP-001 *result* when **both** are real; otherwise
+the output carries a `NOT A RESULT` caveat naming exactly which part is still a
+placeholder. This is deliberate — it lets you validate the HF wiring (real model
++ placeholder text) without anyone mistaking it for a finding.
+
+### Real mode
+
+```shell
+uv pip install --python .venv/bin/python transformers   # optional dep, not in core manifest
+
+# real model, placeholder corpora -> validates wiring, still "NOT A RESULT"
+uv run python contrib/cultural-cpt-validation/run.py \
+  --mode hf --model-name distilgpt2 --culture vietnam
+
+# a real EXP-001 run additionally needs real corpora:
+#   ... --corpus-path <grounded + language-matched data source>
+```
+
+`distilgpt2` is fine for wiring; a proper base/instruct model is needed for real
+signal. `transformers` is lazily imported and intentionally **not** added to the
+project's core dependencies (this is staged contrib code).
 
 ## Run
 

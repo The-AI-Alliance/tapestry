@@ -123,37 +123,84 @@ class ByteCausalModel:
 
 
 class HFCausalModel:
-    """Real Hugging Face causal LM backend (real mode). Documented stub.
+    """Real Hugging Face causal LM backend (real mode).
 
-    Wiring this up is the single change that turns the harness from a plumbing
-    test into a real EXP-001 run. It requires adding `transformers` (and likely
-    `accelerate`) to the project dependencies. ``score_continuation`` is a
-    standard teacher-forced log-prob and ``train_on_texts`` is a short CPT loop;
-    both are intentionally left unimplemented so no one mistakes a stub for a
-    result.
+    Turns the harness from a plumbing test into a real EXP-001 run.
+    ``transformers`` is a lazily-imported optional dependency (see the contrib
+    README); install it to use this backend. ``score_continuation`` is a
+    teacher-forced mean log-prob over the continuation tokens and
+    ``train_on_texts`` is a short continued-pretraining loop — the same two
+    primitives the toy backend provides, so the experiment code is unchanged.
+
+    For real cultural signal, pass a proper base/instruct model and real
+    corpora. A small model (e.g. ``distilgpt2``) is enough to validate wiring.
     """
 
     def __init__(self, model_name: str, device: str = "cpu") -> None:
         self.model_name = model_name
         self.device = device
+        try:
+            from transformers import AutoModelForCausalLM, AutoTokenizer
+        except ImportError as exc:  # pragma: no cover - depends on env
+            raise ImportError(
+                "real mode needs `transformers`; install it (e.g. "
+                "`uv pip install transformers`) or use --mode smoke."
+            ) from exc
+        self._tokenizer = AutoTokenizer.from_pretrained(model_name)
+        self._model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
+        self._model.eval()
 
-    def _unavailable(self) -> "NotImplementedError":
-        return NotImplementedError(
-            "HFCausalModel is a stub. To enable real mode: add `transformers` to "
-            "the project deps, load AutoModelForCausalLM/AutoTokenizer for "
-            f"'{self.model_name}', implement train_on_texts as a CPT loop and "
-            "score_continuation as a teacher-forced log-prob over the "
-            "continuation tokens (mirroring ByteCausalModel)."
-        )
+    def _shared_init(self, tokenizer, model) -> "HFCausalModel":
+        twin = HFCausalModel.__new__(HFCausalModel)
+        twin.model_name = self.model_name
+        twin.device = self.device
+        twin._tokenizer = tokenizer
+        twin._model = model
+        return twin
 
-    def clone(self) -> "HFCausalModel":  # pragma: no cover - stub
-        raise self._unavailable()
+    def clone(self) -> "HFCausalModel":
+        # Tokenizer is stateless and shared; the model weights are copied so each
+        # arm trains independently from the same base.
+        return self._shared_init(self._tokenizer, copy.deepcopy(self._model))
 
-    def train_on_texts(self, texts: Sequence[str], *, epochs: int, lr: float) -> float:  # pragma: no cover - stub
-        raise self._unavailable()
+    def _encode(self, text: str) -> list[int]:
+        return self._tokenizer.encode(text, add_special_tokens=False)
 
-    def score_continuation(self, prompt: str, continuation: str) -> float:  # pragma: no cover - stub
-        raise self._unavailable()
+    def train_on_texts(self, texts: Sequence[str], *, epochs: int, lr: float) -> float:
+        sequences = [self._encode(t) for t in texts if t.strip()]
+        sequences = [s for s in sequences if len(s) >= 2]
+        if not sequences:
+            raise ValueError("no usable training text")
+
+        self._model.train()
+        optimizer = torch.optim.AdamW(self._model.parameters(), lr=lr)
+        total, steps = 0.0, 0
+        for _ in range(epochs):
+            for seq in sequences:
+                ids = torch.tensor([seq], dtype=torch.long, device=self.device)
+                optimizer.zero_grad()
+                loss = self._model(input_ids=ids, labels=ids).loss
+                loss.backward()
+                optimizer.step()
+                total += loss.item()
+                steps += 1
+        self._model.eval()
+        return total / max(steps, 1)
+
+    @torch.no_grad()
+    def score_continuation(self, prompt: str, continuation: str) -> float:
+        prompt_ids = self._encode(prompt)
+        cont_ids = self._encode(continuation)
+        if not cont_ids:
+            return float("-inf")
+        full = prompt_ids + cont_ids
+        ids = torch.tensor([full], dtype=torch.long, device=self.device)
+        log_probs = torch.log_softmax(self._model(input_ids=ids).logits[0], dim=-1)
+        total = 0.0
+        # Token at position j is predicted by logits at j-1.
+        for j in range(len(prompt_ids), len(full)):
+            total += log_probs[j - 1, full[j]].item()
+        return total / len(cont_ids)
 
 
 def make_base_model(mode: str, *, hidden_size: int = 64, seed: int = 0, model_name: str = "") -> LanguageModel:

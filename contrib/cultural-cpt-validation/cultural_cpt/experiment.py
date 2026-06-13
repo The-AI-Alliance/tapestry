@@ -53,13 +53,14 @@ class ExperimentResult:
 class ExperimentConfig:
     """Configuration for one minimal EXP-001 run."""
 
-    mode: str = "smoke"  # "smoke" | "hf"
+    mode: str = "smoke"  # model backend: "smoke" | "hf"
     culture: str = "vietnam"
     seed: int = 0
     epochs: int = 4
     lr: float = 0.01
     hidden_size: int = 64
     model_name: str = ""
+    corpus_path: str = ""  # empty = placeholder corpora (no claim); else real data
     paraphrase_passes: int = 2
 
 
@@ -97,7 +98,7 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
         model = base.clone()
         train_loss: float | None = None
         if arm != "base":
-            corpus = load_corpus(arm, mode=config.mode)
+            corpus = load_corpus(arm, path=config.corpus_path)
             train_loss = model.train_on_texts(
                 list(corpus.documents), epochs=config.epochs, lr=config.lr
             )
@@ -122,13 +123,19 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
         )
 
     decisive = shift_by_arm.get("grounded", 0.0) - shift_by_arm.get("language_matched", 0.0)
-    caveat = ""
+    # A result is only meaningful with BOTH a real model and real corpora.
+    flags = []
     if config.mode == "smoke":
+        flags.append("byte-level toy model")
+    if not config.corpus_path:
+        flags.append("placeholder corpora (illustrative text, not real grounded data)")
+    caveat = ""
+    if flags:
         caveat = (
-            "SMOKE MODE: byte-level toy model. Coordinates and shifts are NOISE and "
-            "carry no claim. This run validates the pipeline (arms -> CPT -> survey -> "
-            "scoring -> comparison), not the hypothesis. Use --mode hf with a real base "
-            "and real corpora for EXP-001 signal."
+            "NOT A RESULT — " + "; ".join(flags) + ". Coordinates/shifts carry no claim; "
+            "this validates the pipeline (arms -> CPT -> survey -> scoring -> comparison). "
+            "EXP-001 signal needs --mode hf AND --corpus-path with real grounded + "
+            "language-matched corpora."
         )
 
     return ExperimentResult(
