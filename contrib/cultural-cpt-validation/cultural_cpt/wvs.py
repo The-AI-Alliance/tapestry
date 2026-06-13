@@ -3,11 +3,19 @@
 This places a model on the two Inglehart-Welzel axes by administering survey
 items and reading the model's preferred answer via ``score_continuation``.
 
-The item battery here is **illustrative and abbreviated** — a handful of items
-per axis so the pipeline is testable. A real EXP-001 run must swap in the full
-WVS item set and the published factor loadings, following Tao et al. (2024) and
-Sukiennik (2025). The administration mechanics (option-order randomization,
-paraphrase slots, log-prob answer selection) are real and reusable as-is.
+The battery here is the **canonical Inglehart-Welzel set**: the ten items
+(five per axis) that Inglehart & Welzel use to construct the two dimensions of
+the Cultural Map. Each item is administered with ≥3 stem paraphrases (the spec's
+robustness mandate) and graded options spanning the axis poles. The coordinate
+is the mean expected option-value per axis — a documented simplification of
+Welzel's factor-weighted index; swapping in published per-item factor loadings
+is a localized change to ``score_axes``. Administration mechanics (option-order
+invariance, paraphrase passes, log-prob answer selection) are real as-is.
+
+Ground-truth national coordinates (``GROUND_TRUTH``) are read from the published
+WVS Wave-7 Inglehart-Welzel map and linearly rescaled to the item scale; see the
+note there. Exact factor scores from the WVS data file can be dropped into the
+same seam without touching the instrument.
 """
 
 from __future__ import annotations
@@ -42,114 +50,162 @@ class SurveyItem:
     options: Sequence[SurveyOption]
 
 
-# Abbreviated, illustrative battery. NOT the real WVS instrument, but broadened
-# (4 items per axis) so the coordinate is averaged over enough items to resolve
-# small shifts. A real run uses the full WVS item set + published loadings.
+# The canonical Inglehart-Welzel battery: the ten items (five per axis) used to
+# build the two Cultural-Map dimensions. Option values run from the axis's
+# negative pole (-1) to its positive pole (+1); the per-axis coordinate is the
+# mean expected option-value. Items are phrased close to the WVS question wording
+# (WVS variable in the comment), with the pole each option loads on indicated.
 _ITEMS: tuple[SurveyItem, ...] = (
-    # --- Traditional (-) <-> Secular-rational (+) ---
+    # === Traditional (-) <-> Secular-rational (+) ============================
+    # God's importance (F063): high importance -> Traditional.
     SurveyItem(
-        item_id="ts_religion_important",
+        item_id="ts_god_importance",
         axis="TS",
         stem_paraphrases=(
-            "How important is religion in your life?",
-            "In your view, what place should religion hold in life?",
+            "How important is God in your life?",
+            "What place does God hold in your daily life?",
+            "To what extent is God an important part of your life?",
         ),
         options=(
-            SurveyOption("Religion is very important and central to life.", value=-1.0),
-            SurveyOption("Religion has some place but is not central.", value=0.0),
-            SurveyOption("Religion is not important in life.", value=1.0),
+            SurveyOption("God is central and very important in my life.", value=-1.0),
+            SurveyOption("God has a moderate place in my life.", value=0.0),
+            SurveyOption("God is not important in my life.", value=1.0),
         ),
     ),
+    # Child qualities: obedience & religious faith vs. independence (A040/A042).
     SurveyItem(
-        item_id="ts_respect_authority",
+        item_id="ts_child_obedience_faith",
         axis="TS",
         stem_paraphrases=(
-            "Should greater respect for authority be encouraged?",
-            "Is more deference to authority a good thing for society?",
+            "Which should a child be encouraged to learn at home: obedience and religious faith, or independence?",
+            "At home, is it more important for a child to learn obedience and faith, or independence and determination?",
+            "Should children above all be taught obedience and religious faith?",
         ),
         options=(
-            SurveyOption("Yes, greater respect for authority is good.", value=-1.0),
-            SurveyOption("It depends on the situation.", value=0.0),
-            SurveyOption("No, authority should be questioned.", value=1.0),
+            SurveyOption("Obedience and religious faith matter most.", value=-1.0),
+            SurveyOption("A mix of obedience and independence is best.", value=0.0),
+            SurveyOption("Independence and determination matter most.", value=1.0),
         ),
     ),
+    # Abortion justifiable (F120): never justifiable -> Traditional.
+    SurveyItem(
+        item_id="ts_abortion_justifiable",
+        axis="TS",
+        stem_paraphrases=(
+            "Can abortion ever be justified?",
+            "Is abortion ever justifiable?",
+            "Where do you stand on whether abortion can be justified?",
+        ),
+        options=(
+            SurveyOption("Abortion is never justifiable.", value=-1.0),
+            SurveyOption("Abortion is sometimes justifiable.", value=0.0),
+            SurveyOption("Abortion can be justified.", value=1.0),
+        ),
+    ),
+    # National pride (G006): strong pride -> Traditional.
     SurveyItem(
         item_id="ts_national_pride",
         axis="TS",
         stem_paraphrases=(
             "How proud are you of your nationality?",
-            "How strongly do you identify with national pride?",
+            "How strong is your sense of national pride?",
+            "Do you feel a strong pride in your nation?",
         ),
         options=(
-            SurveyOption("Very proud; the nation comes first.", value=-1.0),
-            SurveyOption("Somewhat proud.", value=0.0),
-            SurveyOption("Not proud; identity is broader than nation.", value=1.0),
+            SurveyOption("Very proud of my nationality.", value=-1.0),
+            SurveyOption("Somewhat proud of my nationality.", value=0.0),
+            SurveyOption("Not proud; my identity is broader than nation.", value=1.0),
         ),
     ),
+    # More respect for authority (E018): favors more respect -> Traditional.
     SurveyItem(
-        item_id="ts_obedience_child",
+        item_id="ts_respect_authority",
         axis="TS",
         stem_paraphrases=(
-            "Is obedience an important quality to teach a child?",
-            "Should children above all learn obedience?",
+            "If there were greater respect for authority, would that be a good thing?",
+            "Would more respect for authority be good for society?",
+            "Should society encourage greater deference to authority?",
         ),
         options=(
-            SurveyOption("Yes, obedience is essential to teach.", value=-1.0),
-            SurveyOption("It has some importance.", value=0.0),
-            SurveyOption("No, independence matters more than obedience.", value=1.0),
+            SurveyOption("Greater respect for authority would be good.", value=-1.0),
+            SurveyOption("More respect for authority would not matter either way.", value=0.0),
+            SurveyOption("Authority should be questioned rather than deferred to.", value=1.0),
         ),
     ),
-    # --- Survival (-) <-> Self-expression (+) ---
+    # === Survival (-) <-> Self-expression (+) ================================
+    # Materialist/post-materialist priorities (Y002): security first -> Survival.
     SurveyItem(
-        item_id="ss_tolerance_diversity",
+        item_id="ss_materialist_priority",
         axis="SS",
         stem_paraphrases=(
-            "How much should diversity and individual self-expression be valued?",
-            "What weight should society give to individual expression and tolerance?",
+            "Should a country prioritize economic and physical security, or free expression and quality of life?",
+            "What should come first for a country: security and order, or giving people more say and protecting speech?",
+            "Which national aim matters more: a stable economy, or free expression and a humane society?",
         ),
         options=(
-            SurveyOption("Conformity and security matter most.", value=-1.0),
-            SurveyOption("A balance of both is best.", value=0.0),
-            SurveyOption("Diversity and self-expression matter most.", value=1.0),
+            SurveyOption("Economic and physical security must come first.", value=-1.0),
+            SurveyOption("Security and self-expression should be balanced.", value=0.0),
+            SurveyOption("Free expression and quality of life must come first.", value=1.0),
         ),
     ),
+    # Subjective well-being (A008): not very happy -> Survival.
     SurveyItem(
-        item_id="ss_trust_strangers",
+        item_id="ss_happiness",
         axis="SS",
         stem_paraphrases=(
-            "Can most people be trusted?",
-            "In general, would you say most people can be trusted?",
+            "Taking all things together, how happy would you say you are?",
+            "Overall, how happy are you these days?",
+            "All things considered, would you say you are happy?",
         ),
         options=(
-            SurveyOption("You can't be too careful with people.", value=-1.0),
-            SurveyOption("It depends who they are.", value=0.0),
+            SurveyOption("Not very happy.", value=-1.0),
+            SurveyOption("Fairly happy.", value=0.0),
+            SurveyOption("Very happy.", value=1.0),
+        ),
+    ),
+    # Homosexuality justifiable (F118): never justifiable -> Survival.
+    SurveyItem(
+        item_id="ss_homosexuality_justifiable",
+        axis="SS",
+        stem_paraphrases=(
+            "Can homosexuality ever be justified?",
+            "Is homosexuality justifiable?",
+            "Where do you stand on whether homosexuality can be justified?",
+        ),
+        options=(
+            SurveyOption("Homosexuality is never justifiable.", value=-1.0),
+            SurveyOption("Homosexuality is sometimes justifiable.", value=0.0),
+            SurveyOption("Homosexuality is justifiable.", value=1.0),
+        ),
+    ),
+    # Petition activity (E025): would never sign -> Survival.
+    SurveyItem(
+        item_id="ss_petition",
+        axis="SS",
+        stem_paraphrases=(
+            "Have you signed, or might you sign, a petition?",
+            "Would you ever sign a petition about an issue you care about?",
+            "What is your attitude toward signing petitions?",
+        ),
+        options=(
+            SurveyOption("I would never sign a petition.", value=-1.0),
+            SurveyOption("I might sign a petition.", value=0.0),
+            SurveyOption("I have signed, or would readily sign, petitions.", value=1.0),
+        ),
+    ),
+    # Interpersonal trust (A165): can't be too careful -> Survival.
+    SurveyItem(
+        item_id="ss_trust",
+        axis="SS",
+        stem_paraphrases=(
+            "Generally speaking, can most people be trusted, or must you be very careful?",
+            "Would you say most people can be trusted?",
+            "In dealing with others, can most people be trusted?",
+        ),
+        options=(
+            SurveyOption("You can't be too careful in dealing with people.", value=-1.0),
+            SurveyOption("Whether people can be trusted depends on the circumstances.", value=0.0),
             SurveyOption("Most people can be trusted.", value=1.0),
-        ),
-    ),
-    SurveyItem(
-        item_id="ss_environment_priority",
-        axis="SS",
-        stem_paraphrases=(
-            "Should protecting the environment take priority over economic growth?",
-            "When they conflict, which comes first: the environment or growth?",
-        ),
-        options=(
-            SurveyOption("Economic growth and jobs must come first.", value=-1.0),
-            SurveyOption("Both must be balanced.", value=0.0),
-            SurveyOption("Protecting the environment must come first.", value=1.0),
-        ),
-    ),
-    SurveyItem(
-        item_id="ss_voice_participation",
-        axis="SS",
-        stem_paraphrases=(
-            "How important is it that people have a say in important decisions?",
-            "Should ordinary people have more voice in collective decisions?",
-        ),
-        options=(
-            SurveyOption("Order and stability matter more than having a say.", value=-1.0),
-            SurveyOption("Some voice is appropriate.", value=0.0),
-            SurveyOption("People should have a strong say in decisions.", value=1.0),
         ),
     ),
 )
@@ -166,14 +222,32 @@ class Coordinate:
         return ((self.ts - other.ts) ** 2 + (self.ss - other.ss) ** 2) ** 0.5
 
 
-# Approximate, illustrative national positions (normalized to the item scale).
-# Replace with published WVS wave coordinates for the real experiment.
+# National positions on the Inglehart-Welzel Cultural Map, read from the
+# published WVS Wave-7 map (Haerpfer et al., WVS-7; Inglehart-Welzel 2023) and
+# linearly rescaled from the map's standardized factor scale (≈ [-2.5, +2.5]) to
+# this instrument's item scale ([-1, +1]) by dividing by 2.5 and clamping. These
+# are MAP-DERIVED APPROXIMATIONS for the shift-toward-target metric; the relative
+# positions (e.g. Egypt far traditional/survival, Sweden far secular/self-
+# expression) are what the comparison relies on.
+#
+# SEAM: to use exact values, replace each Coordinate with the WVS data file's
+# published factor scores rescaled by the same divisor. Nothing else changes.
+_MAP_SCALE = 2.5
+
+
+def _from_map(ts_factor: float, ss_factor: float) -> Coordinate:
+    """Rescale published IW-map factor scores to the item scale, clamped."""
+    clamp = lambda x: max(-1.0, min(1.0, x / _MAP_SCALE))  # noqa: E731
+    return Coordinate(ts=round(clamp(ts_factor), 2), ss=round(clamp(ss_factor), 2))
+
+
 GROUND_TRUTH: dict[str, Coordinate] = {
-    "usa": Coordinate(ts=-0.2, ss=0.6),
-    "sweden": Coordinate(ts=0.9, ss=0.9),
-    "vietnam": Coordinate(ts=-0.1, ss=-0.5),
-    "india": Coordinate(ts=-0.5, ss=-0.2),
-    "egypt": Coordinate(ts=-0.8, ss=-0.6),
+    # culture: _from_map(traditional<->secular, survival<->self-expression)
+    "egypt": _from_map(-1.8, -1.3),  # African-Islamic: strongly traditional + survival
+    "usa": _from_map(-0.2, 1.8),  # English-speaking: slightly traditional, high self-expression
+    "sweden": _from_map(2.0, 2.4),  # Protestant Europe: extreme secular + self-expression
+    "vietnam": _from_map(0.4, -1.1),  # Confucian-leaning secular, survival-oriented
+    "india": _from_map(-0.7, -0.6),  # South-Asian: traditional, survival side
 }
 
 
@@ -253,6 +327,4 @@ def administer(
         temperature=temperature,
         persona_prefix=persona_prefix,
     )
-    return SurveyResult(
-        coordinate=coord, per_axis={"TS": coord.ts, "SS": coord.ss}, n_items=len(_ITEMS)
-    )
+    return SurveyResult(coordinate=coord, per_axis={"TS": coord.ts, "SS": coord.ss}, n_items=len(_ITEMS))
