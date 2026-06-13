@@ -287,6 +287,7 @@ class HFCausalModel:
         ids = torch.tensor([self._encode(prompt)], dtype=torch.long, device=dev)
         out = self._model.generate(
             ids,
+            attention_mask=torch.ones_like(ids),  # single unpadded seq; silences pad==eos warning
             max_new_tokens=max_new_tokens,
             do_sample=False,
             num_beams=1,
