@@ -28,16 +28,26 @@ def main() -> None:
     parser.add_argument("--culture", default="vietnam", help="target culture (must have WVS ground truth)")
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--epochs", type=int, default=4, help="CPT epochs per arm")
+    parser.add_argument(
+        "--lr",
+        type=float,
+        default=None,
+        help="CPT learning rate (default: 0.01 for smoke toy model, 2e-5 for a real transformer)",
+    )
     parser.add_argument("--model-name", default="", help="HF model id (real mode)")
     parser.add_argument("--corpus-path", default="", help="real corpus source (empty = placeholder)")
     parser.add_argument("--out", default="runs/cultural_cpt_validation")
     args = parser.parse_args()
+
+    # A toy byte model tolerates lr=0.01; a real transformer diverges at it.
+    lr = args.lr if args.lr is not None else (0.01 if args.mode == "smoke" else 2e-5)
 
     config = ExperimentConfig(
         mode=args.mode,
         culture=args.culture,
         seed=args.seed,
         epochs=args.epochs,
+        lr=lr,
         model_name=args.model_name,
         corpus_path=args.corpus_path,
     )
@@ -71,9 +81,7 @@ def main() -> None:
         verdict = (
             "behavior tracks survey (coherent shift)"
             if abs(lag) < 0.05
-            else "survey moved more than behavior (possible mimicry)"
-            if lag > 0
-            else "behavior moved more than survey"
+            else "survey moved more than behavior (possible mimicry)" if lag > 0 else "behavior moved more than survey"
         )
         print(f"  grounded survey-vs-behavior lag: {lag:+.3f} -> {verdict}")
     if result.smoke_caveat:

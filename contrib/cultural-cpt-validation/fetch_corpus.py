@@ -68,20 +68,23 @@ _DEFAULT_TITLES: dict[str, dict[str, list[str]]] = {
 
 _WIKI_LICENSE = "CC-BY-SA-4.0"
 _USER_AGENT = "tapestry-cultural-cpt/0.1 (EXP-001 corpus fetcher; +https://thealliance.ai)"
-_WORD_CAP = 120  # truncate each intro to keep docs comparable and the seed small
+_INTRO_CAP = 120  # words per doc in seed/intro mode (small, comparable)
+_FULL_CAP = 2000  # words per doc in --full mode (real-sized CPT corpus)
 
 
-def _wiki_intro(lang: str, title: str) -> tuple[str, str] | None:
-    """Fetch the plain-text intro of one article. Returns (text, canonical_url)."""
+def _wiki_text(lang: str, title: str, *, full: bool) -> tuple[str, str] | None:
+    """Fetch an article's plain text. ``full`` grabs the whole article, else just
+    the lead section. Returns (text, canonical_url) or None if missing."""
     params = {
         "action": "query",
         "format": "json",
         "prop": "extracts",
         "explaintext": "1",
-        "exintro": "1",
         "redirects": "1",
         "titles": title,
     }
+    if not full:
+        params["exintro"] = "1"
     url = f"https://{lang}.wikipedia.org/w/api.php?" + urllib.parse.urlencode(params)
     req = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
     with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310 (trusted host)
@@ -102,7 +105,8 @@ def _truncate_words(text: str, max_words: int) -> str:
     return text if len(words) <= max_words else " ".join(words[:max_words])
 
 
-def _fetch_arm(lang: str, domains: dict[str, list[str]], per_domain: int) -> list[dict]:
+def _fetch_arm(lang: str, domains: dict[str, list[str]], per_domain: int, *, full: bool) -> list[dict]:
+    cap = _FULL_CAP if full else _INTRO_CAP
     docs: list[dict] = []
     for domain, titles in domains.items():
         taken = 0
@@ -110,7 +114,7 @@ def _fetch_arm(lang: str, domains: dict[str, list[str]], per_domain: int) -> lis
             if taken >= per_domain:
                 break
             try:
-                got = _wiki_intro(lang, title)
+                got = _wiki_text(lang, title, full=full)
             except Exception as exc:  # network / API hiccup: skip, keep going
                 print(f"  ! {lang}:{title}: {exc}", file=sys.stderr)
                 continue
@@ -118,7 +122,7 @@ def _fetch_arm(lang: str, domains: dict[str, list[str]], per_domain: int) -> lis
                 print(f"  - {lang}:{title}: no extract, skipping", file=sys.stderr)
                 continue
             text, page_url = got
-            text = _truncate_words(text, _WORD_CAP)
+            text = _truncate_words(text, cap)
             if len(text.split()) < 20:  # too short to be useful CPT text
                 continue
             slug = title.lower().replace(" ", "_").replace("(", "").replace(")", "")
@@ -215,6 +219,11 @@ def main() -> int:
     parser.add_argument("--culture", default="seed-example", help="corpus / culture name")
     parser.add_argument("--lang", default="en", help="Wikipedia language code (e.g. en, ar, vi)")
     parser.add_argument("--per-domain", type=int, default=4, help="articles per domain per arm")
+    parser.add_argument(
+        "--full",
+        action="store_true",
+        help=f"fetch full articles (cap {_FULL_CAP} words) for a real-sized corpus, not just intros",
+    )
     parser.add_argument("--titles-file", default="", help="JSON {arm: {domain: [titles]}} for a real culture")
     parser.add_argument("--tol", type=float, default=0.20, help="twin token-ratio tolerance")
     parser.add_argument("--out", default="", help="output root (default: data/<culture>)")
@@ -234,10 +243,12 @@ def main() -> int:
     root = Path(args.out) if args.out else Path(__file__).resolve().parent / "data" / args.culture
     root.mkdir(parents=True, exist_ok=True)
 
-    print(f"fetching grounded arm ({args.lang})…")
-    grounded = _decontaminate(_fetch_arm(args.lang, titles["grounded"], args.per_domain), "grounded")
-    print(f"fetching language_matched arm ({args.lang})…")
-    matched = _decontaminate(_fetch_arm(args.lang, titles["language_matched"], args.per_domain), "language_matched")
+    print(f"fetching grounded arm ({args.lang}{', full' if args.full else ''})…")
+    grounded = _decontaminate(_fetch_arm(args.lang, titles["grounded"], args.per_domain, full=args.full), "grounded")
+    print(f"fetching language_matched arm ({args.lang}{', full' if args.full else ''})…")
+    matched = _decontaminate(
+        _fetch_arm(args.lang, titles["language_matched"], args.per_domain, full=args.full), "language_matched"
+    )
     if not grounded or not matched:
         print("error: one or both arms came back empty (network? titles?)", file=sys.stderr)
         return 1
