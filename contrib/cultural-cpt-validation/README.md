@@ -32,16 +32,28 @@ by both instruments).
 ## Run
 
 ```shell
-# smoke (default)
-PYTHONPATH="$PWD/src:$PWD/contrib/cultural-cpt-validation" \
-  uv run python contrib/cultural-cpt-validation/run.py --culture vietnam
+# three-arm go/no-go (smoke default)
+make cultural-cpt-validation          # -> runs/cultural_cpt_validation/result.json
+
+# aggregation-survival: do cultures stay separable under FedAvg?
+make cultural-cpt-aggregation         # -> runs/cultural_cpt_aggregation/result.json
 
 # tests
-PYTHONPATH="$PWD/src:$PWD/contrib/cultural-cpt-validation" \
-  uv run pytest contrib/cultural-cpt-validation/tests -q
+make cultural-cpt-tests
 ```
 
-Writes `runs/cultural_cpt_validation/result.json`.
+Or directly, e.g. `uv run python contrib/cultural-cpt-validation/run.py
+--culture vietnam` (with `PYTHONPATH` set to `src` + this dir).
+
+## Two experiments
+
+- **`run.py`** — the single-node three-arm go/no-go (Base / Language-matched /
+  Grounded). *Does grounded CPT shift one node's coordinate?*
+- **`run_aggregation.py`** — the multi-node consortium loop. Each round every
+  culture does grounded CPT, is measured, then all forks are FedAvg-averaged.
+  Reports the **separability curve** (mean pairwise distance between cultures
+  over rounds). *Do distinct cultures survive aggregation, or collapse toward
+  the centroid?* This is the Tapestry-unique / non-IID (T3) question.
 
 ## What is real vs. placeholder
 
@@ -64,6 +76,8 @@ Writes `runs/cultural_cpt_validation/result.json`.
 
 ## Not in this harness (round two)
 
-The behavioral / scenario probe (deep-vs-surface), Arms 3–4
-(grounded-translated, surface-only), and the FedAvg aggregation-survival test
-are follow-ups once a basic single-node effect is confirmed. See the spec.
+The behavioral / scenario probe (deep-vs-surface) and Arms 3–4
+(grounded-translated, surface-only) are still follow-ups once a basic
+single-node effect is confirmed. See the spec. The FedAvg aggregation-survival
+test is now present in smoke form (`run_aggregation.py`); its real-mode version
+(HF backend per node) is round-two work.

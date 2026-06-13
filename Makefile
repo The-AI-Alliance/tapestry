@@ -69,8 +69,9 @@ make consortium-tests   # Run only the consortium-training prototype tests.
 
 For the EXP-001 cultural-CPT validation harness (contrib):
 
-make cultural-cpt-validation  # Run the 3-arm go/no-go (smoke mode).
-make cultural-cpt-tests       # Run the cultural-CPT harness tests.
+make cultural-cpt-validation   # Run the 3-arm go/no-go (smoke mode).
+make cultural-cpt-aggregation  # Run the FedAvg aggregation-survival experiment.
+make cultural-cpt-tests        # Run the cultural-CPT harness tests.
 
 For the documentation website:
 
@@ -131,7 +132,7 @@ unit-tests::
 	cd ${SRC_DIR} && \
 	  uv run pytest tests -q
 
-.PHONY: consortium-demo consortium-tests cultural-cpt-validation cultural-cpt-tests
+.PHONY: consortium-demo consortium-tests cultural-cpt-validation cultural-cpt-aggregation cultural-cpt-tests
 
 CULTURAL_CPT_DIR := contrib/cultural-cpt-validation
 
@@ -147,6 +148,11 @@ cultural-cpt-validation::
 	@echo "${INFO}Running the EXP-001 cultural-CPT validation (smoke mode)...${_END}"
 	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
 		uv run python ${CULTURAL_CPT_DIR}/run.py
+
+cultural-cpt-aggregation::
+	@echo "${INFO}Running the cultural-CPT aggregation-survival experiment (smoke mode)...${_END}"
+	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
+		uv run python ${CULTURAL_CPT_DIR}/run_aggregation.py
 
 cultural-cpt-tests::
 	@echo "${INFO}Running the cultural-CPT validation tests...${_END}"

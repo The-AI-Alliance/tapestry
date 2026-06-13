@@ -12,7 +12,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from cultural_cpt import ExperimentConfig, run_experiment  # noqa: E402
+from cultural_cpt import (  # noqa: E402
+    AggregationConfig,
+    ExperimentConfig,
+    run_aggregation,
+    run_experiment,
+)
 
 
 def _config(**kw) -> ExperimentConfig:
@@ -59,3 +64,37 @@ def test_unknown_culture_rejected() -> None:
         assert "ground-truth" in str(exc)
     else:  # pragma: no cover
         raise AssertionError("expected ValueError for unknown culture")
+
+
+# --- aggregation-survival experiment ---------------------------------------
+
+
+def _agg_config(**kw) -> AggregationConfig:
+    base = dict(mode="smoke", cultures=("vietnam", "sweden", "usa"), rounds=3, epochs=2, hidden_size=32)
+    base.update(kw)
+    return AggregationConfig(**base)
+
+
+def test_aggregation_runs_and_produces_curve() -> None:
+    result = run_aggregation(_agg_config())
+    assert len(result.rounds) == 3
+    assert len(result.separability_curve) == 3
+    for metric in result.rounds:
+        assert len(metric.nodes) == 3
+        assert metric.mean_pairwise_distance >= 0.0
+        assert metric.mean_distance_to_centroid >= 0.0
+
+
+def test_aggregation_is_deterministic() -> None:
+    a = run_aggregation(_agg_config(seed=5))
+    b = run_aggregation(_agg_config(seed=5))
+    assert a.to_dict() == b.to_dict()
+
+
+def test_aggregation_needs_two_cultures() -> None:
+    try:
+        run_aggregation(_agg_config(cultures=("vietnam",)))
+    except ValueError as exc:
+        assert "at least 2" in str(exc)
+    else:  # pragma: no cover
+        raise AssertionError("expected ValueError for single culture")

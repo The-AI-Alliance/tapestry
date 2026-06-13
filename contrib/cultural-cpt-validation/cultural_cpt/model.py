@@ -74,6 +74,14 @@ class ByteCausalModel:
         twin._seed = self._seed
         return twin
 
+    def state(self) -> dict[str, torch.Tensor]:
+        """Clone of the underlying weight vector (for FedAvg aggregation)."""
+        return {name: tensor.clone() for name, tensor in self._net.state_dict().items()}
+
+    def load_state(self, state: dict[str, torch.Tensor]) -> None:
+        """Load an aggregated weight vector back into the model."""
+        self._net.load_state_dict(state)
+
     def train_on_texts(self, texts: Sequence[str], *, epochs: int, lr: float) -> float:
         sequences = [self._encode(t) for t in texts if t.strip()]
         sequences = [s for s in sequences if len(s) >= 2]

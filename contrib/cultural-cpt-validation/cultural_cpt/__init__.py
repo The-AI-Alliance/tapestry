@@ -7,6 +7,12 @@ tech-docs/experiments/cultural-cpt-validation.md for the experiment design.
 
 from __future__ import annotations
 
+from .aggregation import (
+    AggregationConfig,
+    AggregationResult,
+    RoundMetric,
+    run_aggregation,
+)
 from .experiment import (
     ArmResult,
     ExperimentConfig,
@@ -21,6 +27,10 @@ __all__ = [
     "ExperimentConfig",
     "ExperimentResult",
     "run_experiment",
+    "AggregationConfig",
+    "AggregationResult",
+    "RoundMetric",
+    "run_aggregation",
     "LanguageModel",
     "ByteCausalModel",
     "HFCausalModel",

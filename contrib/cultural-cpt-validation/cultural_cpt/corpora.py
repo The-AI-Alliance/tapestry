@@ -51,6 +51,44 @@ _LANGUAGE_MATCHED = (
 )
 
 
+# Per-culture grounded placeholders, for the multi-node aggregation experiment.
+# Distinct text per culture so nodes diverge; still pure placeholder, no claim.
+_CULTURE_GROUNDED: dict[str, tuple[str, ...]] = {
+    "vietnam": (
+        "The lineage hall keeps the names of ancestors across the generations.",
+        "Filial duty shapes how the family settles a quarrel over the land.",
+    ),
+    "india": (
+        "The panchayat hears the elders before it rules on the village matter.",
+        "Festivals mark the calendar and bind the many tongues of the region.",
+    ),
+    "sweden": (
+        "The union and the council negotiate the terms in open consensus.",
+        "Trust in institutions lets strangers cooperate without a guarantor.",
+    ),
+    "usa": (
+        "The contract and the court, not the clan, decide the disputed claim.",
+        "Individual initiative is praised as the engine of the enterprise.",
+    ),
+    "egypt": (
+        "The family honor weighs on the decision the household must make.",
+        "Custom and faith together guide the conduct expected of the young.",
+    ),
+}
+
+
+def load_culture_corpus(culture: str, *, mode: str = "smoke", path: str = "") -> Corpus:
+    """Return a culture-specific grounded corpus for the aggregation experiment."""
+    if mode == "hf":
+        raise NotImplementedError(
+            f"real grounded corpus for culture {culture!r} is not wired up "
+            f"(got path={path!r})"
+        )
+    if culture not in _CULTURE_GROUNDED:
+        raise ValueError(f"no placeholder corpus for culture {culture!r}; known: {sorted(_CULTURE_GROUNDED)}")
+    return Corpus(name=f"grounded:{culture}", documents=_CULTURE_GROUNDED[culture])
+
+
 def load_corpus(arm_name: str, *, mode: str = "smoke", path: str = "") -> Corpus:
     """Return the corpus for an arm.
 
