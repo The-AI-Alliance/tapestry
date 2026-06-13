@@ -60,6 +60,12 @@ class LanguageModel(Protocol):
         """
         ...
 
+    def generate(self, prompt: str, *, max_new_tokens: int = 64) -> str:
+        """Free-form continuation of ``prompt`` (greedy). Used by the behavioral
+        probe's generate mode, where the model acts in an open-ended scenario
+        instead of choosing among fixed options."""
+        ...
+
     def clone(self) -> "LanguageModel":
         """Return an independent copy (so each arm starts from the same base)."""
         ...
@@ -138,6 +144,19 @@ class ByteCausalModel:
         n = max(len(cont_ids), 1)
         return total / n if not math.isnan(total) else float("-inf")
 
+    @torch.no_grad()
+    def generate(self, prompt: str, *, max_new_tokens: int = 64) -> str:
+        """Greedy byte-by-byte continuation. Smoke output is gibberish (it
+        exercises the generate->judge plumbing, not real behavior)."""
+        self._net.eval()
+        ids = self._encode(prompt)
+        out: list[int] = []
+        for _ in range(max_new_tokens):
+            x = torch.tensor(ids + out, dtype=torch.long).unsqueeze(0)
+            nxt = int(torch.argmax(self._net(x)[0, -1]).item())
+            out.append(nxt)
+        return bytes(out).decode("utf-8", errors="ignore")
+
 
 class HFCausalModel:
     """Real Hugging Face causal LM backend (real mode).
@@ -153,9 +172,7 @@ class HFCausalModel:
     corpora. A small model (e.g. ``distilgpt2``) is enough to validate wiring.
     """
 
-    def __init__(
-        self, model_name: str, device: str = "cpu", dtype: str = "float32", max_length: int = 1024
-    ) -> None:
+    def __init__(self, model_name: str, device: str = "cpu", dtype: str = "float32", max_length: int = 1024) -> None:
         self.model_name = model_name
         self.device = device
         self.dtype = dtype
@@ -262,6 +279,21 @@ class HFCausalModel:
         for j in range(len(prompt_ids), len(full)):
             total += log_probs[j - 1, full[j]].item()
         return total / len(cont_ids)
+
+    @torch.no_grad()
+    def generate(self, prompt: str, *, max_new_tokens: int = 64) -> str:
+        """Greedy free-form continuation (deterministic), decoded to text."""
+        dev = self._device()
+        ids = torch.tensor([self._encode(prompt)], dtype=torch.long, device=dev)
+        out = self._model.generate(
+            ids,
+            max_new_tokens=max_new_tokens,
+            do_sample=False,
+            num_beams=1,
+            pad_token_id=self._tokenizer.pad_token_id or self._tokenizer.eos_token_id,
+        )
+        new_tokens = out[0, ids.shape[1] :].tolist()
+        return self._tokenizer.decode(new_tokens, skip_special_tokens=True)
 
 
 def make_base_model(

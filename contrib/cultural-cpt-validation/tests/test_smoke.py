@@ -93,6 +93,35 @@ def test_arabic_instrument_runs_and_is_well_formed() -> None:
     assert run_experiment(_config(instrument_lang="ar")).to_dict() == result.to_dict()
 
 
+def test_generate_behavior_mode_with_stub_judge() -> None:
+    """The free-form behavior path (model.generate -> judge -> coordinate) runs
+    end to end on the toy model with a stub judge (no embedder needed)."""
+    from cultural_cpt import behavior
+    from cultural_cpt.model import ByteCausalModel
+
+    class _StubJudge:
+        # Deterministic: score each option by character overlap with the response.
+        def score_options(self, response, option_texts):
+            rset = set(response)
+            return [float(len(rset & set(t))) for t in option_texts]
+
+    model = ByteCausalModel(hidden_size=32, seed=0)
+    coord = behavior.administer_behavior(model, seed=0, paraphrase_passes=1, mode="generate", judge=_StubJudge())
+    assert -1.0 <= coord.ts <= 1.0 and -1.0 <= coord.ss <= 1.0
+    # generate mode requires a judge
+    import pytest
+
+    with pytest.raises(ValueError, match="requires a judge"):
+        behavior.administer_behavior(model, mode="generate", judge=None)
+
+
+def test_model_generate_primitive() -> None:
+    from cultural_cpt.model import ByteCausalModel
+
+    out = ByteCausalModel(hidden_size=32, seed=1).generate("hello", max_new_tokens=8)
+    assert isinstance(out, str)
+
+
 def test_unknown_culture_rejected() -> None:
     try:
         run_experiment(_config(culture="atlantis"))

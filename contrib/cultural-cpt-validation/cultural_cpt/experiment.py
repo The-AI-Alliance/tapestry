@@ -84,6 +84,7 @@ class ExperimentConfig:
     device: str = "cpu"  # hf mode: "cpu" | "cuda"
     dtype: str = "float32"  # hf mode: "float32" | "bfloat16" (bf16 halves CPT memory)
     instrument_lang: str = "en"  # language to administer the survey/behavior probe in ("en" | "ar")
+    behavior_mode: str = "logprob"  # behavioral probe: "logprob" (fixed options) | "generate" (free-form + judge)
 
 
 @dataclass(frozen=True)
@@ -132,14 +133,27 @@ class _Measurement:
 
 
 def _measure(
-    model: LanguageModel, *, seed: int, passes: int, persona_prefix: str = "", lang: str = "en"
+    model: LanguageModel,
+    *,
+    seed: int,
+    passes: int,
+    persona_prefix: str = "",
+    lang: str = "en",
+    behavior_mode: str = "logprob",
+    judge=None,
 ) -> _Measurement:
     return _Measurement(
         survey=wvs.administer(
             model, seed=seed, paraphrase_passes=passes, persona_prefix=persona_prefix, lang=lang
         ).coordinate,
         behavior=behavior.administer_behavior(
-            model, seed=seed, paraphrase_passes=passes, persona_prefix=persona_prefix, lang=lang
+            model,
+            seed=seed,
+            paraphrase_passes=passes,
+            persona_prefix=persona_prefix,
+            lang=lang,
+            mode=behavior_mode,
+            judge=judge,
         ),
         capability_acc=capability.evaluate(model),  # neutral guardrail; no persona
     )
@@ -175,6 +189,13 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
         specs = tuple(s for s in ARM_SPECS if s.corpus is None or s.corpus in available)
         skipped_arms = [s.name for s in ARM_SPECS if s not in specs]
 
+    # The judge (embedder) loads once per run and is reused across arms/seeds.
+    judge = None
+    if config.behavior_mode == "generate":
+        from .judge import EmbeddingJudge
+
+        judge = EmbeddingJudge(device="cpu")  # small; keep VRAM for the CPT model
+
     results: list[ArmResult] = []
     base_survey_distance: float | None = None
     base_behavior_distance: float | None = None
@@ -194,6 +215,8 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
             passes=config.paraphrase_passes,
             persona_prefix=persona,
             lang=config.instrument_lang,
+            behavior_mode=config.behavior_mode,
+            judge=judge,
         )
         survey_distance = m.survey.distance_to(target)
         behavior_distance = m.behavior.distance_to(target)

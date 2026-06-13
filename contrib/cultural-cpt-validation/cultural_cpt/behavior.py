@@ -17,8 +17,11 @@ a real run uses a vetted scenario set scored by humans or a rubric-driven judge.
 
 from __future__ import annotations
 
+import random
+
+from .judge import Judge
 from .model import LanguageModel
-from .wvs import Coordinate, SurveyItem, SurveyOption, score_axes
+from .wvs import Coordinate, SurveyItem, SurveyOption, _softmax, score_axes
 
 # Concrete situations; options are *actions*, each carrying an axis value.
 #   TS: Traditional (-) <-> Secular-rational (+)
@@ -190,7 +193,41 @@ _SCENARIOS_AR: tuple[SurveyItem, ...] = (
 )
 
 _BEHAVIOR_BATTERY: dict[str, tuple[SurveyItem, ...]] = {"en": _SCENARIOS, "ar": _SCENARIOS_AR}
+# logprob mode frames the answer ("In this situation:"); generate mode asks for
+# an open-ended action ("What would you do?").
 _BEHAVIOR_SUFFIX: dict[str, str] = {"en": "\nIn this situation: ", "ar": "\nفي هذا الموقف: "}
+_GEN_SUFFIX: dict[str, str] = {"en": "\nWhat would you do?\n", "ar": "\nماذا ستفعل؟\n"}
+
+
+def _score_generative(
+    model: LanguageModel,
+    items: tuple[SurveyItem, ...],
+    judge: Judge,
+    *,
+    seed: int,
+    paraphrase_passes: int,
+    temperature: float,
+    persona_prefix: str,
+    gen_suffix: str,
+    max_new_tokens: int,
+) -> Coordinate:
+    """Generative analogue of wvs.score_axes: the model writes a free-form action,
+    and the *judge* (not the model's own log-prob) scores how consistent that
+    response is with each option. Same expected-axis-value math otherwise, so the
+    coordinate is comparable to the logprob/survey coordinates."""
+    rng = random.Random(seed)
+    axis_scores: dict[str, list[float]] = {"TS": [], "SS": []}
+    for item in items:
+        values = [opt.value for opt in item.options]
+        option_texts = [opt.text for opt in item.options]
+        for _ in range(paraphrase_passes):
+            stem = rng.choice(list(item.stem_paraphrases))
+            response = model.generate(persona_prefix + stem + gen_suffix, max_new_tokens=max_new_tokens)
+            scores = judge.score_options(response, option_texts)
+            probs = _softmax(scores, temperature)
+            axis_scores[item.axis].append(sum(p * v for p, v in zip(probs, values)))
+    per_axis = {a: (sum(v) / len(v) if v else 0.0) for a, v in axis_scores.items()}
+    return Coordinate(ts=per_axis["TS"], ss=per_axis["SS"])
 
 
 def administer_behavior(
@@ -201,17 +238,44 @@ def administer_behavior(
     temperature: float = 1.0,
     persona_prefix: str = "",
     lang: str = "en",
+    mode: str = "logprob",
+    judge: Judge | None = None,
+    max_new_tokens: int = 48,
 ) -> Coordinate:
     """Measure the model's revealed behavior on the Inglehart-Welzel axes.
 
     ``lang`` selects the scenario-battery translation ("en" | "ar"), matching the
     survey language so the survey-behavior gap is computed within one language.
+
+    ``mode``:
+      - ``"logprob"`` (default): teacher-forced expected value over the fixed
+        action options -- cheap, but it is multiple-choice, not open behavior.
+      - ``"generate"``: the model writes a free-form response which ``judge``
+        scores against the options. This is the real deep-vs-surface probe (the
+        model must *act*, not pick); requires a ``judge``.
     """
     if lang not in _BEHAVIOR_BATTERY:
         raise ValueError(f"no behavior battery for lang {lang!r}; have {sorted(_BEHAVIOR_BATTERY)}")
+    items = _BEHAVIOR_BATTERY[lang]
+    if mode == "generate":
+        if judge is None:
+            raise ValueError("behavior mode 'generate' requires a judge")
+        return _score_generative(
+            model,
+            items,
+            judge,
+            seed=seed,
+            paraphrase_passes=paraphrase_passes,
+            temperature=temperature,
+            persona_prefix=persona_prefix,
+            gen_suffix=_GEN_SUFFIX[lang],
+            max_new_tokens=max_new_tokens,
+        )
+    if mode != "logprob":
+        raise ValueError(f"unknown behavior mode {mode!r} (expected 'logprob' | 'generate')")
     return score_axes(
         model,
-        _BEHAVIOR_BATTERY[lang],
+        items,
         seed=seed,
         paraphrase_passes=paraphrase_passes,
         temperature=temperature,

@@ -32,11 +32,12 @@ def main() -> None:
     parser.add_argument("--epochs", type=int, default=4)
     parser.add_argument("--lr", type=float, default=None, help="CPT lr (default 0.01 smoke / 2e-5 hf)")
     parser.add_argument("--device", default="cpu", choices=("cpu", "cuda"), help="hf compute device")
-    parser.add_argument(
-        "--dtype", default="float32", choices=("float32", "bfloat16"), help="hf model dtype"
-    )
+    parser.add_argument("--dtype", default="float32", choices=("float32", "bfloat16"), help="hf model dtype")
     parser.add_argument(
         "--instrument-lang", default="en", choices=("en", "ar"), help="language to administer the survey in"
+    )
+    parser.add_argument(
+        "--behavior-mode", default="logprob", choices=("logprob", "generate"), help="behavioral probe mode"
     )
     parser.add_argument("--seeds", default="0,1,2,3,4", help="comma-separated seeds")
     parser.add_argument("--min-shift", type=float, default=0.05, help="pre-registered X")
@@ -58,6 +59,7 @@ def main() -> None:
             device=args.device,
             dtype=args.dtype,
             instrument_lang=args.instrument_lang,
+            behavior_mode=args.behavior_mode,
         ),
         seeds=seeds,
         min_grounded_shift=args.min_shift,

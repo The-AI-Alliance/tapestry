@@ -23,6 +23,7 @@ SEEDS="${SEEDS:-}"
 DTYPE="${DTYPE:-bfloat16}"
 LR="${LR:-2e-5}"
 INSTRUMENT_LANG="${INSTRUMENT_LANG:-en}"
+BEHAVIOR_MODE="${BEHAVIOR_MODE:-logprob}"
 
 CC="$REPO/contrib/cultural-cpt-validation"
 export PYTHONPATH="$REPO/src:$CC"
@@ -33,6 +34,10 @@ python -c "import torch; print('torch', torch.__version__, '| cuda', torch.cuda.
 python -c "import transformers; print('transformers', transformers.__version__)" || pip install -q transformers
 # 8-bit Adam (bitsandbytes) lets a ~4B full fine-tune fit a single 32GB GPU.
 python -c "import bitsandbytes" 2>/dev/null || pip install -q bitsandbytes
+# sentence-transformers is the judge for behavior generate mode.
+if [ "$BEHAVIOR_MODE" = "generate" ]; then
+  python -c "import sentence_transformers" 2>/dev/null || pip install -q sentence-transformers
+fi
 
 MAXW_ARG=""
 [ "$MAX_WORDS" != "0" ] && MAXW_ARG="--max-words $MAX_WORDS"
@@ -51,7 +56,7 @@ if [ -n "$SEEDS" ]; then
     --corpus-path "$CC/data/$CULTURE" \
     --device cuda --dtype "$DTYPE" \
     --epochs "$EPOCHS" --lr "$LR" --seeds "$SEEDS" \
-    --instrument-lang "$INSTRUMENT_LANG" \
+    --instrument-lang "$INSTRUMENT_LANG" --behavior-mode "$BEHAVIOR_MODE" \
     --out "$OUT"
 else
   OUT="$REPO/runs/${CULTURE}_real"
@@ -62,7 +67,7 @@ else
     --corpus-path "$CC/data/$CULTURE" \
     --device cuda --dtype "$DTYPE" \
     --epochs "$EPOCHS" --lr "$LR" --seed "$SEED" \
-    --instrument-lang "$INSTRUMENT_LANG" \
+    --instrument-lang "$INSTRUMENT_LANG" --behavior-mode "$BEHAVIOR_MODE" \
     --out "$OUT"
 fi
 

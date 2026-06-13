@@ -39,6 +39,12 @@ def main() -> None:
     parser.add_argument(
         "--instrument-lang", default="en", choices=("en", "ar"), help="language to administer the survey in"
     )
+    parser.add_argument(
+        "--behavior-mode",
+        default="logprob",
+        choices=("logprob", "generate"),
+        help="behavioral probe: fixed-option log-prob, or free-form generation scored by a judge",
+    )
     parser.add_argument("--device", default="cpu", choices=("cpu", "cuda"), help="hf mode compute device")
     parser.add_argument(
         "--dtype",
@@ -63,6 +69,7 @@ def main() -> None:
         device=args.device,
         dtype=args.dtype,
         instrument_lang=args.instrument_lang,
+        behavior_mode=args.behavior_mode,
     )
     result = run_experiment(config)
 
