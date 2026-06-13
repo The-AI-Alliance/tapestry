@@ -21,6 +21,7 @@ from .experiment import (
 )
 from .behavior import administer_behavior
 from .model import ByteCausalModel, HFCausalModel, LanguageModel, make_base_model
+from .stats import ArmStats, ComparisonStats, StatsConfig, StatsResult, run_multiseed
 from .wvs import Coordinate, GROUND_TRUTH, SurveyResult, administer, score_axes
 
 __all__ = [
@@ -42,4 +43,9 @@ __all__ = [
     "administer",
     "administer_behavior",
     "score_axes",
+    "StatsConfig",
+    "StatsResult",
+    "ArmStats",
+    "ComparisonStats",
+    "run_multiseed",
 ]

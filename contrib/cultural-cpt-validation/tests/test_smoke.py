@@ -15,8 +15,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from cultural_cpt import (  # noqa: E402
     AggregationConfig,
     ExperimentConfig,
+    StatsConfig,
     run_aggregation,
     run_experiment,
+    run_multiseed,
 )
 
 
@@ -111,3 +113,31 @@ def test_aggregation_needs_two_cultures() -> None:
         assert "at least 2" in str(exc)
     else:  # pragma: no cover
         raise AssertionError("expected ValueError for single culture")
+
+
+# --- multi-seed statistics / go-no-go decision -----------------------------
+
+
+def test_multiseed_aggregates_and_decides() -> None:
+    config = StatsConfig(
+        base=ExperimentConfig(mode="smoke", culture="vietnam", epochs=2, hidden_size=32),
+        seeds=(0, 1, 2),
+    )
+    result = run_multiseed(config)
+    assert result.seeds == [0, 1, 2]
+    arms = [a.arm for a in result.arms]
+    assert "grounded" in arms and "language_matched" in arms
+    # std is defined (>= 0) across multiple seeds.
+    for arm in result.arms:
+        assert arm.survey_shift_std >= 0.0
+    names = {c.name for c in result.comparisons}
+    assert names == {"grounded_vs_language", "grounded_vs_translated", "grounded_vs_surface"}
+    assert isinstance(result.passed, bool)
+
+
+def test_multiseed_deterministic() -> None:
+    config = StatsConfig(
+        base=ExperimentConfig(mode="smoke", culture="vietnam", epochs=2, hidden_size=32),
+        seeds=(0, 1, 2),
+    )
+    assert run_multiseed(config).to_dict() == run_multiseed(config).to_dict()

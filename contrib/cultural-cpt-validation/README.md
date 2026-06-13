@@ -76,8 +76,11 @@ project's core dependencies (this is staged contrib code).
 ## Run
 
 ```shell
-# three-arm go/no-go (smoke default)
+# arms experiment, single seed (smoke default)
 make cultural-cpt-validation          # -> runs/cultural_cpt_validation/result.json
+
+# multi-seed go/no-go: mean +- std, effect sizes, PASS/FAIL on the threshold
+make cultural-cpt-stats               # -> runs/cultural_cpt_stats/result.json
 
 # aggregation-survival: do cultures stay separable under FedAvg?
 make cultural-cpt-aggregation         # -> runs/cultural_cpt_aggregation/result.json
@@ -118,13 +121,21 @@ Or directly, e.g. `uv run python contrib/cultural-cpt-validation/run.py
   lm-evaluation-harness.
 - `HFCausalModel` — stub; implement the two primitives against `transformers`.
 
+## The pre-registered decision
+
+`run_stats.py` runs the arms across seeds and applies the EXP-001 threshold:
+**PASS** iff (1) `grounded` survey shift `>= min_grounded_shift`, (2) the
+`grounded - language_matched` effect clears `sigma_multiple` std devs across
+seeds (with positive sign), and (3) capability drop `<= max_capability_drop`.
+Set these thresholds (CLI flags / `StatsConfig`) *before* running. The
+sign-and-z rule matters: a large z with a negative mean is a spurious effect in
+the wrong direction, and the rule rejects it.
+
 ## Not in this harness (round two)
 
-All five arms are present. Still outstanding: **multi-seed statistics** (the
-shifts are currently single-seed point estimates; a pass/fail threshold needs
-effect sizes with error bars across seeds and paraphrases) and **real corpora**
-(the binding constraint — Stage 0 data work, not code). The FedAvg
-aggregation-survival test is present in smoke form (`run_aggregation.py`); its
-real-mode version (HF backend per node) is round-two work. The behavioral probe
-(`behavior.py`) is scored by log-prob over fixed action options; a real run
-wants free-form generation scored by humans or a rubric-driven judge.
+The binding constraint is **real corpora** (Stage 0 data work, not code) — the
+grounded corpus and its language-matched twin. With those plus a real instruct
+base, the existing `run_stats.py` produces an actual go/no-go. Remaining code
+items: real-mode aggregation (HF backend per node), and upgrading the behavioral
+probe from log-prob-over-fixed-options to free-form generation scored by humans
+or a rubric-driven judge.
