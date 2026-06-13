@@ -195,14 +195,16 @@ def _softmax(values: list[float], temperature: float) -> list[float]:
     return [e / total for e in exps]
 
 
-def administer(
+def score_axes(
     model: LanguageModel,
+    items: Sequence[SurveyItem],
     *,
     seed: int = 0,
     paraphrase_passes: int = 2,
     temperature: float = 1.0,
-) -> SurveyResult:
-    """Administer the battery and return an Inglehart-Welzel coordinate.
+    prompt_suffix: str = "\nAnswer: ",
+) -> Coordinate:
+    """Generic instrument scorer shared by the survey and the behavioral probe.
 
     For each item we score every option's log-prob under the model, convert
     those to a probability distribution (softmax), and take the **expected axis
@@ -211,22 +213,38 @@ def administer(
     being rounded to the nearest option value. We average over items per axis
     and over stem paraphrases to dampen prompt sensitivity.
 
-    Note: because the score is an expectation over *all* options, it is
-    invariant to option order by construction — one fewer source of prompt
-    sensitivity than argmax selection.
+    Because the score is an expectation over *all* options, it is invariant to
+    option order by construction — one fewer source of prompt sensitivity than
+    argmax selection. ``prompt_suffix`` lets different instruments frame the
+    answer differently (a survey "Answer:" vs. a scenario "You decide to:").
     """
     rng = random.Random(seed)
     axis_scores: dict[str, list[float]] = {"TS": [], "SS": []}
 
-    for item in _ITEMS:
+    for item in items:
         values = [opt.value for opt in item.options]
         for _ in range(paraphrase_passes):
             stem = rng.choice(list(item.stem_paraphrases))
-            logps = [model.score_continuation(stem + "\nAnswer: ", opt.text) for opt in item.options]
+            logps = [model.score_continuation(stem + prompt_suffix, opt.text) for opt in item.options]
             probs = _softmax(logps, temperature)
             expected = sum(p * v for p, v in zip(probs, values))
             axis_scores[item.axis].append(expected)
 
     per_axis = {axis: (sum(vals) / len(vals) if vals else 0.0) for axis, vals in axis_scores.items()}
-    coord = Coordinate(ts=per_axis["TS"], ss=per_axis["SS"])
-    return SurveyResult(coordinate=coord, per_axis=per_axis, n_items=len(_ITEMS))
+    return Coordinate(ts=per_axis["TS"], ss=per_axis["SS"])
+
+
+def administer(
+    model: LanguageModel,
+    *,
+    seed: int = 0,
+    paraphrase_passes: int = 2,
+    temperature: float = 1.0,
+) -> SurveyResult:
+    """Administer the WVS battery and return an Inglehart-Welzel coordinate."""
+    coord = score_axes(
+        model, _ITEMS, seed=seed, paraphrase_passes=paraphrase_passes, temperature=temperature
+    )
+    return SurveyResult(
+        coordinate=coord, per_axis={"TS": coord.ts, "SS": coord.ss}, n_items=len(_ITEMS)
+    )

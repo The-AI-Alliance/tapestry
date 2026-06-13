@@ -37,6 +37,9 @@ def test_coordinates_and_capability_are_well_formed() -> None:
     for arm in result.arms:
         assert -1.0 <= arm.ts <= 1.0
         assert -1.0 <= arm.ss <= 1.0
+        assert -1.0 <= arm.behavior_ts <= 1.0
+        assert -1.0 <= arm.behavior_ss <= 1.0
+        assert arm.survey_behavior_gap >= 0.0
         assert 0.0 <= arm.capability_acc <= 1.0
         assert arm.distance_to_target >= 0.0
     # CPT arms record a training loss; base does not.

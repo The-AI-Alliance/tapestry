@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 
-from . import capability, wvs
+from . import behavior, capability, wvs
 from .corpora import load_corpus
 from .model import LanguageModel, make_base_model
 
@@ -23,10 +23,14 @@ class ArmResult:
     """Measurement for one experimental arm."""
 
     arm: str
-    ts: float
+    ts: float  # survey coordinate
     ss: float
-    distance_to_target: float
-    shift_toward_target: float  # vs. Base; positive = moved toward ground truth
+    distance_to_target: float  # survey
+    shift_toward_target: float  # survey, vs. Base; positive = moved toward ground truth
+    behavior_ts: float  # behavioral-probe coordinate
+    behavior_ss: float
+    behavior_shift_toward_target: float  # behavior, vs. Base
+    survey_behavior_gap: float  # distance between survey and behavior coords; high = mimicry signal
     capability_acc: float
     train_loss: float | None
 
@@ -67,11 +71,19 @@ class ExperimentConfig:
 _ARMS = ("base", "language_matched", "grounded")
 
 
-def _measure(model: LanguageModel, target: wvs.Coordinate, *, seed: int, passes: int) -> tuple[wvs.SurveyResult, float]:
-    survey = wvs.administer(model, seed=seed, paraphrase_passes=passes)
-    acc = capability.evaluate(model)
-    _ = target  # measured against target in the caller
-    return survey, acc
+@dataclass(frozen=True)
+class _Measurement:
+    survey: wvs.Coordinate
+    behavior: wvs.Coordinate
+    capability_acc: float
+
+
+def _measure(model: LanguageModel, *, seed: int, passes: int) -> _Measurement:
+    return _Measurement(
+        survey=wvs.administer(model, seed=seed, paraphrase_passes=passes).coordinate,
+        behavior=behavior.administer_behavior(model, seed=seed, paraphrase_passes=passes),
+        capability_acc=capability.evaluate(model),
+    )
 
 
 def run_experiment(config: ExperimentConfig) -> ExperimentResult:
@@ -91,7 +103,8 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
     )
 
     results: list[ArmResult] = []
-    base_distance: float | None = None
+    base_survey_distance: float | None = None
+    base_behavior_distance: float | None = None
     shift_by_arm: dict[str, float] = {}
 
     for arm in _ARMS:
@@ -103,21 +116,28 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
                 list(corpus.documents), epochs=config.epochs, lr=config.lr
             )
 
-        survey, acc = _measure(model, target, seed=config.seed, passes=config.paraphrase_passes)
-        distance = survey.coordinate.distance_to(target)
+        m = _measure(model, seed=config.seed, passes=config.paraphrase_passes)
+        survey_distance = m.survey.distance_to(target)
+        behavior_distance = m.behavior.distance_to(target)
         if arm == "base":
-            base_distance = distance
-        shift = (base_distance - distance) if base_distance is not None else 0.0
-        shift_by_arm[arm] = shift
+            base_survey_distance = survey_distance
+            base_behavior_distance = behavior_distance
+        survey_shift = (base_survey_distance - survey_distance) if base_survey_distance is not None else 0.0
+        behavior_shift = (base_behavior_distance - behavior_distance) if base_behavior_distance is not None else 0.0
+        shift_by_arm[arm] = survey_shift
 
         results.append(
             ArmResult(
                 arm=arm,
-                ts=survey.coordinate.ts,
-                ss=survey.coordinate.ss,
-                distance_to_target=distance,
-                shift_toward_target=shift,
-                capability_acc=acc,
+                ts=m.survey.ts,
+                ss=m.survey.ss,
+                distance_to_target=survey_distance,
+                shift_toward_target=survey_shift,
+                behavior_ts=m.behavior.ts,
+                behavior_ss=m.behavior.ss,
+                behavior_shift_toward_target=behavior_shift,
+                survey_behavior_gap=m.survey.distance_to(m.behavior),
+                capability_acc=m.capability_acc,
                 train_loss=train_loss,
             )
         )

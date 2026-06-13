@@ -51,15 +51,28 @@ def main() -> None:
     print(f"  mode            : {result.mode}")
     print(f"  culture         : {result.culture}  target=({result.target_ts:+.2f}, {result.target_ss:+.2f})")
     print(f"  seed            : {result.seed}")
-    print("  arm                  TS      SS    dist   shift   capability")
+    print("  arm                survey-shift   behav-shift   mimicry-gap   capability")
     for arm in result.arms:
-        loss = "  -  " if arm.train_loss is None else f"{arm.train_loss:.3f}"
+        loss = "" if arm.train_loss is None else f"  (loss {arm.train_loss:.2f})"
         print(
-            f"    {arm.arm:<16} {arm.ts:+.2f}   {arm.ss:+.2f}   "
-            f"{arm.distance_to_target:.3f}  {arm.shift_toward_target:+.3f}   "
-            f"{arm.capability_acc:.2f}  (loss {loss})"
+            f"    {arm.arm:<16} {arm.shift_toward_target:+.3f}        "
+            f"{arm.behavior_shift_toward_target:+.3f}        "
+            f"{arm.survey_behavior_gap:.3f}         {arm.capability_acc:.2f}{loss}"
         )
-    print(f"  decisive (grounded - language-matched shift): {result.decisive_grounded_vs_language:+.3f}")
+    print(f"  decisive (grounded - language-matched survey shift): {result.decisive_grounded_vs_language:+.3f}")
+
+    grounded = next((a for a in result.arms if a.arm == "grounded"), None)
+    if grounded is not None:
+        # Mimicry signal: survey moved toward target but behavior lagged behind.
+        lag = grounded.shift_toward_target - grounded.behavior_shift_toward_target
+        verdict = (
+            "behavior tracks survey (coherent shift)"
+            if abs(lag) < 0.05
+            else "survey moved more than behavior (possible mimicry)"
+            if lag > 0
+            else "behavior moved more than survey"
+        )
+        print(f"  grounded survey-vs-behavior lag: {lag:+.3f} -> {verdict}")
     if result.smoke_caveat:
         print(f"\n  {result.smoke_caveat}")
 

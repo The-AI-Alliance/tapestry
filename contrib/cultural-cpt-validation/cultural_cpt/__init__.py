@@ -19,8 +19,9 @@ from .experiment import (
     ExperimentResult,
     run_experiment,
 )
+from .behavior import administer_behavior
 from .model import ByteCausalModel, HFCausalModel, LanguageModel, make_base_model
-from .wvs import Coordinate, GROUND_TRUTH, SurveyResult, administer
+from .wvs import Coordinate, GROUND_TRUTH, SurveyResult, administer, score_axes
 
 __all__ = [
     "ArmResult",
@@ -39,4 +40,6 @@ __all__ = [
     "GROUND_TRUTH",
     "SurveyResult",
     "administer",
+    "administer_behavior",
+    "score_axes",
 ]

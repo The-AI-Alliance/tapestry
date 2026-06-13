@@ -11,10 +11,19 @@ Staged under `contrib/` (like `jneums-consortium-experiment`) while it iterates.
 
 Runs the **minimal three-arm go/no-go** — Base / Language-matched / Grounded —
 end to end: starts every arm from the same base model, applies each arm's
-treatment (no CPT, or CPT on that arm's corpus), then measures an
-Inglehart-Welzel coordinate (WVS survey instrument) and a capability score, and
-reports whether **Grounded** moved toward the target nation's ground-truth
-coordinate more than **Language-matched** did.
+treatment (no CPT, or CPT on that arm's corpus), then measures each arm on two
+instruments plus a capability score, and reports whether **Grounded** moved
+toward the target nation's ground-truth coordinate more than **Language-matched**
+did.
+
+Two instruments, both producing an Inglehart-Welzel coordinate:
+- **WVS survey** (`wvs.py`) — abstract value questions.
+- **Behavioral probe** (`behavior.py`) — concrete situations with action
+  choices. The **survey-behavior gap** is the deep-vs-surface guardrail: if an
+  arm's *survey* answers move toward the target culture but its *behavior* does
+  not (a large gap / lag), the apparent shift is surface mimicry, not a
+  representational change. This is clause (c) of the hypothesis and the most
+  important failure mode to catch.
 
 ## Two modes
 
@@ -100,8 +109,9 @@ Or directly, e.g. `uv run python contrib/cultural-cpt-validation/run.py
 
 ## Not in this harness (round two)
 
-The behavioral / scenario probe (deep-vs-surface) and Arms 3–4
-(grounded-translated, surface-only) are still follow-ups once a basic
+Arms 3–4 (grounded-translated, surface-only) are still follow-ups once a basic
 single-node effect is confirmed. See the spec. The FedAvg aggregation-survival
-test is now present in smoke form (`run_aggregation.py`); its real-mode version
-(HF backend per node) is round-two work.
+test is present in smoke form (`run_aggregation.py`); its real-mode version (HF
+backend per node) is round-two work. The behavioral probe (`behavior.py`) is
+present but scored by log-prob over fixed action options; a real run wants
+free-form generation scored by humans or a rubric-driven judge.
