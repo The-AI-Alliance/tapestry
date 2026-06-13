@@ -1,0 +1,8 @@
+This contribution follows the repository default licenses:
+
+- Documentation: Creative Commons Attribution 4.0 International. See ../../LICENSE.CC-BY-4.0.
+- Code, if added later: Apache License, Version 2.0. See ../../LICENSE.Apache-2.0.
+- Data, if added later: CDLA Permissive 2.0. See ../../LICENSE.CDLA-2.0.
+
+This contribution does not include raw training data, private notes, model
+weights, credentials, or restricted datasets.
