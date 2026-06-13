@@ -34,6 +34,16 @@ contrib/
 
 Keep it simple, but please respect the following:
 
+### Scope & Neutrality
+
+`contrib/` is a staging area for ideas that advance Project Tapestry — not a place to advertise products or steer the project toward a single vendor or ecosystem. Even a "merged for consideration" contribution lives permanently under the AI Alliance's name, so we keep this space vendor-neutral. This mirrors the [Kubernetes Documentation Content Guide](https://kubernetes.io/docs/contribute/style/content-guide/): _"feature docs aren't a place for vendors to advertise their products."_
+
+- **On-mission.** Contributions should be relevant to Tapestry's work (sovereign/consortium training, data governance, evaluation, supporting infrastructure). Material whose primary purpose is to promote an external project, product, token, or ecosystem does not belong here, even if it is technically adjacent.
+- **Cite, don't promote.** You may reference external open-source tools, datasets, or standards when they are genuinely relevant (e.g. evaluation harnesses, public benchmarks, published standards). Name them plainly and link to their canonical source. Do **not** add marketing language, calls to action, or links to commercial product, rewards, airdrop, or token pages.
+- **No personal-portfolio padding.** Examples should illustrate a principle, not showcase a contributor's own products or unrelated work. Anonymize or generalize examples so the point survives without the brand name.
+
+If you're unsure whether something fits, open a [Discussion](https://github.com/The-AI-Alliance/tapestry/discussions) before submitting a PR.
+
 ### Licensing
 
 Every contribution must be clearly licensed. Unless you state otherwise (compatibly), Tapestry's default licenses apply:
