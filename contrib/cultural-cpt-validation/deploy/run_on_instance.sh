@@ -6,16 +6,19 @@
 # (Blackwell, sm_120), and network access (to fetch the model + regenerate the
 # corpus from the committed titles file). Idempotent enough to re-run.
 #
-# Override via env: MODEL, EPOCHS, PER_DOMAIN, SEED, DTYPE, CULTURE, LR.
+# Override via env: MODEL, EPOCHS, PER_DOMAIN, SEED, SEEDS, DTYPE, CULTURE, LR.
+# If SEEDS (comma-separated) is set, runs the multi-seed go/no-go (run_stats.py)
+# instead of the single run (run.py).
 set -euo pipefail
 
 REPO="${REPO:-/workspace/tapestry}"
 MODEL="${MODEL:-Qwen/Qwen2.5-1.5B-Instruct}"
 CULTURE="${CULTURE:-egypt}"
 LANG_CODE="${LANG_CODE:-ar}"
-EPOCHS="${EPOCHS:-2}"
-PER_DOMAIN="${PER_DOMAIN:-6}"
+EPOCHS="${EPOCHS:-6}"
+PER_DOMAIN="${PER_DOMAIN:-8}"
 SEED="${SEED:-0}"
+SEEDS="${SEEDS:-}"
 DTYPE="${DTYPE:-bfloat16}"
 LR="${LR:-2e-5}"
 
@@ -33,14 +36,27 @@ python "$CC/fetch_corpus.py" \
   --titles-file "$CC/titles/${CULTURE}.${LANG_CODE}.json" \
   --per-domain "$PER_DOMAIN" --full
 
-echo "== run the real CPT experiment ($MODEL, $DTYPE, cuda) =="
-python "$CC/run.py" \
-  --mode hf --model-name "$MODEL" \
-  --culture "$CULTURE" \
-  --corpus-path "$CC/data/$CULTURE" \
-  --device cuda --dtype "$DTYPE" \
-  --epochs "$EPOCHS" --lr "$LR" --seed "$SEED" \
-  --out "$REPO/runs/${CULTURE}_real"
+if [ -n "$SEEDS" ]; then
+  OUT="$REPO/runs/${CULTURE}_stats"
+  echo "== run the multi-seed go/no-go ($MODEL, $DTYPE, cuda, seeds=$SEEDS) =="
+  python "$CC/run_stats.py" \
+    --mode hf --model-name "$MODEL" \
+    --culture "$CULTURE" \
+    --corpus-path "$CC/data/$CULTURE" \
+    --device cuda --dtype "$DTYPE" \
+    --epochs "$EPOCHS" --lr "$LR" --seeds "$SEEDS" \
+    --out "$OUT"
+else
+  OUT="$REPO/runs/${CULTURE}_real"
+  echo "== run the single real CPT experiment ($MODEL, $DTYPE, cuda) =="
+  python "$CC/run.py" \
+    --mode hf --model-name "$MODEL" \
+    --culture "$CULTURE" \
+    --corpus-path "$CC/data/$CULTURE" \
+    --device cuda --dtype "$DTYPE" \
+    --epochs "$EPOCHS" --lr "$LR" --seed "$SEED" \
+    --out "$OUT"
+fi
 
 echo "== result =="
-cat "$REPO/runs/${CULTURE}_real/result.json"
+cat "$OUT/result.json"

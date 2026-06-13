@@ -30,6 +30,11 @@ def main() -> None:
     parser.add_argument("--model-name", default="")
     parser.add_argument("--corpus-path", default="")
     parser.add_argument("--epochs", type=int, default=4)
+    parser.add_argument("--lr", type=float, default=None, help="CPT lr (default 0.01 smoke / 2e-5 hf)")
+    parser.add_argument("--device", default="cpu", choices=("cpu", "cuda"), help="hf compute device")
+    parser.add_argument(
+        "--dtype", default="float32", choices=("float32", "bfloat16"), help="hf model dtype"
+    )
     parser.add_argument("--seeds", default="0,1,2,3,4", help="comma-separated seeds")
     parser.add_argument("--min-shift", type=float, default=0.05, help="pre-registered X")
     parser.add_argument("--sigma", type=float, default=2.0, help="pre-registered sigma multiple")
@@ -38,6 +43,7 @@ def main() -> None:
     args = parser.parse_args()
 
     seeds = tuple(int(s) for s in args.seeds.split(",") if s.strip())
+    lr = args.lr if args.lr is not None else (0.01 if args.mode == "smoke" else 2e-5)
     config = StatsConfig(
         base=ExperimentConfig(
             mode=args.mode,
@@ -45,6 +51,9 @@ def main() -> None:
             model_name=args.model_name,
             corpus_path=args.corpus_path,
             epochs=args.epochs,
+            lr=lr,
+            device=args.device,
+            dtype=args.dtype,
         ),
         seeds=seeds,
         min_grounded_shift=args.min_shift,
