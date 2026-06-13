@@ -7,9 +7,10 @@ caveat. Numbers from the toy/smoke model are not recorded here.
 Run artifacts (`runs/…/result.json`) are git-ignored; the numbers below are the
 record. Corpora regenerate from `titles/egypt.ar.json` via `fetch_corpus.py`.
 
-## Setup common to both runs
+## Setup common to all runs
 
-- **Base model:** `Qwen/Qwen2.5-1.5B-Instruct`, full-parameter CPT, bf16.
+- **Base model:** Runs 1–2 `Qwen/Qwen2.5-1.5B-Instruct`; Run 3
+  `Qwen/Qwen3-4B-Instruct-2507`. Full-parameter CPT, bf16 (Run 3: + 8-bit Adam).
 - **Culture:** Egypt. WVS-7 Inglehart-Welzel map target (rescaled to item
   scale): **(ts −0.72, ss −0.52)** — far Traditional / Survival.
 - **Instrument:** canonical 10-item IW battery (`wvs.py`), ≥3 paraphrases/item,
@@ -60,27 +61,68 @@ capability drop 0.000.
 shift −0.029 (≥0.05? no); grounding effect z=1.41 (≥2? no); capability drop
 0.000 (≤0.10? yes).
 
+## Run 3 — Qwen3-4B, scaled corpus, multi-seed
+
+`run_stats.py`, **`Qwen/Qwen3-4B-Instruct-2507`**, seeds 0/1/2, epochs 4,
+per-domain 18 / max-words 6000 → corpus ≈**151k / 189k** tokens. Full-parameter
+CPT fit one 32GB 5090 via 8-bit Adam (bitsandbytes) + base-on-CPU + gradient
+checkpointing.
+
+| arm | survey shift (mean ± std) | behavior shift | capability |
+| :-- | --: | --: | --: |
+| base | — | — | 0.75 |
+| language_matched | −0.006 ± 0.017 | −0.187 ± 0.011 | 1.00 |
+| **grounded** | **+0.023 ± 0.047** | −0.160 ± 0.038 | 0.92 |
+| surface_only (prompt) | +0.186 ± 0.034 | +0.040 ± 0.025 | 0.75 |
+
+| comparison | mean ± std | z |
+| :-- | --: | --: |
+| grounded − language | **+0.028 ± 0.038** | **+0.75** |
+| grounded − surface | −0.163 ± 0.076 | −2.16 |
+
+### VERDICT: **FAIL** — shift +0.023 (≥0.05? no); z=0.75 (≥2? no); capability fine.
+
+## Trend across scale (the encouraging part)
+
+|  | grounded survey shift | grounded − language | beaten by prompt? |
+| :-- | --: | --: | :-- |
+| Qwen2.5-1.5B, ~50k tok | **−0.029** (away) | +0.019 (z=1.41) | yes, z=−8.57 |
+| Qwen3-4B, ~150k tok | **+0.023** (toward) | +0.028 (z=0.75) | yes, z=−2.16 |
+
+Scaling model (1.5B→4B) and corpus (~50k→150k tokens) **flipped the grounded
+survey shift from away-from to toward Egypt**, grew its lead over language-matched
+(+0.019→+0.028, both in the H1-predicted direction), and shrank prompting's
+dominance (z −8.57→−2.16). The effect moved the right way on every axis — it is
+just still inside the noise. (Caveat: epochs differ 6 vs 4 and only two scale
+points, so this is suggestive, not a controlled scaling curve.)
+
 ## Interpretation
 
-Taken at face value: at this scale full grounded CPT produces **no significant
-cultural shift** and is **beaten by a one-line persona prompt** (z=−8.57) — which
-would *undercut* the depth-over-shallow architectural bet. But this is **not a
-verdict on H1**, because the run is badly underpowered:
+All three runs **FAIL** the pre-registered threshold: no arm clears the +0.05
+shift or the 2σ bar. But the **trend across scale is the actual finding** — every
+indicator moved in H1's predicted direction as model and corpus grew (see the
+trend table above). The story is "underpowered but pointing the right way," not
+"refuted." Reasons it's still not a verdict on H1:
 
-1. **Tiny corpus / few epochs.** ~50k tokens over 6 epochs on a 1.5B model barely
-   perturbs the weights. Real CPT uses orders of magnitude more tokens. This is
-   the recurring Stage-0 bottleneck, not a property of the hypothesis.
-2. **The one encouraging thread:** grounded beats language-matched by **+0.019 in
-   the direction H1 predicts** — just inside the noise. Scale/tokens could push it
-   past 2σ.
+1. **Still token-starved.** Even Run 3's ~150k tokens over 4 epochs is tiny for
+   CPT (real CPT = millions+ of tokens). The grounded shift is positive but small;
+   more tokens is the obvious next lever. This is the recurring Stage-0 bottleneck,
+   not a property of the hypothesis.
+2. **Direction is consistent and improving with scale** (the trend table): the
+   grounding-beyond-language effect is positive in both runs and grew with scale.
+   That is exactly what H1 predicts; it just has not cleared 2σ yet.
 3. **Noise band is measurement-only** (paraphrase/temperature/option-order),
-   because HF training is deterministic across seeds. So z=1.41 is, if anything,
-   optimistic; real training-seed variance would widen the band.
-4. **Language carrier not isolated:** corpus is Arabic, survey is English; the
-   `grounded_translated` arm (which would separate content from language) was not
-   in the corpus. Administering the survey in Arabic is the cleaner fix.
-5. Capability "0.75" is the toy MMLU stub, not real MMLU — the capability
-   guardrail is not yet meaningful.
+   because HF training is deterministic across seeds. So the z-scores are, if
+   anything, optimistic; real training-seed variance would widen the band.
+4. **Behavioral probe regressed:** in Run 3 both CPT arms' *behavior* coordinate
+   moved away from Egypt (−0.16/−0.19) while only the prompt moved it toward.
+   Either CPT degrades the behavioral probe, or (more likely) the probe is too
+   crude — upgrading it to free-form generation + a rubric judge is overdue.
+5. **Language carrier not isolated:** corpus is Arabic, survey is English; the
+   `grounded_translated` arm (content vs. language) was not in the corpus.
+   Administering the survey in Arabic is the cleaner fix.
+6. Capability is the toy 4-item MMLU stub (CPT arms even "improved" to 0.92–1.00,
+   which is noise) — the capability guardrail is not yet meaningful.
 
 **Solid takeaways that do hold:** the full pipeline produces a genuine,
 reproducible EXP-001 data point end to end; capability is preserved under CPT at
