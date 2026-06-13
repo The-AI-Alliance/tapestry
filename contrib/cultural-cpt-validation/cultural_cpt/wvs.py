@@ -12,6 +12,7 @@ paraphrase slots, log-prob answer selection) are real and reusable as-is.
 
 from __future__ import annotations
 
+import math
 import random
 from dataclasses import dataclass, field
 from typing import Sequence
@@ -41,8 +42,11 @@ class SurveyItem:
     options: Sequence[SurveyOption]
 
 
-# Abbreviated, illustrative battery. NOT the real WVS instrument.
+# Abbreviated, illustrative battery. NOT the real WVS instrument, but broadened
+# (4 items per axis) so the coordinate is averaged over enough items to resolve
+# small shifts. A real run uses the full WVS item set + published loadings.
 _ITEMS: tuple[SurveyItem, ...] = (
+    # --- Traditional (-) <-> Secular-rational (+) ---
     SurveyItem(
         item_id="ts_religion_important",
         axis="TS",
@@ -70,6 +74,33 @@ _ITEMS: tuple[SurveyItem, ...] = (
         ),
     ),
     SurveyItem(
+        item_id="ts_national_pride",
+        axis="TS",
+        stem_paraphrases=(
+            "How proud are you of your nationality?",
+            "How strongly do you identify with national pride?",
+        ),
+        options=(
+            SurveyOption("Very proud; the nation comes first.", value=-1.0),
+            SurveyOption("Somewhat proud.", value=0.0),
+            SurveyOption("Not proud; identity is broader than nation.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_obedience_child",
+        axis="TS",
+        stem_paraphrases=(
+            "Is obedience an important quality to teach a child?",
+            "Should children above all learn obedience?",
+        ),
+        options=(
+            SurveyOption("Yes, obedience is essential to teach.", value=-1.0),
+            SurveyOption("It has some importance.", value=0.0),
+            SurveyOption("No, independence matters more than obedience.", value=1.0),
+        ),
+    ),
+    # --- Survival (-) <-> Self-expression (+) ---
+    SurveyItem(
         item_id="ss_tolerance_diversity",
         axis="SS",
         stem_paraphrases=(
@@ -93,6 +124,32 @@ _ITEMS: tuple[SurveyItem, ...] = (
             SurveyOption("You can't be too careful with people.", value=-1.0),
             SurveyOption("It depends who they are.", value=0.0),
             SurveyOption("Most people can be trusted.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_environment_priority",
+        axis="SS",
+        stem_paraphrases=(
+            "Should protecting the environment take priority over economic growth?",
+            "When they conflict, which comes first: the environment or growth?",
+        ),
+        options=(
+            SurveyOption("Economic growth and jobs must come first.", value=-1.0),
+            SurveyOption("Both must be balanced.", value=0.0),
+            SurveyOption("Protecting the environment must come first.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_voice_participation",
+        axis="SS",
+        stem_paraphrases=(
+            "How important is it that people have a say in important decisions?",
+            "Should ordinary people have more voice in collective decisions?",
+        ),
+        options=(
+            SurveyOption("Order and stability matter more than having a say.", value=-1.0),
+            SurveyOption("Some voice is appropriate.", value=0.0),
+            SurveyOption("People should have a strong say in decisions.", value=1.0),
         ),
     ),
 )
@@ -129,29 +186,46 @@ class SurveyResult:
     n_items: int = 0
 
 
+def _softmax(values: list[float], temperature: float) -> list[float]:
+    """Numerically stable softmax over log-prob scores."""
+    scaled = [v / temperature for v in values]
+    hi = max(scaled)
+    exps = [math.exp(v - hi) for v in scaled]
+    total = sum(exps) or 1.0
+    return [e / total for e in exps]
+
+
 def administer(
     model: LanguageModel,
     *,
     seed: int = 0,
     paraphrase_passes: int = 2,
+    temperature: float = 1.0,
 ) -> SurveyResult:
     """Administer the battery and return an Inglehart-Welzel coordinate.
 
-    For each item we randomize option order, score each option's log-prob under
-    the model, take the argmax option's axis value, and average per axis. We
-    repeat across paraphrases/passes to dampen prompt sensitivity.
+    For each item we score every option's log-prob under the model, convert
+    those to a probability distribution (softmax), and take the **expected axis
+    value** under that distribution rather than the argmax option. This makes
+    the coordinate continuous, so small preference shifts move it instead of
+    being rounded to the nearest option value. We average over items per axis
+    and over stem paraphrases to dampen prompt sensitivity.
+
+    Note: because the score is an expectation over *all* options, it is
+    invariant to option order by construction — one fewer source of prompt
+    sensitivity than argmax selection.
     """
     rng = random.Random(seed)
     axis_scores: dict[str, list[float]] = {"TS": [], "SS": []}
 
     for item in _ITEMS:
+        values = [opt.value for opt in item.options]
         for _ in range(paraphrase_passes):
             stem = rng.choice(list(item.stem_paraphrases))
-            options = list(item.options)
-            rng.shuffle(options)  # option-order randomization
-            scored = [(opt.value, model.score_continuation(stem + "\nAnswer: ", opt.text)) for opt in options]
-            chosen_value = max(scored, key=lambda vs: vs[1])[0]
-            axis_scores[item.axis].append(chosen_value)
+            logps = [model.score_continuation(stem + "\nAnswer: ", opt.text) for opt in item.options]
+            probs = _softmax(logps, temperature)
+            expected = sum(p * v for p, v in zip(probs, values))
+            axis_scores[item.axis].append(expected)
 
     per_axis = {axis: (sum(vals) / len(vals) if vals else 0.0) for axis, vals in axis_scores.items()}
     coord = Coordinate(ts=per_axis["TS"], ss=per_axis["SS"])
