@@ -136,9 +136,10 @@ class HFCausalModel:
     corpora. A small model (e.g. ``distilgpt2``) is enough to validate wiring.
     """
 
-    def __init__(self, model_name: str, device: str = "cpu") -> None:
+    def __init__(self, model_name: str, device: str = "cpu", dtype: str = "float32") -> None:
         self.model_name = model_name
         self.device = device
+        self.dtype = dtype
         try:
             from transformers import AutoModelForCausalLM, AutoTokenizer
         except ImportError as exc:  # pragma: no cover - depends on env
@@ -146,14 +147,17 @@ class HFCausalModel:
                 "real mode needs `transformers`; install it (e.g. "
                 "`uv pip install transformers`) or use --mode smoke."
             ) from exc
+        # bf16 halves the memory of a full-parameter CPT run (params + grads),
+        # the difference between fitting a ~1.5-3B base on a single GPU or not.
         self._tokenizer = AutoTokenizer.from_pretrained(model_name)
-        self._model = AutoModelForCausalLM.from_pretrained(model_name).to(device)
+        self._model = AutoModelForCausalLM.from_pretrained(model_name, dtype=getattr(torch, dtype)).to(device)
         self._model.eval()
 
     def _shared_init(self, tokenizer, model) -> "HFCausalModel":
         twin = HFCausalModel.__new__(HFCausalModel)
         twin.model_name = self.model_name
         twin.device = self.device
+        twin.dtype = self.dtype
         twin._tokenizer = tokenizer
         twin._model = model
         return twin
@@ -204,7 +208,13 @@ class HFCausalModel:
 
 
 def make_base_model(
-    mode: str, *, hidden_size: int = 64, seed: int = 0, model_name: str = "", device: str = "cpu"
+    mode: str,
+    *,
+    hidden_size: int = 64,
+    seed: int = 0,
+    model_name: str = "",
+    device: str = "cpu",
+    dtype: str = "float32",
 ) -> LanguageModel:
     """Build the shared base model all arms start from."""
     if mode == "smoke":
@@ -212,5 +222,5 @@ def make_base_model(
     if mode == "hf":
         if not model_name:
             raise ValueError("hf mode requires --model-name")
-        return HFCausalModel(model_name=model_name, device=device)
+        return HFCausalModel(model_name=model_name, device=device, dtype=dtype)
     raise ValueError(f"unknown mode: {mode!r} (expected 'smoke' or 'hf')")

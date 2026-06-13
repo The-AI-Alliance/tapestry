@@ -82,6 +82,7 @@ class ExperimentConfig:
     corpus_path: str = ""  # empty = placeholder corpora (no claim); else real data
     paraphrase_passes: int = 2
     device: str = "cpu"  # hf mode: "cpu" | "cuda"
+    dtype: str = "float32"  # hf mode: "float32" | "bfloat16" (bf16 halves CPT memory)
 
 
 @dataclass(frozen=True)
@@ -141,6 +142,7 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
         seed=config.seed,
         model_name=config.model_name,
         device=config.device,
+        dtype=config.dtype,
     )
 
     # With a real corpus, only run CPT arms the corpus actually provides. The

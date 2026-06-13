@@ -37,6 +37,12 @@ def main() -> None:
     parser.add_argument("--model-name", default="", help="HF model id (real mode)")
     parser.add_argument("--corpus-path", default="", help="real corpus source (empty = placeholder)")
     parser.add_argument("--device", default="cpu", choices=("cpu", "cuda"), help="hf mode compute device")
+    parser.add_argument(
+        "--dtype",
+        default="float32",
+        choices=("float32", "bfloat16"),
+        help="hf mode model dtype (bfloat16 halves CPT memory)",
+    )
     parser.add_argument("--out", default="runs/cultural_cpt_validation")
     args = parser.parse_args()
 
@@ -52,6 +58,7 @@ def main() -> None:
         model_name=args.model_name,
         corpus_path=args.corpus_path,
         device=args.device,
+        dtype=args.dtype,
     )
     result = run_experiment(config)
 
