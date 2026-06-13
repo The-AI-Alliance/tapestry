@@ -59,7 +59,10 @@ def main() -> None:
             f"{arm.behavior_shift_toward_target:+.3f}        "
             f"{arm.survey_behavior_gap:.3f}         {arm.capability_acc:.2f}{loss}"
         )
-    print(f"  decisive (grounded - language-matched survey shift): {result.decisive_grounded_vs_language:+.3f}")
+    print("  decisive comparisons (grounded survey shift minus other arm):")
+    print(f"    vs language-matched   : {result.decisive_grounded_vs_language:+.3f}   (grounding beyond language?)")
+    print(f"    vs grounded-translated: {result.decisive_grounded_vs_translated:+.3f}   (content vs language carrier?)")
+    print(f"    vs surface-only       : {result.decisive_grounded_vs_surface:+.3f}   (CPT beats prompting?)")
 
     grounded = next((a for a in result.arms if a.arm == "grounded"), None)
     if grounded is not None:

@@ -9,12 +9,23 @@ Staged under `contrib/` (like `jneums-consortium-experiment`) while it iterates.
 
 ## What it does
 
-Runs the **minimal three-arm go/no-go** — Base / Language-matched / Grounded —
-end to end: starts every arm from the same base model, applies each arm's
-treatment (no CPT, or CPT on that arm's corpus), then measures each arm on two
-instruments plus a capability score, and reports whether **Grounded** moved
-toward the target nation's ground-truth coordinate more than **Language-matched**
-did.
+Runs the EXP-001 arms end to end: starts every arm from the same base model,
+applies each arm's treatment, then measures each on two instruments plus a
+capability score, and reports the decisive comparisons.
+
+| Arm | Treatment | Isolates |
+| :-- | :-------- | :------- |
+| `base` | none | baseline + noise floor |
+| `language_matched` | CPT on same-language, value-neutral text | — |
+| `grounded` | CPT on culturally grounded text | the treatment |
+| `grounded_translated` | CPT on grounded content in the base's language | content vs. the language carrying it |
+| `surface_only` | no CPT; cultural persona prompt at measurement | does CPT beat cheap prompting? |
+
+Decisive comparisons are `grounded`'s survey shift toward the target minus each
+other arm's. `grounded vs language_matched` asks if grounding adds anything
+beyond language; `grounded vs surface_only` asks if expensive CPT beats
+prompting — **a tie there would undercut the depth-over-shallow architectural
+bet.**
 
 Two instruments, both producing an Inglehart-Welzel coordinate:
 - **WVS survey** (`wvs.py`) — abstract value questions.
@@ -109,9 +120,11 @@ Or directly, e.g. `uv run python contrib/cultural-cpt-validation/run.py
 
 ## Not in this harness (round two)
 
-Arms 3–4 (grounded-translated, surface-only) are still follow-ups once a basic
-single-node effect is confirmed. See the spec. The FedAvg aggregation-survival
-test is present in smoke form (`run_aggregation.py`); its real-mode version (HF
-backend per node) is round-two work. The behavioral probe (`behavior.py`) is
-present but scored by log-prob over fixed action options; a real run wants
-free-form generation scored by humans or a rubric-driven judge.
+All five arms are present. Still outstanding: **multi-seed statistics** (the
+shifts are currently single-seed point estimates; a pass/fail threshold needs
+effect sizes with error bars across seeds and paraphrases) and **real corpora**
+(the binding constraint — Stage 0 data work, not code). The FedAvg
+aggregation-survival test is present in smoke form (`run_aggregation.py`); its
+real-mode version (HF backend per node) is round-two work. The behavioral probe
+(`behavior.py`) is scored by log-prob over fixed action options; a real run
+wants free-form generation scored by humans or a rubric-driven judge.

@@ -203,6 +203,7 @@ def score_axes(
     paraphrase_passes: int = 2,
     temperature: float = 1.0,
     prompt_suffix: str = "\nAnswer: ",
+    persona_prefix: str = "",
 ) -> Coordinate:
     """Generic instrument scorer shared by the survey and the behavioral probe.
 
@@ -225,7 +226,8 @@ def score_axes(
         values = [opt.value for opt in item.options]
         for _ in range(paraphrase_passes):
             stem = rng.choice(list(item.stem_paraphrases))
-            logps = [model.score_continuation(stem + prompt_suffix, opt.text) for opt in item.options]
+            prompt = persona_prefix + stem + prompt_suffix
+            logps = [model.score_continuation(prompt, opt.text) for opt in item.options]
             probs = _softmax(logps, temperature)
             expected = sum(p * v for p, v in zip(probs, values))
             axis_scores[item.axis].append(expected)
@@ -240,10 +242,16 @@ def administer(
     seed: int = 0,
     paraphrase_passes: int = 2,
     temperature: float = 1.0,
+    persona_prefix: str = "",
 ) -> SurveyResult:
     """Administer the WVS battery and return an Inglehart-Welzel coordinate."""
     coord = score_axes(
-        model, _ITEMS, seed=seed, paraphrase_passes=paraphrase_passes, temperature=temperature
+        model,
+        _ITEMS,
+        seed=seed,
+        paraphrase_passes=paraphrase_passes,
+        temperature=temperature,
+        persona_prefix=persona_prefix,
     )
     return SurveyResult(
         coordinate=coord, per_axis={"TS": coord.ts, "SS": coord.ss}, n_items=len(_ITEMS)

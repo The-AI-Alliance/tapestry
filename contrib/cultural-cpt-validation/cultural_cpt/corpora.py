@@ -50,6 +50,17 @@ _LANGUAGE_MATCHED = (
     "Insert tab A into slot B and confirm the indicator light turns green.",
 )
 
+# Arm 3: the grounded content carried in the base model's dominant language
+# (i.e. machine-translated). Isolates cultural *content* from the *language* it
+# arrives in. In smoke this is just a paraphrase of _GROUNDED; a real run
+# machine-translates the grounded corpus.
+_GROUNDED_TRANSLATED = (
+    "The council balanced the duty owed to elders against the claims of the young.",
+    "By tradition, the harvest festival ties the village to its ancestors.",
+    "A fair ruling respects both the written code and the community's customs.",
+    "Concern for the family name shaped the merchant's choice in the dispute.",
+)
+
 
 # Per-culture grounded placeholders, for the multi-node aggregation experiment.
 # Distinct text per culture so nodes diverge; still pure placeholder, no claim.
@@ -105,4 +116,6 @@ def load_corpus(arm_name: str, *, path: str = "") -> Corpus:
         return Corpus(name="grounded", documents=_GROUNDED)
     if arm_name == "language_matched":
         return Corpus(name="language_matched", documents=_LANGUAGE_MATCHED)
+    if arm_name == "grounded_translated":
+        return Corpus(name="grounded_translated", documents=_GROUNDED_TRANSLATED)
     raise ValueError(f"no corpus for arm {arm_name!r}")

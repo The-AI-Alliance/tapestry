@@ -26,10 +26,18 @@ def _config(**kw) -> ExperimentConfig:
     return ExperimentConfig(**base)
 
 
-def test_runs_all_three_arms() -> None:
+def test_runs_all_arms() -> None:
     result = run_experiment(_config())
     arms = [a.arm for a in result.arms]
-    assert arms == ["base", "language_matched", "grounded"]
+    assert arms == ["base", "language_matched", "grounded", "grounded_translated", "surface_only"]
+
+
+def test_surface_only_arm_does_no_cpt() -> None:
+    result = run_experiment(_config())
+    by_arm = {a.arm: a for a in result.arms}
+    # surface_only steers via prompt, not weights -> no training loss.
+    assert by_arm["surface_only"].train_loss is None
+    assert by_arm["grounded_translated"].train_loss is not None
 
 
 def test_coordinates_and_capability_are_well_formed() -> None:

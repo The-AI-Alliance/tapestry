@@ -111,6 +111,7 @@ def administer_behavior(
     seed: int = 0,
     paraphrase_passes: int = 2,
     temperature: float = 1.0,
+    persona_prefix: str = "",
 ) -> Coordinate:
     """Measure the model's revealed behavior on the Inglehart-Welzel axes."""
     return score_axes(
@@ -120,4 +121,5 @@ def administer_behavior(
         paraphrase_passes=paraphrase_passes,
         temperature=temperature,
         prompt_suffix="\nIn this situation: ",
+        persona_prefix=persona_prefix,
     )

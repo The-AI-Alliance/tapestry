@@ -1,12 +1,23 @@
-"""Orchestration for the EXP-001 minimal go/no-go (Base / Language-matched / Grounded).
+"""Orchestration for the EXP-001 arms.
 
-For each arm: start from the *same* base model, apply the arm's treatment (no
-CPT, or CPT on the arm's corpus), then measure the Inglehart-Welzel coordinate
-and capability. The decisive comparison is whether **Grounded** moves toward the
-target nation's ground-truth coordinate more than **Language-matched** does.
+For each arm: start from the *same* base model, apply the arm's treatment, then
+measure the Inglehart-Welzel coordinate (survey + behavior) and capability.
+
+Arms:
+  - base               no treatment (baseline + noise floor)
+  - language_matched   CPT on same-language, value-neutral text
+  - grounded           CPT on culturally grounded text (the treatment)
+  - grounded_translated CPT on the grounded content in the base's language
+  - surface_only       no CPT; a cultural persona prompt at measurement time
+
+Decisive comparisons (grounded survey shift minus the other arm's):
+  - vs language_matched : grounding beyond language?
+  - vs grounded_translated : the cultural content, or the language carrying it?
+  - vs surface_only : does CPT beat cheap prompting? (a tie undercuts the
+    depth-over-shallow bet)
 
 See tech-docs/experiments/cultural-cpt-validation.md (EXP-001) for the full
-design, arms, and pre-registered thresholds.
+design and pre-registered thresholds.
 """
 
 from __future__ import annotations
@@ -45,7 +56,11 @@ class ExperimentResult:
     target_ts: float
     target_ss: float
     arms: list[ArmResult]
+    # Decisive comparisons (grounded survey shift minus the other arm's), all
+    # relative to Base. See module docstring for what each one isolates.
     decisive_grounded_vs_language: float = field(default=0.0)
+    decisive_grounded_vs_translated: float = field(default=0.0)
+    decisive_grounded_vs_surface: float = field(default=0.0)
     smoke_caveat: str = ""
 
     def to_dict(self) -> dict:
@@ -68,7 +83,30 @@ class ExperimentConfig:
     paraphrase_passes: int = 2
 
 
-_ARMS = ("base", "language_matched", "grounded")
+@dataclass(frozen=True)
+class _ArmSpec:
+    """How one arm differs: which corpus it continues-pretrains on (if any), and
+    whether a cultural persona is applied at measurement time instead."""
+
+    name: str
+    corpus: str | None  # corpus arm to CPT on; None = no continued pretraining
+    persona: bool  # apply a cultural-persona prompt prefix at measurement
+
+
+# Arm 4 (surface_only) does NO weight change — it just prompts the base model to
+# answer as a target-culture respondent. It tests whether expensive CPT beats
+# cheap prompting; if surface_only matches grounded, the depth bet is undercut.
+ARM_SPECS: tuple[_ArmSpec, ...] = (
+    _ArmSpec("base", corpus=None, persona=False),
+    _ArmSpec("language_matched", corpus="language_matched", persona=False),
+    _ArmSpec("grounded", corpus="grounded", persona=False),
+    _ArmSpec("grounded_translated", corpus="grounded_translated", persona=False),
+    _ArmSpec("surface_only", corpus=None, persona=True),
+)
+
+
+def _persona_prefix(culture: str) -> str:
+    return f"Answer as a typical person from {culture.title()} would.\n"
 
 
 @dataclass(frozen=True)
@@ -78,11 +116,15 @@ class _Measurement:
     capability_acc: float
 
 
-def _measure(model: LanguageModel, *, seed: int, passes: int) -> _Measurement:
+def _measure(model: LanguageModel, *, seed: int, passes: int, persona_prefix: str = "") -> _Measurement:
     return _Measurement(
-        survey=wvs.administer(model, seed=seed, paraphrase_passes=passes).coordinate,
-        behavior=behavior.administer_behavior(model, seed=seed, paraphrase_passes=passes),
-        capability_acc=capability.evaluate(model),
+        survey=wvs.administer(
+            model, seed=seed, paraphrase_passes=passes, persona_prefix=persona_prefix
+        ).coordinate,
+        behavior=behavior.administer_behavior(
+            model, seed=seed, paraphrase_passes=passes, persona_prefix=persona_prefix
+        ),
+        capability_acc=capability.evaluate(model),  # neutral guardrail; no persona
     )
 
 
@@ -107,28 +149,29 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
     base_behavior_distance: float | None = None
     shift_by_arm: dict[str, float] = {}
 
-    for arm in _ARMS:
+    for spec in ARM_SPECS:
         model = base.clone()
         train_loss: float | None = None
-        if arm != "base":
-            corpus = load_corpus(arm, path=config.corpus_path)
+        if spec.corpus is not None:
+            corpus = load_corpus(spec.corpus, path=config.corpus_path)
             train_loss = model.train_on_texts(
                 list(corpus.documents), epochs=config.epochs, lr=config.lr
             )
 
-        m = _measure(model, seed=config.seed, passes=config.paraphrase_passes)
+        persona = _persona_prefix(config.culture) if spec.persona else ""
+        m = _measure(model, seed=config.seed, passes=config.paraphrase_passes, persona_prefix=persona)
         survey_distance = m.survey.distance_to(target)
         behavior_distance = m.behavior.distance_to(target)
-        if arm == "base":
+        if spec.name == "base":
             base_survey_distance = survey_distance
             base_behavior_distance = behavior_distance
         survey_shift = (base_survey_distance - survey_distance) if base_survey_distance is not None else 0.0
         behavior_shift = (base_behavior_distance - behavior_distance) if base_behavior_distance is not None else 0.0
-        shift_by_arm[arm] = survey_shift
+        shift_by_arm[spec.name] = survey_shift
 
         results.append(
             ArmResult(
-                arm=arm,
+                arm=spec.name,
                 ts=m.survey.ts,
                 ss=m.survey.ss,
                 distance_to_target=survey_distance,
@@ -142,7 +185,10 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
             )
         )
 
-    decisive = shift_by_arm.get("grounded", 0.0) - shift_by_arm.get("language_matched", 0.0)
+    grounded_shift = shift_by_arm.get("grounded", 0.0)
+    decisive = grounded_shift - shift_by_arm.get("language_matched", 0.0)
+    decisive_translated = grounded_shift - shift_by_arm.get("grounded_translated", 0.0)
+    decisive_surface = grounded_shift - shift_by_arm.get("surface_only", 0.0)
     # A result is only meaningful with BOTH a real model and real corpora.
     flags = []
     if config.mode == "smoke":
@@ -166,5 +212,7 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
         target_ss=target.ss,
         arms=results,
         decisive_grounded_vs_language=decisive,
+        decisive_grounded_vs_translated=decisive_translated,
+        decisive_grounded_vs_surface=decisive_surface,
         smoke_caveat=caveat,
     )
