@@ -124,7 +124,7 @@ This runs the following command, which you can run yourself if you prefer:
 
 ```shell
 cd src
-uv run pytest tests -q
+uv run python -m pytest tests -q
 ```
 
 ### Code Formatting
