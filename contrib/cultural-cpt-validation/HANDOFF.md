@@ -17,16 +17,19 @@ base model (Qwen) does full-parameter CPT on a real Arabic corpus, then is
 measured on the canonical Inglehart-Welzel WVS instrument (in Arabic) plus a
 free-form behavioral probe, across seeds, with a pre-registered PASS/FAIL.
 
-**Headline finding (5 runs, see FINDINGS):** the *decisive* comparison —
-grounded CPT vs. value-neutral CPT in the same language — is now **statistically
-significant** (Run 5: grounded−language **+0.080, z=7.26**, capability preserved).
-That supports H1(b) ("grounding ≠ just speaking the language"). The
-pre-registered **overall verdict is still FAIL**: the *absolute* grounded shift
-is ~0 (grounded mostly *prevents the away-drift* that neutral CPT causes rather
-than actively pulling toward Egypt), and the free-form behavioral probe shows no
-arm shifting open-ended behavior (H1(c) unmet). Every lever (bigger model →
-Arabic measurement → more tokens) moved the decisive comparison the predicted way;
-the binding constraint each time was **corpus tokens**.
+**Headline finding (6 runs, see FINDINGS):** Run 5's promising decisive result —
+grounded CPT vs. value-neutral CPT in the same language at **+0.080, z=7.26** —
+**did NOT replicate** in Run 6. On a freshly-sampled corpus with the upgraded
+harness (real MMLU/safety guardrails + the new translated arm), grounded−language
+collapses to null (**−0.008, z=−0.29**), grounded drifts away from Egypt as much
+as the neutral twin, and the new Arm 3 shows the content's language is irrelevant
+(grounded ≈ grounded_translated, z=0.05). Current honest position: **no robust
+evidence** that grounded micro-CPT moves IW coordinates more than neutral CPT at
+this scale — Run 5 looks corpus-sample-specific, inflated by a measurement-only
+noise band. What *does* hold across all six runs: capability (now real) is
+preserved, and a one-line persona prompt (`surface_only`) beats CPT every time
+(Run 6: grounded−surface z=−6.27). The pre-registered verdict has been FAIL in
+every run.
 
 ## What the harness can do now
 
@@ -192,6 +195,8 @@ In rough priority:
 ## One-line orientation for a new session
 
 "Real EXP-001 go/no-go harness for culturally-grounded CPT; Egypt/Arabic pilot on
-Qwen3-4B via Vast.ai 5090s. Decisive grounded-vs-language comparison is now
-significant (z=7.26) but overall still FAIL on absolute shift + behavior. See
-FINDINGS.md for the five runs and deploy/README.md to run another."
+Qwen3-4B via Vast.ai 5090s. Run 5's significant grounded-vs-language result
+(z=7.26) did NOT replicate in Run 6 (z=−0.29) on a fresh corpus with real
+guardrails + the translated arm — current read: no robust grounding effect at
+this scale; prompting beats CPT. See FINDINGS.md for the six runs and
+deploy/README.md to run another."

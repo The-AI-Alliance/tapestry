@@ -168,7 +168,74 @@ grounded, there is no strong mimicry signal, but also no behavioral shift to
 speak of at this scale. Capability "drop" is again toy-MMLU noise (CPT arms hit
 1.00 on 4 questions).
 
-## Trend across all five runs (the decisive comparison)
+## Run 6 — first `grounded_translated` arm + real guardrails (and a non-replication)
+
+Qwen3-4B, Arabic survey, generate-mode behavior, 3 seeds, 4 epochs — same shape
+as Run 5, but three things are new and the corpus was **freshly regenerated**
+(228/255/228 docs → **300k / 288k / 291k tokens** for grounded / language_matched
+/ grounded_translated):
+
+1. **Arm 3 (`grounded_translated`) is built and run for the first time** — the
+   grounded Arabic corpus machine-translated ar→en (Opus-MT), ~291k tokens, so
+   the decisive *content-vs-language-carrier* comparison is a real number, not a
+   skipped 0.0.
+2. **Real capability guardrail** — `cais/mmlu` (EN) + `MBZUAI/ArabicMMLU` (AR)
+   scored by `score_continuation`, replacing the toy 4-item stub.
+3. **Safety/refusal guardrail** — log-prob refusal-vs-compliance probe (EN/AR).
+
+~5.5 h on one RTX 5090 (3 CPT arms × 3 seeds; the harness trains batch-size-1, so
+the extra arm over Run 5 is expensive).
+
+| arm | survey shift → Egypt | behavior shift | capability | refusal |
+| :-- | --: | --: | --: | --: |
+| base | — | — | 0.34 | 1.00 |
+| language_matched | −0.047 ± 0.015 | −0.028 ± 0.036 | 0.35 | 1.00 |
+| **grounded** | **−0.055 ± 0.029** | −0.049 ± 0.004 | 0.34 | 0.96 |
+| grounded_translated | −0.059 ± 0.105 | −0.014 ± 0.027 | 0.34 | 1.00 |
+| surface_only (prompt) | +0.063 ± 0.010 | −0.004 ± 0.006 | 0.34 | 1.00 |
+
+| comparison | mean ± std | z |
+| :-- | --: | --: |
+| grounded − language | **−0.008 ± 0.027** | **−0.29** |
+| grounded − translated | +0.005 ± 0.090 | +0.05 |
+| grounded − surface | −0.118 ± 0.019 | −6.27 |
+
+### VERDICT: **FAIL** — and Run 5's decisive effect did **not** replicate.
+
+shift −0.055 (≥0.05? no); grounding effect z=−0.29 (≥2? no); capability drop
+−0.003 (≤0.10? yes); safety drop +0.042 (≤0.10? yes).
+
+Three things to take seriously, honestly:
+
+1. **The grounding-beyond-language effect vanished.** grounded − language went
+   from Run 5's **+0.080 (z=7.26)** to **−0.008 (z=−0.29)** — null. The corpus was
+   freshly fetched (Wikipedia category membership/ordering drifts between pulls),
+   so Run 6 is effectively a *replication on a new corpus sample of the same
+   protocol* — and the headline H1(b) result did not hold. This is consistent
+   with the standing caveat that the cross-seed noise band is **measurement-only**
+   (HF training is deterministic across seeds), so Run 5's z=7.26 was optimistic;
+   the real, corpus-resampling variance is much larger. The effect is **fragile to
+   corpus resampling**.
+2. **All three CPT arms drift *away* from Egypt** (grounded −0.055, language
+   −0.047, translated −0.059). Run 5's "grounded holds position while neutral
+   drifts away" mechanism did not reappear — here grounded drifts as much as the
+   neutral twin. And **`grounded ≈ grounded_translated`** (z=0.05): whether the
+   cultural content arrives in Arabic or MT-English makes no measurable
+   difference — but both are ~null/negative, so this is "equally not-working,"
+   not a clean content-over-language win.
+3. **The guardrails are now real and both pass.** Capability is flat at ~0.34
+   across every arm (real MMLU — the toy "improves to 1.00" artifact is gone), so
+   CPT preserved knowledge; refusal stays ~1.00 (grounded 0.96). Prompting again
+   crushes CPT (grounded − surface z=−6.27); `surface_only` is the **only** arm
+   that moves toward Egypt (+0.063).
+
+Net: the more rigorous harness (real capability/safety, the translated arm, a
+fresh corpus) gives a **soberer** read than Run 5. The novel claim (grounded ≠
+language-matched) does **not** survive a corpus resample; the cultural shift from
+micro-scale CPT is small, noisy, sometimes negative, and reliably beaten by a
+one-line persona prompt.
+
+## Trend across all six runs (the decisive comparison)
 
 | run | model | survey | corpus | grounded − language | beaten by prompt? |
 | :-- | :-- | :-- | --: | --: | :-- |
@@ -176,15 +243,32 @@ speak of at this scale. Capability "drop" is again toy-MMLU noise (CPT arms hit
 | 3 | Qwen3-4B | EN | ~150k | +0.028 (z=0.75) | yes, z=−2.16 |
 | 4 | Qwen3-4B | **AR** | ~150k | +0.140 (z=1.54) | tie, z=−0.50 |
 | 5 | Qwen3-4B | AR | **271k** | **+0.080 (z=7.26)** ✅ | z=−2.09 |
+| 6 | Qwen3-4B | AR | 300k (fresh) | **−0.008 (z=−0.29)** ✗ | z=−6.27 |
 
-Each lever helped the *decisive* grounding-beyond-language comparison: a bigger
-model+corpus flipped the grounded shift toward Egypt (Run 3), measuring **in
-Arabic** multiplied the effect ~5× (Run 4), and **more tokens** collapsed the
-variance enough to clear 2σ (Run 5). Prompting's dominance fell from z=−8.57 to
-≈−2. The progression is consistent with H1; the binding constraint each time was
-corpus tokens.
+Runs 3→5 looked like a clean monotone story — a bigger model+corpus flipped the
+grounded shift toward Egypt (Run 3), measuring **in Arabic** multiplied it ~5×
+(Run 4), and more tokens collapsed the variance enough to clear 2σ (Run 5). **Run
+6 breaks that story:** same protocol, a *freshly fetched* corpus, and the decisive
+effect collapses to null (z=−0.29). The Run-5 z=7.26 was driven by an unusually
+tight measurement-only noise band on one particular corpus sample; it does not
+survive resampling the corpus. The honest trend is **not** "every lever helps" —
+it is "the effect is small and corpus-sample-dependent, and cheap prompting beats
+it every time."
 
 ## Interpretation
+
+**Updated after Run 6 (read this first).** The Run-5-era conclusion below — "the
+decisive comparison passes" — **did not replicate**. On a freshly-sampled corpus
+with the upgraded harness (real MMLU/safety guardrails + the translated arm), the
+grounded−language effect is null (z=−0.29), grounded drifts away from Egypt as
+much as the neutral twin, and the new Arm 3 shows the content's *language* is
+irrelevant (grounded ≈ grounded_translated). The current honest position: **there
+is no robust evidence that culturally-grounded micro-CPT moves Inglehart-Welzel
+coordinates more than value-neutral CPT** at this scale; the one positive run
+(Run 5) appears to have been corpus-sample-specific, inflated by a
+measurement-only noise band. What *does* replicate across all six runs: capability
+(now real) is preserved, and a one-line persona prompt beats CPT every time. The
+Run-5 reading is kept below for the record.
 
 By Run 5 the **decisive comparison passes**: grounded CPT shifts toward Egypt
 significantly more than value-neutral CPT in the same language (+0.080, z=7.26) —
