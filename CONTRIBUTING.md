@@ -61,15 +61,15 @@ To stimulate submission and discussion of more "speculative" or "incomplete" ide
 
 To facilitate this when you draft a PR, you will find two description templates from which to select, one of which is for new contributions, with a check list to help you do the requested steps, and a second template for updates to existing code and documentation.
 
-In brief, for new contributions, we ask you do the following.
+In brief, for new contributions, we ask you to do the following.
 
-1. Create a subdirectory named with the format `contrib/<your_github_user_name>-<feature_name>`, e.g. `contrib/deanwampler-sovereign-data-enforcement/.
+1. Create a subdirectory named with the format `contrib/<your_github_user_name>-<feature_name>`, e.g. `contrib/h4x3r-sovereign-data-enforcement/`.
 1. Include a short `README.md` that describes the contribution, its motivation and status, and how to try/evaluate it.
-1. Add a LICENSE. By default, the project uses Apache-2.0 for code, CC-BY-4.0 for docs, and CDLA-2.0 for data (discussed more below).
-1. (If contributing code) I put the code in a `<feature_name>` subdirectory and the unit tests in a `tests` subdirectory.
+1. Add a `LICENSE`. By default, the project uses Apache-2.0 for code, CC-BY-4.0 for docs, and CDLA-2.0 for data (discussed more below).
+1. If contributing code, put it in a `<feature_name>` subdirectory and the unit tests in a `tests` subdirectory.
 1. Once these steps are done, open a focused PR.
 
-For the `LICENSE`, we recommend including the following content: 
+For the `LICENSE`, we recommend including content like the following: 
 
 ```
 This contribution follows the repository default licenses:

@@ -1,17 +1,17 @@
 # [New Contribution] YOUR TITLE
 
-> Edit this template as appropriate. For example, if the PR doesn't contain code, it's okay to delete the content below that is specific to code contributions.
+> Edit this template as appropriate. For example, if the PR doesn't contain code, it's okay to delete the content below that is specific to code contributions. Please also delete this paragraph!
 
 ## New Contribution Check List
 
 Follow this check list for new contributions:
 
-- [ ] I created a subdirectory named with the format `contrib/<my_github_user_name>-<feature_name>`, e.g. `contrib/h4x3r-sovereign-data-enforcement/.
+- [ ] I created a subdirectory named with the format `contrib/<my_github_user_name>-<feature_name>`, e.g. `contrib/h4x3r-sovereign-data-enforcement/`.
 - [ ] I included a short `README.md` that describes the contribution, its motivation and status, and how to try/evaluate it.
-- [ ] I added a LICENSE. (By default, the project uses Apache-2.0 for code, CC-BY-4.0 for docs, and CDLA-2.0 for data - discussed more below).
+- [ ] I added a `LICENSE`. (By default, the project uses Apache-2.0 for code, CC-BY-4.0 for docs, and CDLA-2.0 for data - discussed more below).
 - [ ] (If contributing code) I put the code in a `<feature_name>` subdirectory and the unit tests in a `tests` subdirectory.
 
-For the `LICENSE`, we recommend including the following content: 
+For the `LICENSE`, we recommend including content like the following: 
 
 ```
 This contribution follows the repository default licenses:
@@ -38,7 +38,7 @@ Related issues or PRs (#number, ...):
 
 ### Code Description
 
-When code is included, provide an overview of the most important details about the code:
+Provide an overview of the most important details about the code:
 
 * Important files and directories added
 * Important data structures and algorithms used
@@ -46,7 +46,7 @@ When code is included, provide an overview of the most important details about t
 
 ### Testing Performed
 
-Describe the testing performed to validate the contribution:
+Describe key aspects of the testing performed to validate the contribution:
 
 * Unit tests included in a `tests` subdirectory
 * Integration tests performed
@@ -61,7 +61,7 @@ Include an example of how to use the new function or feature:
 
 ## Checklist
 
-Confirm that the following have been completed, where applicable:
+In addition to the **New Contribution Check List** above, confirm that the following have been completed, where applicable:
 
 - [ ] I have read and understood the [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) guide.
 
@@ -75,12 +75,12 @@ For code contributions:
 
 For documentation contributions, including `tech-docs`:
 
-- [ ] I have followed the documentation style guide.
-- [ ] I have included appropriate screenshots, example code, etc.
+- [ ] I have followed the existing documentation styles and conventions.
+- [ ] I have included helpful diagrams, screenshots, tables, etc.
 
 Currently the content in `docs` for the Tapestry technical "microsite" ([the-ai-alliance.github.io/tapestry/](https://the-ai-alliance.github.io/tapestry/)) just points back to the repo's `tech-docs` locations. Eventually, mature content will be copied or migrated from `tech-docs` to this site for easier reading, searching, etc. **Hence, you should ignore `docs` for new contributions.**
 
 However, **if** you are proposing `docs` changes:
 
 - [ ] I have verified the microsite `make view-local` runs without errors and the changes render as expected.
-- [ ] I have checked that external links (i.e., those going to different domains) have `target="..."` specifications by running `./check-external-links.sh` and fixed any missing cases. (This tool doesn't add missing links nor does it verify the links are valid.)
+- [ ] I have checked that external links (i.e., those going to different domains) have `target="..."` specifications by running `./check-external-links.sh` and fixing any flagged URLs. (This tool doesn't add missing links itself nor does it verify that the links found are valid.)
