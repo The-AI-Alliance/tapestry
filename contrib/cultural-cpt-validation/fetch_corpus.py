@@ -38,8 +38,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
 import re
 import sys
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -71,6 +74,42 @@ _WIKI_LICENSE = "CC-BY-SA-4.0"
 _USER_AGENT = "tapestry-cultural-cpt/0.1 (EXP-001 corpus fetcher; +https://thealliance.ai)"
 _INTRO_CAP = 120  # words per doc in seed/intro mode (small, comparable)
 _FULL_CAP = 2000  # words per doc in --full mode (real-sized CPT corpus)
+# Wikipedia throttles bursts with HTTP 429. A large twin corpus is hundreds of
+# requests, so a build that just skips 429s drops a whole arm (it did: Run-of
+# 2026-06-14 fetched grounded, then got 429 on every language_matched title ->
+# empty arm -> fatal). Be polite (small inter-request delay) and back off on 429.
+_REQUEST_DELAY_S = 0.4  # courtesy gap between requests
+_MAX_RETRIES = 5  # attempts per URL before giving up
+_last_request_t = 0.0
+
+
+def _http_get_json(url: str) -> dict:
+    """GET a Wikipedia API URL as JSON, with a courtesy delay and 429/5xx backoff.
+
+    Honors ``Retry-After`` when present, else exponential backoff with jitter.
+    Raises the last error if every attempt fails, so the caller's existing
+    skip-and-continue still applies to genuinely broken titles (not throttling).
+    """
+    global _last_request_t
+    req = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
+    for attempt in range(_MAX_RETRIES):
+        gap = _REQUEST_DELAY_S - (time.monotonic() - _last_request_t)
+        if gap > 0:
+            time.sleep(gap)
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310 (trusted host)
+                return json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            if exc.code not in (429, 500, 502, 503, 504) or attempt == _MAX_RETRIES - 1:
+                raise
+            retry_after = exc.headers.get("Retry-After") if exc.headers else None
+            wait = float(retry_after) if (retry_after and retry_after.isdigit()) else 2.0**attempt
+            wait += random.uniform(0, 0.5)
+            print(f"  … HTTP {exc.code}; backing off {wait:.1f}s (attempt {attempt + 1})", file=sys.stderr)
+            time.sleep(wait)
+        finally:
+            _last_request_t = time.monotonic()
+    raise RuntimeError("unreachable")  # pragma: no cover
 
 
 def _wiki_text(lang: str, title: str, *, full: bool) -> tuple[str, str] | None:
@@ -87,9 +126,7 @@ def _wiki_text(lang: str, title: str, *, full: bool) -> tuple[str, str] | None:
     if not full:
         params["exintro"] = "1"
     url = f"https://{lang}.wikipedia.org/w/api.php?" + urllib.parse.urlencode(params)
-    req = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
-    with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310 (trusted host)
-        data = json.loads(resp.read().decode("utf-8"))
+    data = _http_get_json(url)
     pages = data.get("query", {}).get("pages", {})
     for page in pages.values():
         extract = (page.get("extract") or "").strip()
@@ -122,10 +159,8 @@ def _category_members(lang: str, category: str, limit: int) -> list[str]:
         "cmtype": "page",
     }
     url = f"https://{lang}.wikipedia.org/w/api.php?" + urllib.parse.urlencode(params)
-    req = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
     try:
-        with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310
-            data = json.loads(resp.read().decode("utf-8"))
+        data = _http_get_json(url)
     except Exception as exc:
         print(f"  ! category {category}: {exc}", file=sys.stderr)
         return []
