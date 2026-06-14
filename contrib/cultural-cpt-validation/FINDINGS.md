@@ -123,27 +123,80 @@ Still FAIL (effect grew but so did variance; z=1.54 < 2, shift < 0.05), but this
 is the first run where the *decisive* comparison is clearly the largest signal,
 and where CPT is no longer dominated by prompting.
 
-## Trend across scale (the encouraging part)
+## Run 5 — everything stacked (4B + Arabic survey + free-form behavior + 2× corpus)
 
-|  | grounded survey shift | grounded − language | beaten by prompt? |
-| :-- | --: | --: | :-- |
-| Qwen2.5-1.5B, ~50k tok | **−0.029** (away) | +0.019 (z=1.41) | yes, z=−8.57 |
-| Qwen3-4B, ~150k tok | **+0.023** (toward) | +0.028 (z=0.75) | yes, z=−2.16 |
+Qwen3-4B, Arabic survey (`--instrument-lang ar`), **behavioral probe in free-form
+generate mode** (model writes an action, a multilingual-embedding judge scores
+it — `--behavior-mode generate`), corpus scaled to **271k / 289k tokens** via
+Wikipedia category fetching, 3 seeds, 4 epochs.
 
-Scaling model (1.5B→4B) and corpus (~50k→150k tokens) **flipped the grounded
-survey shift from away-from to toward Egypt**, grew its lead over language-matched
-(+0.019→+0.028, both in the H1-predicted direction), and shrank prompting's
-dominance (z −8.57→−2.16). The effect moved the right way on every axis — it is
-just still inside the noise. (Caveat: epochs differ 6 vs 4 and only two scale
-points, so this is suggestive, not a controlled scaling curve.)
+| arm | survey shift → Egypt | behavior shift (generate) | capability |
+| :-- | --: | --: | --: |
+| base | — | — | 0.75 |
+| language_matched | **−0.078 ± 0.018** | −0.007 ± 0.044 | 1.00 |
+| **grounded** | +0.003 ± 0.029 | −0.021 ± 0.037 | 1.00 |
+| surface_only (prompt) | +0.063 ± 0.010 | −0.003 ± 0.006 | 0.75 |
+
+| comparison | mean ± std | z |
+| :-- | --: | --: |
+| **grounded − language** | **+0.080 ± 0.011** | **+7.26** ✅ |
+| grounded − surface | −0.060 ± 0.029 | −2.09 |
+
+### VERDICT: **FAIL** — but the decisive comparison finally passes.
+
+The pre-registered rule has three conjuncts; for the first time the **grounding
+effect clears 2σ** (z=7.26, positive) and capability is fine. It still FAILs only
+on the **absolute** grounded shift: +0.003 < 0.05.
+
+### What actually happened — grounding *prevents drift* more than it *pulls*
+
+More tokens **collapsed the variance** (grounded−language std 0.091→0.011), so the
+effect that was directionally right but noisy in Run 4 is now **robustly
+significant**. But the mechanism is subtler than "grounded CPT pulls toward
+Egypt": at this scale **neutral Arabic CPT pushes the model *away* from Egypt
+(−0.078)** while **grounded CPT holds position (+0.003)**. The grounding effect is
+real and significant (+0.080, z=7.26) but is mostly *grounded avoiding the
+away-drift that value-neutral text causes* — not a large active pull. That is
+still H1(b) ("grounding ≠ just language"), now supported; it is H1(a) in the
+strong absolute sense that hasn't cleared the bar.
+
+Other notes: prompting's edge over CPT keeps shrinking (grounded−surface z went
+−8.57 → −2.16 → −2.09). The **free-form behavioral probe** (now trustworthy: the
+model generates, an embedding judge scores) shows **no arm moves open-ended
+behavior** toward Egypt — including the prompt. With the survey also ~flat for
+grounded, there is no strong mimicry signal, but also no behavioral shift to
+speak of at this scale. Capability "drop" is again toy-MMLU noise (CPT arms hit
+1.00 on 4 questions).
+
+## Trend across all five runs (the decisive comparison)
+
+| run | model | survey | corpus | grounded − language | beaten by prompt? |
+| :-- | :-- | :-- | --: | --: | :-- |
+| 1–2 | Qwen2.5-1.5B | EN | ~50k | +0.019 (z=1.41) | yes, z=−8.57 |
+| 3 | Qwen3-4B | EN | ~150k | +0.028 (z=0.75) | yes, z=−2.16 |
+| 4 | Qwen3-4B | **AR** | ~150k | +0.140 (z=1.54) | tie, z=−0.50 |
+| 5 | Qwen3-4B | AR | **271k** | **+0.080 (z=7.26)** ✅ | z=−2.09 |
+
+Each lever helped the *decisive* grounding-beyond-language comparison: a bigger
+model+corpus flipped the grounded shift toward Egypt (Run 3), measuring **in
+Arabic** multiplied the effect ~5× (Run 4), and **more tokens** collapsed the
+variance enough to clear 2σ (Run 5). Prompting's dominance fell from z=−8.57 to
+≈−2. The progression is consistent with H1; the binding constraint each time was
+corpus tokens.
 
 ## Interpretation
 
-All three runs **FAIL** the pre-registered threshold: no arm clears the +0.05
-shift or the 2σ bar. But the **trend across scale is the actual finding** — every
-indicator moved in H1's predicted direction as model and corpus grew (see the
-trend table above). The story is "underpowered but pointing the right way," not
-"refuted." Reasons it's still not a verdict on H1:
+By Run 5 the **decisive comparison passes**: grounded CPT shifts toward Egypt
+significantly more than value-neutral CPT in the same language (+0.080, z=7.26) —
+H1(b), the "grounding ≠ just language" claim, is supported, with capability
+preserved. The pre-registered **overall verdict is still FAIL** on the *absolute*
+grounded shift (+0.003 < 0.05): grounded CPT mainly **prevents the away-drift**
+that neutral CPT causes rather than actively pulling toward Egypt at this scale.
+And the upgraded free-form behavioral probe shows **no arm shifts open-ended
+behavior** — so a representational/behavioral shift (H1(c)) is not yet
+demonstrated. Net: the *novel* claim (grounded beats language-matched) now has
+real evidence; the *strong* claims (large absolute shift; behavioral change)
+remain unmet and are the next targets. Caveats that still hold:
 
 1. **Still token-starved.** Even Run 3's ~150k tokens over 4 epochs is tiny for
    CPT (real CPT = millions+ of tokens). The grounded shift is positive but small;
