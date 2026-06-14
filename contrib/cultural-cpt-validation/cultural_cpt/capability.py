@@ -122,20 +122,16 @@ def _bank_for(lang: str) -> tuple[MCQ, ...]:
 
 # --- Optional real MMLU / Arabic-MMLU (GPU box) ------------------------------
 
-# Dataset ids tried per language, in order. Each entry is (repo, config, split,
-# question_key, choices_key, answer_key). Arabic ids are tried best-effort; any
-# that is unavailable is skipped. answer is an int index OR a letter (A-D).
-_EXTERNAL_SOURCES: dict[str, tuple[tuple, ...]] = {
-    "en": (("cais/mmlu", "all", "test", "question", "choices", "answer"),),
-    "ar": (
-        ("MBZUAI/ArabicMMLU", None, "test", "question", "choices", "answer"),
-        ("OALL/Arabic_MMLU", None, "test", "question", "choices", "answer"),
-    ),
-}
+# Real MMLU schemas differ per dataset, so each has a small adapter (load_dataset
+# -> list[MCQ]) rather than one rigid column mapping. Adapters are tried in order
+# per language; the first that yields items wins, and any failure is swallowed so
+# the guardrail degrades to the embedded bank instead of crashing a long run.
 
 
 def _coerce_answer_index(answer, n_options: int) -> int | None:
     """Normalize an MMLU answer (int index or letter 'A'..'D') to an index."""
+    if isinstance(answer, bool):
+        return None
     if isinstance(answer, int) and 0 <= answer < n_options:
         return answer
     if isinstance(answer, str):
@@ -149,6 +145,53 @@ def _coerce_answer_index(answer, n_options: int) -> int | None:
     return None
 
 
+def _sample(items: list[MCQ], limit: int, seed: int) -> tuple[MCQ, ...]:
+    if limit and len(items) > limit:
+        items = random.Random(seed).sample(items, limit)
+    return tuple(items)
+
+
+def _load_cais_mmlu(load_dataset, limit: int, seed: int) -> tuple[MCQ, ...]:  # pragma: no cover - needs network
+    """cais/mmlu: question, choices (list[str]), answer (int index)."""
+    ds = load_dataset("cais/mmlu", "all", split="test")
+    items: list[MCQ] = []
+    for row in ds:
+        opts = row.get("choices")
+        if not opts or len(opts) < 2:
+            continue
+        idx = _coerce_answer_index(row.get("answer"), len(opts))
+        if idx is not None:
+            items.append(MCQ(str(row["question"]), tuple(str(o) for o in opts), idx))
+    return _sample(items, limit, seed)
+
+
+def _load_mbzuai_arabicmmlu(load_dataset, limit: int, seed: int) -> tuple[MCQ, ...]:  # pragma: no cover - needs network
+    """MBZUAI/ArabicMMLU ('All' config): Question, Option 1..5 (unused = 'None'),
+    Answer Key (letter), optional Context."""
+    ds = load_dataset("MBZUAI/ArabicMMLU", "All", split="test")
+    items: list[MCQ] = []
+    for row in ds:
+        opts = [row.get(f"Option {i}") for i in range(1, 6)]
+        opts = [str(o) for o in opts if o is not None and str(o).strip() not in ("", "None")]
+        if len(opts) < 2:
+            continue
+        idx = _coerce_answer_index(row.get("Answer Key"), len(opts))
+        if idx is None:
+            continue
+        question = str(row.get("Question", ""))
+        context = row.get("Context")
+        if context and str(context).strip() not in ("", "None"):
+            question = f"{context}\n{question}"
+        items.append(MCQ(question, tuple(opts), idx))
+    return _sample(items, limit, seed)
+
+
+_EXTERNAL_BUILDERS: dict[str, tuple] = {
+    "en": (_load_cais_mmlu,),
+    "ar": (_load_mbzuai_arabicmmlu,),
+}
+
+
 def _load_external(lang: str, limit: int, *, seed: int = 0) -> tuple[MCQ, ...] | None:
     """Load real MMLU/Arabic-MMLU items, or ``None`` if unavailable.
 
@@ -160,25 +203,11 @@ def _load_external(lang: str, limit: int, *, seed: int = 0) -> tuple[MCQ, ...] |
         from datasets import load_dataset
     except Exception:  # pragma: no cover - datasets is GPU-box-only
         return None
-    for repo, config, split, qk, ck, ak in _EXTERNAL_SOURCES.get(lang, ()):  # pragma: no cover - needs network
+    for builder in _EXTERNAL_BUILDERS.get(lang, ()):  # pragma: no cover - needs network
         try:
-            ds = load_dataset(repo, config, split=split) if config else load_dataset(repo, split=split)
-            items: list[MCQ] = []
-            for row in ds:
-                opts = row.get(ck)
-                if isinstance(opts, dict):  # some schemas store choices as {"text": [...]}
-                    opts = opts.get("text")
-                if not opts or len(opts) < 2:
-                    continue
-                idx = _coerce_answer_index(row.get(ak), len(opts))
-                if idx is None:
-                    continue
-                items.append(MCQ(str(row[qk]), tuple(str(o) for o in opts), idx))
-            if not items:
-                continue
-            if limit and len(items) > limit:
-                items = random.Random(seed).sample(items, limit)
-            return tuple(items)
+            items = builder(load_dataset, limit, seed)
+            if items:
+                return items
         except Exception:  # pragma: no cover - network / schema drift
             continue
     return None
