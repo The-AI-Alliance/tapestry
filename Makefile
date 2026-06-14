@@ -65,6 +65,8 @@ make before-pr          # Make format-lint-type-check and tests.
 For the consortium-training prototype:
 
 make consortium-demo    # Run the N+1 consortium-training proof-of-concept demo.
+make consortium-experiment
+                        # Run deterministic PoC metrics for consortium-training rounds.
 make consortium-tests   # Run only the consortium-training prototype tests.
 
 For the documentation website:
@@ -126,15 +128,19 @@ unit-tests::
 	cd ${SRC_DIR} && \
 	  uv run pytest tests -q
 
-.PHONY: consortium-demo consortium-tests
+.PHONY: consortium-demo consortium-experiment consortium-tests
 
 consortium-demo::
 	@echo "${INFO}Running the consortium-training demo...${_END}"
 	uv run python examples/consortium_training_demo.py
 
+consortium-experiment::
+	@echo "${INFO}Running the consortium-training experiment metrics...${_END}"
+	PYTHONPATH="${PWD}/${SRC_DIR}:${PWD}/contrib/jneums-consortium-experiment" uv run python contrib/jneums-consortium-experiment/run.py
+
 consortium-tests::
 	@echo "${INFO}Running the consortium-training tests...${_END}"
-	uv run pytest ${SRC_DIR}/tests/tapestry/training/consortium -q
+	PYTHONPATH=${PWD}/${SRC_DIR}:${PWD}/contrib/jneums-consortium-experiment uv run pytest ${SRC_DIR}/tests/tapestry/training/consortium contrib/jneums-consortium-experiment/tests -q
 
 .PHONY: before-pr format-lint-type-check flt
 before-pr:: format-lint-type-check tests

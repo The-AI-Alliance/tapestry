@@ -36,7 +36,8 @@ The source code is under the [`src`](src/) directory.
 
 * Use the [**`Makefile`**](Makefile) targets, e.g., `make help`. More details are in [**Development**](#development-anchor) below.
 * Runnable demos in [**`examples/`**](examples/) (try `make consortium-demo`).
-* Consortium training prototype in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md) (try `make consortium-demo` and also `make consortium-tests`).
+* Consortium training prototype in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md) (try `make consortium-demo` and `make consortium-tests`).
+* Contrib experiment metrics for the consortium prototype in [**`contrib/jneums-consortium-experiment/`**](contrib/jneums-consortium-experiment/README.md) (try `make consortium-experiment`).
 
 ### Working with the Technical Documentation
 
