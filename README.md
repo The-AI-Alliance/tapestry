@@ -4,7 +4,7 @@
 
 #### Project Tapestry aims to give every nation and participant frontier AI they can call their own.
 
-#### A global consortium of partners pools data and compute to train a shared **frontier** base model — stronger than any single party could build alone, thanks to a larger and more diverse corpus than ever before.
+#### It brings together talented people, data, and compute from a global consortium of partners to train a shared **frontier** base model — stronger than any single party could build alone, thanks to a larger and more diverse corpus than ever before.
 
 #### From that shared base, each partner builds and owns **sovereign** models, aligned to their own **national**, **socio-cultural**, and **industrial** needs, using the Tapestry open source training platform. Ownership of data and compute stays with the partners throughout.
 
