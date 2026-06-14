@@ -6,6 +6,7 @@ direction of cultural shift — on the toy model that would be testing noise.
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -17,6 +18,7 @@ from cultural_cpt import (  # noqa: E402
     ExperimentConfig,
     StatsConfig,
     run_aggregation,
+    run_corpus_resampled,
     run_experiment,
     run_multiseed,
 )
@@ -201,3 +203,104 @@ def test_multiseed_deterministic() -> None:
         seeds=(0, 1, 2),
     )
     assert run_multiseed(config).to_dict() == run_multiseed(config).to_dict()
+
+
+# --- corpus-resampled go/no-go (the cross-corpus noise band) ----------------
+
+
+def _equal_token_corpus(tmp_path: Path) -> Path:
+    """A tiny twin corpus with equal per-doc token counts, culture in GROUND_TRUTH.
+
+    Equal token lengths keep the matched-twin ratio at 1.0 under any equal-size
+    subsample, so resampling exercises the plumbing without tripping the twin
+    control. Text is neutral filler (no WVS leakage); numbers here carry no claim.
+    """
+    grounded = [
+        {
+            "id": f"g{i}",
+            "text": "alpha beta gamma delta epsilon zeta eta theta",
+            "source": "s",
+            "license": "CC-BY-SA-4.0",
+            "lang": "en",
+            "domain": "law",
+        }
+        for i in range(10)
+    ]
+    matched = [
+        {
+            "id": f"m{i}",
+            "text": "one two three four five six seven eight",
+            "source": "s",
+            "license": "CC-BY-SA-4.0",
+            "lang": "en",
+            "domain": "weather",
+        }
+        for i in range(10)
+    ]
+    (tmp_path / "grounded.jsonl").write_text("".join(json.dumps(d) + "\n" for d in grounded), encoding="utf-8")
+    (tmp_path / "language_matched.jsonl").write_text("".join(json.dumps(d) + "\n" for d in matched), encoding="utf-8")
+    (tmp_path / "manifest.json").write_text(
+        json.dumps(
+            {
+                "culture": "egypt",
+                "language": "en",
+                "arms": {
+                    "grounded": {
+                        "file": "grounded.jsonl",
+                        "lang": "en",
+                        "register": "encyclopedic",
+                        "value_laden": True,
+                    },
+                    "language_matched": {
+                        "file": "language_matched.jsonl",
+                        "lang": "en",
+                        "register": "encyclopedic",
+                        "value_laden": False,
+                    },
+                },
+                "twin_matching": {"token_ratio_tolerance": 0.20},
+            }
+        ),
+        encoding="utf-8",
+    )
+    return tmp_path
+
+
+def test_corpus_resampled_aggregates_over_draws(tmp_path: Path) -> None:
+    root = _equal_token_corpus(tmp_path)
+    config = StatsConfig(
+        base=ExperimentConfig(mode="smoke", culture="egypt", corpus_path=str(root), epochs=1, hidden_size=32),
+        seeds=(0, 1),
+    )
+    result = run_corpus_resampled(config, draws=3, sample_fraction=0.6)
+    assert [d.draw for d in result.draws] == [0, 1, 2]
+    assert {c.name for c in result.comparisons} == {
+        "grounded_vs_language",
+        "grounded_vs_translated",
+        "grounded_vs_surface",
+    }
+    # The reported band is the cross-draw std (>= 0), and the verdict names it.
+    assert result.grounded_shift_std >= 0.0
+    assert "cross-corpus-draw band" in result.verdict
+    assert isinstance(result.passed, bool)
+
+
+def test_corpus_resampled_rejects_full_pool() -> None:
+    config = StatsConfig(base=ExperimentConfig(mode="smoke", culture="egypt"), seeds=(0,))
+    try:
+        run_corpus_resampled(config, draws=2, sample_fraction=1.0)
+    except ValueError:
+        pass
+    else:  # pragma: no cover
+        raise AssertionError("full pool should be rejected for resampling")
+
+
+def test_corpus_resampled_deterministic(tmp_path: Path) -> None:
+    root = _equal_token_corpus(tmp_path)
+    config = StatsConfig(
+        base=ExperimentConfig(mode="smoke", culture="egypt", corpus_path=str(root), epochs=1, hidden_size=32),
+        seeds=(0, 1),
+    )
+    a = run_corpus_resampled(config, draws=2, sample_fraction=0.6)
+    b = run_corpus_resampled(config, draws=2, sample_fraction=0.6)
+    assert a.to_dict() == b.to_dict()

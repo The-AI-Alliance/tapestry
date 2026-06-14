@@ -86,6 +86,10 @@ class ExperimentConfig:
     dtype: str = "float32"  # hf mode: "float32" | "bfloat16" (bf16 halves CPT memory)
     instrument_lang: str = "en"  # language to administer the survey/behavior probe in ("en" | "ar")
     behavior_mode: str = "logprob"  # behavioral probe: "logprob" (fixed options) | "generate" (free-form + judge)
+    # Corpus draw: a subset of each arm's on-disk pool, for resampling the corpus.
+    # fraction=1.0 (or seed=None) uses the full pool — the default single-corpus run.
+    corpus_sample_fraction: float = 1.0
+    corpus_sample_seed: int | None = None
 
 
 @dataclass(frozen=True)
@@ -226,7 +230,12 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
         model = base.clone()
         train_loss: float | None = None
         if spec.corpus is not None:
-            corpus = load_corpus(spec.corpus, path=config.corpus_path)
+            corpus = load_corpus(
+                spec.corpus,
+                path=config.corpus_path,
+                sample_fraction=config.corpus_sample_fraction,
+                sample_seed=config.corpus_sample_seed,
+            )
             train_loss = model.train_on_texts(list(corpus.documents), epochs=config.epochs, lr=config.lr)
 
         persona = _persona_prefix(config.culture, config.instrument_lang) if spec.persona else ""

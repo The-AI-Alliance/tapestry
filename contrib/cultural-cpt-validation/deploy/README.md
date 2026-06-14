@@ -57,6 +57,15 @@ rsync -az -e "ssh -p <SSH_PORT>" \
 # 5. Run it (regenerates the corpus on-box, then the experiment).
 $SSH 'bash /workspace/tapestry/contrib/cultural-cpt-validation/deploy/run_on_instance.sh'
 
+# 5b. Corpus-RESAMPLED go/no-go (the real noise band; see "Corpus resampling"
+#     below). Decides on cross-corpus variance, not the measurement-only seed
+#     band. Cost ≈ CORPUS_DRAWS × the single-corpus run.
+$SSH 'REPO=/workspace/tapestry MODEL=Qwen/Qwen3-4B-Instruct-2507 \
+  SEEDS=0,1,2 EPOCHS=4 PER_DOMAIN=18 MAX_WORDS=4000 CAT_LIMIT=25 MAX_TOKENS=300000 \
+  DTYPE=bfloat16 INSTRUMENT_LANG=ar BEHAVIOR_MODE=generate \
+  CORPUS_DRAWS=4 CORPUS_FRACTION=0.7 \
+  bash /workspace/tapestry/contrib/cultural-cpt-validation/deploy/run_on_instance.sh'
+
 # 6. Pull the result back.
 rsync -az -e "ssh -p <SSH_PORT>" \
   root@<SSH_HOST>:/workspace/tapestry/runs/egypt_real/ \
@@ -79,3 +88,24 @@ For the pre-registered multi-seed go/no-go, run `run_stats.py` with the same
 `--mode hf` config across seeds instead of `run.py` (it applies the PASS/FAIL
 threshold). Start with `run.py` for one seed to confirm the run is sane and
 sized right before spending on multiple seeds.
+
+## Corpus resampling (the real noise band)
+
+Run 5's headline `grounded − language` effect (z=7.26) did **not** survive a
+fresh corpus pull (Run 6, z=−0.29). The reason: within one corpus the seeds vary
+only *measurement* (HF training is deterministic across seeds), so the cross-seed
+std understates the true variance — the real variance is *which documents land in
+the twin*. `CORPUS_DRAWS=N` (with `CORPUS_FRACTION<1`) re-runs the whole
+multi-seed experiment on `N` deterministic subsamples of the on-disk pool and
+decides PASS/FAIL on the **cross-draw** spread of the decisive comparison.
+
+- Each draw samples ~`CORPUS_FRACTION` of each arm's *token mass* (not document
+  count), so the matched-twin token-budget control holds per draw.
+- Draws are seeded stably (SHA-256), so a sweep reproduces exactly on the box and
+  in CI; `result.json` records each draw plus the cross-draw band and verdict.
+- `CORPUS_FRACTION` must be `<1.0` (the full pool makes every draw identical).
+  0.6–0.8 is a reasonable range; lower fraction = more independent draws but
+  fewer tokens each. Cost scales ~linearly with `CORPUS_DRAWS`.
+
+This is the recommended decisive run: it answers whether `grounded − language` is
+genuinely null or merely noisy, instead of reading a z-score off the wrong band.

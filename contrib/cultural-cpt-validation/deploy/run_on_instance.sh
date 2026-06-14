@@ -27,6 +27,12 @@ LR="${LR:-2e-5}"
 INSTRUMENT_LANG="${INSTRUMENT_LANG:-en}"
 BEHAVIOR_MODE="${BEHAVIOR_MODE:-logprob}"
 TRANSLATE="${TRANSLATE:-0}"  # 1 = also build the grounded_translated arm (Arm 3, needs MT)
+# Corpus resampling: with CORPUS_DRAWS>1 the go/no-go decides on the cross-corpus
+# noise band — re-runs all SEEDS per draw, each on a CORPUS_FRACTION subset of the
+# pool. This is the real variance source (Run 5's effect did not survive a fresh
+# corpus pull). Cost scales ~linearly with CORPUS_DRAWS.
+CORPUS_DRAWS="${CORPUS_DRAWS:-1}"
+CORPUS_FRACTION="${CORPUS_FRACTION:-1.0}"
 
 CC="$REPO/contrib/cultural-cpt-validation"
 export PYTHONPATH="$REPO/src:$CC"
@@ -63,6 +69,7 @@ if [ -n "$SEEDS" ]; then
     --device cuda --dtype "$DTYPE" \
     --epochs "$EPOCHS" --lr "$LR" --seeds "$SEEDS" \
     --instrument-lang "$INSTRUMENT_LANG" --behavior-mode "$BEHAVIOR_MODE" \
+    --corpus-draws "$CORPUS_DRAWS" --corpus-fraction "$CORPUS_FRACTION" \
     --out "$OUT"
 else
   OUT="$REPO/runs/${CULTURE}_real"

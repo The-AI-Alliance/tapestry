@@ -56,9 +56,17 @@ every run.
 - **Multi-seed pre-registered go/no-go** (`run_stats.py` / `stats.py`):
   mean±std, effect sizes (z), PASS/FAIL on `min_grounded_shift` /
   `sigma_multiple` / `max_capability_drop`.
+- **Corpus-resampled go/no-go** (`run_stats.py --corpus-draws N --corpus-fraction
+  F`, `stats.run_corpus_resampled`): re-runs the whole multi-seed experiment on N
+  deterministic token-budget subsamples of the pool and decides on the
+  **cross-draw** band — the real variance source, since HF training is
+  deterministic across seeds, so the cross-seed std understated it. This is the
+  direct test of whether Run 5's effect was corpus-sample-specific. The
+  matched-twin token-budget control is enforced per draw; draws are SHA-256-seeded
+  so a sweep reproduces exactly. See `deploy/README.md` "Corpus resampling".
 - **Aggregation-survival experiment** (`run_aggregation.py`): FedAvg across
   cultures (round-two; smoke only so far).
-- **30 tests** (`tests/`), all green; `ruff` clean; black-formatted (line 120).
+- **46 tests** (`tests/`), all green; `ruff` clean; black-formatted (line 120).
 
 ## Repo map (the files that matter)
 
@@ -173,12 +181,21 @@ judge, multi-seed go/no-go, the Egypt Arabic corpus (regenerable from `titles/`)
 
 ## Open questions & recommended next steps
 
-The novel claim (grounded ≠ language) now has evidence; the strong claims don't.
-In rough priority:
+After Run 6 the honest read is: no robust grounding effect at this scale, and the
+z-scores were computed against a measurement-only band. In rough priority:
 
+0. **DECISIVE NEXT RUN — corpus-resampled go/no-go (now wired).** Run the
+   `--corpus-draws N --corpus-fraction F` sweep (e.g. `CORPUS_DRAWS=4
+   CORPUS_FRACTION=0.7`; see `deploy/README.md`). This decides on the cross-corpus
+   band — the variance that actually broke Run 5→6 — and answers whether
+   `grounded − language` is genuinely null or merely noisy. Do this *before*
+   spending on bigger scale: a positive single-corpus z is meaningless until it
+   survives resampling. If the band confirms null → write it up and pivot to (2);
+   if a real effect survives → *then* push scale (1).
 1. **Push tokens/epochs further** to see if grounded crosses from *prevent-drift*
    into *active pull* (does the absolute shift reach +0.05?). Infra is ready —
-   raise `MAX_TOKENS`/`CAT_LIMIT`/`EPOCHS`.
+   raise `MAX_TOKENS`/`CAT_LIMIT`/`EPOCHS`. Only worth it once (0) shows a
+   resampling-robust effect to chase.
 2. **Understand the prevent-drift mechanism** — *why* does value-neutral Arabic
    CPT push the model away from Egypt? This may be the more interesting science
    now (catastrophic-forgetting-style drift vs. genuine value movement).
@@ -198,5 +215,8 @@ In rough priority:
 Qwen3-4B via Vast.ai 5090s. Run 5's significant grounded-vs-language result
 (z=7.26) did NOT replicate in Run 6 (z=−0.29) on a fresh corpus with real
 guardrails + the translated arm — current read: no robust grounding effect at
-this scale; prompting beats CPT. See FINDINGS.md for the six runs and
-deploy/README.md to run another."
+this scale; prompting beats CPT. The decisive next run is the now-wired
+corpus-resampled go/no-go (`--corpus-draws`), which decides on the cross-corpus
+band that broke Run 5→6 instead of the measurement-only seed band. See
+FINDINGS.md for the six runs and deploy/README.md ('Corpus resampling') to run
+it."

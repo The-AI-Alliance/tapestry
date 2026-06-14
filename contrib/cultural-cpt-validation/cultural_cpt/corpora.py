@@ -107,18 +107,30 @@ def load_culture_corpus(culture: str, *, path: str = "") -> Corpus:
     return Corpus(name=f"grounded:{culture}", documents=_CULTURE_GROUNDED[culture])
 
 
-def load_corpus(arm_name: str, *, path: str = "") -> Corpus:
+def load_corpus(
+    arm_name: str,
+    *,
+    path: str = "",
+    sample_fraction: float = 1.0,
+    sample_seed: int | None = None,
+) -> Corpus:
     """Return the corpus for an arm.
 
     Corpus realism is independent of the model backend: with no ``path`` this
     returns the illustrative placeholder text (which carries no claim — the
     caller is expected to flag it). With a ``path`` it must load real text from
     a directory or dataset id; left as a seam.
+
+    ``sample_fraction``/``sample_seed`` select a deterministic corpus *draw* (a
+    subset of the on-disk pool) so a caller can resample the corpus across draws;
+    they only apply to the real-data path.
     """
     if path:
         from . import dataset
 
-        docs = dataset.load_arm_documents(Path(path), arm_name)
+        docs = dataset.load_arm_documents(
+            Path(path), arm_name, sample_fraction=sample_fraction, sample_seed=sample_seed
+        )
         return Corpus(name=arm_name, documents=tuple(d.text for d in docs))
     if arm_name == "grounded":
         return Corpus(name="grounded", documents=_GROUNDED)

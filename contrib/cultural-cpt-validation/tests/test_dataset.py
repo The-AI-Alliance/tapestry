@@ -238,3 +238,32 @@ def test_recency_out_of_window_rejected(tmp_path: Path) -> None:
     root = _write_root(tmp_path, grounded=[_doc(year=2030)], matched=[_doc(id="m0")], manifest=manifest)
     with pytest.raises(dataset.CorpusError, match="year"):
         dataset.load_arm_documents(root, "grounded")
+
+
+# --- corpus resampling (the cross-corpus noise band) ------------------------
+
+
+def test_subsample_is_deterministic_across_calls() -> None:
+    docs = [dataset.DocumentRecord.from_json(_doc(id=f"d{i}"), where="t") for i in range(16)]
+    a = dataset.subsample_documents(docs, arm="grounded", fraction=0.5, sample_seed=3)
+    b = dataset.subsample_documents(docs, arm="grounded", fraction=0.5, sample_seed=3)
+    assert [d.id for d in a] == [d.id for d in b]
+    assert len(a) == 8
+
+
+def test_subsample_draws_differ_and_full_pool_is_passthrough() -> None:
+    docs = [dataset.DocumentRecord.from_json(_doc(id=f"d{i}"), where="t") for i in range(16)]
+    draw0 = {d.id for d in dataset.subsample_documents(docs, arm="grounded", fraction=0.5, sample_seed=0)}
+    draw1 = {d.id for d in dataset.subsample_documents(docs, arm="grounded", fraction=0.5, sample_seed=1)}
+    assert draw0 != draw1  # different draws see different subsets
+    # fraction>=1 or no seed returns the full pool unchanged
+    assert len(dataset.subsample_documents(docs, arm="grounded", fraction=1.0, sample_seed=0)) == 16
+    assert len(dataset.subsample_documents(docs, arm="grounded", fraction=0.5, sample_seed=None)) == 16
+
+
+def test_load_arm_documents_subsamples_and_keeps_twin_valid() -> None:
+    full = dataset.load_arm_documents(_SEED_ROOT, "grounded")
+    drawn = dataset.load_arm_documents(_SEED_ROOT, "grounded", sample_fraction=0.6, sample_seed=0)
+    assert 0 < len(drawn) < len(full)  # a real subset
+    # twin check ran on the subsampled pair without raising
+    assert all(d.text.strip() for d in drawn)

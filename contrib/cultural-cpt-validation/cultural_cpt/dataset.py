@@ -31,7 +31,9 @@ See ``data/README.md`` for the schema and the sourcing protocol.
 
 from __future__ import annotations
 
+import hashlib
 import json
+import random
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -288,6 +290,70 @@ def _max_window_jaccard(doc_toks: Sequence[str], probe_toks: Sequence[str]) -> f
     return best
 
 
+# --- Corpus resampling -------------------------------------------------------
+#
+# Run 5's headline effect did not survive a *fresh* corpus pull (Run 6): the
+# real variance source is which documents land in the twin, not the (deterministic)
+# training seed. To estimate that band honestly we resample the on-disk pool:
+# each "draw" deterministically subsamples a fraction of each arm's documents,
+# so the cross-draw spread of the decisive comparison is the genuine noise band.
+
+
+def _stable_seed(sample_seed: int, arm: str) -> int:
+    """A process-stable integer seed from (draw seed, arm).
+
+    Uses SHA-256 rather than ``hash()`` so the selected subset is identical
+    across processes/machines regardless of ``PYTHONHASHSEED`` — a corpus draw
+    must reproduce exactly on the GPU box and in CI. The arm name is mixed in so
+    the twin arms draw independent (but each individually reproducible) subsets.
+    """
+    digest = hashlib.sha256(f"{sample_seed}:{arm}".encode("utf-8")).hexdigest()
+    return int(digest[:16], 16)
+
+
+def subsample_documents(
+    docs: Sequence[DocumentRecord],
+    *,
+    arm: str,
+    fraction: float,
+    sample_seed: int | None,
+) -> list[DocumentRecord]:
+    """Deterministically subsample one arm's documents for a corpus draw.
+
+    ``fraction >= 1.0`` or ``sample_seed is None`` returns the full pool (the
+    default, single-corpus behavior). Otherwise it keeps a random subset whose
+    **token mass** is ~``fraction`` of the arm's pool, by shuffling documents
+    with a process-stable seed and accumulating until the token budget is met.
+
+    Sampling on *tokens* (not document count) is what keeps the matched twin
+    valid per draw: grounded and language-matched docs have different length
+    distributions, so a fixed document-count fraction drifts their token-budget
+    ratio out of tolerance, whereas shrinking each arm to the same fraction of
+    its own token mass preserves the (already-matched) full-corpus ratio. The
+    per-arm controls and the twin check then run on the subsampled set, so we
+    validate exactly what we train on.
+    """
+    if sample_seed is None or fraction >= 1.0:
+        return list(docs)
+    if fraction <= 0.0:
+        raise CorpusError(f"arm {arm!r}: corpus sample fraction must be in (0, 1], got {fraction}")
+    tokens = [len(_normalize(d.text)) for d in docs]
+    total = sum(tokens)
+    if total == 0:
+        return list(docs)
+    target = fraction * total
+    order = list(range(len(docs)))
+    random.Random(_stable_seed(sample_seed, arm)).shuffle(order)
+    picked: list[int] = []
+    acc = 0
+    for i in order:
+        picked.append(i)
+        acc += tokens[i]
+        if acc >= target:
+            break
+    return [docs[i] for i in sorted(picked)]
+
+
 # --- Loading + validation ----------------------------------------------------
 
 
@@ -405,12 +471,20 @@ def load_arm_documents(
     decontaminate: bool = True,
     max_jaccard: float = 0.6,
     check_twin: bool = True,
+    sample_fraction: float = 1.0,
+    sample_seed: int | None = None,
 ) -> list[DocumentRecord]:
     """Load and validate one arm's documents from a real corpus root.
 
     Runs the per-arm checks always, and the matched-twin check whenever the
     requested arm is part of the twin (``grounded``/``language_matched``) and
     its partner is present in the manifest.
+
+    ``sample_fraction`` < 1 with a ``sample_seed`` selects one corpus *draw* — a
+    deterministic subset of each arm's pool — so callers can resample the corpus
+    to estimate the cross-corpus noise band. The validity controls and twin check
+    run on the subsampled set; both twin arms are subsampled with the same draw
+    seed so the matched-twin invariant is enforced per draw.
     """
     root = Path(root)
     manifest = manifest or CorpusManifest.load(root)
@@ -418,6 +492,7 @@ def load_arm_documents(
         raise CorpusError(f"arm {arm!r} not in manifest for {root} (declared: {sorted(manifest.arms)})")
     spec = manifest.arms[arm]
     docs = _read_jsonl(root / spec.file)
+    docs = subsample_documents(docs, arm=arm, fraction=sample_fraction, sample_seed=sample_seed)
     _validate_arm(arm, spec, docs, decontaminate=decontaminate, max_jaccard=max_jaccard)
 
     if (
@@ -431,6 +506,7 @@ def load_arm_documents(
     ):
         partner = "language_matched" if arm == "grounded" else "grounded"
         partner_docs = _read_jsonl(root / manifest.arms[partner].file)
+        partner_docs = subsample_documents(partner_docs, arm=partner, fraction=sample_fraction, sample_seed=sample_seed)
         _validate_arm(
             partner,
             manifest.arms[partner],

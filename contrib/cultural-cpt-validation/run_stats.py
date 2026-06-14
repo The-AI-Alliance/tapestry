@@ -19,7 +19,57 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from cultural_cpt import ExperimentConfig, StatsConfig, run_multiseed  # noqa: E402
+from dataclasses import asdict  # noqa: E402
+
+from cultural_cpt import (  # noqa: E402
+    ExperimentConfig,
+    StatsConfig,
+    run_corpus_resampled,
+    run_multiseed,
+)
+
+
+def _run_resampled(config: StatsConfig, out_dir: Path, *, draws: int, fraction: float) -> None:
+    """Resample the corpus across draws and report the cross-corpus go/no-go."""
+    if fraction >= 1.0:
+        raise SystemExit(
+            "--corpus-draws >1 needs --corpus-fraction <1.0 (otherwise every draw is the "
+            "full pool and identical). Try e.g. --corpus-fraction 0.6."
+        )
+
+    def _checkpoint(summaries: list) -> None:
+        # A sweep is many GPU-hours and silent until the end; persist after each
+        # draw so progress is pollable and an interrupted spot box loses nothing.
+        partial = {
+            "status": "in_progress",
+            "draws_completed": len(summaries),
+            "draws_total": draws,
+            "sample_fraction": fraction,
+            "draws": [asdict(s) for s in summaries],
+        }
+        (out_dir / "partial.json").write_text(json.dumps(partial, indent=2, sort_keys=True) + "\n")
+        print(f"  [checkpoint] draw {len(summaries)}/{draws} done -> {out_dir / 'partial.json'}", flush=True)
+
+    result = run_corpus_resampled(config, draws=draws, sample_fraction=fraction, on_draw=_checkpoint)
+    (out_dir / "result.json").write_text(json.dumps(result.to_dict(), indent=2, sort_keys=True) + "\n")
+
+    print("EXP-001 corpus-resampled go/no-go (decision on the cross-corpus band)")
+    print(f"  culture : {config.base.culture}   inner seeds : {result.seeds}   draws : {draws} @ {fraction:.2f}")
+    print("  per-draw point estimates (each averaged over the inner seeds):")
+    print("    draw  grounded-shift   g-vs-language   g-vs-translated   g-vs-surface")
+    for d in result.draws:
+        print(
+            f"    {d.draw:<5} {d.grounded_shift:+.3f}          {d.grounded_vs_language:+.3f}"
+            f"          {d.grounded_vs_translated:+.3f}            {d.grounded_vs_surface:+.3f}"
+        )
+    print(f"  grounded shift across draws: {result.grounded_shift_mean:+.3f} +- {result.grounded_shift_std:.3f}")
+    print("  decisive comparisons across draws (mean +- std, z = effect/corpus-noise):")
+    for comp in result.comparisons:
+        print(f"    {comp.name:<24} {comp.mean:+.3f} +- {comp.std:.3f}   z={comp.z:+.2f}")
+    print(f"  VERDICT: {'PASS' if result.passed else 'FAIL'}")
+    print(f"    {result.verdict}")
+    if result.caveat:
+        print(f"\n  {result.caveat}")
 
 
 def main() -> None:
@@ -40,6 +90,18 @@ def main() -> None:
         "--behavior-mode", default="logprob", choices=("logprob", "generate"), help="behavioral probe mode"
     )
     parser.add_argument("--seeds", default="0,1,2,3,4", help="comma-separated seeds")
+    parser.add_argument(
+        "--corpus-draws",
+        type=int,
+        default=1,
+        help="independent corpus resamples; >1 decides on the cross-corpus noise band (the real one)",
+    )
+    parser.add_argument(
+        "--corpus-fraction",
+        type=float,
+        default=1.0,
+        help="fraction of each arm's pool sampled per draw (must be <1 to make draws differ)",
+    )
     parser.add_argument("--min-shift", type=float, default=0.05, help="pre-registered X")
     parser.add_argument("--sigma", type=float, default=2.0, help="pre-registered sigma multiple")
     parser.add_argument("--max-cap-drop", type=float, default=0.10, help="pre-registered Y")
@@ -68,10 +130,21 @@ def main() -> None:
         max_capability_drop=args.max_cap_drop,
         max_safety_drop=args.max_safety_drop,
     )
-    result = run_multiseed(config)
-
     out_dir = Path(args.out)
     out_dir.mkdir(parents=True, exist_ok=True)
+
+    if args.corpus_draws > 1:
+        _run_resampled(config, out_dir, draws=args.corpus_draws, fraction=args.corpus_fraction)
+        return
+
+    if args.corpus_fraction < 1.0:
+        print(
+            f"  note: --corpus-fraction {args.corpus_fraction} ignored with a single draw "
+            f"(use --corpus-draws >1 to resample)",
+            file=sys.stderr,
+        )
+
+    result = run_multiseed(config)
     (out_dir / "result.json").write_text(json.dumps(result.to_dict(), indent=2, sort_keys=True) + "\n")
 
     print("EXP-001 multi-seed go/no-go")
