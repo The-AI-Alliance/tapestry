@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sys
 import urllib.parse
 import urllib.request
@@ -238,27 +239,126 @@ def _cap_tokens(docs: list[dict], max_tokens: int, *, seed: int = 0) -> list[dic
     return out
 
 
+# --- Arm 3: grounded_translated (content vs. language carrier) --------------
+
+# Sentence terminators across Latin + Arabic punctuation, so MT chunking respects
+# sentence boundaries in either script.
+_SENT_SPLIT = re.compile(r"(?<=[.!?؟।])\s+|\n+")
+
+
+def _chunk_for_mt(text: str, max_words: int = 60) -> list[str]:
+    """Pack a document into <=max_words chunks on sentence boundaries.
+
+    Opus-MT models truncate beyond ~512 tokens, so a whole article must be split.
+    Splitting on sentences (not arbitrary word windows) keeps each chunk
+    translatable on its own."""
+    chunks: list[str] = []
+    current: list[str] = []
+    count = 0
+    for sentence in _SENT_SPLIT.split(text):
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+        n = len(sentence.split())
+        if current and count + n > max_words:
+            chunks.append(" ".join(current))
+            current, count = [], 0
+        current.append(sentence)
+        count += n
+    if current:
+        chunks.append(" ".join(current))
+    return chunks
+
+
+def _make_translator(src_lang: str):
+    """Return a ``str -> str`` machine translator into English, or raise.
+
+    Loads a Helsinki-NLP Opus-MT seq2seq model directly (model + tokenizer, then
+    ``generate``) rather than the ``pipeline("translation")`` helper, which was
+    removed in transformers 5.x. Tries the language-specific pair first, then the
+    multilingual ``mul-en`` fallback. This is the seam that turns the grounded
+    corpus into its English twin for Arm 3, isolating cultural *content* from the
+    *language* it arrives in."""
+    try:
+        import torch
+        from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+    except ImportError as exc:  # pragma: no cover - GPU-box dependency
+        raise ImportError("--translate needs `transformers`; install it or omit the flag.") from exc
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    last_exc: Exception | None = None
+    for model_id in (f"Helsinki-NLP/opus-mt-{src_lang}-en", "Helsinki-NLP/opus-mt-mul-en"):
+        try:
+            tokenizer = AutoTokenizer.from_pretrained(model_id)
+            model = AutoModelForSeq2SeqLM.from_pretrained(model_id).to(device).eval()
+            print(f"  translator: {model_id} on {device}")
+
+            def translate(text: str, _tok=tokenizer, _model=model, _dev=device) -> str:
+                pieces: list[str] = []
+                for chunk in _chunk_for_mt(text):
+                    enc = _tok(chunk, return_tensors="pt", truncation=True, max_length=512).to(_dev)
+                    with torch.no_grad():
+                        gen = _model.generate(**enc, max_length=512, num_beams=1)
+                    pieces.append(_tok.batch_decode(gen, skip_special_tokens=True)[0])
+                return " ".join(p.strip() for p in pieces if p.strip())
+
+            return translate
+        except Exception as exc:  # pragma: no cover - model availability
+            last_exc = exc
+            print(f"  ! translator {model_id} unavailable: {exc}", file=sys.stderr)
+    raise RuntimeError(f"no Opus-MT model loaded for {src_lang!r}->en: {last_exc}")
+
+
+def _translate_grounded(grounded: list[dict], src_lang: str) -> list[dict]:
+    """Machine-translate the (already finalized) grounded docs into English.
+
+    Same documents, same domains/provenance — only the text and language change,
+    plus an ``:en`` id suffix — so Arm 3 trains on the grounded *content* carried
+    in the base model's language."""
+    translate = _make_translator(src_lang)
+    out: list[dict] = []
+    for d in grounded:
+        try:
+            en = translate(d["text"])
+        except Exception as exc:  # pragma: no cover - per-doc MT hiccup
+            print(f"  ! translate {d['id']}: {exc}", file=sys.stderr)
+            continue
+        if len(en.split()) < 20:
+            continue
+        out.append({**d, "id": f"{d['id']}:en", "text": en, "lang": "en"})
+        print(f"  ~ translated {d['domain']:<12} {d['id']} ({len(en.split())} words)")
+    return out
+
+
 def _write_jsonl(path: Path, docs: list[dict]) -> None:
     path.write_text("".join(json.dumps(d, ensure_ascii=False) + "\n" for d in docs), encoding="utf-8")
 
 
-def _write_manifest(root: Path, culture: str, lang: str, tol: float, titles: dict) -> None:
-    def arm(name: str, value_laden: bool) -> dict:
+def _write_manifest(
+    root: Path, culture: str, lang: str, tol: float, titles: dict, *, with_translated: bool = False
+) -> None:
+    def arm(name: str, value_laden: bool, arm_lang: str = lang) -> dict:
         return {
             "file": f"{name}.jsonl",
-            "lang": lang,
+            "lang": arm_lang,
             "register": "encyclopedic",
-            "domains": sorted(titles[name].keys()),
+            "domains": sorted(titles["grounded"].keys() if name == "grounded_translated" else titles[name].keys()),
             "value_laden": value_laden,
         }
+
+    arms = {
+        "grounded": arm("grounded", True),
+        "language_matched": arm("language_matched", False),
+    }
+    if with_translated:
+        # Arm 3 is the grounded content in the base model's language (English).
+        # It is exempt from the twin control (different language + post-MT length).
+        arms["grounded_translated"] = arm("grounded_translated", True, arm_lang="en")
 
     manifest = {
         "culture": culture,
         "language": lang,
-        "arms": {
-            "grounded": arm("grounded", True),
-            "language_matched": arm("language_matched", False),
-        },
+        "arms": arms,
         "twin_matching": {
             "token_ratio_tolerance": tol,
             "require_same_language": True,
@@ -309,6 +409,12 @@ def main() -> int:
         help="per-arm token budget; subsample to this so corpus size / training time is predictable (0 = no cap)",
     )
     parser.add_argument("--tol", type=float, default=0.20, help="twin token-ratio tolerance")
+    parser.add_argument(
+        "--translate",
+        action="store_true",
+        help="also build the grounded_translated arm (Arm 3): MT the grounded corpus to English "
+        "to isolate cultural content from the language carrying it. Needs `transformers`.",
+    )
     parser.add_argument("--out", default="", help="output root (default: data/<culture>)")
     parser.add_argument("--validate", default="", help="validate an existing root and exit")
     args = parser.parse_args()
@@ -362,7 +468,21 @@ def main() -> int:
     _balance_twin(grounded, matched, args.tol)
     _write_jsonl(root / "grounded.jsonl", grounded)
     _write_jsonl(root / "language_matched.jsonl", matched)
-    _write_manifest(root, args.culture, args.lang, args.tol, titles)
+
+    with_translated = False
+    if args.translate:
+        if args.lang == "en":
+            print("note: --translate is a no-op for an English corpus (already the base language)", file=sys.stderr)
+        else:
+            print(f"building grounded_translated arm ({args.lang} -> en)…")
+            translated = _decontaminate(_translate_grounded(grounded, args.lang), "grounded_translated")
+            if translated:
+                _write_jsonl(root / "grounded_translated.jsonl", translated)
+                with_translated = True
+            else:
+                print("warning: translation produced no usable docs; skipping Arm 3", file=sys.stderr)
+
+    _write_manifest(root, args.culture, args.lang, args.tol, titles, with_translated=with_translated)
     print(f"wrote {root}")
     return _validate(root)
 

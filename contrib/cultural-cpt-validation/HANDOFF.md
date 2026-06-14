@@ -68,10 +68,11 @@ the binding constraint each time was **corpus tokens**.
 | `cultural_cpt/judge.py` | `EmbeddingJudge` for free-form behavior |
 | `cultural_cpt/experiment.py` | one-run orchestration (arms → CPT → measure) |
 | `cultural_cpt/stats.py` | multi-seed aggregation + go/no-go decision |
-| `cultural_cpt/capability.py` | capability guardrail — **still toy MMLU** |
+| `cultural_cpt/capability.py` | capability guardrail — bilingual bank + optional real MMLU |
+| `cultural_cpt/safety.py` | refusal/safety guardrail (log-prob refusal-vs-comply) |
 | `run.py` / `run_stats.py` / `run_aggregation.py` | CLIs |
-| `fetch_corpus.py` | corpus assembler (+ `--validate`) |
-| `titles/egypt.ar.json` | curated Arabic titles + categories for Egypt |
+| `fetch_corpus.py` | corpus assembler (+ `--validate`, `--translate` for Arm 3) |
+| `titles/egypt.ar.json`, `titles/vietnam.vi.json` | curated titles + categories per culture |
 | `deploy/run_on_instance.sh` | the on-GPU-box runner (env-parameterized) |
 | `deploy/README.md` | Vast.ai self-rental recipe |
 | `data/` | corpora (bulk git-ignored; only the committed seed travels) |
@@ -133,21 +134,38 @@ Gotchas we hit and the fixes baked into the flow:
 ## What is real vs. still placeholder
 
 **Real:** model backends, full-CPT memory path, corpus loader + controls, the
-EN/AR WVS instruments, the generate-mode behavioral probe + embedding judge,
-multi-seed go/no-go, the Egypt Arabic corpus (regenerable from `titles/`).
+EN/AR/**VI** WVS instruments, the generate-mode behavioral probe + embedding
+judge, multi-seed go/no-go, the Egypt Arabic corpus (regenerable from `titles/`).
+
+**Newly real (this session — all local, no GPU yet):**
+- **Capability guardrail** (`capability.py`) is no longer the 4-item toy: a
+  ~24-item bilingual (EN/AR) general-knowledge bank with varied answer indices,
+  measured in the corpus's language, **plus** an optional real MMLU/Arabic-MMLU
+  loader (`use_external`, best-effort via `datasets` on the GPU box, falls back
+  to the bank). Wired into the go/no-go's `max_capability_drop`.
+- **Safety guardrail** (`safety.py`, new): a deterministic refusal probe —
+  harmful-request stems scored refusal-vs-compliance by log-prob, EN/AR, **no
+  operational harmful content**. Reported per arm as `safety_refusal` and gated
+  by a new `max_safety_drop` conjunct in the pre-registered decision.
+- **`grounded_translated` (Arm 3)** is now buildable: `fetch_corpus.py
+  --translate` MT's the grounded corpus to English (Opus-MT), decontaminates,
+  and declares the arm. The harness already runs it when the manifest has it, so
+  `decisive_grounded_vs_translated` stops being a skipped 0.0.
+- **Second culture: Vietnam.** `titles/vietnam.vi.json` + full Vietnamese WVS &
+  behavior batteries (`_ITEMS_VI`/`_SCENARIOS_VI`) + `vi` persona/suffixes, so
+  Vietnam is measurable **in-language** (the lever that mattered most for Egypt).
+- 40 tests green (added `test_guardrails.py`, `test_corpus_build.py`); ruff +
+  black clean.
 
 **Still placeholder / weak:**
-- `capability.py` is a **toy 4-item MMLU** — the capability/safety guardrail is
-  not yet meaningful (CPT arms "improve" to 1.00 by noise). Swap in real MMLU /
-  Arabic-MMLU + a refusal suite.
-- **No safety/red-team eval** at all yet (spec S1/S3).
 - **Ground-truth coordinates** are read from the published IW map and rescaled,
-  not exact WVS-data-file factor scores (seam: `wvs._from_map`).
+  not exact WVS-data-file factor scores (seam: `wvs._from_map`). Vietnam's target
+  `(0.16, -0.44)` is map-derived like the rest.
 - **Behavioral judge** is embedding-similarity; an LLM-as-judge would be higher
   quality (but adds an external dependency / cost / nondeterminism).
-- `grounded_translated` (Arm 3) corpus is **not built** for Egypt, so that
-  decisive comparison is always skipped. Building it (MT the grounded corpus to
-  English) would isolate content-vs-language directly.
+- The external MMLU path and the `--translate` MT are **untested on real
+  hardware** (no `datasets`/MT model locally); both are best-effort with clean
+  fallbacks, but the next GPU run is their first live exercise.
 - Aggregation experiment is **smoke-only** (no HF/per-node real CPT yet).
 
 ## Open questions & recommended next steps

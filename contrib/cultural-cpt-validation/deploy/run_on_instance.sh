@@ -26,6 +26,7 @@ DTYPE="${DTYPE:-bfloat16}"
 LR="${LR:-2e-5}"
 INSTRUMENT_LANG="${INSTRUMENT_LANG:-en}"
 BEHAVIOR_MODE="${BEHAVIOR_MODE:-logprob}"
+TRANSLATE="${TRANSLATE:-0}"  # 1 = also build the grounded_translated arm (Arm 3, needs MT)
 
 CC="$REPO/contrib/cultural-cpt-validation"
 export PYTHONPATH="$REPO/src:$CC"
@@ -43,12 +44,14 @@ fi
 
 MAXW_ARG=""
 [ "$MAX_WORDS" != "0" ] && MAXW_ARG="--max-words $MAX_WORDS"
+TRANSLATE_ARG=""
+[ "$TRANSLATE" = "1" ] && TRANSLATE_ARG="--translate"
 echo "== regenerate the $CULTURE corpus from the committed titles file =="
 python "$CC/fetch_corpus.py" \
   --culture "$CULTURE" --lang "$LANG_CODE" \
   --titles-file "$CC/titles/${CULTURE}.${LANG_CODE}.json" \
   --per-domain "$PER_DOMAIN" --full $MAXW_ARG \
-  --cat-limit "$CAT_LIMIT" --max-tokens "$MAX_TOKENS"
+  --cat-limit "$CAT_LIMIT" --max-tokens "$MAX_TOKENS" $TRANSLATE_ARG
 
 if [ -n "$SEEDS" ]; then
   OUT="$REPO/runs/${CULTURE}_stats"

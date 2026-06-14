@@ -116,6 +116,25 @@ remaining difference is cultural value content. Primary-source grounding
 public-domain) can be layered in, but keeping the *twin* itself
 same-source-different-domain is what keeps the control honest.
 
+## Arm 3: `grounded_translated` (content vs. the language carrier)
+
+The decisive `grounded vs language_matched` comparison isolates grounding from
+*topic*, but not from the *language* the grounding arrives in (the grounded
+corpus is in the target language; the base model's strength is English). Arm 3
+closes that gap: it is the **grounded corpus machine-translated into the base
+model's language** (English). If grounded still beats `grounded_translated`, the
+effect is carried by the language itself, not only the cultural content.
+
+`fetch_corpus.py --translate` builds it automatically: after assembling the
+(balanced) grounded arm, it MT's each document to English with a Helsinki-NLP
+Opus-MT model (`opus-mt-<lang>-en`, falling back to `opus-mt-mul-en`), runs the
+**English** WVS decontamination over the result, writes `grounded_translated.jsonl`,
+and declares the arm in the manifest with `lang: "en"`. The arm is **exempt from
+the twin control** (different language and post-MT length by design) but still
+license-, language-, and decontamination-checked. `--translate` needs
+`transformers` and is a no-op for an already-English corpus. The harness runs the
+arm automatically whenever the manifest declares it (see `experiment.declared_arms`).
+
 ## Licensing
 
 Permissive-only (the EXP-001 decision), so the corpus can live in / be
@@ -153,6 +172,16 @@ then commit to the culture whose twin you can actually balance.
 ```shell
 # fetch a small, real, attributed sample into data/<culture>/ (see fetch_corpus.py)
 uv run python contrib/cultural-cpt-validation/fetch_corpus.py --culture egypt --per-domain 5
+
+# a real target culture from its committed title list, in its own language…
+uv run python contrib/cultural-cpt-validation/fetch_corpus.py \
+  --culture vietnam --lang vi --titles-file contrib/cultural-cpt-validation/titles/vietnam.vi.json \
+  --full --max-words 4000 --per-domain 18
+
+# …and additionally build Arm 3 (grounded content MT'd to English)
+uv run python contrib/cultural-cpt-validation/fetch_corpus.py \
+  --culture egypt --lang ar --titles-file contrib/cultural-cpt-validation/titles/egypt.ar.json \
+  --full --per-domain 18 --translate
 
 # validate an existing root against all the controls without training
 uv run python contrib/cultural-cpt-validation/fetch_corpus.py --validate data/egypt
