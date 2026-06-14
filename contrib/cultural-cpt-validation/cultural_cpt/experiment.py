@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass, field
 
-from . import behavior, capability, wvs
+from . import behavior, capability, safety, wvs
 from .corpora import load_corpus
 from .model import LanguageModel, make_base_model
 
@@ -42,7 +42,8 @@ class ArmResult:
     behavior_ss: float
     behavior_shift_toward_target: float  # behavior, vs. Base
     survey_behavior_gap: float  # distance between survey and behavior coords; high = mimicry signal
-    capability_acc: float
+    capability_acc: float  # general-knowledge MCQ accuracy (guardrail)
+    safety_refusal: float  # refusal rate on the harmful-request probe (guardrail)
     train_loss: float | None
 
 
@@ -109,20 +110,36 @@ ARM_SPECS: tuple[_ArmSpec, ...] = (
 )
 
 
-# Culture names in Arabic, for the Arabic persona prefix (surface_only arm).
-_CULTURE_AR: dict[str, str] = {
-    "egypt": "مصر",
-    "usa": "الولايات المتحدة",
-    "sweden": "السويد",
-    "vietnam": "فيتنام",
-    "india": "الهند",
+# Culture names per measurement language, for the persona prefix (surface_only
+# arm). The persona is written in the survey language so it frames the model the
+# same way the items do.
+_CULTURE_NAMES: dict[str, dict[str, str]] = {
+    "ar": {
+        "egypt": "مصر",
+        "usa": "الولايات المتحدة",
+        "sweden": "السويد",
+        "vietnam": "فيتنام",
+        "india": "الهند",
+    },
+    "vi": {
+        "egypt": "Ai Cập",
+        "usa": "Hoa Kỳ",
+        "sweden": "Thụy Điển",
+        "vietnam": "Việt Nam",
+        "india": "Ấn Độ",
+    },
+}
+_PERSONA_TEMPLATES: dict[str, str] = {
+    "en": "Answer as a typical person from {name} would.\n",
+    "ar": "أجب كما قد يجيب شخص عادي من {name}.\n",
+    "vi": "Hãy trả lời như một người bình thường ở {name}.\n",
 }
 
 
 def _persona_prefix(culture: str, lang: str = "en") -> str:
-    if lang == "ar":
-        return f"أجب كما قد يجيب شخص عادي من {_CULTURE_AR.get(culture, culture)}.\n"
-    return f"Answer as a typical person from {culture.title()} would.\n"
+    template = _PERSONA_TEMPLATES.get(lang, _PERSONA_TEMPLATES["en"])
+    name = _CULTURE_NAMES.get(lang, {}).get(culture, culture.title())
+    return template.format(name=name)
 
 
 @dataclass(frozen=True)
@@ -130,6 +147,7 @@ class _Measurement:
     survey: wvs.Coordinate
     behavior: wvs.Coordinate
     capability_acc: float
+    safety_refusal: float
 
 
 def _measure(
@@ -141,6 +159,7 @@ def _measure(
     lang: str = "en",
     behavior_mode: str = "logprob",
     judge=None,
+    use_external_capability: bool = False,
 ) -> _Measurement:
     return _Measurement(
         survey=wvs.administer(
@@ -155,7 +174,9 @@ def _measure(
             mode=behavior_mode,
             judge=judge,
         ),
-        capability_acc=capability.evaluate(model),  # neutral guardrail; no persona
+        # Guardrails are measured neutrally (no persona) in the corpus's own language.
+        capability_acc=capability.evaluate(model, lang=lang, use_external=use_external_capability),
+        safety_refusal=safety.evaluate_refusal(model, lang=lang),
     )
 
 
@@ -217,6 +238,8 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
             lang=config.instrument_lang,
             behavior_mode=config.behavior_mode,
             judge=judge,
+            # Real MMLU only when there's a real model behind it; smoke uses the bank.
+            use_external_capability=config.mode == "hf",
         )
         survey_distance = m.survey.distance_to(target)
         behavior_distance = m.behavior.distance_to(target)
@@ -239,6 +262,7 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
                 behavior_shift_toward_target=behavior_shift,
                 survey_behavior_gap=m.survey.distance_to(m.behavior),
                 capability_acc=m.capability_acc,
+                safety_refusal=m.safety_refusal,
                 train_loss=train_loss,
             )
         )

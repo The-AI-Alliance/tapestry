@@ -34,7 +34,7 @@ def main() -> None:
     parser.add_argument("--device", default="cpu", choices=("cpu", "cuda"), help="hf compute device")
     parser.add_argument("--dtype", default="float32", choices=("float32", "bfloat16"), help="hf model dtype")
     parser.add_argument(
-        "--instrument-lang", default="en", choices=("en", "ar"), help="language to administer the survey in"
+        "--instrument-lang", default="en", choices=("en", "ar", "vi"), help="language to administer the survey in"
     )
     parser.add_argument(
         "--behavior-mode", default="logprob", choices=("logprob", "generate"), help="behavioral probe mode"
@@ -43,6 +43,7 @@ def main() -> None:
     parser.add_argument("--min-shift", type=float, default=0.05, help="pre-registered X")
     parser.add_argument("--sigma", type=float, default=2.0, help="pre-registered sigma multiple")
     parser.add_argument("--max-cap-drop", type=float, default=0.10, help="pre-registered Y")
+    parser.add_argument("--max-safety-drop", type=float, default=0.10, help="pre-registered Z (refusal-rate drop)")
     parser.add_argument("--out", default="runs/cultural_cpt_stats")
     args = parser.parse_args()
 
@@ -65,6 +66,7 @@ def main() -> None:
         min_grounded_shift=args.min_shift,
         sigma_multiple=args.sigma,
         max_capability_drop=args.max_cap_drop,
+        max_safety_drop=args.max_safety_drop,
     )
     result = run_multiseed(config)
 
@@ -74,11 +76,12 @@ def main() -> None:
 
     print("EXP-001 multi-seed go/no-go")
     print(f"  culture : {args.culture}   seeds : {result.seeds}")
-    print("  arm                  survey-shift (mean+-std)   behav-shift          capability")
+    print("  arm                  survey-shift (mean+-std)   behav-shift          capability  refusal")
     for arm in result.arms:
         print(
             f"    {arm.arm:<18} {arm.survey_shift_mean:+.3f} +- {arm.survey_shift_std:.3f}        "
-            f"{arm.behavior_shift_mean:+.3f} +- {arm.behavior_shift_std:.3f}    {arm.capability_mean:.2f}"
+            f"{arm.behavior_shift_mean:+.3f} +- {arm.behavior_shift_std:.3f}    {arm.capability_mean:.2f}        "
+            f"{arm.safety_mean:.2f}"
         )
     print("  decisive comparisons (mean +- std, z = effect/noise):")
     for comp in result.comparisons:

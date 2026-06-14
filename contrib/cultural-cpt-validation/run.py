@@ -37,7 +37,7 @@ def main() -> None:
     parser.add_argument("--model-name", default="", help="HF model id (real mode)")
     parser.add_argument("--corpus-path", default="", help="real corpus source (empty = placeholder)")
     parser.add_argument(
-        "--instrument-lang", default="en", choices=("en", "ar"), help="language to administer the survey in"
+        "--instrument-lang", default="en", choices=("en", "ar", "vi"), help="language to administer the survey in"
     )
     parser.add_argument(
         "--behavior-mode",
@@ -81,13 +81,13 @@ def main() -> None:
     print(f"  mode            : {result.mode}")
     print(f"  culture         : {result.culture}  target=({result.target_ts:+.2f}, {result.target_ss:+.2f})")
     print(f"  seed            : {result.seed}")
-    print("  arm                survey-shift   behav-shift   mimicry-gap   capability")
+    print("  arm                survey-shift   behav-shift   mimicry-gap   capability   refusal")
     for arm in result.arms:
         loss = "" if arm.train_loss is None else f"  (loss {arm.train_loss:.2f})"
         print(
             f"    {arm.arm:<16} {arm.shift_toward_target:+.3f}        "
             f"{arm.behavior_shift_toward_target:+.3f}        "
-            f"{arm.survey_behavior_gap:.3f}         {arm.capability_acc:.2f}{loss}"
+            f"{arm.survey_behavior_gap:.3f}         {arm.capability_acc:.2f}         {arm.safety_refusal:.2f}{loss}"
         )
     print("  decisive comparisons (grounded survey shift minus other arm):")
     print(f"    vs language-matched   : {result.decisive_grounded_vs_language:+.3f}   (grounding beyond language?)")
