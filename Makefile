@@ -126,7 +126,7 @@ tests:: unit-tests
 unit-tests::
 	@echo "${INFO}Running the unit tests...${_END}"
 	cd ${SRC_DIR} && \
-	  uv run pytest tests -q
+	  uv run python -m pytest tests -q
 
 .PHONY: consortium-demo consortium-experiment consortium-tests
 
@@ -140,7 +140,7 @@ consortium-experiment::
 
 consortium-tests::
 	@echo "${INFO}Running the consortium-training tests...${_END}"
-	PYTHONPATH=${PWD}/${SRC_DIR}:${PWD}/contrib/jneums-consortium-experiment uv run pytest ${SRC_DIR}/tests/tapestry/training/consortium contrib/jneums-consortium-experiment/tests -q
+	PYTHONPATH=${PWD}/${SRC_DIR}:${PWD}/contrib/jneums-consortium-experiment uv run python -m pytest ${SRC_DIR}/tests/tapestry/training/consortium contrib/jneums-consortium-experiment/tests -q
 
 .PHONY: before-pr format-lint-type-check flt
 before-pr:: format-lint-type-check tests
