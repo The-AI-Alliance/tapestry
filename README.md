@@ -110,20 +110,17 @@ uv pip install -e .         # minimum dependencies
 
 ### Running Tests
 
-We use [unittest](https://docs.python.org/3/library/unittest.html) and [hypothesis](https://hypothesis.readthedocs.io/en/latest/) for testing. The easiest way to run the test suite is using `make`:
+We use [pytest](https://docs.pytest.org/) for testing. The easiest way to run the test suite is using `make`:
 
 ```shell
 make unit-tests # or just tests; they are currently the same.
 ```
 
-This runs the following commands, which you can run yourself if you prefer:
+This runs the following command, which you can run yourself if you prefer:
 
 ```shell
 cd src
-uv run python -m unittest discover \
-    --pattern 'test_*.py' \
-    --start-directory tests \
-    --top-level-directory .
+uv run pytest tests -q
 ```
 
 ### Code Formatting
