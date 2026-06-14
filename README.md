@@ -2,13 +2,13 @@
 
 # Welcome to Project Tapestry
 
-#### Project Tapestry aims to give every nation and participant frontier AI they can call their own.
+#### At Project Tapestry, we aim to give every nation and participant frontier AI they can call their own.
 
-#### It brings together talented people, data, and compute from a global consortium of partners to train a shared **frontier** base model — stronger than any single party could build alone, thanks to a larger and more diverse corpus than ever before.
+#### We bring together talented people, data, and compute from a global consortium of partners to train a shared **frontier** base model — stronger than any single party could build alone, thanks to a larger and more diverse corpus than ever before.
 
 #### From that shared base, each partner builds and owns **sovereign** models, aligned to their own **national**, **socio-cultural**, and **industrial** needs, using the Tapestry open source training platform. Ownership of data and compute stays with the partners throughout.
 
-#### The aim is AI that is frontier and sovereign at once — not a tradeoff between the two.
+#### Our aim is AI that is frontier and sovereign at once — not a tradeoff between the two.
 
 Learn more from our [Kickoff Workshop Blog](https://thealliance.ai/blog/project-tapestry-the-path-to-frontier-sovereign-ai) and check out the [Project Tapestry](https://thealliance.ai/projects/tapestry/) website for more information about partnering, events, and how to support Project Tapestry.
 
