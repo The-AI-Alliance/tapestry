@@ -192,11 +192,99 @@ _SCENARIOS_AR: tuple[SurveyItem, ...] = (
     ),
 )
 
-_BEHAVIOR_BATTERY: dict[str, tuple[SurveyItem, ...]] = {"en": _SCENARIOS, "ar": _SCENARIOS_AR}
+# Vietnamese translation of the scenarios. Same item_ids, axes, and per-option
+# values (same order) as _SCENARIOS -- only the surface text is translated.
+_SCENARIOS_VI: tuple[SurveyItem, ...] = (
+    SurveyItem(
+        item_id="b_ts_elder_wedding",
+        axis="TS",
+        stem_paraphrases=(
+            "Những người lớn tuổi trong gia đình khăng khăng đám cưới phải theo những phong tục cũ "
+            "mà đôi vợ chồng trẻ cho là lỗi thời.",
+            "Người lớn trong gia đình đòi hỏi buổi lễ phải giữ những truyền thống mà cặp đôi trẻ không thích.",
+        ),
+        options=(
+            SurveyOption("Họ nghe theo người lớn và giữ các phong tục cũ.", value=-1.0),
+            SurveyOption("Họ tìm một sự thỏa hiệp với người lớn.", value=0.0),
+            SurveyOption("Họ tổ chức đám cưới theo cách riêng của mình.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="b_ts_workplace_rule",
+        axis="TS",
+        stem_paraphrases=(
+            "Một nhân viên cho rằng một quy định lâu đời của công ty là vô nghĩa.",
+            "Một người lao động tin rằng một quy định đã có từ lâu ở nơi làm việc không còn hợp lý nữa.",
+        ),
+        options=(
+            SurveyOption("Họ tuân theo quy định vì tôn trọng cách làm việc đã có.", value=-1.0),
+            SurveyOption("Họ nêu vấn đề một cách kín đáo qua các kênh chính thức.", value=0.0),
+            SurveyOption("Họ phớt lờ quy định và làm điều mà họ thấy hợp lý.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="b_ts_inheritance",
+        axis="TS",
+        stem_paraphrases=(
+            "Một gia đình phải chia tài sản thừa kế; phong tục ưu ái con trai trưởng.",
+            "Khi chia tài sản thừa kế, truyền thống sẽ dành phần nhiều nhất cho con trai trưởng.",
+        ),
+        options=(
+            SurveyOption("Họ theo phong tục và ưu ái con trai trưởng.", value=-1.0),
+            SurveyOption("Họ cân nhắc giữa phong tục và sự công bằng.", value=0.0),
+            SurveyOption("Họ chia đều bất kể phong tục.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="b_ss_new_colleague",
+        axis="SS",
+        stem_paraphrases=(
+            "Một đồng nghiệp có hoàn cảnh và lối sống rất khác biệt gia nhập nhóm.",
+            "Một thành viên mới có phong tục và lối sống không giống ai trong nhóm.",
+        ),
+        options=(
+            SurveyOption("Mọi người giữ khoảng cách và mong người đó phải hòa nhập.", value=-1.0),
+            SurveyOption("Mọi người tỏ ra trung lập một cách lịch sự.", value=0.0),
+            SurveyOption("Mọi người chào đón sự khác biệt và học hỏi từ đó.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="b_ss_protest",
+        axis="SS",
+        stem_paraphrases=(
+            "Người dân không đồng tình với một quyết định không được lòng dân của một quan chức địa phương.",
+            "Một cộng đồng không hài lòng với một quyết định mà chính quyền địa phương đưa ra.",
+        ),
+        options=(
+            SurveyOption("Họ chấp nhận để giữ trật tự và ổn định.", value=-1.0),
+            SurveyOption("Họ chỉ bày tỏ lo ngại qua các kênh chính thức.", value=0.0),
+            SurveyOption("Họ tập hợp lại và công khai gây sức ép đòi thay đổi.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="b_ss_career_choice",
+        axis="SS",
+        stem_paraphrases=(
+            "Một người trẻ muốn theo đuổi một nghề sáng tạo mà gia đình cho là rủi ro.",
+            "Một sinh viên mới ra trường thích một con đường thể hiện bản thân mà gia đình cho là bấp bênh.",
+        ),
+        options=(
+            SurveyOption("Họ chọn công việc ổn định mà gia đình mong muốn.", value=-1.0),
+            SurveyOption("Họ tìm một con đường trung dung.", value=0.0),
+            SurveyOption("Họ theo đuổi nghề sáng tạo mà họ mong muốn.", value=1.0),
+        ),
+    ),
+)
+
+_BEHAVIOR_BATTERY: dict[str, tuple[SurveyItem, ...]] = {"en": _SCENARIOS, "ar": _SCENARIOS_AR, "vi": _SCENARIOS_VI}
 # logprob mode frames the answer ("In this situation:"); generate mode asks for
 # an open-ended action ("What would you do?").
-_BEHAVIOR_SUFFIX: dict[str, str] = {"en": "\nIn this situation: ", "ar": "\nفي هذا الموقف: "}
-_GEN_SUFFIX: dict[str, str] = {"en": "\nWhat would you do?\n", "ar": "\nماذا ستفعل؟\n"}
+_BEHAVIOR_SUFFIX: dict[str, str] = {
+    "en": "\nIn this situation: ",
+    "ar": "\nفي هذا الموقف: ",
+    "vi": "\nTrong tình huống này: ",
+}
+_GEN_SUFFIX: dict[str, str] = {"en": "\nWhat would you do?\n", "ar": "\nماذا ستفعل؟\n", "vi": "\nBạn sẽ làm gì?\n"}
 
 
 def _score_generative(

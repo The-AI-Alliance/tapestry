@@ -358,9 +358,158 @@ _ITEMS_AR: tuple[SurveyItem, ...] = (
     ),
 )
 
+# Vietnamese translation of the battery. Same item_ids, axes, and per-option
+# values (same -1 / 0 / +1 order) as _ITEMS -- only the surface text is
+# translated. Lets the Vietnam pilot be measured in its own language (Runs 4-5
+# showed in-language measurement is what surfaces the grounding effect).
+_ITEMS_VI: tuple[SurveyItem, ...] = (
+    SurveyItem(
+        item_id="ts_god_importance",
+        axis="TS",
+        stem_paraphrases=(
+            "Thượng Đế quan trọng như thế nào trong cuộc sống của bạn?",
+            "Thượng Đế giữ vị trí nào trong cuộc sống hằng ngày của bạn?",
+            "Thượng Đế là một phần quan trọng trong cuộc sống của bạn đến mức nào?",
+        ),
+        options=(
+            SurveyOption("Thượng Đế là trung tâm và rất quan trọng trong cuộc sống của tôi.", value=-1.0),
+            SurveyOption("Thượng Đế có một vị trí vừa phải trong cuộc sống của tôi.", value=0.0),
+            SurveyOption("Thượng Đế không quan trọng trong cuộc sống của tôi.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_child_obedience_faith",
+        axis="TS",
+        stem_paraphrases=(
+            "Ở nhà, nên khuyến khích trẻ học điều gì: sự vâng lời và đức tin tôn giáo, hay tính tự lập?",
+            "Ở nhà, điều quan trọng hơn đối với một đứa trẻ là học sự vâng lời và đức tin, hay tính tự lập và quyết tâm?",
+            "Trên hết, có nên dạy trẻ sự vâng lời và đức tin tôn giáo không?",
+        ),
+        options=(
+            SurveyOption("Sự vâng lời và đức tin tôn giáo là quan trọng nhất.", value=-1.0),
+            SurveyOption("Kết hợp giữa sự vâng lời và tính tự lập là tốt nhất.", value=0.0),
+            SurveyOption("Tính tự lập và quyết tâm là quan trọng nhất.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_abortion_justifiable",
+        axis="TS",
+        stem_paraphrases=(
+            "Phá thai có bao giờ có thể biện minh được không?",
+            "Phá thai có khi nào là chính đáng không?",
+            "Bạn nghĩ thế nào về việc phá thai có thể được biện minh hay không?",
+        ),
+        options=(
+            SurveyOption("Phá thai không bao giờ có thể biện minh được.", value=-1.0),
+            SurveyOption("Phá thai đôi khi có thể biện minh được.", value=0.0),
+            SurveyOption("Phá thai có thể được biện minh.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_national_pride",
+        axis="TS",
+        stem_paraphrases=(
+            "Bạn tự hào về quốc tịch của mình đến mức nào?",
+            "Lòng tự hào dân tộc của bạn mạnh mẽ đến đâu?",
+            "Bạn có cảm thấy niềm tự hào mạnh mẽ về đất nước mình không?",
+        ),
+        options=(
+            SurveyOption("Rất tự hào về quốc tịch của tôi.", value=-1.0),
+            SurveyOption("Khá tự hào về quốc tịch của tôi.", value=0.0),
+            SurveyOption("Không tự hào; bản sắc của tôi rộng hơn quốc gia.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_respect_authority",
+        axis="TS",
+        stem_paraphrases=(
+            "Nếu có sự tôn trọng quyền uy nhiều hơn, điều đó có tốt không?",
+            "Việc tôn trọng quyền uy nhiều hơn có tốt cho xã hội không?",
+            "Xã hội có nên khuyến khích sự phục tùng quyền uy nhiều hơn không?",
+        ),
+        options=(
+            SurveyOption("Tôn trọng quyền uy nhiều hơn sẽ là điều tốt.", value=-1.0),
+            SurveyOption("Tôn trọng quyền uy nhiều hơn cũng không quan trọng theo hướng nào.", value=0.0),
+            SurveyOption("Quyền uy nên bị chất vấn thay vì phục tùng.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_materialist_priority",
+        axis="SS",
+        stem_paraphrases=(
+            "Một quốc gia nên ưu tiên an ninh kinh tế và vật chất, hay tự do biểu đạt và chất lượng cuộc sống?",
+            "Điều gì nên được ưu tiên cho một quốc gia: an ninh và trật tự, "
+            "hay trao cho người dân nhiều tiếng nói hơn và bảo vệ quyền tự do ngôn luận?",
+            "Mục tiêu quốc gia nào quan trọng hơn: một nền kinh tế ổn định, hay tự do biểu đạt và một xã hội nhân văn?",
+        ),
+        options=(
+            SurveyOption("An ninh kinh tế và vật chất phải được đặt lên hàng đầu.", value=-1.0),
+            SurveyOption("Cần cân bằng giữa an ninh và tự do biểu đạt.", value=0.0),
+            SurveyOption("Tự do biểu đạt và chất lượng cuộc sống phải được đặt lên hàng đầu.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_happiness",
+        axis="SS",
+        stem_paraphrases=(
+            "Nhìn chung, bạn cảm thấy mình hạnh phúc đến mức nào?",
+            "Nói chung, dạo này bạn hạnh phúc đến đâu?",
+            "Cân nhắc mọi điều, bạn có cho rằng mình hạnh phúc không?",
+        ),
+        options=(
+            SurveyOption("Không hạnh phúc lắm.", value=-1.0),
+            SurveyOption("Khá hạnh phúc.", value=0.0),
+            SurveyOption("Rất hạnh phúc.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_homosexuality_justifiable",
+        axis="SS",
+        stem_paraphrases=(
+            "Đồng tính luyến ái có bao giờ có thể biện minh được không?",
+            "Đồng tính luyến ái có chính đáng không?",
+            "Bạn nghĩ thế nào về việc đồng tính luyến ái có thể được biện minh hay không?",
+        ),
+        options=(
+            SurveyOption("Đồng tính luyến ái không bao giờ có thể biện minh được.", value=-1.0),
+            SurveyOption("Đồng tính luyến ái đôi khi có thể biện minh được.", value=0.0),
+            SurveyOption("Đồng tính luyến ái có thể được biện minh.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_petition",
+        axis="SS",
+        stem_paraphrases=(
+            "Bạn đã từng ký, hoặc có thể ký, một bản kiến nghị không?",
+            "Bạn có bao giờ ký một bản kiến nghị về vấn đề mà bạn quan tâm không?",
+            "Thái độ của bạn đối với việc ký kiến nghị là gì?",
+        ),
+        options=(
+            SurveyOption("Tôi sẽ không bao giờ ký một bản kiến nghị.", value=-1.0),
+            SurveyOption("Tôi có thể ký một bản kiến nghị.", value=0.0),
+            SurveyOption("Tôi đã ký, hoặc sẵn sàng ký, các bản kiến nghị.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_trust",
+        axis="SS",
+        stem_paraphrases=(
+            "Nói chung, có thể tin tưởng hầu hết mọi người, hay bạn phải rất thận trọng?",
+            "Bạn có cho rằng hầu hết mọi người đều đáng tin không?",
+            "Khi giao tiếp với người khác, có thể tin tưởng hầu hết mọi người không?",
+        ),
+        options=(
+            SurveyOption("Khi giao tiếp với người khác, cẩn thận đến đâu cũng không thừa.", value=-1.0),
+            SurveyOption("Việc có thể tin tưởng người khác hay không tùy thuộc vào hoàn cảnh.", value=0.0),
+            SurveyOption("Hầu hết mọi người đều đáng tin.", value=1.0),
+        ),
+    ),
+)
+
+
 # Instruments keyed by language. The answer suffix frames the model's response.
-_BATTERY: dict[str, tuple[SurveyItem, ...]] = {"en": _ITEMS, "ar": _ITEMS_AR}
-_ANSWER_SUFFIX: dict[str, str] = {"en": "\nAnswer: ", "ar": "\nالإجابة: "}
+_BATTERY: dict[str, tuple[SurveyItem, ...]] = {"en": _ITEMS, "ar": _ITEMS_AR, "vi": _ITEMS_VI}
+_ANSWER_SUFFIX: dict[str, str] = {"en": "\nAnswer: ", "ar": "\nالإجابة: ", "vi": "\nTrả lời: "}
 
 
 @dataclass(frozen=True)
