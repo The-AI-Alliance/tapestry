@@ -14,9 +14,12 @@
 
 ## How to Contribute to Project Tapestry
 
-We follow normal _GitOps_ practices. Contribute your work as a pull request where it will be go through the usual build and validation, review, etc. If you are new to _GitOps_ practices, see our community [Contributing Guide](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md#processes-for-contributing-to-existing-projects) for an explanation.
+We follow normal _GitOps_ practices. Contribute your work (code and docs) as a pull request where it will be go through the usual build and validation, review, etc. If you are new to _GitOps_ practices, see our community [Contributing Guide](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md#processes-for-contributing-to-existing-projects) for an explanation.
 
-The only additional requirement that may be new to you is the use of DCO, discussed next.
+There are two additional requirements that may be new to you:
+
+* We use _DCO_, discussed [next](#developer-certificate-of-origin-dco).
+* For new contributions, we ask that you put them in the `contrib` directory, discussed [below](#new-contributions)
 
 ### Developer Certificate of Origin (DCO)
 
@@ -38,7 +41,7 @@ git commit -s -m 'bug fix' ...
 
 > **Tips:** 
 >
-> * If a commit is created that did not include the `-s` option, the original commit message can be edited by using the `git commit -s --amend` command. A "force push" must be done afterward to add the amended commit to a PR. See this [StackOverflow post](https://stackoverflow.com/questions/13043357/git-sign-off-previous-commits) for more information.
+> * If a commit is created that did not include the `-s` option, the original commit message can be edited by using the `git commit --amend --no-edit -s` command. Then do a "force push" to add the amended commit to a PR. See this [StackOverflow post](https://stackoverflow.com/questions/13043357/git-sign-off-previous-commits) for more information.
 > * Since it is easy to forget to use the `-s` flag every time, create a git _alias_ that permanently adds the `-s` flag to all commits. For example, here is how to define and use a _global_ alias, `cs`, for this purpose:
 > 
 > ```shell
@@ -51,7 +54,34 @@ git commit -s -m 'bug fix' ...
 
 If you don't want to make this a global alias, omit `--global` and run the `git config` command in the root directory for your local copy of the `tapestry` repo. The alias will be added to the `.git/config` file.
 
-## What to Know Before Contributing to Project Tapestry
+
+### New Contributions
+
+To stimulate submission and discussion of more "speculative" or "incomplete" ideas, we ask that PRs with new contributions be staged into the `contrib` directory, but otherwise follow the same practices for any code or documentation changes.
+
+To facilitate this when you draft a PR, you will find two description templates from which to select, one of which is for new contributions, with a check list to help you do the requested steps, and a second template for updates to existing code and documentation.
+
+In brief, for new contributions, we ask you to do the following.
+
+1. Create a subdirectory named with the format `contrib/<your_github_user_name>-<feature_name>`, e.g. `contrib/h4x3r-sovereign-data-enforcement/`.
+1. Include a short `README.md` that describes the contribution, its motivation and status, and how to try/evaluate it.
+1. Add a `LICENSE`. By default, the project uses Apache-2.0 for code, CC-BY-4.0 for docs, and CDLA-2.0 for data (discussed more below).
+1. If contributing code, put it in a `<feature_name>` subdirectory and the unit tests in a `tests` subdirectory.
+1. Once these steps are done, open a focused PR.
+
+For the `LICENSE`, we recommend including content like the following: 
+
+```
+This contribution follows the repository default licenses:
+
+- Code: Apache License, Version 2.0. See ../../LICENSE.Apache-2.0.
+- Documentation: Creative Commons Attribution 4.0 International. See ../../LICENSE.CC-BY-4.0.
+- Data, if added later: CDLA Permissive 2.0. See ../../LICENSE.CDLA-2.0.
+```
+
+Because having too many licenses can make managing the project difficult, please justify any choices that don't follow our defaults.
+
+## What Else to Know Before Contributing to Project Tapestry
 
 We welcome contributions to all AI Alliance projects. However, we ask that all contributors accept certain agreements and conditions. See also the [AI Alliance governance](https://thealliance.ai/governance) for more general information about AI Alliance policies.
 
