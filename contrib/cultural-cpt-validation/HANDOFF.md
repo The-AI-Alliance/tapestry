@@ -17,19 +17,20 @@ base model (Qwen) does full-parameter CPT on a real Arabic corpus, then is
 measured on the canonical Inglehart-Welzel WVS instrument (in Arabic) plus a
 free-form behavioral probe, across seeds, with a pre-registered PASS/FAIL.
 
-**Headline finding (6 runs, see FINDINGS):** Run 5's promising decisive result —
-grounded CPT vs. value-neutral CPT in the same language at **+0.080, z=7.26** —
-**did NOT replicate** in Run 6. On a freshly-sampled corpus with the upgraded
-harness (real MMLU/safety guardrails + the new translated arm), grounded−language
-collapses to null (**−0.008, z=−0.29**), grounded drifts away from Egypt as much
-as the neutral twin, and the new Arm 3 shows the content's language is irrelevant
-(grounded ≈ grounded_translated, z=0.05). Current honest position: **no robust
-evidence** that grounded micro-CPT moves IW coordinates more than neutral CPT at
-this scale — Run 5 looks corpus-sample-specific, inflated by a measurement-only
-noise band. What *does* hold across all six runs: capability (now real) is
-preserved, and a one-line persona prompt (`surface_only`) beats CPT every time
-(Run 6: grounded−surface z=−6.27). The pre-registered verdict has been FAIL in
-every run.
+**Headline finding (7 runs, see FINDINGS):** Run 5's "decisive" result
+(grounded−language **+0.080, z=7.26**) and Run 6's "null" (**−0.008, z=−0.29**)
+were both single corpus draws of a high-variance quantity, with z computed against
+a measurement-only band (HF training is deterministic across seeds). **Run 7
+estimated the real band by resampling the corpus (4 draws):** grounded−language is
+**+0.040 ± 0.044 (z=0.91)** — small, positive on average (3/4 draws positive), but
+**not significant against corpus-resampling noise.** This reconciles Runs 5 and 6
+(two draws from a distribution centered ~+0.04, σ≈0.044). Honest position: **a hint
+of a grounding-beyond-language effect, but underpowered/swamped by which documents
+land in the corpus — neither confirmed nor null.** The absolute grounded shift is
+slightly negative (−0.034: no net pull toward Egypt), and a one-line persona prompt
+(`surface_only`) beats CPT in every run (Run 7: grounded−surface z=−2.53). The
+pre-registered verdict has been FAIL in all seven runs. Result + artifacts:
+`runs/egypt_stats_resampled/`.
 
 ## What the harness can do now
 
@@ -184,21 +185,20 @@ judge, multi-seed go/no-go, the Egypt Arabic corpus (regenerable from `titles/`)
 After Run 6 the honest read is: no robust grounding effect at this scale, and the
 z-scores were computed against a measurement-only band. In rough priority:
 
-0. **DECISIVE NEXT RUN — corpus-resampled go/no-go (now wired).** Run the
-   `--corpus-draws N --corpus-fraction F` sweep (e.g. `CORPUS_DRAWS=4
-   CORPUS_FRACTION=0.7`; see `deploy/README.md`). This decides on the cross-corpus
-   band — the variance that actually broke Run 5→6 — and answers whether
-   `grounded − language` is genuinely null or merely noisy. Do this *before*
-   spending on bigger scale: a positive single-corpus z is meaningless until it
-   survives resampling. If the band confirms null → write it up and pivot to (2);
-   if a real effect survives → *then* push scale (1).
-1. **Push tokens/epochs further** to see if grounded crosses from *prevent-drift*
-   into *active pull* (does the absolute shift reach +0.05?). Infra is ready —
-   raise `MAX_TOKENS`/`CAT_LIMIT`/`EPOCHS`. Only worth it once (0) shows a
-   resampling-robust effect to chase.
-2. **Understand the prevent-drift mechanism** — *why* does value-neutral Arabic
-   CPT push the model away from Egypt? This may be the more interesting science
-   now (catastrophic-forgetting-style drift vs. genuine value movement).
+0. **DONE — corpus-resampled go/no-go (Run 7).** The `--corpus-draws` sweep ran
+   (4 draws, `runs/egypt_stats_resampled/`): grounded−language is +0.040 ± 0.044
+   (z=0.91) — small, positive, **not significant** against the real corpus band.
+   This settled the Run 5 vs 6 contradiction (both were single draws). The effect
+   is underpowered, not null. Next decisions branch from here:
+1. **Grow the per-draw effect, then re-resample.** Confirming a +0.04 effect
+   against ±0.044 would need ~dozens of draws (not worth it); make each draw bigger
+   first — **more tokens (10×+) and more epochs** (real CPT is millions of tokens;
+   we use ~300k). Then re-run the sweep; a +0.08–0.10 per-draw effect clears the
+   band with few draws. Infra ready — raise `MAX_TOKENS`/`CAT_LIMIT`/`EPOCHS`.
+2. **Understand the away-drift** — the absolute grounded shift is negative across
+   Runs 6–7; *why* does Arabic CPT (grounded or neutral) push the coordinate off
+   Egypt? Catastrophic-forgetting-style drift vs. genuine value movement is now the
+   more interesting science, measurable with the current harness.
 3. **Real capability + safety evals** so H1(d) is testable — the current
    guardrail is a placeholder.
 4. **Build the `grounded_translated` arm** to cleanly separate cultural content
@@ -213,10 +213,9 @@ z-scores were computed against a measurement-only band. In rough priority:
 
 "Real EXP-001 go/no-go harness for culturally-grounded CPT; Egypt/Arabic pilot on
 Qwen3-4B via Vast.ai 5090s. Run 5's significant grounded-vs-language result
-(z=7.26) did NOT replicate in Run 6 (z=−0.29) on a fresh corpus with real
-guardrails + the translated arm — current read: no robust grounding effect at
-this scale; prompting beats CPT. The decisive next run is the now-wired
-corpus-resampled go/no-go (`--corpus-draws`), which decides on the cross-corpus
-band that broke Run 5→6 instead of the measurement-only seed band. See
-FINDINGS.md for the six runs and deploy/README.md ('Corpus resampling') to run
-it."
+(z=7.26) and Run 6 (z=−0.29) were single corpus draws; Run 7's corpus-resampled
+sweep (4 draws) gave the honest answer — grounded−language +0.040 ± 0.044
+(z=0.91), small/positive/not-significant, reconciling 5 vs 6. Read: underpowered
+grounding effect swamped by corpus-sampling noise; prompting beats CPT. Next:
+grow the per-draw effect (more tokens/epochs) then re-resample. See FINDINGS.md
+(7 runs) and deploy/README.md ('Corpus resampling')."

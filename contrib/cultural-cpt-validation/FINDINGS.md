@@ -235,7 +235,60 @@ language-matched) does **not** survive a corpus resample; the cultural shift fro
 micro-scale CPT is small, noisy, sometimes negative, and reliably beaten by a
 one-line persona prompt.
 
-## Trend across all six runs (the decisive comparison)
+## Run 7 — corpus-RESAMPLED go/no-go (the real noise band)
+
+The first six runs each measured `grounded − language` on **one** corpus draw and
+reported a z against the cross-*seed* band — but HF training is deterministic
+across seeds, so that band is measurement-only and understates the truth. Run 5
+(z=7.26) and Run 6 (z=−0.29) are just two single draws of a high-variance quantity
+disagreeing. Run 7 measures the variance directly: **4 independent corpus draws**
+(each a deterministic 70%-token-mass subsample of a fresh ~300k-token pool), the
+full multi-seed experiment per draw, and the go/no-go decided on the **cross-draw**
+spread. Qwen3-4B, 3 seeds, Arabic survey, generate-mode behavior, `TRANSLATE=0`
+(no Arm 3 — not needed for this comparison). ~4.5 h on one RTX 5090.
+
+| draw | grounded shift | grounded − language | grounded − surface |
+| :-- | --: | --: | --: |
+| 0 | −0.051 | +0.038 | −0.114 |
+| 1 | +0.002 | +0.064 | −0.060 |
+| 2 | −0.079 | −0.021 | −0.142 |
+| 3 | −0.008 | +0.078 | −0.070 |
+
+| comparison (across draws) | mean ± std | z |
+| :-- | --: | --: |
+| **grounded − language** | **+0.040 ± 0.044** | **+0.91** |
+| grounded − surface | −0.097 ± 0.038 | −2.53 |
+| grounded shift (absolute) | −0.034 ± 0.038 | — |
+
+### VERDICT: **FAIL** — and now we know *why* the prior runs disagreed.
+
+shift −0.034 (≥0.05? no); grounding effect z=0.91 (≥2? no); capability drop
+−0.021 (≤0.10? yes); safety drop +0.083 (≤0.10? yes).
+
+This is the most honest data point in the series, and it reconciles Runs 5 and 6:
+
+1. **The true `grounded − language` effect is small and positive (+0.040), but the
+   real corpus-resampling band is huge (±0.044).** So z=0.91 — nowhere near 2σ.
+   Three of four draws are positive (+0.038, +0.064, +0.078) and one is negative
+   (−0.021); the effect sits *between* Run 5's +0.080 and Run 6's −0.008, exactly
+   where a high-variance quantity sampled twice would land. **Run 5's z=7.26 was an
+   artifact of the measurement-only band** (the real σ is ~0.044, not the ~0.011 a
+   single corpus's seeds implied); Run 6's null was the unlucky draw. Neither
+   single-corpus z meant what it claimed.
+2. **Grounded CPT still drifts *away* from Egypt on average** (absolute shift
+   −0.034), consistent with Run 6: at this scale neutral and grounded Arabic CPT
+   both move the coordinate off-target; grounding does not produce a net pull.
+3. **Prompting still beats CPT** (grounded − surface −0.097, z=−2.53) — the one
+   robust finding across all seven runs.
+
+Bottom line: with the variance estimated honestly, **there is a hint of a positive
+grounding-beyond-language effect (+0.04, 3/4 draws positive) but it is not
+significant against corpus-resampling noise.** The right read is "underpowered and
+high-variance at this scale," not "confirmed" (Run 5) or "null" (Run 6). To move
+the needle you need either many more draws (to pin down a +0.04 effect against
+±0.044 you'd need ~dozens) or a larger per-draw effect (more tokens/epochs).
+
+## Trend across all seven runs (the decisive comparison)
 
 | run | model | survey | corpus | grounded − language | beaten by prompt? |
 | :-- | :-- | :-- | --: | --: | :-- |
@@ -244,31 +297,31 @@ one-line persona prompt.
 | 4 | Qwen3-4B | **AR** | ~150k | +0.140 (z=1.54) | tie, z=−0.50 |
 | 5 | Qwen3-4B | AR | **271k** | **+0.080 (z=7.26)** ✅ | z=−2.09 |
 | 6 | Qwen3-4B | AR | 300k (fresh) | **−0.008 (z=−0.29)** ✗ | z=−6.27 |
+| **7** | Qwen3-4B | AR | **4× resampled** | **+0.040 (z=0.91)** | z=−2.53 |
 
-Runs 3→5 looked like a clean monotone story — a bigger model+corpus flipped the
-grounded shift toward Egypt (Run 3), measuring **in Arabic** multiplied it ~5×
-(Run 4), and more tokens collapsed the variance enough to clear 2σ (Run 5). **Run
-6 breaks that story:** same protocol, a *freshly fetched* corpus, and the decisive
-effect collapses to null (z=−0.29). The Run-5 z=7.26 was driven by an unusually
-tight measurement-only noise band on one particular corpus sample; it does not
-survive resampling the corpus. The honest trend is **not** "every lever helps" —
-it is "the effect is small and corpus-sample-dependent, and cheap prompting beats
-it every time."
+Runs 1–6 each computed z against a measurement-only band, so their z's are not
+comparable to a real effect size. **Run 7 supersedes the single-corpus z's:** the
+genuine effect is +0.040 with a cross-corpus σ of 0.044 (z=0.91). Runs 5 and 6 are
+now explained — they are two draws (+0.080, −0.008) from a distribution centered
+near +0.04 with σ≈0.044, so neither the "decisive pass" nor the "null" was real.
+The honest trend is: a small, positive-on-average, **not-significant** grounding
+effect that is swamped by which documents land in the corpus, and prompting beats
+CPT every time.
 
 ## Interpretation
 
-**Updated after Run 6 (read this first).** The Run-5-era conclusion below — "the
-decisive comparison passes" — **did not replicate**. On a freshly-sampled corpus
-with the upgraded harness (real MMLU/safety guardrails + the translated arm), the
-grounded−language effect is null (z=−0.29), grounded drifts away from Egypt as
-much as the neutral twin, and the new Arm 3 shows the content's *language* is
-irrelevant (grounded ≈ grounded_translated). The current honest position: **there
-is no robust evidence that culturally-grounded micro-CPT moves Inglehart-Welzel
-coordinates more than value-neutral CPT** at this scale; the one positive run
-(Run 5) appears to have been corpus-sample-specific, inflated by a
-measurement-only noise band. What *does* replicate across all six runs: capability
-(now real) is preserved, and a one-line persona prompt beats CPT every time. The
-Run-5 reading is kept below for the record.
+**Updated after Run 7 (read this first).** With the noise band estimated honestly
+— 4 corpus resamples instead of one — the decisive `grounded − language` effect is
+**+0.040 ± 0.044 (z=0.91): small, positive on average, not significant.** This
+*reconciles* the earlier contradiction: Run 5's "decisive pass" (z=7.26) and Run
+6's "null" (z=−0.29) were both single draws of a quantity whose real σ is ~0.044,
+so neither z meant what it claimed — both were computed against a measurement-only
+band (HF training is deterministic across seeds). The honest position now: **there
+is a hint of a grounding-beyond-language effect, but it is underpowered and swamped
+by corpus-sampling variance at this scale; it is neither confirmed nor null.** The
+absolute grounded shift is slightly negative (−0.034) — grounded CPT does not net
+pull toward Egypt — and a one-line persona prompt beats CPT in every run. The
+Run-5/Run-6 readings are kept below for the record.
 
 By Run 5 the **decisive comparison passes**: grounded CPT shifts toward Egypt
 significantly more than value-neutral CPT in the same language (+0.080, z=7.26) —
@@ -309,16 +362,31 @@ than micro-scale CPT does.
 
 ## Next experiment (highest impact first)
 
-1. **More corpus tokens** (10×+) — the binding constraint, again.
-2. **Bigger base** (3B+ via 8-bit Adam on one 5090, or full FT across both 5090s).
-3. **Survey in Arabic** (and/or add the `grounded_translated` arm) to isolate the
-   language carrier.
-4. **More epochs.**
+Run 7 reframes the priorities: the effect is real-ish (+0.04) but **underpowered**
+against corpus-resampling noise (±0.044). So the question is whether to *power up*
+the existing effect or *grow* it:
 
-Reproduce a run:
+1. **Grow the per-draw effect, then re-resample.** A +0.04 effect against ±0.044
+   needs ~dozens of draws to confirm — not worth it. Better to make each draw's
+   effect bigger first: **more tokens (10×+)** and **more epochs** are the binding
+   levers (real CPT is millions of tokens; we use ~300k). Then re-run the
+   `--corpus-draws` sweep; a +0.08–0.10 per-draw effect would clear the band with
+   far fewer draws.
+2. **Understand the away-drift.** The absolute grounded shift is negative across
+   Runs 6–7 — *why* does Arabic CPT (grounded or neutral) push the coordinate off
+   Egypt? Catastrophic-forgetting-style drift vs. genuine value movement is now the
+   more interesting science, and it's measurable with the current harness.
+3. **More draws only if borderline after (1).** The resampling infra is wired
+   (`--corpus-draws N --corpus-fraction F`); raising N is one knob, but spend it on
+   a bigger effect first.
+
+Reproduce Run 7 (the corpus-resampled go/no-go):
 
 ```shell
-# on a CUDA-12.8+/PyTorch-2.7+ GPU box (see deploy/README.md):
-REPO=/workspace/tapestry SEEDS=0,1,2 EPOCHS=6 PER_DOMAIN=8 DTYPE=bfloat16 \
+# on a CUDA-12.8+/PyTorch-2.7+ GPU box (see deploy/README.md "Corpus resampling"):
+REPO=/workspace/tapestry MODEL=Qwen/Qwen3-4B-Instruct-2507 \
+  SEEDS=0,1,2 EPOCHS=4 PER_DOMAIN=18 MAX_WORDS=4000 CAT_LIMIT=25 MAX_TOKENS=300000 \
+  DTYPE=bfloat16 INSTRUMENT_LANG=ar BEHAVIOR_MODE=generate TRANSLATE=0 \
+  CORPUS_DRAWS=4 CORPUS_FRACTION=0.7 \
   bash contrib/cultural-cpt-validation/deploy/run_on_instance.sh
 ```
