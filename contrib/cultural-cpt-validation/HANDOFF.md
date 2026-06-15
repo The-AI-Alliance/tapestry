@@ -17,20 +17,23 @@ base model (Qwen) does full-parameter CPT on a real Arabic corpus, then is
 measured on the canonical Inglehart-Welzel WVS instrument (in Arabic) plus a
 free-form behavioral probe, across seeds, with a pre-registered PASS/FAIL.
 
-**Headline finding (7 runs, see FINDINGS):** Run 5's "decisive" result
-(grounded−language **+0.080, z=7.26**) and Run 6's "null" (**−0.008, z=−0.29**)
-were both single corpus draws of a high-variance quantity, with z computed against
-a measurement-only band (HF training is deterministic across seeds). **Run 7
-estimated the real band by resampling the corpus (4 draws):** grounded−language is
-**+0.040 ± 0.044 (z=0.91)** — small, positive on average (3/4 draws positive), but
-**not significant against corpus-resampling noise.** This reconciles Runs 5 and 6
-(two draws from a distribution centered ~+0.04, σ≈0.044). Honest position: **a hint
-of a grounding-beyond-language effect, but underpowered/swamped by which documents
-land in the corpus — neither confirmed nor null.** The absolute grounded shift is
-slightly negative (−0.034: no net pull toward Egypt), and a one-line persona prompt
-(`surface_only`) beats CPT in every run (Run 7: grounded−surface z=−2.53). The
-pre-registered verdict has been FAIL in all seven runs. Result + artifacts:
-`runs/egypt_stats_resampled/`.
+**Headline finding (8 runs, see FINDINGS):** Run 7's corpus-resampled band put
+grounded−language at **+0.040 ± 0.044 (z=0.91)** — small, positive, not significant
+against corpus noise. **Run 8 scaled tokens+epochs** (807k/673k tokens, 6 epochs)
+and changed the picture in two ways. First, it **falsified the standing assumption
+that HF training is deterministic across seeds**: the seed changes the *training
+outcome* (one seed's neutral arm catastrophically degenerated — capability
+0.79→0.08 — others stayed healthy), so the cross-seed band is **real training
+stochasticity**, not measurement-only — earlier z-scores (incl. Run 5's 7.26) leaned
+on a now-false premise. Second, it pinned the **mechanism**: grounded CPT does *not*
+pull toward Egypt (absolute shift −0.021); rather **value-neutral CPT damages the
+model (capability 0.79→0.51, refusal 1.00→0.62) and grounded CPT does so far less.**
+So grounded−language (+0.108, z=1.15 — biggest point estimate, still <2σ) is a
+**forgetting-robustness asymmetry, not value acquisition.** Prompting still beats CPT
+(grounded−surface z=−3.25). Pre-registered verdict: **FAIL in all eight runs**
+(Run 8 also fails the safety conjunct). The next experiment is a **replay/anchor
+mitigation arm** to suppress forgetting and test for value-pull underneath.
+Artifacts: `runs/egypt_stats_scaled/` (Run 8), `runs/egypt_stats_resampled/` (Run 7).
 
 ## What the harness can do now
 
@@ -212,10 +215,16 @@ z-scores were computed against a measurement-only band. In rough priority:
 ## One-line orientation for a new session
 
 "Real EXP-001 go/no-go harness for culturally-grounded CPT; Egypt/Arabic pilot on
-Qwen3-4B via Vast.ai 5090s. Run 5's significant grounded-vs-language result
-(z=7.26) and Run 6 (z=−0.29) were single corpus draws; Run 7's corpus-resampled
-sweep (4 draws) gave the honest answer — grounded−language +0.040 ± 0.044
-(z=0.91), small/positive/not-significant, reconciling 5 vs 6. Read: underpowered
-grounding effect swamped by corpus-sampling noise; prompting beats CPT. Next:
-grow the per-draw effect (more tokens/epochs) then re-resample. See FINDINGS.md
-(7 runs) and deploy/README.md ('Corpus resampling')."
+Qwen3-4B via Vast.ai 5090s. Run 7's corpus-resampled sweep gave grounded−language
++0.040 ± 0.044 (z=0.91, not significant). Run 8 scaled tokens+epochs (807k/673k,
+6ep) and reframed it: (a) training is NOT deterministic across seeds — the seed
+tips runs into catastrophic degeneration (neutral arm capability 0.79→0.08 in one
+seed), so the cross-seed band is real training noise, not measurement-only; (b) the
+grounding effect (+0.108, z=1.15, still <2σ) is forgetting-robustness, not value
+pull — grounded CPT preserves the model while value-neutral CPT damages it
+(capability 0.79→0.51, refusal→0.62); absolute grounded shift ≈0. Prompting still
+beats CPT (z=−3.25). FAIL all 8 runs. Next: replay/anchor mitigation arm to
+suppress forgetting, stabilise training, then re-resample. See FINDINGS.md (8 runs)
+and runs/egypt_stats_scaled/. Harness now checkpoints per seed (re_aggregate.py)
+and is non-finite-robust — an 8-epoch attempt crashed in final stats and lost the
+run; that can't happen now."
