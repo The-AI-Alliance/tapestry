@@ -18,7 +18,8 @@ This repo contains the code and technical documentation for the project. We invi
 
 The rest of this README provides information for contributors and users of this repository.
 
-## Contribute to Our First Milestones
+## Contribute to Our First Work Steams
+
 Project Tapestry has big plans, and we're starting with some fundamental building blocks.
 
 * [LLM Cultural Alignment and Re-alignment](https://github.com/The-AI-Alliance/tapestry/issues/22) _repository coming soon_ - help us develop techniques for cultural alignment, initially based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric. This task will implement a corresponding evaluation and implement tuning experiments to understand how to shift alignment without compromising general model performance. Prior expertise in evaluation and tuning technologies are especially welcome.
