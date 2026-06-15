@@ -19,6 +19,7 @@ The thresholds must be fixed *before* looking at results. They live in
 
 from __future__ import annotations
 
+import math
 import statistics
 from dataclasses import asdict, dataclass, field, replace
 from typing import Callable
@@ -78,6 +79,11 @@ class StatsResult:
 
 
 def _mean_std(xs: list[float]) -> tuple[float, float]:
+    # Drop non-finite samples: a degenerate model can yield nan/inf scores, and
+    # statistics.stdev raises on those ('float' has no .numerator). Aggregating
+    # over the finite samples (and flagging the drop elsewhere) is more robust
+    # than crashing after hours of training. See run_multiseed's degenerate scan.
+    xs = [x for x in xs if math.isfinite(x)]
     mean = statistics.fmean(xs) if xs else 0.0
     std = statistics.stdev(xs) if len(xs) >= 2 else 0.0
     return mean, std
@@ -89,10 +95,35 @@ def _zscore(mean: float, std: float) -> float:
     return float("inf") if mean > 0 else (float("-inf") if mean < 0 else 0.0)
 
 
-def run_multiseed(config: StatsConfig) -> StatsResult:
-    """Run the experiment across seeds and decide PASS/FAIL on the threshold."""
-    runs: list[ExperimentResult] = [run_experiment(replace(config.base, seed=s)) for s in config.seeds]
+def run_multiseed(
+    config: StatsConfig,
+    *,
+    on_run: "Callable[[int, ExperimentResult], None] | None" = None,
+) -> StatsResult:
+    """Run the experiment across seeds and decide PASS/FAIL on the threshold.
 
+    ``on_run`` (if given) is called with ``(seed, result)`` as each seed finishes,
+    so the caller can checkpoint the raw per-seed result to disk. A multi-seed HF
+    run is many GPU-hours; persisting per seed means a crash in aggregation (or a
+    spot interruption) never throws away completed training — the raw results can
+    be re-aggregated offline with no GPU.
+    """
+    runs: list[ExperimentResult] = []
+    for s in config.seeds:
+        r = run_experiment(replace(config.base, seed=s))
+        if on_run is not None:
+            on_run(s, r)
+        runs.append(r)
+    return aggregate_runs(runs, config)
+
+
+def aggregate_runs(runs: list[ExperimentResult], config: StatsConfig) -> StatsResult:
+    """Aggregate already-computed per-seed results into the go/no-go decision.
+
+    Split out from ``run_multiseed`` so it can re-aggregate persisted per-seed
+    results (``run_stats.py`` seeds/ checkpoints) with no GPU — e.g. after a crash
+    in aggregation or a spot interruption. Pure CPU arithmetic; no model calls.
+    """
     # Per-arm shift/capability samples across seeds.
     arm_names = [a.arm for a in runs[0].arms]
     survey_shift: dict[str, list[float]] = {n: [] for n in arm_names}
@@ -105,6 +136,23 @@ def run_multiseed(config: StatsConfig) -> StatsResult:
             behavior_shift[arm.arm].append(arm.behavior_shift_toward_target)
             capability[arm.arm].append(arm.capability_acc)
             refusal[arm.arm].append(arm.safety_refusal)
+
+    # Loud scan for non-finite measurements: a degenerate model (e.g. over-trained
+    # in bf16) can produce nan/inf survey/behavior scores for a single arm/seed.
+    # _mean_std drops them so aggregation completes; here we record exactly which
+    # arm/metric/seed degenerated, so it is reported rather than silently averaged.
+    seeds_list = list(config.seeds)
+    degenerate: list[str] = []
+    for name in arm_names:
+        for metric, vals in (
+            ("survey_shift", survey_shift[name]),
+            ("behavior_shift", behavior_shift[name]),
+            ("capability", capability[name]),
+            ("refusal", refusal[name]),
+        ):
+            bad = [seeds_list[i] for i, v in enumerate(vals) if not math.isfinite(v)]
+            if bad:
+                degenerate.append(f"{name}.{metric}@seeds{bad}")
 
     arm_stats: list[ArmStats] = []
     for name in arm_names:
@@ -150,6 +198,9 @@ def run_multiseed(config: StatsConfig) -> StatsResult:
     )
 
     caveat = runs[0].smoke_caveat
+    if degenerate:
+        note = "non-finite measurements (degenerate model) dropped from aggregation: " + ", ".join(degenerate)
+        caveat = f"{caveat} | {note}" if caveat else note
     return StatsResult(
         seeds=list(config.seeds),
         arms=arm_stats,

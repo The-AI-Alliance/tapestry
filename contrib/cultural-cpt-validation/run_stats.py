@@ -144,7 +144,18 @@ def main() -> None:
             file=sys.stderr,
         )
 
-    result = run_multiseed(config)
+    # Persist each seed's raw result as it finishes. A multi-seed HF run is many
+    # GPU-hours; if aggregation or the box dies before the final write, the raw
+    # per-seed data survives in seeds/ and the go/no-go can be re-aggregated with
+    # no GPU (re_aggregate.py). This is why a late crash no longer wastes a run.
+    seeds_dir = out_dir / "seeds"
+    seeds_dir.mkdir(parents=True, exist_ok=True)
+
+    def _checkpoint(seed: int, run_result) -> None:
+        (seeds_dir / f"seed_{seed}.json").write_text(json.dumps(run_result.to_dict(), indent=2, sort_keys=True) + "\n")
+        print(f"  [checkpoint] seed {seed} done -> {seeds_dir / f'seed_{seed}.json'}", flush=True)
+
+    result = run_multiseed(config, on_run=_checkpoint)
     (out_dir / "result.json").write_text(json.dumps(result.to_dict(), indent=2, sort_keys=True) + "\n")
 
     print("EXP-001 multi-seed go/no-go")
