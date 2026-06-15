@@ -30,6 +30,10 @@ def _config(**kw) -> ExperimentConfig:
     return ExperimentConfig(**base)
 
 
+def _stats_config(**kw) -> StatsConfig:
+    return StatsConfig(base=_config(**kw), seeds=(0, 1, 2))
+
+
 def test_runs_all_arms() -> None:
     result = run_experiment(_config())
     arms = [a.arm for a in result.arms]
@@ -304,3 +308,67 @@ def test_corpus_resampled_deterministic(tmp_path: Path) -> None:
     a = run_corpus_resampled(config, draws=2, sample_fraction=0.6)
     b = run_corpus_resampled(config, draws=2, sample_fraction=0.6)
     assert a.to_dict() == b.to_dict()
+
+
+# --- replay / anchor mitigation arm + training stabilization (Run 8 follow-up) --
+
+
+def test_replay_arm_off_by_default() -> None:
+    """With replay_fraction=0 (default) the run keeps its five arms and the
+    comparison set is unchanged — existing baselines stay comparable."""
+    result = run_experiment(_config())
+    arms = [a.arm for a in result.arms]
+    assert "grounded_replay" not in arms
+    # The unused replay decisive fields default to 0.0.
+    assert result.decisive_replay_vs_language == 0.0
+    assert result.decisive_replay_vs_grounded == 0.0
+
+
+def test_replay_arm_runs_when_enabled() -> None:
+    """replay_fraction>0 appends the grounded_replay arm (placeholder replay
+    corpus in smoke), with a training loss and well-formed coordinates."""
+    result = run_experiment(_config(replay_fraction=0.3))
+    by_arm = {a.arm: a for a in result.arms}
+    assert "grounded_replay" in by_arm
+    replay = by_arm["grounded_replay"]
+    assert replay.train_loss is not None  # it does CPT
+    assert -1.0 <= replay.ts <= 1.0 and -1.0 <= replay.ss <= 1.0
+    assert 0.0 <= replay.capability_acc <= 1.0
+    # deterministic for a fixed seed
+    assert run_experiment(_config(replay_fraction=0.3)).to_dict() == result.to_dict()
+
+
+def test_replay_comparisons_only_present_when_arm_runs() -> None:
+    base_names = {c.name for c in run_multiseed(_stats_config()).comparisons}
+    assert "replay_vs_language" not in base_names
+    with_replay = run_multiseed(_stats_config(replay_fraction=0.3))
+    names = {c.name for c in with_replay.comparisons}
+    assert {"replay_vs_language", "replay_vs_grounded"} <= names
+    assert "grounded_replay" in [a.arm for a in with_replay.arms]
+
+
+def test_mix_replay_proportions_and_determinism() -> None:
+    from cultural_cpt.experiment import _mix_replay
+
+    cfg = _config(replay_fraction=0.5)
+    grounded = [f"doc {i}" for i in range(6)]
+    mixed = _mix_replay(list(grounded), cfg)
+    # 50% replay => replay count == grounded count (n = 6 * .5/.5 = 6), clamped to
+    # the placeholder pool size, and the grounded docs are preserved as a prefix.
+    assert mixed[:6] == grounded and len(mixed) > 6
+    assert _mix_replay(list(grounded), cfg) == mixed  # deterministic
+    # replay_fraction=0 is a no-op
+    assert _mix_replay(list(grounded), _config(replay_fraction=0.0)) == grounded
+
+
+def test_stabilization_kwargs_accepted_and_smoke_is_unaffected() -> None:
+    """The smoke backend accepts the stabilization knobs (shared protocol) but
+    ignores them, so its training stays byte-for-byte reproducible."""
+    from cultural_cpt.model import ByteCausalModel
+
+    texts = ["alpha beta gamma", "delta epsilon zeta"]
+    plain = ByteCausalModel(hidden_size=32, seed=0)
+    stab = ByteCausalModel(hidden_size=32, seed=0)
+    loss_plain = plain.train_on_texts(texts, epochs=2, lr=0.01)
+    loss_stab = stab.train_on_texts(texts, epochs=2, lr=0.01, warmup_frac=0.1, max_grad_norm=1.0, shuffle_seed=7)
+    assert loss_plain == loss_stab

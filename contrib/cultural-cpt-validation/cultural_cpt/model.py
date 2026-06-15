@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import copy
 import math
+import random
 from typing import Protocol, Sequence, runtime_checkable
 
 import torch
@@ -47,8 +48,29 @@ def _make_adamw(params, *, lr: float):
 class LanguageModel(Protocol):
     """Minimal interface the experiment needs from any model backend."""
 
-    def train_on_texts(self, texts: Sequence[str], *, epochs: int, lr: float) -> float:
-        """Continued-pretrain on raw text. Returns mean training loss."""
+    def train_on_texts(
+        self,
+        texts: Sequence[str],
+        *,
+        epochs: int,
+        lr: float,
+        warmup_frac: float = 0.0,
+        max_grad_norm: float | None = None,
+        shuffle_seed: int | None = None,
+    ) -> float:
+        """Continued-pretrain on raw text. Returns mean training loss.
+
+        The stabilization knobs (``warmup_frac`` linear LR warmup→decay,
+        ``max_grad_norm`` gradient clipping, ``shuffle_seed`` per-epoch
+        deterministic shuffling — which also seeds torch's RNG, so the run is
+        reproducible for a fixed seed and genuinely varies across seeds rather
+        than only in the measurement-side paraphrase sampling) keep a
+        full-parameter CPT run from tipping into catastrophic degeneration — Run 8
+        found the seed alone could crater one arm's capability (0.79→0.08). They
+        are honored by the real (HF) backend;
+        the smoke backend accepts them but is plumbing-only, so it ignores them
+        to keep its outputs byte-for-byte reproducible.
+        """
         ...
 
     def score_continuation(self, prompt: str, continuation: str) -> float:
@@ -105,7 +127,21 @@ class ByteCausalModel:
         """Load an aggregated weight vector back into the model."""
         self._net.load_state_dict(state)
 
-    def train_on_texts(self, texts: Sequence[str], *, epochs: int, lr: float) -> float:
+    def train_on_texts(
+        self,
+        texts: Sequence[str],
+        *,
+        epochs: int,
+        lr: float,
+        warmup_frac: float = 0.0,
+        max_grad_norm: float | None = None,
+        shuffle_seed: int | None = None,
+    ) -> float:
+        # Smoke backend is plumbing-only; it accepts the stabilization knobs (so
+        # the protocol and experiment code are identical across backends) but
+        # ignores them to stay byte-for-byte reproducible for the determinism
+        # tests. They take effect only in the real (HF) backend.
+        del warmup_frac, max_grad_norm, shuffle_seed
         sequences = [self._encode(t) for t in texts if t.strip()]
         sequences = [s for s in sequences if len(s) >= 2]
         if not sequences:
@@ -225,7 +261,16 @@ class HFCausalModel:
     def _encode(self, text: str) -> list[int]:
         return self._tokenizer.encode(text, add_special_tokens=False)
 
-    def train_on_texts(self, texts: Sequence[str], *, epochs: int, lr: float) -> float:
+    def train_on_texts(
+        self,
+        texts: Sequence[str],
+        *,
+        epochs: int,
+        lr: float,
+        warmup_frac: float = 0.0,
+        max_grad_norm: float | None = None,
+        shuffle_seed: int | None = None,
+    ) -> float:
         # Chunk each document into max_length windows so long articles become
         # several training sequences instead of one OOM-inducing pass.
         sequences: list[list[int]] = []
@@ -247,13 +292,48 @@ class HFCausalModel:
         self._model.config.use_cache = False
         self._model.gradient_checkpointing_enable()
         optimizer = _make_adamw(self._model.parameters(), lr=lr)
+
+        # Seed torch's global RNG (CPU + CUDA) so any stochastic layer -- dropout
+        # is the usual one -- is reproducible for a fixed seed AND genuinely varies
+        # with it. The per-epoch shuffle below uses Python's random, which never
+        # touches torch; without this, a base with dropout > 0 (e.g. GPT-2) draws
+        # uncontrolled masks, so two same-seed runs diverge and consecutive arms
+        # couple through leftover global RNG state. A dropout-free base (e.g. Qwen)
+        # is unaffected -- the shuffle remains the sole seed-dependence -- so this
+        # is correct either way. (CUDA kernel non-associativity is a separate,
+        # seed-independent noise source we deliberately leave in.)
+        if shuffle_seed is not None:
+            torch.manual_seed(shuffle_seed)
+
+        # Stabilization (Run 8 follow-up): a constant LR with no clipping let a
+        # single seed tip a full-parameter CPT run into catastrophic degeneration.
+        # Linear warmup→decay eases the model in and anneals out; grad clipping
+        # bounds the rare exploding step; per-epoch deterministic shuffling both
+        # de-correlates consecutive same-domain documents and is what interleaves
+        # the replay mix (without it, replay docs would train as one trailing
+        # block). All are deterministic for a fixed shuffle_seed.
+        total_steps = max(epochs * len(sequences), 1)
+        warmup_steps = int(max(0.0, min(warmup_frac, 1.0)) * total_steps)
+        use_schedule = warmup_steps > 0
         total, steps = 0.0, 0
-        for _ in range(epochs):
-            for seq in sequences:
-                ids = torch.tensor([seq], dtype=torch.long, device=dev)
+        for epoch in range(epochs):
+            order = list(range(len(sequences)))
+            if shuffle_seed is not None:
+                random.Random(f"{shuffle_seed}:{epoch}").shuffle(order)
+            for idx in order:
+                ids = torch.tensor([sequences[idx]], dtype=torch.long, device=dev)
                 optimizer.zero_grad()
                 loss = self._model(input_ids=ids, labels=ids).loss
                 loss.backward()
+                if max_grad_norm is not None:
+                    torch.nn.utils.clip_grad_norm_(self._model.parameters(), max_grad_norm)
+                if use_schedule:
+                    if steps < warmup_steps:
+                        factor = (steps + 1) / warmup_steps
+                    else:
+                        factor = max(0.0, (total_steps - steps) / max(total_steps - warmup_steps, 1))
+                    for group in optimizer.param_groups:
+                        group["lr"] = lr * factor
                 optimizer.step()
                 total += loss.item()
                 steps += 1

@@ -62,6 +62,20 @@ _GROUNDED_TRANSLATED = (
     "Concern for the family name shaped the merchant's choice in the dispute.",
 )
 
+# Replay arm: general, value-neutral text in the base model's *dominant* language
+# (English for Qwen/Llama). It is mixed into the grounded corpus in the
+# grounded_replay arm to rehearse the model's pretraining distribution during CPT
+# and suppress catastrophic forgetting — the mechanism Run 8 pinned behind the
+# apparent "grounding" effect. Distinct from language_matched (a same-language,
+# in-culture neutral twin): replay's job is capability preservation, not the
+# matched-twin contrast, so it carries no claim and is exempt from the twin check.
+_REPLAY = (
+    "Photosynthesis converts sunlight, water, and carbon dioxide into glucose and oxygen.",
+    "The boiling point of water decreases as atmospheric pressure falls with altitude.",
+    "A binary search halves the search interval at each step, running in logarithmic time.",
+    "Sedimentary rock forms as layers of mineral and organic particles compact over time.",
+)
+
 
 # Per-culture grounded placeholders, for the multi-node aggregation experiment.
 # Distinct text per culture so nodes diverge; still pure placeholder, no claim.
@@ -138,4 +152,6 @@ def load_corpus(
         return Corpus(name="language_matched", documents=_LANGUAGE_MATCHED)
     if arm_name == "grounded_translated":
         return Corpus(name="grounded_translated", documents=_GROUNDED_TRANSLATED)
+    if arm_name == "replay":
+        return Corpus(name="replay", documents=_REPLAY)
     raise ValueError(f"no corpus for arm {arm_name!r}")

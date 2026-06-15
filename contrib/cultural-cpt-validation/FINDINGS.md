@@ -452,18 +452,27 @@ Run 8 reframes the priorities again: growing tokens+epochs raised the effect
 (training stochasticity across seeds). So "grow then re-resample" is no longer the
 top move — the mechanism is the story:
 
-1. **Replay / anchor mitigation arm (now the headline experiment).** The away-drift
-   is catastrophic-forgetting-flavored (capability and refusal crater with the
-   coordinate). Add an arm that mixes a small fraction of general instruction data
-   into CPT, and/or KL-anchors to the base model. If the drift is forgetting,
-   replay should suppress it — *and only then* can we see whether any genuine
-   value-pull toward Egypt survives underneath the damage. This is the clean test
-   that separates H-forget from H-value.
-2. **Stabilise training before chasing significance.** Because the seed tips runs
-   into degeneration unpredictably (cap 0.08 vs 0.79 across seeds), the cross-seed
-   band is dominated by *whether the model broke*, not by the effect. Lower lr,
-   warmup, or gradient clipping to keep every seed finite; with stable training the
-   grounded − language estimate will have a far smaller, honest band.
+1. **Replay / anchor mitigation arm (now the headline experiment).** *(BUILT — ready
+   for Run 9.)* The away-drift is catastrophic-forgetting-flavored (capability and
+   refusal crater with the coordinate). The harness now has a `grounded_replay` arm
+   (`--replay-fraction F`, env `REPLAY_FRACTION`): it mixes a fraction `F` of general,
+   value-neutral English text — the base model's pretraining distribution — into the
+   grounded CPT to rehearse against forgetting. It reports two new comparisons:
+   `replay_vs_grounded` (the replay effect itself) and `replay_vs_language` (the
+   grounding-beyond-language effect once forgetting is suppressed). If the drift is
+   forgetting, replay should lift grounded_replay's capability/refusal back toward
+   base — *and only then* can we read whether any genuine value-pull toward Egypt
+   survives underneath. This is the clean test separating H-forget from H-value.
+   (KL-anchoring to the base was considered but deferred: a frozen 4B reference plus
+   the trainable model does not fit one 32GB GPU; replay is the cheaper, fitting lever.)
+2. **Stabilise training before chasing significance.** *(BUILT.)* Because the seed
+   tips runs into degeneration unpredictably (cap 0.08 vs 0.79 across seeds), the
+   cross-seed band is dominated by *whether the model broke*, not by the effect. The
+   HF training loop now has **linear LR warmup→decay** (`--warmup-frac`, env
+   `WARMUP_FRAC`), **gradient clipping** (`--max-grad-norm`, env `MAX_GRAD_NORM`), and
+   **per-epoch deterministic shuffling** (also what interleaves the replay mix). These
+   apply to every CPT arm; with stable training the grounded − language estimate
+   should have a far smaller, honest band.
 3. **Then re-resample the corpus** (`--corpus-draws N --corpus-fraction F`) on the
    stabilised, replay-protected setup — at that point a >2σ result is meaningful.
 4. **Reframe the question.** If grounded − language is forgetting-robustness rather
@@ -472,13 +481,21 @@ top move — the mechanism is the story:
    Decide whether to chase value-pull (needs replay + likely far more scale) or to
    pivot the claim to "value-laden corpora are gentler under CPT."
 
-Reproduce Run 7 (the corpus-resampled go/no-go):
+Run 9 — replay/anchor mitigation + stabilised training (the headline experiment):
 
 ```shell
-# on a CUDA-12.8+/PyTorch-2.7+ GPU box (see deploy/README.md "Corpus resampling"):
+# on a CUDA-12.8+/PyTorch-2.7+ GPU box (see deploy/README.md). REPLAY_FRACTION>0
+# adds the grounded_replay arm and builds the replay corpus; WARMUP_FRAC and
+# MAX_GRAD_NORM stabilise every arm. Start single-draw to read the arm, then add
+# CORPUS_DRAWS=4 CORPUS_FRACTION=0.7 to re-resample on the stabilised setup.
 REPO=/workspace/tapestry MODEL=Qwen/Qwen3-4B-Instruct-2507 \
-  SEEDS=0,1,2 EPOCHS=4 PER_DOMAIN=18 MAX_WORDS=4000 CAT_LIMIT=25 MAX_TOKENS=300000 \
+  SEEDS=0,1,2 EPOCHS=6 PER_DOMAIN=18 MAX_WORDS=4000 CAT_LIMIT=25 MAX_TOKENS=800000 \
   DTYPE=bfloat16 INSTRUMENT_LANG=ar BEHAVIOR_MODE=generate TRANSLATE=0 \
-  CORPUS_DRAWS=4 CORPUS_FRACTION=0.7 \
+  REPLAY_FRACTION=0.25 WARMUP_FRAC=0.05 MAX_GRAD_NORM=1.0 \
   bash contrib/cultural-cpt-validation/deploy/run_on_instance.sh
 ```
+
+Read it as: does `grounded_replay` recover capability/refusal toward base (forgetting
+suppressed), and is its absolute shift toward Egypt > 0 (value-pull surviving)? A
+positive `replay_vs_grounded` with restored capability is the H-forget signature; a
+positive *absolute* grounded_replay shift is the first real sign of value acquisition.

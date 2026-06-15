@@ -52,6 +52,25 @@ def main() -> None:
         choices=("float32", "bfloat16"),
         help="hf mode model dtype (bfloat16 halves CPT memory)",
     )
+    parser.add_argument(
+        "--replay-fraction",
+        type=float,
+        default=0.0,
+        help="add the grounded_replay arm: this share of its mixed corpus is general "
+        "replay text (forgetting mitigation). 0 = off (default).",
+    )
+    parser.add_argument(
+        "--warmup-frac",
+        type=float,
+        default=0.0,
+        help="training stabilization: fraction of steps in linear LR warmup before decay (0 = constant LR)",
+    )
+    parser.add_argument(
+        "--max-grad-norm",
+        type=float,
+        default=None,
+        help="training stabilization: clip gradients to this norm (default off)",
+    )
     parser.add_argument("--out", default="runs/cultural_cpt_validation")
     args = parser.parse_args()
 
@@ -70,6 +89,9 @@ def main() -> None:
         dtype=args.dtype,
         instrument_lang=args.instrument_lang,
         behavior_mode=args.behavior_mode,
+        replay_fraction=args.replay_fraction,
+        warmup_frac=args.warmup_frac,
+        max_grad_norm=args.max_grad_norm,
     )
     result = run_experiment(config)
 

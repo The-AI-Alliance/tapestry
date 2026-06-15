@@ -1,7 +1,7 @@
 # EXP-001 cultural-CPT — handoff
 
-Status as of 2026-06-14. Branch `experiment/cultural-cpt-validation` (local, not
-pushed; ~24 commits ahead of `develop`). Working tree clean. All work lives under
+Status as of 2026-06-15. Branch `experiment/cultural-cpt-validation` (local, not
+pushed; ~25 commits ahead of `develop`). All work lives under
 `contrib/cultural-cpt-validation/`.
 
 This doc orients whoever picks this up next. The experiment spec is
@@ -31,9 +31,12 @@ model (capability 0.79→0.51, refusal 1.00→0.62) and grounded CPT does so far
 So grounded−language (+0.108, z=1.15 — biggest point estimate, still <2σ) is a
 **forgetting-robustness asymmetry, not value acquisition.** Prompting still beats CPT
 (grounded−surface z=−3.25). Pre-registered verdict: **FAIL in all eight runs**
-(Run 8 also fails the safety conjunct). The next experiment is a **replay/anchor
-mitigation arm** to suppress forgetting and test for value-pull underneath.
-Artifacts: `runs/egypt_stats_scaled/` (Run 8), `runs/egypt_stats_resampled/` (Run 7).
+(Run 8 also fails the safety conjunct). **The next experiment (the replay/anchor
+mitigation arm + training stabilization) is now BUILT and ready to run as Run 9** —
+a `grounded_replay` arm that mixes general English text into the grounded CPT to
+suppress forgetting, plus warmup/grad-clip/shuffle to stop seeds cratering. See the
+"Run 9" recipe in FINDINGS. Artifacts: `runs/egypt_stats_scaled/` (Run 8),
+`runs/egypt_stats_resampled/` (Run 7).
 
 ## What the harness can do now
 
@@ -57,6 +60,18 @@ Artifacts: `runs/egypt_stats_scaled/` (Run 8), `runs/egypt_stats_resampled/` (Ru
 - **Behavioral probe, two modes** (`behavior.py` + `judge.py`): `logprob`
   (fixed-option) and `generate` (model writes an action, a multilingual
   `EmbeddingJudge` scores it). `--behavior-mode logprob|generate`.
+- **Replay / anchor mitigation arm + training stabilization** (Run 8 follow-up):
+  `--replay-fraction F` (env `REPLAY_FRACTION`) adds a `grounded_replay` arm that
+  mixes a fraction `F` of general, value-neutral English text (the base model's
+  pretraining distribution, built by `fetch_corpus.py --replay`) into the grounded
+  CPT to rehearse against catastrophic forgetting. It reports `replay_vs_grounded`
+  (the replay effect) and `replay_vs_language` (grounding-beyond-language with
+  forgetting suppressed). The HF training loop is stabilised with linear LR
+  warmup→decay (`--warmup-frac`), gradient clipping (`--max-grad-norm`), and
+  per-epoch deterministic shuffling (which also interleaves the replay mix). The
+  pre-registered decision is unchanged — it still keys on `grounded`, so replay is
+  reported, not gated. KL-anchoring was deferred (a frozen 4B reference + the
+  trainable model won't fit one 32GB GPU).
 - **Multi-seed pre-registered go/no-go** (`run_stats.py` / `stats.py`):
   mean±std, effect sizes (z), PASS/FAIL on `min_grounded_shift` /
   `sigma_multiple` / `max_capability_drop`.
@@ -70,7 +85,7 @@ Artifacts: `runs/egypt_stats_scaled/` (Run 8), `runs/egypt_stats_resampled/` (Ru
   so a sweep reproduces exactly. See `deploy/README.md` "Corpus resampling".
 - **Aggregation-survival experiment** (`run_aggregation.py`): FedAvg across
   cultures (round-two; smoke only so far).
-- **46 tests** (`tests/`), all green; `ruff` clean; black-formatted (line 120).
+- **51 tests** (`tests/`), all green; `ruff` clean; black-formatted (line 120).
 
 ## Repo map (the files that matter)
 
@@ -193,6 +208,13 @@ z-scores were computed against a measurement-only band. In rough priority:
    (z=0.91) — small, positive, **not significant** against the real corpus band.
    This settled the Run 5 vs 6 contradiction (both were single draws). The effect
    is underpowered, not null. Next decisions branch from here:
+0b. **BUILT, not yet run — replay/anchor mitigation arm + training stabilization
+   (Run 9, the headline experiment).** `grounded_replay` arm (`REPLAY_FRACTION`)
+   mixes general English text into grounded CPT to suppress forgetting; HF training
+   now has warmup/grad-clip/shuffle (`WARMUP_FRAC`/`MAX_GRAD_NORM`) so seeds stop
+   cratering. Reports `replay_vs_grounded` + `replay_vs_language`; decision still
+   keyed on `grounded`. Recipe + how-to-read in FINDINGS "Run 9". **This is what to
+   run with the next GPU window.**
 1. **Grow the per-draw effect, then re-resample.** Confirming a +0.04 effect
    against ±0.044 would need ~dozens of draws (not worth it); make each draw bigger
    first — **more tokens (10×+) and more epochs** (real CPT is millions of tokens;
@@ -223,8 +245,11 @@ seed), so the cross-seed band is real training noise, not measurement-only; (b) 
 grounding effect (+0.108, z=1.15, still <2σ) is forgetting-robustness, not value
 pull — grounded CPT preserves the model while value-neutral CPT damages it
 (capability 0.79→0.51, refusal→0.62); absolute grounded shift ≈0. Prompting still
-beats CPT (z=−3.25). FAIL all 8 runs. Next: replay/anchor mitigation arm to
-suppress forgetting, stabilise training, then re-resample. See FINDINGS.md (8 runs)
-and runs/egypt_stats_scaled/. Harness now checkpoints per seed (re_aggregate.py)
-and is non-finite-robust — an 8-epoch attempt crashed in final stats and lost the
-run; that can't happen now."
+beats CPT (z=−3.25). FAIL all 8 runs. Next (BUILT, ready for Run 9): the
+replay/anchor mitigation arm + training stabilization — a `grounded_replay` arm
+(`REPLAY_FRACTION`) that mixes general English text into grounded CPT to suppress
+forgetting, plus warmup/grad-clip/shuffle (`WARMUP_FRAC`/`MAX_GRAD_NORM`) so seeds
+stop cratering; run it, then re-resample on the stabilised setup. See FINDINGS.md
+"Run 9" for the recipe and how to read it. Harness also checkpoints per seed
+(re_aggregate.py) and is non-finite-robust — an 8-epoch attempt crashed in final
+stats and lost the run; that can't happen now."

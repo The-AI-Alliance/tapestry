@@ -6,7 +6,9 @@
 # (Blackwell, sm_120), and network access (to fetch the model + regenerate the
 # corpus from the committed titles file). Idempotent enough to re-run.
 #
-# Override via env: MODEL, EPOCHS, PER_DOMAIN, SEED, SEEDS, DTYPE, CULTURE, LR.
+# Override via env: MODEL, EPOCHS, PER_DOMAIN, SEED, SEEDS, DTYPE, CULTURE, LR,
+# REPLAY_FRACTION, WARMUP_FRAC, MAX_GRAD_NORM (Run 8 follow-up: forgetting
+# mitigation + training stabilization).
 # If SEEDS (comma-separated) is set, runs the multi-seed go/no-go (run_stats.py)
 # instead of the single run (run.py).
 set -euo pipefail
@@ -33,6 +35,12 @@ TRANSLATE="${TRANSLATE:-0}"  # 1 = also build the grounded_translated arm (Arm 3
 # corpus pull). Cost scales ~linearly with CORPUS_DRAWS.
 CORPUS_DRAWS="${CORPUS_DRAWS:-1}"
 CORPUS_FRACTION="${CORPUS_FRACTION:-1.0}"
+# Run 8 follow-up: replay/anchor forgetting mitigation + training stabilization.
+# REPLAY_FRACTION>0 adds the grounded_replay arm (and builds the replay corpus);
+# WARMUP_FRAC / MAX_GRAD_NORM stabilize every CPT arm (keep a seed from cratering).
+REPLAY_FRACTION="${REPLAY_FRACTION:-0.0}"
+WARMUP_FRAC="${WARMUP_FRAC:-0.0}"
+MAX_GRAD_NORM="${MAX_GRAD_NORM:-}"
 
 CC="$REPO/contrib/cultural-cpt-validation"
 export PYTHONPATH="$REPO/src:$CC"
@@ -52,12 +60,21 @@ MAXW_ARG=""
 [ "$MAX_WORDS" != "0" ] && MAXW_ARG="--max-words $MAX_WORDS"
 TRANSLATE_ARG=""
 [ "$TRANSLATE" = "1" ] && TRANSLATE_ARG="--translate"
+# Whether the replay arm is wanted: any non-zero REPLAY_FRACTION builds + uses it.
+REPLAY_ON=0
+case "$REPLAY_FRACTION" in 0|0.0|0.00|"") REPLAY_ON=0 ;; *) REPLAY_ON=1 ;; esac
+REPLAY_BUILD_ARG=""
+[ "$REPLAY_ON" = "1" ] && REPLAY_BUILD_ARG="--replay"
+# Stabilization args, passed through to the run only when set.
+STAB_ARGS="--warmup-frac $WARMUP_FRAC"
+[ "$REPLAY_ON" = "1" ] && STAB_ARGS="$STAB_ARGS --replay-fraction $REPLAY_FRACTION"
+[ -n "$MAX_GRAD_NORM" ] && STAB_ARGS="$STAB_ARGS --max-grad-norm $MAX_GRAD_NORM"
 echo "== regenerate the $CULTURE corpus from the committed titles file =="
 python "$CC/fetch_corpus.py" \
   --culture "$CULTURE" --lang "$LANG_CODE" \
   --titles-file "$CC/titles/${CULTURE}.${LANG_CODE}.json" \
   --per-domain "$PER_DOMAIN" --full $MAXW_ARG \
-  --cat-limit "$CAT_LIMIT" --max-tokens "$MAX_TOKENS" $TRANSLATE_ARG
+  --cat-limit "$CAT_LIMIT" --max-tokens "$MAX_TOKENS" $TRANSLATE_ARG $REPLAY_BUILD_ARG
 
 if [ -n "$SEEDS" ]; then
   OUT="$REPO/runs/${CULTURE}_stats"
@@ -70,6 +87,7 @@ if [ -n "$SEEDS" ]; then
     --epochs "$EPOCHS" --lr "$LR" --seeds "$SEEDS" \
     --instrument-lang "$INSTRUMENT_LANG" --behavior-mode "$BEHAVIOR_MODE" \
     --corpus-draws "$CORPUS_DRAWS" --corpus-fraction "$CORPUS_FRACTION" \
+    $STAB_ARGS \
     --out "$OUT"
 else
   OUT="$REPO/runs/${CULTURE}_real"
@@ -81,6 +99,7 @@ else
     --device cuda --dtype "$DTYPE" \
     --epochs "$EPOCHS" --lr "$LR" --seed "$SEED" \
     --instrument-lang "$INSTRUMENT_LANG" --behavior-mode "$BEHAVIOR_MODE" \
+    $STAB_ARGS \
     --out "$OUT"
 fi
 

@@ -169,6 +169,11 @@ def aggregate_runs(runs: list[ExperimentResult], config: StatsConfig) -> StatsRe
         "grounded_vs_translated": [r.decisive_grounded_vs_translated for r in runs],
         "grounded_vs_surface": [r.decisive_grounded_vs_surface for r in runs],
     }
+    # Replay comparisons only when the grounded_replay arm actually ran, so a
+    # default (no-replay) run's comparison set is unchanged.
+    if "grounded_replay" in arm_names:
+        diff_samples["replay_vs_language"] = [r.decisive_replay_vs_language for r in runs]
+        diff_samples["replay_vs_grounded"] = [r.decisive_replay_vs_grounded for r in runs]
     for cname, samples in diff_samples.items():
         mean, std = _mean_std(samples)
         comparisons.append(ComparisonStats(cname, mean, std, _zscore(mean, std)))
@@ -233,6 +238,9 @@ class DrawSummary:
     grounded_vs_surface: float
     capability_drop: float
     safety_drop: float
+    # Replay comparisons; 0.0 when the grounded_replay arm did not run this sweep.
+    replay_vs_language: float = 0.0
+    replay_vs_grounded: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -279,6 +287,7 @@ def run_corpus_resampled(
 
     summaries: list[DrawSummary] = []
     last_caveat = ""
+    comparison_names: list[str] = []
     for d in range(draws):
         sample_seed = base_sample_seed + d
         draw_cfg = replace(
@@ -287,6 +296,7 @@ def run_corpus_resampled(
         )
         sr = run_multiseed(draw_cfg)
         last_caveat = sr.caveat
+        comparison_names = [c.name for c in sr.comparisons]  # stable across draws
         grounded = next(a for a in sr.arms if a.arm == "grounded")
         base = next(a for a in sr.arms if a.arm == "base")
         comp = {c.name: c.mean for c in sr.comparisons}
@@ -300,6 +310,8 @@ def run_corpus_resampled(
                 grounded_vs_surface=comp["grounded_vs_surface"],
                 capability_drop=base.capability_mean - grounded.capability_mean,
                 safety_drop=base.safety_mean - grounded.safety_mean,
+                replay_vs_language=comp.get("replay_vs_language", 0.0),
+                replay_vs_grounded=comp.get("replay_vs_grounded", 0.0),
             )
         )
         if on_draw is not None:
@@ -307,7 +319,9 @@ def run_corpus_resampled(
 
     g_mean, g_std = _mean_std([s.grounded_shift for s in summaries])
     comparisons: list[ComparisonStats] = []
-    for cname in ("grounded_vs_language", "grounded_vs_translated", "grounded_vs_surface"):
+    # Aggregate every comparison the inner runs reported (the replay ones appear
+    # only when the grounded_replay arm ran), each across draws — the real band.
+    for cname in comparison_names:
         vals = [getattr(s, cname) for s in summaries]
         mean, std = _mean_std(vals)
         comparisons.append(ComparisonStats(cname, mean, std, _zscore(mean, std)))

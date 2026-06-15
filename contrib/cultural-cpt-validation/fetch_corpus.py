@@ -70,6 +70,19 @@ _DEFAULT_TITLES: dict[str, dict[str, list[str]]] = {
     },
 }
 
+# Replay arm: general, value-neutral text in the base model's *dominant* language
+# (English for Qwen/Llama), mixed into the grounded CPT to rehearse the model's
+# pretraining distribution and suppress catastrophic forgetting. Broad,
+# low-cultural-loading topics across science/tech/nature so it preserves general
+# capability without nudging any value coordinate. Always fetched in English,
+# regardless of the corpus language. (Built only with --replay.)
+_REPLAY_TITLES: dict[str, list[str]] = {
+    "science": ["Photosynthesis", "Cell (biology)", "Atom", "Gravity", "Evolution", "Thermodynamics"],
+    "geography": ["Mountain", "River", "Ocean", "Desert", "Glacier", "Volcano"],
+    "technology": ["Computer", "Electricity", "Telephone", "Microscope", "Steam engine", "Radio"],
+    "nature": ["Ecosystem", "Mammal", "Insect", "Tree", "Bird migration", "Coral reef"],
+}
+
 _WIKI_LICENSE = "CC-BY-SA-4.0"
 _USER_AGENT = "tapestry-cultural-cpt/0.1 (EXP-001 corpus fetcher; +https://thealliance.ai)"
 _INTRO_CAP = 120  # words per doc in seed/intro mode (small, comparable)
@@ -370,14 +383,28 @@ def _write_jsonl(path: Path, docs: list[dict]) -> None:
 
 
 def _write_manifest(
-    root: Path, culture: str, lang: str, tol: float, titles: dict, *, with_translated: bool = False
+    root: Path,
+    culture: str,
+    lang: str,
+    tol: float,
+    titles: dict,
+    *,
+    with_translated: bool = False,
+    with_replay: bool = False,
 ) -> None:
+    def domains_for(name: str) -> list[str]:
+        if name == "grounded_translated":
+            return sorted(titles["grounded"].keys())
+        if name == "replay":
+            return sorted(_REPLAY_TITLES.keys())
+        return sorted(titles[name].keys())
+
     def arm(name: str, value_laden: bool, arm_lang: str = lang) -> dict:
         return {
             "file": f"{name}.jsonl",
             "lang": arm_lang,
             "register": "encyclopedic",
-            "domains": sorted(titles["grounded"].keys() if name == "grounded_translated" else titles[name].keys()),
+            "domains": domains_for(name),
             "value_laden": value_laden,
         }
 
@@ -389,6 +416,10 @@ def _write_manifest(
         # Arm 3 is the grounded content in the base model's language (English).
         # It is exempt from the twin control (different language + post-MT length).
         arms["grounded_translated"] = arm("grounded_translated", True, arm_lang="en")
+    if with_replay:
+        # Replay is general English text for forgetting mitigation; value-neutral
+        # and exempt from the twin control (it is not part of the matched twin).
+        arms["replay"] = arm("replay", False, arm_lang="en")
 
     manifest = {
         "culture": culture,
@@ -449,6 +480,12 @@ def main() -> int:
         action="store_true",
         help="also build the grounded_translated arm (Arm 3): MT the grounded corpus to English "
         "to isolate cultural content from the language carrying it. Needs `transformers`.",
+    )
+    parser.add_argument(
+        "--replay",
+        action="store_true",
+        help="also build the replay arm: a general, value-neutral English corpus mixed into the "
+        "grounded_replay arm's CPT to suppress catastrophic forgetting (Run 8 follow-up).",
     )
     parser.add_argument("--out", default="", help="output root (default: data/<culture>)")
     parser.add_argument("--validate", default="", help="validate an existing root and exit")
@@ -517,7 +554,26 @@ def main() -> int:
             else:
                 print("warning: translation produced no usable docs; skipping Arm 3", file=sys.stderr)
 
-    _write_manifest(root, args.culture, args.lang, args.tol, titles, with_translated=with_translated)
+    with_replay = False
+    if args.replay:
+        print("fetching replay arm (general, value-neutral, en)…")
+        # Replay is always English (the base model's dominant language) and is not
+        # part of the twin, so it is fetched independently and capped to the same
+        # per-arm token budget as the twin arms.
+        replay = _decontaminate(
+            _fetch_arm("en", _REPLAY_TITLES, args.per_domain, full=args.full, max_words=args.max_words),
+            "replay",
+        )
+        replay = _cap_tokens(replay, args.max_tokens)
+        if replay:
+            _write_jsonl(root / "replay.jsonl", replay)
+            with_replay = True
+        else:
+            print("warning: replay arm came back empty; skipping it", file=sys.stderr)
+
+    _write_manifest(
+        root, args.culture, args.lang, args.tol, titles, with_translated=with_translated, with_replay=with_replay
+    )
     print(f"wrote {root}")
     return _validate(root)
 

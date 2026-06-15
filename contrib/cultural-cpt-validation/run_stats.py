@@ -102,6 +102,25 @@ def main() -> None:
         default=1.0,
         help="fraction of each arm's pool sampled per draw (must be <1 to make draws differ)",
     )
+    parser.add_argument(
+        "--replay-fraction",
+        type=float,
+        default=0.0,
+        help="add the grounded_replay arm: this share of its mixed corpus is general "
+        "replay text (forgetting mitigation). 0 = off (default).",
+    )
+    parser.add_argument(
+        "--warmup-frac",
+        type=float,
+        default=0.0,
+        help="training stabilization: fraction of steps in linear LR warmup before decay (0 = constant LR)",
+    )
+    parser.add_argument(
+        "--max-grad-norm",
+        type=float,
+        default=None,
+        help="training stabilization: clip gradients to this norm (default off)",
+    )
     parser.add_argument("--min-shift", type=float, default=0.05, help="pre-registered X")
     parser.add_argument("--sigma", type=float, default=2.0, help="pre-registered sigma multiple")
     parser.add_argument("--max-cap-drop", type=float, default=0.10, help="pre-registered Y")
@@ -123,6 +142,9 @@ def main() -> None:
             dtype=args.dtype,
             instrument_lang=args.instrument_lang,
             behavior_mode=args.behavior_mode,
+            replay_fraction=args.replay_fraction,
+            warmup_frac=args.warmup_frac,
+            max_grad_norm=args.max_grad_norm,
         ),
         seeds=seeds,
         min_grounded_shift=args.min_shift,

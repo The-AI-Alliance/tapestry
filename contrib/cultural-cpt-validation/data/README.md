@@ -35,6 +35,7 @@ data/<culture>/
   grounded.jsonl              # Arm 1: culturally grounded, value-laden text
   language_matched.jsonl      # Arm 2: same language, value-neutral text (the twin)
   grounded_translated.jsonl   # Arm 3 (optional): grounded content, base's language
+  replay.jsonl                # Replay (optional): general value-neutral EN text
 ```
 
 - **Arms experiment** (`run.py --corpus-path data/<culture>`): the arm name
@@ -134,6 +135,25 @@ the twin control** (different language and post-MT length by design) but still
 license-, language-, and decontamination-checked. `--translate` needs
 `transformers` and is a no-op for an already-English corpus. The harness runs the
 arm automatically whenever the manifest declares it (see `experiment.declared_arms`).
+
+## Replay arm: `replay` (forgetting mitigation, Run 8 follow-up)
+
+Run 8 found the apparent "grounding beyond language" effect is really a
+**forgetting-robustness asymmetry**: value-neutral CPT damages the model
+(capability/refusal crater) while grounded CPT does so less. The replay arm is the
+clean test that separates forgetting from value acquisition. It is a **general,
+value-neutral corpus in the base model's dominant language (English)** — broad
+science/tech/nature topics, deliberately low cultural loading — that the
+`grounded_replay` experiment arm mixes into the grounded CPT (`--replay-fraction F`)
+to rehearse the model's pretraining distribution and suppress forgetting.
+
+`fetch_corpus.py --replay` builds it: it fetches the general English topics, runs
+WVS decontamination, caps it to the same per-arm token budget, writes `replay.jsonl`,
+and declares the arm with `lang: "en"`, `value_laden: false`. Like Arm 3 it is
+**exempt from the twin control** (it is not part of the matched twin — its job is
+capability preservation, not the grounding contrast) but still license-, language-,
+and decontamination-checked. The `grounded_replay` arm runs only when the manifest
+declares `replay` **and** the run passes `--replay-fraction > 0`.
 
 ## Licensing
 

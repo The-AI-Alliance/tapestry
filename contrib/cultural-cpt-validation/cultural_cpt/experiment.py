@@ -8,6 +8,8 @@ Arms:
   - language_matched   CPT on same-language, value-neutral text
   - grounded           CPT on culturally grounded text (the treatment)
   - grounded_translated CPT on the grounded content in the base's language
+  - grounded_replay     CPT on grounded text with a general-data replay mix
+                        (opt-in via replay_fraction > 0)
   - surface_only       no CPT; a cultural persona prompt at measurement time
 
 Decisive comparisons (grounded survey shift minus the other arm's):
@@ -16,12 +18,20 @@ Decisive comparisons (grounded survey shift minus the other arm's):
   - vs surface_only : does CPT beat cheap prompting? (a tie undercuts the
     depth-over-shallow bet)
 
+Replay comparisons (only when the grounded_replay arm runs):
+  - replay vs language_matched : the grounding-beyond-language effect once
+    forgetting is suppressed — does any genuine value-pull survive?
+  - replay vs grounded : the effect of the replay mix itself (Run 8 reframed the
+    grounding effect as forgetting-robustness; replay is the clean test that
+    separates H-forget from H-value).
+
 See ../SPEC.md (EXP-001) for the full
 design and pre-registered thresholds.
 """
 
 from __future__ import annotations
 
+import random
 from dataclasses import asdict, dataclass, field
 
 from . import behavior, capability, safety, wvs
@@ -62,6 +72,9 @@ class ExperimentResult:
     decisive_grounded_vs_language: float = field(default=0.0)
     decisive_grounded_vs_translated: float = field(default=0.0)
     decisive_grounded_vs_surface: float = field(default=0.0)
+    # Replay arm (0.0 / ignored unless the grounded_replay arm ran).
+    decisive_replay_vs_language: float = field(default=0.0)
+    decisive_replay_vs_grounded: float = field(default=0.0)
     smoke_caveat: str = ""
 
     def to_dict(self) -> dict:
@@ -90,6 +103,15 @@ class ExperimentConfig:
     # fraction=1.0 (or seed=None) uses the full pool — the default single-corpus run.
     corpus_sample_fraction: float = 1.0
     corpus_sample_seed: int | None = None
+    # Replay / anchor mitigation. replay_fraction > 0 adds the grounded_replay arm,
+    # which mixes that fraction of general (base-language) replay text into the
+    # grounded CPT to suppress catastrophic forgetting. 0 = arm off (default).
+    replay_fraction: float = 0.0
+    # Training stabilization, applied to every CPT arm (HF backend only). warmup_frac
+    # is the fraction of total steps spent in linear LR warmup before linear decay;
+    # max_grad_norm clips gradients. Defaults reproduce the pre-Run-8 unstable loop.
+    warmup_frac: float = 0.0
+    max_grad_norm: float | None = None
 
 
 @dataclass(frozen=True)
@@ -100,6 +122,7 @@ class _ArmSpec:
     name: str
     corpus: str | None  # corpus arm to CPT on; None = no continued pretraining
     persona: bool  # apply a cultural-persona prompt prefix at measurement
+    replay: bool = False  # mix the replay corpus into this arm's CPT (forgetting mitigation)
 
 
 # Arm 4 (surface_only) does NO weight change — it just prompts the base model to
@@ -112,6 +135,11 @@ ARM_SPECS: tuple[_ArmSpec, ...] = (
     _ArmSpec("grounded_translated", corpus="grounded_translated", persona=False),
     _ArmSpec("surface_only", corpus=None, persona=True),
 )
+
+# Appended only when replay_fraction > 0 (keeps the default 5-arm run unchanged).
+# Continues-pretrains on the grounded corpus, same as the grounded arm, but with a
+# replay mix folded in — so grounded_replay vs grounded isolates the replay effect.
+_REPLAY_ARM = _ArmSpec("grounded_replay", corpus="grounded", persona=False, replay=True)
 
 
 # Culture names per measurement language, for the persona prefix (surface_only
@@ -184,6 +212,28 @@ def _measure(
     )
 
 
+def _mix_replay(grounded_docs: list[str], config: ExperimentConfig) -> list[str]:
+    """Append a replay-fraction of general text to the grounded docs.
+
+    ``replay_fraction`` is the target share of the *mixed* corpus that is replay,
+    so the replay count is ``n_grounded * f / (1 - f)`` documents, deterministically
+    drawn from the replay pool. The training loop's per-epoch shuffle then
+    interleaves them (it must — otherwise replay would train as a trailing block).
+    Falls back to the unmixed docs if no replay pool is available.
+    """
+    f = min(max(config.replay_fraction, 0.0), 0.95)
+    if f <= 0.0 or not grounded_docs:
+        return grounded_docs
+    replay_docs = list(load_corpus("replay", path=config.corpus_path).documents)
+    if not replay_docs:
+        return grounded_docs
+    n = round(len(grounded_docs) * f / (1.0 - f))
+    n = max(1, min(n, len(replay_docs)))
+    rng = random.Random(f"replay:{config.corpus_sample_seed}:{config.seed}")
+    picked = replay_docs if n >= len(replay_docs) else rng.sample(replay_docs, n)
+    return grounded_docs + list(picked)
+
+
 def run_experiment(config: ExperimentConfig) -> ExperimentResult:
     """Run the minimal three-arm go/no-go and return measurements."""
     if config.culture not in wvs.GROUND_TRUTH:
@@ -205,14 +255,24 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
     # spec's recommended first run is the minimal twin (grounded + language_
     # matched); a corpus need not declare grounded_translated. Arms without a
     # corpus (base, surface_only) always run.
-    specs = ARM_SPECS
+    # The replay arm is opt-in: only appended when replay_fraction > 0, so the
+    # default run keeps its five arms (and existing baselines stay comparable).
+    specs = ARM_SPECS + (_REPLAY_ARM,) if config.replay_fraction > 0 else ARM_SPECS
     skipped_arms: list[str] = []
     if config.corpus_path:
         from .dataset import declared_arms
 
         available = declared_arms(config.corpus_path)
-        specs = tuple(s for s in ARM_SPECS if s.corpus is None or s.corpus in available)
-        skipped_arms = [s.name for s in ARM_SPECS if s not in specs]
+
+        def _has_corpora(spec: _ArmSpec) -> bool:
+            if spec.corpus is not None and spec.corpus not in available:
+                return False
+            # A replay arm also needs the replay pool declared in the manifest.
+            return not (spec.replay and "replay" not in available)
+
+        kept = tuple(s for s in specs if _has_corpora(s))
+        skipped_arms = [s.name for s in specs if s not in kept]
+        specs = kept
 
     # The judge (embedder) loads once per run and is reused across arms/seeds.
     judge = None
@@ -236,7 +296,17 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
                 sample_fraction=config.corpus_sample_fraction,
                 sample_seed=config.corpus_sample_seed,
             )
-            train_loss = model.train_on_texts(list(corpus.documents), epochs=config.epochs, lr=config.lr)
+            docs = list(corpus.documents)
+            if spec.replay:
+                docs = _mix_replay(docs, config)
+            train_loss = model.train_on_texts(
+                docs,
+                epochs=config.epochs,
+                lr=config.lr,
+                warmup_frac=config.warmup_frac,
+                max_grad_norm=config.max_grad_norm,
+                shuffle_seed=config.seed,
+            )
 
         persona = _persona_prefix(config.culture, config.instrument_lang) if spec.persona else ""
         m = _measure(
@@ -286,6 +356,19 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
     decisive = _decisive("language_matched")
     decisive_translated = _decisive("grounded_translated")
     decisive_surface = _decisive("surface_only")
+
+    # Replay comparisons (0.0 unless the grounded_replay arm ran). These are the
+    # forgetting-mitigation tests: replay_vs_language is grounding-beyond-language
+    # with forgetting suppressed; replay_vs_grounded is the replay effect itself.
+    replay_shift = shift_by_arm.get("grounded_replay")
+    decisive_replay_vs_language = (
+        replay_shift - shift_by_arm["language_matched"]
+        if replay_shift is not None and "language_matched" in shift_by_arm
+        else 0.0
+    )
+    decisive_replay_vs_grounded = (
+        replay_shift - grounded_shift if replay_shift is not None and "grounded" in shift_by_arm else 0.0
+    )
     # A result is only meaningful with BOTH a real model and real corpora.
     flags = []
     if config.mode == "smoke":
@@ -317,5 +400,7 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
         decisive_grounded_vs_language=decisive,
         decisive_grounded_vs_translated=decisive_translated,
         decisive_grounded_vs_surface=decisive_surface,
+        decisive_replay_vs_language=decisive_replay_vs_language,
+        decisive_replay_vs_grounded=decisive_replay_vs_grounded,
         smoke_caveat=caveat,
     )
