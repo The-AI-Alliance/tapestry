@@ -2,13 +2,10 @@
 
 # Welcome to Project Tapestry
 
-#### Project Tapestry aims to give every nation and participant frontier AI they can call their own.
-
-#### We bring together talented people, data, and compute from a global consortium of partners to train a shared **frontier** base model — stronger than any single party could build alone, thanks to a larger and more diverse corpus than ever before.
-
-#### From that shared base, each partner builds and owns **sovereign** models, aligned to their own **national**, **socio-cultural**, and **industrial** needs, using the Tapestry open source training platform. Ownership of data and compute stays with the partners throughout.
-
-#### The aim is AI that is frontier and sovereign at once — not a tradeoff between the two.
+> [!NOTE]
+> **Project Tapestry is bringing together talented people, data, and compute from a global consortium of partners to build a new foundation model system trained on a larger and more diverse corpus than ever before.**
+>
+> **Tapestry will enable sovereign AI by ensuring ownership of data and compute remains with partners, and that partners can continue to train sovereign derivatives of the consortium-trained base model that they own using the Tapestry open source training platform.**
 
 Learn more from our [Kickoff Workshop Blog](https://thealliance.ai/blog/project-tapestry-the-path-to-frontier-sovereign-ai) and check out the [Project Tapestry](https://thealliance.ai/projects/tapestry/) website for more information about partnering, events, and how to support Project Tapestry.
 
@@ -114,17 +111,20 @@ uv pip install -e .         # minimum dependencies
 
 ### Running Tests
 
-We use [pytest](https://docs.pytest.org/) for testing. The easiest way to run the test suite is using `make`:
+We use [unittest](https://docs.python.org/3/library/unittest.html) and [hypothesis](https://hypothesis.readthedocs.io/en/latest/) for testing. The easiest way to run the test suite is using `make`:
 
 ```shell
 make unit-tests # or just tests; they are currently the same.
 ```
 
-This runs the following command, which you can run yourself if you prefer:
+This runs the following commands, which you can run yourself if you prefer:
 
 ```shell
 cd src
-uv run python -m pytest tests -q
+uv run python -m unittest discover \
+    --pattern 'test_*.py' \
+    --start-directory tests \
+    --top-level-directory .
 ```
 
 ### Code Formatting
