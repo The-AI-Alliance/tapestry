@@ -18,7 +18,7 @@ This repo contains the code and technical documentation for the project. We invi
 
 The rest of this README provides information for contributors and users of this repository.
 
-## Contribute to Our First Work Steams
+## Contribute to Our First Work Streams
 
 Project Tapestry has big plans, and we're starting with some fundamental building blocks.
 
