@@ -168,3 +168,8 @@ runs/
 /contrib/cultural-cpt-validation/data/*
 !/contrib/cultural-cpt-validation/data/README.md
 !/contrib/cultural-cpt-validation/data/seed-example/
+
+# EXP-001 deploy: env-specific Vast.ai self-rental identifiers (machine/offer ids,
+# API-key path) stay local; the tracked deploy/README.md + HANDOFF.md keep only
+# generic, placeholder'd operational know-how.
+/contrib/cultural-cpt-validation/deploy/*.local.md

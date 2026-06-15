@@ -114,11 +114,11 @@ five real runs are transcribed in `FINDINGS.md` so they survive.
 
 ## Vast.ai operational playbook (hard-won; read before the next GPU run)
 
-Our self-rental machine: **id 138905, host `alpha`, 2× RTX 5090 (32GB each)**.
-Offers: `40741822` (1× 5090), `40741823` (2× 5090). API key at
-`/tmp/hvl-vast/api_key` (a **team-context** key — this matters below).
-
-Gotchas we hit and the fixes baked into the flow:
+The env-specific identifiers for our own self-rental box — machine id, host, offer
+ids, the API-key path, and which SSH key to use — live in the **git-ignored**
+[`deploy/vast.local.md`](deploy/vast.local.md) (kept out of this public-bound repo).
+Read that first for the actual values; the generic, reusable gotchas below are what
+matter for *any* Vast.ai 5090 box:
 
 1. **The 5090 is Blackwell (`sm_120`)** → needs CUDA 12.8+ / PyTorch ≥2.7. Use
    image `pytorch/pytorch:2.8.0-cuda12.8-cudnn9-runtime`. Older images load but

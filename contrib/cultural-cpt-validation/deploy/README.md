@@ -30,13 +30,17 @@ python -c "import torch; print(torch.__version__, torch.cuda.get_device_name(0))
 
 ## Steps
 
+<!-- Env-specific values (our machine id, offer ids, API-key path, SSH key) live
+in the git-ignored deploy/vast.local.md. Fill the <...> placeholders from there. -->
+
 ```bash
-export VAST_API_KEY="$(cat /tmp/hvl-vast/api_key)"   # the key must be present here
+export VAST_API_KEY="$(cat <VAST_API_KEY_PATH>)"   # the key must be present here
 vastai() { command vastai --api-key "$VAST_API_KEY" "$@"; }
 
-# 1. Find OUR machine's offer (self-rental). Filter to the 5090 host we own.
-vastai search offers 'gpu_name=RTX_5090 num_gpus>=1 rentable=true' -o 'dph+' --raw
-#    -> pick the OFFER_ID that is our machine.
+# 1. Find your machine's offer. For a self-rental, filter to the host you own
+#    (an unverified host needs verified=any to show up).
+vastai search offers 'gpu_name=RTX_5090 num_gpus>=1 rentable=true verified=any' -o 'dph+' --raw
+#    -> pick the OFFER_ID for your machine.
 
 # 2. Create an interruptible instance on it with a CUDA-12.8 PyTorch image.
 vastai create instance <OFFER_ID> \
@@ -52,7 +56,7 @@ vastai show instance <INSTANCE_ID> --raw   # ports / ssh host+port
 SSH="ssh -p <SSH_PORT> root@<SSH_HOST>"
 rsync -az -e "ssh -p <SSH_PORT>" \
   --exclude .git --exclude .venv --exclude '**/__pycache__' --exclude runs \
-  /home/jesse/tapestry/  root@<SSH_HOST>:/workspace/tapestry/
+  <REPO>/  root@<SSH_HOST>:/workspace/tapestry/
 
 # 5. Run it (regenerates the corpus on-box, then the experiment).
 $SSH 'bash /workspace/tapestry/contrib/cultural-cpt-validation/deploy/run_on_instance.sh'
@@ -69,7 +73,7 @@ $SSH 'REPO=/workspace/tapestry MODEL=Qwen/Qwen3-4B-Instruct-2507 \
 # 6. Pull the result back.
 rsync -az -e "ssh -p <SSH_PORT>" \
   root@<SSH_HOST>:/workspace/tapestry/runs/egypt_real/ \
-  /home/jesse/tapestry/runs/egypt_real/
+  <REPO>/runs/egypt_real/
 
 # 7. ALWAYS destroy when done (self-rental is interruptible; don't leave it up).
 vastai destroy instance <INSTANCE_ID> -y
