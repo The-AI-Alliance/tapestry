@@ -16,7 +16,7 @@ Decisive comparisons (grounded survey shift minus the other arm's):
   - vs surface_only : does CPT beat cheap prompting? (a tie undercuts the
     depth-over-shallow bet)
 
-See tech-docs/experiments/cultural-cpt-validation.md (EXP-001) for the full
+See ../SPEC.md (EXP-001) for the full
 design and pre-registered thresholds.
 """
 

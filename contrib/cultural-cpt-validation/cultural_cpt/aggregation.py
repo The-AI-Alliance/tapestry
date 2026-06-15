@@ -18,7 +18,7 @@ homogenizing the cultures toward the centroid (the drift failure mode); if it
 holds, distinct cultural alignment survives the loop.
 
 Smoke mode runs this on the byte-level toy model — plumbing only, numbers are
-noise. See tech-docs/experiments/cultural-cpt-validation.md.
+noise. See ../SPEC.md.
 """
 
 from __future__ import annotations

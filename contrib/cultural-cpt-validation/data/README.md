@@ -2,7 +2,7 @@
 
 This directory holds the **real** corpora for the cultural-CPT validation
 experiment — the bottleneck the spec calls *"Stage 0 — the real bottleneck"*
-([`tech-docs/experiments/cultural-cpt-validation.md`](../../../tech-docs/experiments/cultural-cpt-validation.md)).
+([`SPEC.md`](../SPEC.md)).
 The harness's smoke mode runs on tiny placeholder text baked into
 [`cultural_cpt/corpora.py`](../cultural_cpt/corpora.py); a real EXP-001 *result*
 needs both a real model (`--mode hf`) **and** real corpora loaded from here

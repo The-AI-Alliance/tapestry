@@ -5,8 +5,8 @@
 | Status | Proposed |
 | Type | Research experiment specification |
 | Date | June 13, 2026 |
-| Validates | [TAP-003](../architecture/decisions/adr-003-cultural-alignment.md), [TAP-005](../architecture/decisions/adr-005-sovereign-pipeline.md) |
-| Open questions addressed | C1, C8, T3, S3 ([open-questions.md](../architecture/open-questions.md)) |
+| Validates | [TAP-003](../../tech-docs/architecture/decisions/adr-003-cultural-alignment.md), [TAP-005](../../tech-docs/architecture/decisions/adr-005-sovereign-pipeline.md) |
+| Open questions addressed | C1, C8, T3, S3 ([open-questions.md](../../tech-docs/architecture/open-questions.md)) |
 
 ## Why this document exists
 
@@ -15,7 +15,7 @@ continued pretraining (CPT) on culturally *grounded* data measurably shifts a
 model's expressed cultural values toward the target culture. TAP-003 calls this
 "the foundational hypothesis"; the Phase 5 option space asks it directly —
 *"Has anyone tested this? What would a controlled experiment look like?"*
-([5-architectural-options.md](../architecture/5-architectural-options.md), Q1/Q12).
+([5-architectural-options.md](../../tech-docs/architecture/5-architectural-options.md), Q1/Q12).
 
 This document is the answer to "what would the experiment look like." It defines
 a falsifiable test, the control structure that isolates *cultural grounding*
@@ -166,5 +166,5 @@ round-two follow-ups once a basic effect is confirmed.
 - ["Fluent but Foreign: Even Regional LLMs Lack Cultural Alignment." arXiv:2505.21548, 2026.](https://arxiv.org/html/2505.21548)
 - [Sukiennik. "An Evaluation of Cultural Value Alignment in LLM." arXiv:2504.08863, 2025.](https://arxiv.org/abs/2504.08863)
 - [Inglehart & Welzel. "The WVS Cultural Map of the World." World Values Survey, 2005-2022.](https://www.worldvaluessurvey.org)
-- [TAP-003: Cultural Alignment as the Primary Differentiator](../architecture/decisions/adr-003-cultural-alignment.md)
-- [TAP-005: Sovereign Model Pipeline](../architecture/decisions/adr-005-sovereign-pipeline.md)
+- [TAP-003: Cultural Alignment as the Primary Differentiator](../../tech-docs/architecture/decisions/adr-003-cultural-alignment.md)
+- [TAP-005: Sovereign Model Pipeline](../../tech-docs/architecture/decisions/adr-005-sovereign-pipeline.md)

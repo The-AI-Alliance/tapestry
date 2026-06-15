@@ -5,7 +5,7 @@ pushed; ~24 commits ahead of `develop`). Working tree clean. All work lives unde
 `contrib/cultural-cpt-validation/`.
 
 This doc orients whoever picks this up next. The experiment spec is
-[`tech-docs/experiments/cultural-cpt-validation.md`](../../tech-docs/experiments/cultural-cpt-validation.md);
+[`SPEC.md`](SPEC.md);
 the numbered run results are [`FINDINGS.md`](FINDINGS.md); the corpus/loader
 contract is [`data/README.md`](data/README.md); the GPU recipe is
 [`deploy/README.md`](deploy/README.md).

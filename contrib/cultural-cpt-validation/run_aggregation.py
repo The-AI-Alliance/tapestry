@@ -3,7 +3,7 @@
 
 Smoke mode (default) runs the multi-node consortium loop on a byte-level toy
 model. Its separability curve is noise; it proves the plumbing. See
-tech-docs/experiments/cultural-cpt-validation.md (consortium extension).
+SPEC.md (consortium extension).
 """
 
 # pylint: disable=wrong-import-position

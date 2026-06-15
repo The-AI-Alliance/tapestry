@@ -2,7 +2,7 @@
 
 Smoke mode runs the full pipeline on a byte-level toy model (CI-scale, no
 downloads/GPU); HF mode is the seam for a real base model. See
-tech-docs/experiments/cultural-cpt-validation.md for the experiment design.
+../SPEC.md for the experiment design.
 """
 
 from __future__ import annotations

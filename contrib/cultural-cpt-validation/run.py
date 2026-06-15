@@ -3,7 +3,7 @@
 
 Smoke mode (default) runs on a byte-level toy model so the full pipeline is
 exercised without downloads or GPUs. Its numbers are noise; it proves the
-plumbing. See tech-docs/experiments/cultural-cpt-validation.md.
+plumbing. See SPEC.md.
 """
 
 # pylint: disable=wrong-import-position

@@ -1,7 +1,7 @@
 # Cultural-CPT validation harness (EXP-001)
 
 A runnable harness for the experiment specified in
-[`tech-docs/experiments/cultural-cpt-validation.md`](../../tech-docs/experiments/cultural-cpt-validation.md):
+[`SPEC.md`](SPEC.md):
 does continued pretraining on culturally *grounded* data measurably shift a
 model's cultural alignment, beyond mere language exposure?
 
@@ -11,21 +11,10 @@ Staged under `contrib/` (like `jneums-consortium-experiment`) while it iterates.
 
 Runs the EXP-001 arms end to end: starts every arm from the same base model,
 applies each arm's treatment, then measures each on two instruments plus a
-capability score, and reports the decisive comparisons.
-
-| Arm | Treatment | Isolates |
-| :-- | :-------- | :------- |
-| `base` | none | baseline + noise floor |
-| `language_matched` | CPT on same-language, value-neutral text | — |
-| `grounded` | CPT on culturally grounded text | the treatment |
-| `grounded_translated` | CPT on grounded content in the base's language | content vs. the language carrying it |
-| `surface_only` | no CPT; cultural persona prompt at measurement | does CPT beat cheap prompting? |
-
-Decisive comparisons are `grounded`'s survey shift toward the target minus each
-other arm's. `grounded vs language_matched` asks if grounding adds anything
-beyond language; `grounded vs surface_only` asks if expensive CPT beats
-prompting — **a tie there would undercut the depth-over-shallow architectural
-bet.**
+capability score, and reports the decisive comparisons. **The arms, the decisive
+comparisons (`grounded` vs `language_matched`, `grounded` vs `surface_only`), and
+the hypothesis they test are specified in [`SPEC.md`](SPEC.md)** — this README
+covers running the harness, not the design.
 
 Two instruments, both producing an Inglehart-Welzel coordinate:
 - **WVS survey** (`wvs.py`) — abstract value questions.
