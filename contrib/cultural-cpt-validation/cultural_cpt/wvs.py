@@ -523,16 +523,19 @@ class Coordinate:
         return ((self.ts - other.ts) ** 2 + (self.ss - other.ss) ** 2) ** 0.5
 
 
-# National positions on the Inglehart-Welzel Cultural Map, read from the
-# published WVS Wave-7 map (Haerpfer et al., WVS-7; Inglehart-Welzel 2023) and
-# linearly rescaled from the map's standardized factor scale (≈ [-2.5, +2.5]) to
-# this instrument's item scale ([-1, +1]) by dividing by 2.5 and clamping. These
-# are MAP-DERIVED APPROXIMATIONS for the shift-toward-target metric; the relative
-# positions (e.g. Egypt far traditional/survival, Sweden far secular/self-
-# expression) are what the comparison relies on.
+# National positions on the Inglehart-Welzel Cultural Map. These are the EXACT
+# published factor scores from the EVS/WVS joint 2023 cultural-map data file
+# (CulturalMapFinalEVSWVS_2023; worldvaluessurvey.org news ID 467) — columns
+# TradAgg (Traditional<->Secular-rational) and SurvSAgg (Survival<->Self-
+# expression), which are this code's TS and SS axes with the same sign
+# convention. They are linearly rescaled from the map's standardized factor
+# scale to this instrument's item scale ([-1, +1]) by dividing by _MAP_SCALE and
+# clamping. Per country we take the most recent available wave (WVS-7 era where
+# present); the wave year is in each comment.
 #
-# SEAM: to use exact values, replace each Coordinate with the WVS data file's
-# published factor scores rescaled by the same divisor. Nothing else changes.
+# The empirical TradAgg/SurvSAgg range runs a bit past ±2.5 (Sweden 2017 SurvSAgg
+# = +3.11 clamps to +1.0); _MAP_SCALE=2.5 is kept for continuity with prior runs.
+# Clamping only affects the extreme-self-expression corner, not Egypt.
 _MAP_SCALE = 2.5
 
 
@@ -543,12 +546,12 @@ def _from_map(ts_factor: float, ss_factor: float) -> Coordinate:
 
 
 GROUND_TRUTH: dict[str, Coordinate] = {
-    # culture: _from_map(traditional<->secular, survival<->self-expression)
-    "egypt": _from_map(-1.8, -1.3),  # African-Islamic: strongly traditional + survival
-    "usa": _from_map(-0.2, 1.8),  # English-speaking: slightly traditional, high self-expression
-    "sweden": _from_map(2.0, 2.4),  # Protestant Europe: extreme secular + self-expression
-    "vietnam": _from_map(0.4, -1.1),  # Confucian-leaning secular, survival-oriented
-    "india": _from_map(-0.7, -0.6),  # South-Asian: traditional, survival side
+    # culture: _from_map(TradAgg, SurvSAgg) from CulturalMapFinalEVSWVS_2023, wave year noted
+    "egypt": _from_map(-0.8544, -2.2318),  # Egypt 2018 (WVS-7): mildly traditional, far survival
+    "usa": _from_map(0.1444, 1.4034),  # United States 2017 (WVS-7): near-neutral TS, self-expression
+    "sweden": _from_map(1.1067, 3.1133),  # Sweden 2017 (WVS-7): secular, extreme self-expression (ss clamps)
+    "vietnam": _from_map(-0.4429, 0.6128),  # Vietnam 2020 (WVS-7): traditional-leaning, mild self-expression
+    "india": _from_map(-0.7095, -0.8615),  # India 2012 (WVS-6, latest available): traditional, survival
 }
 
 
