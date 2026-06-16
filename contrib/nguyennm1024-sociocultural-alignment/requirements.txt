@@ -1,0 +1,17 @@
+# --- data synthesis (data_synthesis/) ---
+openai>=1.100.0
+python-dotenv>=1.0.0
+datasets>=2.20.0
+huggingface_hub>=0.24.0
+
+# --- training + evaluation (training/, evaluation/) ---
+torch>=2.4.0
+transformers>=4.44.0
+peft>=0.12.0
+accelerate>=0.33.0
+numpy>=1.26.0
+matplotlib>=3.8.0
+vllm>=0.6.0
+
+# The evaluation R scripts (if used) additionally need r-base with:
+# psych, dplyr, haven, jsonlite (installed via apt/R, not pip).
