@@ -35,6 +35,7 @@ data/<culture>/
   grounded.jsonl              # Arm 1: culturally grounded, value-laden text
   language_matched.jsonl      # Arm 2: same language, value-neutral text (the twin)
   grounded_translated.jsonl   # Arm 3 (optional): grounded content, base's language
+  neutral_prose.jsonl         # Register control (optional): value-neutral discursive twin
   replay.jsonl                # Replay (optional): general value-neutral EN text
 ```
 
@@ -135,6 +136,38 @@ the twin control** (different language and post-MT length by design) but still
 license-, language-, and decontamination-checked. `--translate` needs
 `transformers` and is a no-op for an already-English corpus. The harness runs the
 arm automatically whenever the manifest declares it (see `experiment.declared_arms`).
+
+## Register control: `neutral_prose` (genre vs cultural content)
+
+The matched twin (`grounded` vs `language_matched`) holds language and token budget
+constant but **not genre/register**: grounded is discursive, normative essay-prose
+(law/religion/family/civic/ethics) while language_matched is terse, list-y, symbol-heavy
+(weather/sports/technical/math). Raw-text CPT drags the model toward the corpus token
+distribution, and the damage/shift scales with distance from the model's output
+manifold — so "grounded shifts more" has a **cultural-content-free** explanation
+(normative prose is register-closer than STEM text). `neutral_prose` is the control: a
+**value-neutral but discursive** same-language twin (biography, history, geography,
+literature/arts — prose-heavy, value-light). The decisive `grounded − neutral_prose`
+comparison isolates cultural content from genre: if it is ~0 while `grounded − language`
+is positive, the grounding effect is a register artifact.
+
+`fetch_corpus.py --neutral-prose` builds it from the titles file's `neutral_prose`
+block (and `categories.neutral_prose`), in the corpus language, declared
+`value_laden: false`. Like Arm 3 it is **exempt from the matched-twin token control**
+(it has its own comparison against grounded) but still license-, language-, and
+decontamination-checked, and capped to the same `--max-tokens` budget for rough size
+matching. The arm runs whenever the manifest declares it.
+
+## Base-model CPT (de-confounding value-pull from alignment decay)
+
+The harness is **model-agnostic** — it scores via teacher-forced log-probs and never
+relies on a chat template — so running the same arms on a **base** model needs no code
+change, just `MODEL=Qwen/Qwen3-4B-Base`. On a base model there is no RLHF alignment to
+erode, so the forgetting-flavored drift (refusal collapse, drift to origin) that
+dominates the instruct runs should largely vanish, letting genuine value-pull be read
+cleanly. Caveat: base models don't instruct-follow, so the survey/persona framing is
+weaker; the log-prob scoring still works, but a light SFT pass (or leaning on the
+relative arm-vs-arm comparisons) is the cleaner read.
 
 ## Replay arm: `replay` (forgetting mitigation, Run 8 follow-up)
 

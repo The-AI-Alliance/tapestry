@@ -51,6 +51,19 @@ _LANGUAGE_MATCHED = (
     "Insert tab A into slot B and confirm the indicator light turns green.",
 )
 
+# Register control: value-NEUTRAL but DISCURSIVE prose (biography, history,
+# geography, arts) — same essay-like register as grounded, without the value
+# content. The grounded − neutral_prose comparison isolates cultural content from
+# genre/register, which the terse, symbol-heavy language_matched twin does not
+# (raw-text CPT damage scales with distance from the model's output manifold, and
+# discursive prose sits closer than technical text regardless of values).
+_NEUTRAL_PROSE = (
+    "The scholar travelled for decades, recording the cities and rivers he crossed.",
+    "Born in a coastal town, the poet later moved to the capital to study.",
+    "The empire rose over three centuries before its provinces gradually fragmented.",
+    "The great river flooded each summer, depositing silt across the wide delta.",
+)
+
 # Arm 3: the grounded content carried in the base model's dominant language
 # (i.e. machine-translated). Isolates cultural *content* from the *language* it
 # arrives in. In smoke this is just a paraphrase of _GROUNDED; a real run
@@ -152,6 +165,8 @@ def load_corpus(
         return Corpus(name="language_matched", documents=_LANGUAGE_MATCHED)
     if arm_name == "grounded_translated":
         return Corpus(name="grounded_translated", documents=_GROUNDED_TRANSLATED)
+    if arm_name == "neutral_prose":
+        return Corpus(name="neutral_prose", documents=_NEUTRAL_PROSE)
     if arm_name == "replay":
         return Corpus(name="replay", documents=_REPLAY)
     raise ValueError(f"no corpus for arm {arm_name!r}")

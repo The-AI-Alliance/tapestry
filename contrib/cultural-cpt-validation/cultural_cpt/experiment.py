@@ -72,6 +72,10 @@ class ExperimentResult:
     decisive_grounded_vs_language: float = field(default=0.0)
     decisive_grounded_vs_translated: float = field(default=0.0)
     decisive_grounded_vs_surface: float = field(default=0.0)
+    # Register control: grounded vs the value-neutral *discursive* twin. If this is
+    # ~0 while grounded−language is positive, the "grounding" effect is a register
+    # artifact (genre, not cultural content). 0.0 when the neutral_prose arm is skipped.
+    decisive_grounded_vs_neutral_prose: float = field(default=0.0)
     # Replay arm (0.0 / ignored unless the grounded_replay arm ran).
     decisive_replay_vs_language: float = field(default=0.0)
     decisive_replay_vs_grounded: float = field(default=0.0)
@@ -133,6 +137,7 @@ ARM_SPECS: tuple[_ArmSpec, ...] = (
     _ArmSpec("language_matched", corpus="language_matched", persona=False),
     _ArmSpec("grounded", corpus="grounded", persona=False),
     _ArmSpec("grounded_translated", corpus="grounded_translated", persona=False),
+    _ArmSpec("neutral_prose", corpus="neutral_prose", persona=False),
     _ArmSpec("surface_only", corpus=None, persona=True),
 )
 
@@ -356,6 +361,7 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
     decisive = _decisive("language_matched")
     decisive_translated = _decisive("grounded_translated")
     decisive_surface = _decisive("surface_only")
+    decisive_neutral_prose = _decisive("neutral_prose")
 
     # Replay comparisons (0.0 unless the grounded_replay arm ran). These are the
     # forgetting-mitigation tests: replay_vs_language is grounding-beyond-language
@@ -400,6 +406,7 @@ def run_experiment(config: ExperimentConfig) -> ExperimentResult:
         decisive_grounded_vs_language=decisive,
         decisive_grounded_vs_translated=decisive_translated,
         decisive_grounded_vs_surface=decisive_surface,
+        decisive_grounded_vs_neutral_prose=decisive_neutral_prose,
         decisive_replay_vs_language=decisive_replay_vs_language,
         decisive_replay_vs_grounded=decisive_replay_vs_grounded,
         smoke_caveat=caveat,

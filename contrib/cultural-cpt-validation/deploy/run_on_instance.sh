@@ -8,7 +8,8 @@
 #
 # Override via env: MODEL, EPOCHS, PER_DOMAIN, SEED, SEEDS, DTYPE, CULTURE, LR,
 # REPLAY_FRACTION, WARMUP_FRAC, MAX_GRAD_NORM (Run 8 follow-up: forgetting
-# mitigation + training stabilization).
+# mitigation + training stabilization), NEUTRAL_PROSE=1 (register-confound control),
+# and MODEL=Qwen/Qwen3-4B-Base (de-confound value-pull from alignment decay).
 # If SEEDS (comma-separated) is set, runs the multi-seed go/no-go (run_stats.py)
 # instead of the single run (run.py).
 set -euo pipefail
@@ -41,6 +42,12 @@ CORPUS_FRACTION="${CORPUS_FRACTION:-1.0}"
 REPLAY_FRACTION="${REPLAY_FRACTION:-0.0}"
 WARMUP_FRAC="${WARMUP_FRAC:-0.0}"
 MAX_GRAD_NORM="${MAX_GRAD_NORM:-}"
+# Register-confound control: build the value-neutral *discursive* twin so the run
+# reports grounded−neutral_prose (genre-controlled grounding effect). 1 = build it.
+NEUTRAL_PROSE="${NEUTRAL_PROSE:-0}"
+# De-confound value-pull from alignment decay: set MODEL=Qwen/Qwen3-4B-Base (no code
+# change — the harness is model-agnostic). On a base model there is no RLHF alignment
+# to erode, so the forgetting-flavored drift should largely vanish.
 
 CC="$REPO/contrib/cultural-cpt-validation"
 export PYTHONPATH="$REPO/src:$CC"
@@ -65,6 +72,8 @@ REPLAY_ON=0
 case "$REPLAY_FRACTION" in 0|0.0|0.00|"") REPLAY_ON=0 ;; *) REPLAY_ON=1 ;; esac
 REPLAY_BUILD_ARG=""
 [ "$REPLAY_ON" = "1" ] && REPLAY_BUILD_ARG="--replay"
+NP_BUILD_ARG=""
+[ "$NEUTRAL_PROSE" = "1" ] && NP_BUILD_ARG="--neutral-prose"
 # Stabilization args, passed through to the run only when set.
 STAB_ARGS="--warmup-frac $WARMUP_FRAC"
 [ "$REPLAY_ON" = "1" ] && STAB_ARGS="$STAB_ARGS --replay-fraction $REPLAY_FRACTION"
@@ -74,7 +83,7 @@ python "$CC/fetch_corpus.py" \
   --culture "$CULTURE" --lang "$LANG_CODE" \
   --titles-file "$CC/titles/${CULTURE}.${LANG_CODE}.json" \
   --per-domain "$PER_DOMAIN" --full $MAXW_ARG \
-  --cat-limit "$CAT_LIMIT" --max-tokens "$MAX_TOKENS" $TRANSLATE_ARG $REPLAY_BUILD_ARG
+  --cat-limit "$CAT_LIMIT" --max-tokens "$MAX_TOKENS" $TRANSLATE_ARG $REPLAY_BUILD_ARG $NP_BUILD_ARG
 
 if [ -n "$SEEDS" ]; then
   OUT="$REPO/runs/${CULTURE}_stats"

@@ -391,6 +391,7 @@ def _write_manifest(
     *,
     with_translated: bool = False,
     with_replay: bool = False,
+    with_neutral_prose: bool = False,
 ) -> None:
     def domains_for(name: str) -> list[str]:
         if name == "grounded_translated":
@@ -416,6 +417,11 @@ def _write_manifest(
         # Arm 3 is the grounded content in the base model's language (English).
         # It is exempt from the twin control (different language + post-MT length).
         arms["grounded_translated"] = arm("grounded_translated", True, arm_lang="en")
+    if with_neutral_prose:
+        # Register control: value-neutral but discursive prose in the corpus
+        # language. Exempt from the twin control (the grounded/language_matched
+        # token-budget twin); grounded−neutral_prose is its own comparison.
+        arms["neutral_prose"] = arm("neutral_prose", False)
     if with_replay:
         # Replay is general English text for forgetting mitigation; value-neutral
         # and exempt from the twin control (it is not part of the matched twin).
@@ -487,6 +493,13 @@ def main() -> int:
         help="also build the replay arm: a general, value-neutral English corpus mixed into the "
         "grounded_replay arm's CPT to suppress catastrophic forgetting (Run 8 follow-up).",
     )
+    parser.add_argument(
+        "--neutral-prose",
+        action="store_true",
+        help="also build the neutral_prose arm: a value-neutral but DISCURSIVE same-language twin "
+        "(biography/history/geography/arts from the titles file) that controls for register, so "
+        "grounded - neutral_prose isolates cultural content from genre.",
+    )
     parser.add_argument("--out", default="", help="output root (default: data/<culture>)")
     parser.add_argument("--validate", default="", help="validate an existing root and exit")
     args = parser.parse_args()
@@ -554,6 +567,33 @@ def main() -> int:
             else:
                 print("warning: translation produced no usable docs; skipping Arm 3", file=sys.stderr)
 
+    with_neutral_prose = False
+    if args.neutral_prose:
+        if "neutral_prose" not in titles:
+            print(
+                "warning: --neutral-prose but the titles file has no 'neutral_prose' block; skipping", file=sys.stderr
+            )
+        else:
+            print(f"fetching neutral_prose arm ({args.lang}{', full' if args.full else ''})…")
+            neutral_prose = _decontaminate(
+                _fetch_arm(
+                    args.lang,
+                    titles["neutral_prose"],
+                    args.per_domain,
+                    full=args.full,
+                    max_words=args.max_words,
+                    categories=cats.get("neutral_prose"),
+                    cat_limit=args.cat_limit,
+                ),
+                "neutral_prose",
+            )
+            neutral_prose = _cap_tokens(neutral_prose, args.max_tokens)
+            if neutral_prose:
+                _write_jsonl(root / "neutral_prose.jsonl", neutral_prose)
+                with_neutral_prose = True
+            else:
+                print("warning: neutral_prose arm came back empty; skipping it", file=sys.stderr)
+
     with_replay = False
     if args.replay:
         print("fetching replay arm (general, value-neutral, en)…")
@@ -572,7 +612,14 @@ def main() -> int:
             print("warning: replay arm came back empty; skipping it", file=sys.stderr)
 
     _write_manifest(
-        root, args.culture, args.lang, args.tol, titles, with_translated=with_translated, with_replay=with_replay
+        root,
+        args.culture,
+        args.lang,
+        args.tol,
+        titles,
+        with_translated=with_translated,
+        with_replay=with_replay,
+        with_neutral_prose=with_neutral_prose,
     )
     print(f"wrote {root}")
     return _validate(root)

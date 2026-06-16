@@ -37,7 +37,7 @@ def _stats_config(**kw) -> StatsConfig:
 def test_runs_all_arms() -> None:
     result = run_experiment(_config())
     arms = [a.arm for a in result.arms]
-    assert arms == ["base", "language_matched", "grounded", "grounded_translated", "surface_only"]
+    assert arms == ["base", "language_matched", "grounded", "grounded_translated", "neutral_prose", "surface_only"]
 
 
 def test_surface_only_arm_does_no_cpt() -> None:
@@ -197,7 +197,12 @@ def test_multiseed_aggregates_and_decides() -> None:
     for arm in result.arms:
         assert arm.survey_shift_std >= 0.0
     names = {c.name for c in result.comparisons}
-    assert names == {"grounded_vs_language", "grounded_vs_translated", "grounded_vs_surface"}
+    assert names == {
+        "grounded_vs_language",
+        "grounded_vs_translated",
+        "grounded_vs_neutral_prose",
+        "grounded_vs_surface",
+    }
     assert isinstance(result.passed, bool)
 
 
@@ -281,6 +286,7 @@ def test_corpus_resampled_aggregates_over_draws(tmp_path: Path) -> None:
     assert {c.name for c in result.comparisons} == {
         "grounded_vs_language",
         "grounded_vs_translated",
+        "grounded_vs_neutral_prose",
         "grounded_vs_surface",
     }
     # The reported band is the cross-draw std (>= 0), and the verdict names it.
@@ -308,6 +314,21 @@ def test_corpus_resampled_deterministic(tmp_path: Path) -> None:
     a = run_corpus_resampled(config, draws=2, sample_fraction=0.6)
     b = run_corpus_resampled(config, draws=2, sample_fraction=0.6)
     assert a.to_dict() == b.to_dict()
+
+
+# --- neutral_prose register-control arm -------------------------------------
+
+
+def test_neutral_prose_arm_runs_and_compares() -> None:
+    """The register-control arm trains and contributes its own decisive comparison
+    (grounded vs the value-neutral discursive twin)."""
+    result = run_experiment(_config())
+    by_arm = {a.arm: a for a in result.arms}
+    assert "neutral_prose" in by_arm
+    assert by_arm["neutral_prose"].train_loss is not None  # it does CPT
+    # The comparison is reported (non-skipped: the placeholder corpus provides it).
+    stats = run_multiseed(_stats_config())
+    assert "grounded_vs_neutral_prose" in {c.name for c in stats.comparisons}
 
 
 # --- replay / anchor mitigation arm + training stabilization (Run 8 follow-up) --

@@ -167,6 +167,7 @@ def aggregate_runs(runs: list[ExperimentResult], config: StatsConfig) -> StatsRe
     diff_samples: dict[str, list[float]] = {
         "grounded_vs_language": [r.decisive_grounded_vs_language for r in runs],
         "grounded_vs_translated": [r.decisive_grounded_vs_translated for r in runs],
+        "grounded_vs_neutral_prose": [r.decisive_grounded_vs_neutral_prose for r in runs],
         "grounded_vs_surface": [r.decisive_grounded_vs_surface for r in runs],
     }
     # Replay comparisons only when the grounded_replay arm actually ran, so a
@@ -238,6 +239,8 @@ class DrawSummary:
     grounded_vs_surface: float
     capability_drop: float
     safety_drop: float
+    # Register control; 0.0 when the neutral_prose arm did not run this sweep.
+    grounded_vs_neutral_prose: float = 0.0
     # Replay comparisons; 0.0 when the grounded_replay arm did not run this sweep.
     replay_vs_language: float = 0.0
     replay_vs_grounded: float = 0.0
@@ -310,6 +313,7 @@ def run_corpus_resampled(
                 grounded_vs_surface=comp["grounded_vs_surface"],
                 capability_drop=base.capability_mean - grounded.capability_mean,
                 safety_drop=base.safety_mean - grounded.safety_mean,
+                grounded_vs_neutral_prose=comp.get("grounded_vs_neutral_prose", 0.0),
                 replay_vs_language=comp.get("replay_vs_language", 0.0),
                 replay_vs_grounded=comp.get("replay_vs_grounded", 0.0),
             )
