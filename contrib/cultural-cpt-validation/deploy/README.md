@@ -20,9 +20,16 @@ mutate min-bid.
 
 The RTX 5090 is Blackwell (`sm_120`) and needs **CUDA 12.8+ / PyTorch ≥ 2.7**.
 An older PyTorch image will load but fail at the first kernel with
-`no kernel image is available for execution on the device`. Use a recent image,
-e.g. `pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime` (or vast's `cuda:12.8`
-PyTorch image). Verify on the instance with:
+`no kernel image is available for execution on the device`.
+
+**Use a `-devel` image, not `-runtime`:**
+`pytorch/pytorch:2.7.0-cuda12.8-cudnn9-devel`. The `-runtime` image has **no C
+compiler**, so `bitsandbytes` cannot build its 8-bit-Adam kernel for `sm_120` and
+silently falls back to fp32 `torch.AdamW` — whose ~32 GB of optimizer moments
+OOM a 4B full fine-tune mid-training, ~20 min in, with a confusing CUDA OOM. The
+`-devel` image bundles `gcc`/`nvcc` so 8-bit Adam builds. (On a `-runtime` box you
+can recover by hand: `apt-get install -y build-essential && pip install -U
+bitsandbytes`.) Verify on the instance with:
 
 ```bash
 python -c "import torch; print(torch.__version__, torch.cuda.get_device_name(0))"
@@ -43,8 +50,10 @@ vastai search offers 'gpu_name=RTX_5090 num_gpus>=1 rentable=true verified=any' 
 #    -> pick the OFFER_ID for your machine.
 
 # 2. Create an interruptible instance on it with a CUDA-12.8 PyTorch image.
+#    Use the -devel image: -runtime lacks a compiler, so bitsandbytes 8-bit Adam
+#    can't build and the 4B fine-tune OOMs on fp32 AdamW (see the CUDA-stack note).
 vastai create instance <OFFER_ID> \
-  --image pytorch/pytorch:2.7.0-cuda12.8-cudnn9-runtime \
+  --image pytorch/pytorch:2.7.0-cuda12.8-cudnn9-devel \
   --disk 60 \
   --ssh --direct \
   --bid_price <BID>            # spot/interruptible; ~$0.30-0.60/hr for one 5090
