@@ -352,7 +352,7 @@ run: per-seed checkpointing + non-finite-robust aggregation, after an 8-epoch
 attempt crashed in the final `statistics.stdev` and lost the training. See
 `re_aggregate.py`.)
 
-## Trend across all eight runs (the decisive comparison)
+## Trend across all nine runs (the decisive comparison)
 
 | run | model | survey | corpus | grounded − language | beaten by prompt? |
 | :-- | :-- | :-- | --: | --: | :-- |
@@ -363,6 +363,7 @@ attempt crashed in the final `statistics.stdev` and lost the training. See
 | 6 | Qwen3-4B | AR | 300k (fresh) | **−0.008 (z=−0.29)** ✗ | z=−6.27 |
 | 7 | Qwen3-4B | AR | **4× resampled** | **+0.040 (z=0.91)** | z=−2.53 |
 | **8** | Qwen3-4B | AR | **807k/673k, 6ep** | **+0.108 (z=1.15)** | z=−3.25 |
+| **9** | Qwen3-4B | AR | **800k, 6ep, +replay+stab** | **+0.088 (z=2.89)** ✅ | tie, z=−1.13 |
 
 Runs 1–6 each computed z against a measurement-only band, so their z's are not
 comparable to a real effect size. **Run 7 supersedes the single-corpus z's:** the
@@ -375,7 +376,51 @@ CPT every time.
 
 ## Interpretation
 
-**Updated after Run 8 (read this first).** Scaling tokens+epochs pushed the
+**Updated after Run 9 (read this first).** Run 9 added the **replay/anchor arm** and,
+crucially, **stabilised training** (linear LR warmup→decay, gradient clipping,
+per-epoch shuffling, and seed-dependent torch RNG so seeds genuinely vary). The
+result reframes Run 8's mechanism story. Three seeds, 800k tokens, 6 epochs:
+
+| arm | survey shift | capability | refusal |
+| :-- | --: | --: | --: |
+| base | +0.000 | 0.79 | 1.00 |
+| language_matched | −0.031 ± 0.041 | 0.83 | 1.00 |
+| grounded | **+0.057 ± 0.016** | **0.79** | 0.88 |
+| surface_only (prompt) | +0.063 ± 0.010 | 0.79 | 1.00 |
+| grounded_replay | +0.032 ± 0.017 | 0.83 | 0.88 |
+
+Decisive: **grounded − language = +0.088 ± 0.030 (z=2.89) — clears 2σ**, with the
+absolute grounded shift **+0.057 (≥0.05)** and **zero capability drop** (0.79→0.79).
+Two big changes from Run 8: (1) **stabilisation killed the seed-degeneration** — no
+arm cratered, capability is preserved everywhere (cap std on grounded is ±0.016, not
+the 0.08-vs-0.79 chaos of Run 8). (2) With forgetting thereby removed, the grounding
+effect **did not vanish** — grounded still beats language by +0.088 *and* pulls
+toward Egypt in absolute terms. **That is evidence the effect is at least partly real
+value acquisition, not only the forgetting-robustness asymmetry Run 8 inferred** (the
+asymmetry was an artifact of unstable training damaging the neutral arm). Prompting no
+longer beats CPT — grounded − surface is **−0.006 (z=−1.13), a statistical tie** (the
+first run where micro-scale CPT matches a one-line persona prompt).
+
+**The replay arm did *not* behave as hypothesised, and that is informative.** If the
+effect had been pure forgetting, replay should have lifted the shift and restored
+refusal. Instead grounded_replay's shift is *lower* (+0.032 vs grounded's +0.057;
+replay − grounded = −0.024, z=−1.02, ns) and refusal stayed dropped (0.88). So mixing
+general English back in slightly *dilutes* the cultural pull without buying back
+safety — consistent with the value-pull being genuine (replay trades grounded tokens
+for neutral ones) rather than a forgetting artifact replay could repair.
+
+**Pre-registered verdict: still FAIL — but now on the *safety* conjunct alone.** The
+grounded shift, the z≥2 grounding effect, and the capability guardrail all PASS for
+the first time; only refusal drop fails (1.00→0.88 = 0.125 > 0.10 on both grounded and
+grounded_replay). Run 9 is the strongest, cleanest data point yet. **Two caveats keep
+it from being decisive:** (a) the z=2.89 band is **cross-seed (3 seeds), not the
+cross-corpus band Run 7 showed is the real noise source** — the committed next step is
+to re-run the corpus-resampled sweep (`--corpus-draws`) *on this stabilised setup*;
+(b) the safety regression (Arabic CPT lowers refusal) is real and now the binding
+failure — worth its own investigation. Artifacts: `runs/egypt_stats_replay/` (Run 9,
+3 seeds).
+
+**Updated after Run 8.** Scaling tokens+epochs pushed the
 `grounded − language` point estimate to its highest (+0.108) but **not past 2σ**
 (z=1.15): the variance grew as fast as the effect. And the variance is now
 understood — Run 8 **falsified the "training is deterministic across seeds"
@@ -445,6 +490,25 @@ this scale; and cheap prompting moves the English-measured coordinate far more
 than micro-scale CPT does.
 
 ## Next experiment (highest impact first)
+
+**Post-Run-9 priorities (current).** Run 9 built and ran the replay arm + training
+stabilization. Stabilisation was the lever: it removed the seed-degeneration, and the
+grounding effect *survived* (grounded − language +0.088, z=2.89; absolute +0.057; zero
+capability drop), which points to genuine value acquisition rather than only
+forgetting-robustness. Verdict still FAIL, now on the **safety conjunct alone**
+(refusal 1.00→0.88). So the two open fronts are:
+
+0a. **Corpus-resampled sweep on the stabilised setup (the decisive test).** Run 9's
+   z=2.89 is a **cross-seed** band; Run 7 showed the **cross-corpus** band is the real
+   one. Re-run with `CORPUS_DRAWS=4 CORPUS_FRACTION=0.7` and the Run 9 stabilisation
+   flags. If grounded − language clears 2σ across draws too, the effect is real. This
+   is the highest-value next GPU run.
+0b. **Investigate the safety regression.** Arabic CPT lowers refusal (1.00→0.88) on
+   grounded *and* grounded_replay — now the binding failure. Is it Arabic-instruction
+   forgetting, corpus content, or the refusal probe itself? This is the gate the
+   experiment now fails on.
+
+The earlier (pre-Run-9) reasoning is kept below for the record:
 
 Run 8 reframes the priorities again: growing tokens+epochs raised the effect
 (+0.108) but not its significance (z=1.15), and revealed the effect is really a

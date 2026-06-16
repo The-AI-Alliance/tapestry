@@ -29,13 +29,21 @@ on a now-false premise. Second, it pinned the **mechanism**: grounded CPT does *
 pull toward Egypt (absolute shift −0.021); rather **value-neutral CPT damages the
 model (capability 0.79→0.51, refusal 1.00→0.62) and grounded CPT does so far less.**
 So grounded−language (+0.108, z=1.15 — biggest point estimate, still <2σ) is a
-**forgetting-robustness asymmetry, not value acquisition.** Prompting still beats CPT
-(grounded−surface z=−3.25). Pre-registered verdict: **FAIL in all eight runs**
-(Run 8 also fails the safety conjunct). **The next experiment (the replay/anchor
-mitigation arm + training stabilization) is now BUILT and ready to run as Run 9** —
-a `grounded_replay` arm that mixes general English text into the grounded CPT to
-suppress forgetting, plus warmup/grad-clip/shuffle to stop seeds cratering. See the
-"Run 9" recipe in FINDINGS. Artifacts: `runs/egypt_stats_scaled/` (Run 8),
+**forgetting-robustness asymmetry, not value acquisition.** **Run 9 then ran the
+replay arm + stabilised training (warmup/grad-clip/shuffle + seed-dependent RNG) and
+changed the conclusion again:** stabilisation removed the seed-degeneration (capability
+preserved everywhere, 0.79→0.79), and with forgetting thereby gone the grounding
+effect *survived* — grounded − language **+0.088, z=2.89 (clears 2σ)**, absolute
+grounded shift **+0.057 (≥0.05)**, zero capability drop. So the effect looks at least
+partly like **genuine value acquisition**, not only the forgetting asymmetry Run 8
+inferred. The replay arm slightly *diluted* the pull (replay−grounded −0.024, ns) and
+did not restore refusal. Prompting no longer beats CPT (grounded−surface z=−1.13, a
+tie). **Pre-registered verdict: FAIL in all nine runs — but Run 9 fails on the safety
+conjunct alone** (refusal 1.00→0.88); the shift, the z≥2 grounding effect, and the
+capability guardrail all PASS for the first time. Caveats: the z=2.89 is a cross-seed
+band (Run 7 showed cross-corpus is the real one → re-resample on the stabilised setup
+next), and the safety regression is now the binding failure. Artifacts:
+`runs/egypt_stats_replay/` (Run 9, 3 seeds), `runs/egypt_stats_scaled/` (Run 8),
 `runs/egypt_stats_resampled/` (Run 7).
 
 ## What the harness can do now
@@ -208,13 +216,18 @@ z-scores were computed against a measurement-only band. In rough priority:
    (z=0.91) — small, positive, **not significant** against the real corpus band.
    This settled the Run 5 vs 6 contradiction (both were single draws). The effect
    is underpowered, not null. Next decisions branch from here:
-0b. **BUILT, not yet run — replay/anchor mitigation arm + training stabilization
-   (Run 9, the headline experiment).** `grounded_replay` arm (`REPLAY_FRACTION`)
-   mixes general English text into grounded CPT to suppress forgetting; HF training
-   now has warmup/grad-clip/shuffle (`WARMUP_FRAC`/`MAX_GRAD_NORM`) so seeds stop
-   cratering. Reports `replay_vs_grounded` + `replay_vs_language`; decision still
-   keyed on `grounded`. Recipe + how-to-read in FINDINGS "Run 9". **This is what to
-   run with the next GPU window.**
+0b. **DONE — replay/anchor mitigation arm + training stabilization (Run 9).** Ran on
+   a Vast 5090 (3 seeds, 800k tokens, 6ep), `runs/egypt_stats_replay/`. Stabilisation
+   (warmup/grad-clip/shuffle + seed RNG) removed the seed-degeneration; the grounding
+   effect survived and clears 2σ on the cross-seed band (grounded−language +0.088,
+   z=2.89; absolute +0.057; zero cap drop) → looks like real value acquisition, not
+   only forgetting-robustness. Replay diluted the pull slightly (ns) and didn't fix
+   refusal. FAIL on the safety conjunct alone (refusal 1.00→0.88). **Next: re-run the
+   corpus-resampled sweep (`CORPUS_DRAWS`) on this stabilised setup to test the effect
+   against the cross-*corpus* band (the real one), and investigate the safety drop.**
+   Operational note: the box is interruptible — it was preempted mid-run twice; the
+   fix that worked was running seeds as isolated single-seed processes + offline
+   re-aggregation (`re_aggregate.py`). Use an on-demand instance next time.
 1. **Grow the per-draw effect, then re-resample.** Confirming a +0.04 effect
    against ±0.044 would need ~dozens of draws (not worth it); make each draw bigger
    first — **more tokens (10×+) and more epochs** (real CPT is millions of tokens;
@@ -245,11 +258,16 @@ seed), so the cross-seed band is real training noise, not measurement-only; (b) 
 grounding effect (+0.108, z=1.15, still <2σ) is forgetting-robustness, not value
 pull — grounded CPT preserves the model while value-neutral CPT damages it
 (capability 0.79→0.51, refusal→0.62); absolute grounded shift ≈0. Prompting still
-beats CPT (z=−3.25). FAIL all 8 runs. Next (BUILT, ready for Run 9): the
-replay/anchor mitigation arm + training stabilization — a `grounded_replay` arm
-(`REPLAY_FRACTION`) that mixes general English text into grounded CPT to suppress
-forgetting, plus warmup/grad-clip/shuffle (`WARMUP_FRAC`/`MAX_GRAD_NORM`) so seeds
-stop cratering; run it, then re-resample on the stabilised setup. See FINDINGS.md
-"Run 9" for the recipe and how to read it. Harness also checkpoints per seed
-(re_aggregate.py) and is non-finite-robust — an 8-epoch attempt crashed in final
-stats and lost the run; that can't happen now."
+beats CPT (z=−3.25). Run 9 then added the replay arm + **stabilised training**
+(warmup/grad-clip/shuffle + seed-dependent RNG): stabilisation removed the
+seed-degeneration, and with forgetting gone the grounding effect SURVIVED —
+grounded−language +0.088, z=2.89 (clears 2σ), absolute shift +0.057, zero capability
+drop — so it looks like **genuine value acquisition**, not only forgetting-robustness.
+Replay slightly diluted the pull (ns) and didn't restore refusal; prompting no longer
+beats CPT (tie, z=−1.13). FAIL all 9 runs, but **Run 9 fails on the safety conjunct
+alone** (refusal 1.00→0.88). Next: re-run the corpus-resampled sweep (`CORPUS_DRAWS`)
+on the stabilised setup — z=2.89 is cross-seed, and the cross-*corpus* band (Run 7) is
+the real test — and investigate the safety drop. `runs/egypt_stats_replay/`. Box is
+interruptible (preempted twice mid-run); run seeds as isolated processes + offline
+re-aggregate (`re_aggregate.py`), or use an on-demand instance. Harness checkpoints
+per seed and is non-finite-robust."
