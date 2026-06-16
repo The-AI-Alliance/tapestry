@@ -317,6 +317,7 @@ def subsample_documents(
     arm: str,
     fraction: float,
     sample_seed: int | None,
+    target_tokens: float | None = None,
 ) -> list[DocumentRecord]:
     """Deterministically subsample one arm's documents for a corpus draw.
 
@@ -325,13 +326,14 @@ def subsample_documents(
     **token mass** is ~``fraction`` of the arm's pool, by shuffling documents
     with a process-stable seed and accumulating until the token budget is met.
 
-    Sampling on *tokens* (not document count) is what keeps the matched twin
-    valid per draw: grounded and language-matched docs have different length
-    distributions, so a fixed document-count fraction drifts their token-budget
-    ratio out of tolerance, whereas shrinking each arm to the same fraction of
-    its own token mass preserves the (already-matched) full-corpus ratio. The
-    per-arm controls and the twin check then run on the subsampled set, so we
-    validate exactly what we train on.
+    Sampling on *tokens* (not document count) keeps the draw representative, but
+    when the full-pool twin ratio sits near the tolerance edge, shrinking each
+    arm to a fraction of *its own* mass lets per-document granularity tip the
+    draw's grounded/language ratio over tolerance. ``target_tokens`` overrides
+    the per-arm ``fraction * total`` budget with an explicit common budget, which
+    the twin loader uses to drive both arms to the *same* token mass per draw so
+    the matched-twin invariant holds with margin. The per-arm controls and the
+    twin check then run on the subsampled set, so we validate exactly what we train on.
     """
     if sample_seed is None or fraction >= 1.0:
         return list(docs)
@@ -341,7 +343,7 @@ def subsample_documents(
     total = sum(tokens)
     if total == 0:
         return list(docs)
-    target = fraction * total
+    target = target_tokens if target_tokens is not None else fraction * total
     order = list(range(len(docs)))
     random.Random(_stable_seed(sample_seed, arm)).shuffle(order)
     picked: list[int] = []
@@ -491,22 +493,28 @@ def load_arm_documents(
     if arm not in manifest.arms:
         raise CorpusError(f"arm {arm!r} not in manifest for {root} (declared: {sorted(manifest.arms)})")
     spec = manifest.arms[arm]
-    docs = _read_jsonl(root / spec.file)
-    docs = subsample_documents(docs, arm=arm, fraction=sample_fraction, sample_seed=sample_seed)
+    raw = _read_jsonl(root / spec.file)
+
+    is_twin = arm in ("grounded", "language_matched") and {"grounded", "language_matched"} <= set(manifest.arms)
+    resampling = sample_seed is not None and sample_fraction < 1.0
+    need_partner = is_twin and (check_twin or resampling)
+    partner = "language_matched" if arm == "grounded" else "grounded"
+    partner_raw = _read_jsonl(root / manifest.arms[partner].file) if need_partner else []
+
+    # When resampling, drive both twin arms to a COMMON per-draw token budget
+    # (fraction of the smaller pool) instead of a fraction of each arm's own mass.
+    # The full-pool grounded/language ratio can sit right at the twin tolerance,
+    # where per-document granularity tips an independent draw over it; a common
+    # budget keeps every draw matched with margin.
+    common_target = sample_fraction * min(_token_count(raw), _token_count(partner_raw)) if (resampling and need_partner) else None
+
+    docs = subsample_documents(raw, arm=arm, fraction=sample_fraction, sample_seed=sample_seed, target_tokens=common_target)
     _validate_arm(arm, spec, docs, decontaminate=decontaminate, max_jaccard=max_jaccard)
 
-    if (
-        check_twin
-        and arm in ("grounded", "language_matched")
-        and {
-            "grounded",
-            "language_matched",
-        }
-        <= set(manifest.arms)
-    ):
-        partner = "language_matched" if arm == "grounded" else "grounded"
-        partner_docs = _read_jsonl(root / manifest.arms[partner].file)
-        partner_docs = subsample_documents(partner_docs, arm=partner, fraction=sample_fraction, sample_seed=sample_seed)
+    if check_twin and is_twin:
+        partner_docs = subsample_documents(
+            partner_raw, arm=partner, fraction=sample_fraction, sample_seed=sample_seed, target_tokens=common_target
+        )
         _validate_arm(
             partner,
             manifest.arms[partner],
