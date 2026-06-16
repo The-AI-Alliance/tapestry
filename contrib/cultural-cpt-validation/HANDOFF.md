@@ -225,9 +225,12 @@ z-scores were computed against a measurement-only band. In rough priority:
    refusal. FAIL on the safety conjunct alone (refusal 1.00→0.88). **Next: re-run the
    corpus-resampled sweep (`CORPUS_DRAWS`) on this stabilised setup to test the effect
    against the cross-*corpus* band (the real one), and investigate the safety drop.**
-   Operational note: the box is interruptible — it was preempted mid-run twice; the
-   fix that worked was running seeds as isolated single-seed processes + offline
-   re-aggregation (`re_aggregate.py`). Use an on-demand instance next time.
+   Operational note: the box is interruptible **on purpose** — it's Jesse's own
+   machine hosted on Vast.ai, so the interruptible tier is **free** and a paying
+   renter is good, not a problem (never switch to on-demand). It was preempted mid-run
+   twice; the fix that worked was running seeds as isolated single-seed processes +
+   offline re-aggregation (`re_aggregate.py`). If the machine is rented, use its other
+   5090 (the 2× offer) if free, else wait for idle.
 1. **Grow the per-draw effect, then re-resample.** Confirming a +0.04 effect
    against ±0.044 would need ~dozens of draws (not worth it); make each draw bigger
    first — **more tokens (10×+) and more epochs** (real CPT is millions of tokens;
@@ -268,6 +271,7 @@ beats CPT (tie, z=−1.13). FAIL all 9 runs, but **Run 9 fails on the safety con
 alone** (refusal 1.00→0.88). Next: re-run the corpus-resampled sweep (`CORPUS_DRAWS`)
 on the stabilised setup — z=2.89 is cross-seed, and the cross-*corpus* band (Run 7) is
 the real test — and investigate the safety drop. `runs/egypt_stats_replay/`. Box is
-interruptible (preempted twice mid-run); run seeds as isolated processes + offline
-re-aggregate (`re_aggregate.py`), or use an on-demand instance. Harness checkpoints
-per seed and is non-finite-robust."
+interruptible **by design** (it's our own machine on Vast.ai, so free — never go
+on-demand; a renter is revenue). Preempted twice mid-run; run seeds as isolated
+processes + offline re-aggregate (`re_aggregate.py`), and if it's rented use the other
+5090 or wait. Harness checkpoints per seed and is non-finite-robust."
