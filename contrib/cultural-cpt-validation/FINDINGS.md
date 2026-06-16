@@ -352,7 +352,7 @@ run: per-seed checkpointing + non-finite-robust aggregation, after an 8-epoch
 attempt crashed in the final `statistics.stdev` and lost the training. See
 `re_aggregate.py`.)
 
-## Trend across all nine runs (the decisive comparison)
+## Trend across all ten runs (the decisive comparison)
 
 | run | model | survey | corpus | grounded − language | beaten by prompt? |
 | :-- | :-- | :-- | --: | --: | :-- |
@@ -364,6 +364,8 @@ attempt crashed in the final `statistics.stdev` and lost the training. See
 | 7 | Qwen3-4B | AR | **4× resampled** | **+0.040 (z=0.91)** | z=−2.53 |
 | **8** | Qwen3-4B | AR | **807k/673k, 6ep** | **+0.108 (z=1.15)** | z=−3.25 |
 | **9** | Qwen3-4B | AR | **800k, 6ep, +replay+stab** | **+0.088 (z=2.89)** ✅ | tie, z=−1.13 |
+| **10a** | Qwen3-4B instruct | AR | **+register twin** | **+0.086 (z=2.12)** ✅ | tie, z=−0.33 |
+| **10b** | Qwen3-4B **Base** | AR | **base de-confound** | **+0.032 (z=3.02)** ✅ | z=+0.98 (CPT wins) |
 
 Runs 1–6 each computed z against a measurement-only band, so their z's are not
 comparable to a real effect size. **Run 7 supersedes the single-corpus z's:** the
@@ -376,7 +378,43 @@ CPT every time.
 
 ## Interpretation
 
-**Updated after Run 9 (read this first).** Run 9 added the **replay/anchor arm** and,
+**Updated after Run 10 (read this first).** Run 10 ran the two external-review
+de-confounders **in parallel on a 2× 5090 box** (`deploy/run_two_gpu.sh`): GPU 0 =
+instruct + the `neutral_prose` register twin (10a), GPU 1 = the same arms on
+**Qwen3-4B-Base** (10b). Both came back **supporting cultural value content over the
+artifact explanations.**
+
+*10a — register confound REJECTED.* The prediction was that a value-neutral but
+discursive twin would be "nearly as grounded-like," collapsing the effect to genre.
+The opposite: the discursive `neutral_prose` arm moved the coordinate **−0.035**, the
+*same* slightly-negative way the terse `language_matched` twin did (−0.029), while
+`grounded` moved **+0.057**. So `grounded − neutral_prose = +0.092` — even larger than
+`grounded − language = +0.086 (z=2.12)`. Register is **not** the driver; value content
+is. (Honest caveat: `grounded − neutral_prose` is z=1.77 — neutral_prose carries more
+variance — so it is directionally decisive against the artifact hypothesis, which
+needed the *opposite sign*, but not itself >2σ on the cross-seed band.)
+
+*10b — base model gives the FIRST full PASS.* On Qwen3-4B-Base there is no RLHF
+alignment to erode, and the whole picture cleans up: `grounded − language = +0.032,
+z=3.02` (tight, ±0.011), absolute grounded shift **+0.051 (≥0.05)**, capability
+**0.92→0.92** (zero drop), and **refusal 0.88→0.88 — no safety regression.** All four
+pre-registered conjuncts pass → **VERDICT: PASS, the first in ten runs.** This confirms
+the diagnosis that the safety FAIL on instruct (refusal 1.00→0.88) is **alignment
+decay, not the corpus**: remove the alignment-erosion confound and the value-pull is
+real, significant, capability-preserving, and safe. On base the *behavioral* probe also
+moves toward Egypt (grounded +0.067), and CPT even edges out the persona prompt
+(grounded − surface +0.021) — the first time the deep lever beats the shallow one.
+
+**Net:** two independent confound controls (register twin + base model) both point to
+genuine value acquisition, and the base run passes the go/no-go outright. **The two
+standing caveats keep it from being final:** (a) both z's are **cross-seed**, not the
+cross-corpus band Run 7 proved is the real noise source — the corpus-resampled sweep on
+this setup is now the single decisive remaining test; (b) the PASS leans partly on the
+absolute +0.051 against a **map-rescaled** target (`wvs._from_map`), so the relative
+z=3.02 is the more trustworthy half. Artifacts: `runs/egypt_register_instruct/` (10a),
+`runs/egypt_register_base/` (10b).
+
+**Updated after Run 9.** Run 9 added the **replay/anchor arm** and,
 crucially, **stabilised training** (linear LR warmup→decay, gradient clipping,
 per-epoch shuffling, and seed-dependent torch RNG so seeds genuinely vary). The
 result reframes Run 8's mechanism story. Three seeds, 800k tokens, 6 epochs:
@@ -491,34 +529,34 @@ than micro-scale CPT does.
 
 ## Next experiment (highest impact first)
 
-**Post-Run-9 priorities (current), revised after external review.** A colleague's
-critique reframed the priorities — the headline grounding effect may be a **register
-confound, not cultural content**, and we should de-confound it before spending GPU on
-a corpus-resample sweep of a possibly-artifactual effect. The two new top moves:
+**Post-Run-10 priorities (current).** Run 10 ran the two external-review de-confounders
+(register twin + base model) and **both passed in favour of cultural content** — the
+register confound is rejected and the base model gives the first full go/no-go PASS.
+That collapses the remaining work to essentially one decisive test plus follow-ups:
 
-1. **Neutral-prose twin — test the register confound (cheap, can invalidate the
-   effect; DO FIRST).** Our matched twin holds language + token budget constant but
-   **not genre/register**: grounded = law/religion/family/civic = discursive, normative
-   essay-prose; language_matched = weather/sports/technical/math = terse, list-y,
-   symbol-heavy. Raw-text CPT drags an instruct model toward the corpus token
-   distribution; normative prose sits closer to the RLHF output manifold than STEM
-   text, so "grounded is gentler / shifts more" has a **cultural-content-free**
-   explanation. Add a **value-neutral but discursive** Arabic twin (op-eds,
-   biographies, general essays — prose-heavy, value-light) and the decisive comparison
-   `grounded − neutral_prose`. Prediction: neutral prose is nearly as grounded-like →
-   the effect collapses to a register artifact. If grounded stays meaningfully ahead of
-   neutral *prose*, it is cultural. Note Run 9 already dissociates the effect from
-   *forgetting* (stabilised: neutral arm undamaged, cap 0.83, yet grounded still +0.088),
-   so the confound, if real, now acts **directly on the value coordinate**, not via
-   capability damage — which is exactly what this twin isolates.
-2. **Base-model CPT — de-confound value-pull from alignment decay.** The drift to
-   origin, refusal collapse, and capability crater are **instruct-alignment erosion**
-   from raw-text CPT; replay/stabilization only *fight* it. On Qwen3-4B-**Base** there
-   is no alignment to strip, so that drift should largely vanish and value-pull can be
-   read cleanly. Run the same arms on the base model (alongside replay, not instead;
-   they answer different questions). Wrinkle: base models don't instruct-follow, so the
-   survey/persona framing is weaker — log-prob scoring still works, but consider a light
-   SFT pass or lean on the relative comparisons.
+1. **Corpus-resampled sweep on the base + stabilised setup — now the single decisive
+   test.** Every positive z so far (incl. Run 10's z=3.02 on base) is a **cross-seed**
+   band; Run 7 proved the **cross-corpus** band is the real noise source. Re-run
+   `deploy/run_two_gpu.sh` (or just the base lane) with `CORPUS_DRAWS=4
+   CORPUS_FRACTION=0.7`. If grounded − language clears 2σ **across corpus draws** on the
+   base model, the effect is real and the experiment is essentially won. This is the
+   one GPU run that still matters.
+2. **Firm up `grounded − neutral_prose` (z=1.77/1.29).** The register comparison has
+   the right (large, positive) sign but wide variance on the neutral_prose arm; more
+   neutral_prose tokens (raise its `--max-tokens` / `--cat-limit`) and the resample
+   sweep would push it past 2σ and make the register-rejection airtight.
+3. **Real WVS-7 factor scores** to replace the map-rescaled targets (`wvs._from_map`).
+   The base PASS leans partly on the absolute +0.051 against an approximate target;
+   real factor scores make the absolute-shift conjunct trustworthy. (Relative
+   comparisons already don't depend on it.)
+
+**Resolved by Run 10 (was on this list):**
+- ~~Register confound~~ — **rejected** (10a): neutral_prose behaves like
+  language_matched, not grounded.
+- ~~Base-model de-confound~~ — **done** (10b): base PASSES; the instruct safety FAIL was
+  alignment decay, not the corpus, confirmed.
+- ~~Investigate the safety regression~~ — **explained**: it's instruct alignment
+  erosion (base shows no refusal drop). Replay/stabilization fight it; base avoids it.
 
    Experiments (1) and (2) are independent and each fits one 32 GB GPU, so on the
    2× 5090 box they run **in parallel** — `deploy/run_two_gpu.sh` fetches the corpus
