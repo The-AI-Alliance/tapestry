@@ -116,6 +116,9 @@ run_on_gpu() {
 echo "== launch both GPUs in parallel =="
 echo "  GPU 0: $MODEL_A (register/instruct) -> $OUT_A"
 echo "  GPU 1: $MODEL_B (base de-confound)   -> $OUT_B"
+# Create the out dirs (and their runs/ parent) BEFORE the redirected launches —
+# the shell opens "${OUT_*}.log" before run_on_gpu's own mkdir runs.
+mkdir -p "$OUT_A" "$OUT_B"
 run_on_gpu 0 "$MODEL_A" "$OUT_A" instruct >"${OUT_A}.log" 2>&1 &
 PID_A=$!
 run_on_gpu 1 "$MODEL_B" "$OUT_B" base >"${OUT_B}.log" 2>&1 &
