@@ -491,22 +491,55 @@ than micro-scale CPT does.
 
 ## Next experiment (highest impact first)
 
-**Post-Run-9 priorities (current).** Run 9 built and ran the replay arm + training
-stabilization. Stabilisation was the lever: it removed the seed-degeneration, and the
-grounding effect *survived* (grounded − language +0.088, z=2.89; absolute +0.057; zero
-capability drop), which points to genuine value acquisition rather than only
-forgetting-robustness. Verdict still FAIL, now on the **safety conjunct alone**
-(refusal 1.00→0.88). So the two open fronts are:
+**Post-Run-9 priorities (current), revised after external review.** A colleague's
+critique reframed the priorities — the headline grounding effect may be a **register
+confound, not cultural content**, and we should de-confound it before spending GPU on
+a corpus-resample sweep of a possibly-artifactual effect. The two new top moves:
 
-0a. **Corpus-resampled sweep on the stabilised setup (the decisive test).** Run 9's
-   z=2.89 is a **cross-seed** band; Run 7 showed the **cross-corpus** band is the real
-   one. Re-run with `CORPUS_DRAWS=4 CORPUS_FRACTION=0.7` and the Run 9 stabilisation
-   flags. If grounded − language clears 2σ across draws too, the effect is real. This
-   is the highest-value next GPU run.
-0b. **Investigate the safety regression.** Arabic CPT lowers refusal (1.00→0.88) on
-   grounded *and* grounded_replay — now the binding failure. Is it Arabic-instruction
-   forgetting, corpus content, or the refusal probe itself? This is the gate the
-   experiment now fails on.
+1. **Neutral-prose twin — test the register confound (cheap, can invalidate the
+   effect; DO FIRST).** Our matched twin holds language + token budget constant but
+   **not genre/register**: grounded = law/religion/family/civic = discursive, normative
+   essay-prose; language_matched = weather/sports/technical/math = terse, list-y,
+   symbol-heavy. Raw-text CPT drags an instruct model toward the corpus token
+   distribution; normative prose sits closer to the RLHF output manifold than STEM
+   text, so "grounded is gentler / shifts more" has a **cultural-content-free**
+   explanation. Add a **value-neutral but discursive** Arabic twin (op-eds,
+   biographies, general essays — prose-heavy, value-light) and the decisive comparison
+   `grounded − neutral_prose`. Prediction: neutral prose is nearly as grounded-like →
+   the effect collapses to a register artifact. If grounded stays meaningfully ahead of
+   neutral *prose*, it is cultural. Note Run 9 already dissociates the effect from
+   *forgetting* (stabilised: neutral arm undamaged, cap 0.83, yet grounded still +0.088),
+   so the confound, if real, now acts **directly on the value coordinate**, not via
+   capability damage — which is exactly what this twin isolates.
+2. **Base-model CPT — de-confound value-pull from alignment decay.** The drift to
+   origin, refusal collapse, and capability crater are **instruct-alignment erosion**
+   from raw-text CPT; replay/stabilization only *fight* it. On Qwen3-4B-**Base** there
+   is no alignment to strip, so that drift should largely vanish and value-pull can be
+   read cleanly. Run the same arms on the base model (alongside replay, not instead;
+   they answer different questions). Wrinkle: base models don't instruct-follow, so the
+   survey/persona framing is weaker — log-prob scoring still works, but consider a light
+   SFT pass or lean on the relative comparisons.
+3. **Corpus-resampled sweep on the stabilised setup — only after (1).** Run 9's z=2.89
+   is a **cross-seed** band; Run 7 showed the **cross-corpus** band is the real one.
+   Re-run `CORPUS_DRAWS=4 CORPUS_FRACTION=0.7` with the Run 9 stabilisation flags — but
+   not worth GPU until the register twin shows the effect is not an artifact.
+4. **Investigate the safety regression.** Arabic CPT lowers refusal (1.00→0.88) on
+   grounded *and* grounded_replay — now the binding failure. Arabic-instruction
+   forgetting, corpus content, or the refusal probe itself?
+
+**Reporting/methodology fixes (do alongside):**
+- **Lead with the relative arm-vs-arm comparisons; treat absolute shift as provisional.**
+  The IW targets are map-rescaled, not real WVS-7 factor scores (`wvs._from_map`), and
+  `min_grounded_shift ≥ 0.05` is gated against that approximate target — so absolute
+  shift is the least trustworthy metric, including Run 9's +0.057 "PASS". Relative
+  comparisons don't depend on the target being exact. Wiring real factor scores is the
+  fix.
+- **Foreground the shallow-beats-deep finding, don't bury it under the FAIL.** Across
+  runs the persona prompt and the *measurement language* move the coordinate more
+  reliably than CPT does — the "fluent-but-foreign / language-router" picture from the
+  inside, voting *shallow* against the project's depth-over-shallow bet. (Run 9's
+  grounded−surface tie, z=−1.13, is the first crack — deep is catching up with scale +
+  stability — but the broader pattern holds and is the most interesting result so far.)
 
 The earlier (pre-Run-9) reasoning is kept below for the record:
 
