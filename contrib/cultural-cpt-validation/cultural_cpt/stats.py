@@ -19,9 +19,11 @@ The thresholds must be fixed *before* looking at results. They live in
 
 from __future__ import annotations
 
+import json
 import math
 import statistics
 from dataclasses import asdict, dataclass, field, replace
+from pathlib import Path
 from typing import Callable
 
 from .experiment import ExperimentConfig, ExperimentResult, run_experiment
@@ -271,6 +273,7 @@ def run_corpus_resampled(
     sample_fraction: float,
     base_sample_seed: int = 0,
     on_draw: "Callable[[list[DrawSummary]], None] | None" = None,
+    cache_dir: "Path | None" = None,
 ) -> ResampledResult:
     """Resample the corpus ``draws`` times and decide PASS/FAIL on the cross-draw band.
 
@@ -282,17 +285,38 @@ def run_corpus_resampled(
     ``on_draw`` (if given) is called with the running list of completed
     ``DrawSummary`` after each draw — used to checkpoint progress to disk, since a
     full sweep is many GPU-hours and otherwise silent until the end.
+
+    ``cache_dir`` (if given) persists each completed draw to ``draws/draw_<d>.json``
+    and reloads it on a later call instead of re-running the GPU work. This makes
+    the sweep resumable on a preemptible box: re-run the identical command and only
+    the unfinished draws cost GPU.
     """
     if draws < 2:
         raise ValueError("run_corpus_resampled needs draws >= 2 to estimate a band")
     if sample_fraction >= 1.0:
         raise ValueError("sample_fraction must be < 1.0 to resample; with the full pool every draw is identical")
 
+    if cache_dir is not None:
+        cache_dir.mkdir(parents=True, exist_ok=True)
+
     summaries: list[DrawSummary] = []
     last_caveat = ""
     comparison_names: list[str] = []
     for d in range(draws):
         sample_seed = base_sample_seed + d
+        # Resume: if this draw already completed in a prior (preempted) run, reload it
+        # from disk instead of re-training. comparison_names is stable across draws, so
+        # recovering it from the cached file is enough to aggregate at the end.
+        cache_file = cache_dir / f"draw_{d}.json" if cache_dir is not None else None
+        if cache_file is not None and cache_file.exists():
+            cached = json.loads(cache_file.read_text())
+            summaries.append(DrawSummary(**cached["summary"]))
+            comparison_names = cached["comparison_names"]
+            last_caveat = cached.get("caveat", "")
+            print(f"  [resume] draw {d}/{draws} loaded from {cache_file} (skipped GPU)", flush=True)
+            if on_draw is not None:
+                on_draw(list(summaries))
+            continue
         draw_cfg = replace(
             config,
             base=replace(config.base, corpus_sample_seed=sample_seed, corpus_sample_fraction=sample_fraction),
@@ -303,21 +327,30 @@ def run_corpus_resampled(
         grounded = next(a for a in sr.arms if a.arm == "grounded")
         base = next(a for a in sr.arms if a.arm == "base")
         comp = {c.name: c.mean for c in sr.comparisons}
-        summaries.append(
-            DrawSummary(
-                draw=d,
-                sample_seed=sample_seed,
-                grounded_shift=grounded.survey_shift_mean,
-                grounded_vs_language=comp["grounded_vs_language"],
-                grounded_vs_translated=comp["grounded_vs_translated"],
-                grounded_vs_surface=comp["grounded_vs_surface"],
-                capability_drop=base.capability_mean - grounded.capability_mean,
-                safety_drop=base.safety_mean - grounded.safety_mean,
-                grounded_vs_neutral_prose=comp.get("grounded_vs_neutral_prose", 0.0),
-                replay_vs_language=comp.get("replay_vs_language", 0.0),
-                replay_vs_grounded=comp.get("replay_vs_grounded", 0.0),
-            )
+        summary = DrawSummary(
+            draw=d,
+            sample_seed=sample_seed,
+            grounded_shift=grounded.survey_shift_mean,
+            grounded_vs_language=comp["grounded_vs_language"],
+            grounded_vs_translated=comp["grounded_vs_translated"],
+            grounded_vs_surface=comp["grounded_vs_surface"],
+            capability_drop=base.capability_mean - grounded.capability_mean,
+            safety_drop=base.safety_mean - grounded.safety_mean,
+            grounded_vs_neutral_prose=comp.get("grounded_vs_neutral_prose", 0.0),
+            replay_vs_language=comp.get("replay_vs_language", 0.0),
+            replay_vs_grounded=comp.get("replay_vs_grounded", 0.0),
         )
+        summaries.append(summary)
+        if cache_file is not None:
+            cache_file.write_text(
+                json.dumps(
+                    {"summary": asdict(summary), "comparison_names": comparison_names, "caveat": last_caveat},
+                    indent=2,
+                    sort_keys=True,
+                )
+                + "\n"
+            )
+            print(f"  [cache] draw {d}/{draws} saved -> {cache_file}", flush=True)
         if on_draw is not None:
             on_draw(list(summaries))
 

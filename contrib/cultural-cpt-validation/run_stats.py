@@ -50,7 +50,9 @@ def _run_resampled(config: StatsConfig, out_dir: Path, *, draws: int, fraction: 
         (out_dir / "partial.json").write_text(json.dumps(partial, indent=2, sort_keys=True) + "\n")
         print(f"  [checkpoint] draw {len(summaries)}/{draws} done -> {out_dir / 'partial.json'}", flush=True)
 
-    result = run_corpus_resampled(config, draws=draws, sample_fraction=fraction, on_draw=_checkpoint)
+    result = run_corpus_resampled(
+        config, draws=draws, sample_fraction=fraction, on_draw=_checkpoint, cache_dir=out_dir / "draws"
+    )
     (out_dir / "result.json").write_text(json.dumps(result.to_dict(), indent=2, sort_keys=True) + "\n")
 
     print("EXP-001 corpus-resampled go/no-go (decision on the cross-corpus band)")

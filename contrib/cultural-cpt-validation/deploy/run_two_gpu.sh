@@ -44,6 +44,12 @@ LR="${LR:-2e-5}"
 WARMUP_FRAC="${WARMUP_FRAC:-0.05}"
 MAX_GRAD_NORM="${MAX_GRAD_NORM:-1.0}"
 REPLAY_FRACTION="${REPLAY_FRACTION:-0.0}"
+# Corpus resampling: with CORPUS_DRAWS>1 each lane decides on the *cross-corpus*
+# noise band (the real one — see FINDINGS Run 7) instead of running per-seed
+# isolated processes. The resample path checkpoints+resumes per draw (draws/draw_<d>.json),
+# so a preempted lane re-run skips finished draws. CORPUS_FRACTION must be <1.0.
+CORPUS_DRAWS="${CORPUS_DRAWS:-1}"
+CORPUS_FRACTION="${CORPUS_FRACTION:-1.0}"
 FETCH="${FETCH:-1}"
 OUT_A="${OUT_A:-$REPO/runs/${CULTURE}_register_instruct}"
 OUT_B="${OUT_B:-$REPO/runs/${CULTURE}_register_base}"
@@ -95,6 +101,25 @@ DEVICE="cpu"
 run_on_gpu() {
   local gpu="$1" model="$2" out="$3" tag="$4"
   mkdir -p "$out"
+
+  # Resample mode: one process runs all seeds × all draws and decides on the
+  # cross-corpus band. The draw cache makes it resumable, so per-seed isolation is
+  # unnecessary — just re-run this same command after a preemption.
+  if [ "$CORPUS_DRAWS" -gt 1 ]; then
+    echo "[$tag gpu$gpu] resample sweep: draws=$CORPUS_DRAWS frac=$CORPUS_FRACTION seeds=$SEEDS start $(date -u)"
+    CUDA_VISIBLE_DEVICES="$gpu" python "$CC/run_stats.py" \
+      --mode "$MODE" --model-name "$model" --culture "$CULTURE" \
+      $CORPUS_ARG --device "$DEVICE" --dtype "$DTYPE" \
+      --epochs "$EPOCHS" --lr "$LR" --seeds "$SEEDS" \
+      --corpus-draws "$CORPUS_DRAWS" --corpus-fraction "$CORPUS_FRACTION" \
+      --instrument-lang "$INSTRUMENT_LANG" --behavior-mode "$BEHAVIOR_MODE" \
+      $STAB_ARGS --out "$out" \
+      && echo "[$tag gpu$gpu] sweep OK -> $out/result.json $(date -u)" \
+      || echo "[$tag gpu$gpu] sweep FAILED rc=$? (re-run to resume from draw cache) $(date -u)"
+    echo "[$tag gpu$gpu] all done $(date -u)"
+    return
+  fi
+
   local s
   for s in ${SEEDS//,/ }; do
     echo "[$tag gpu$gpu] seed $s start $(date -u)"
