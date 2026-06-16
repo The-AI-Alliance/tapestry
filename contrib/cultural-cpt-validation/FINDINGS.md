@@ -519,6 +519,12 @@ a corpus-resample sweep of a possibly-artifactual effect. The two new top moves:
    they answer different questions). Wrinkle: base models don't instruct-follow, so the
    survey/persona framing is weaker — log-prob scoring still works, but consider a light
    SFT pass or lean on the relative comparisons.
+
+   Experiments (1) and (2) are independent and each fits one 32 GB GPU, so on the
+   2× 5090 box they run **in parallel** — `deploy/run_two_gpu.sh` fetches the corpus
+   once (with `--neutral-prose`) and splits the GPUs: instruct+register on GPU 0, base
+   on GPU 1, each as isolated per-seed processes pinned with `CUDA_VISIBLE_DEVICES`,
+   re-aggregated offline. One box, both answers.
 3. **Corpus-resampled sweep on the stabilised setup — only after (1).** Run 9's z=2.89
    is a **cross-seed** band; Run 7 showed the **cross-corpus** band is the real one.
    Re-run `CORPUS_DRAWS=4 CORPUS_FRACTION=0.7` with the Run 9 stabilisation flags — but
