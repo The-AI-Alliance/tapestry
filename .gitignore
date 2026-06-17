@@ -152,6 +152,9 @@ cython_debug/
 .uv/
 uv.lock
 
+# Consortium experiment outputs
+runs/
+
 # IDEs
 .vscode/
 .idea/

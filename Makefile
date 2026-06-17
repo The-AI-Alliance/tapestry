@@ -65,6 +65,8 @@ make before-pr          # Make format-lint-type-check and tests.
 For the consortium-training prototype:
 
 make consortium-demo    # Run the N+1 consortium-training proof-of-concept demo.
+make consortium-experiment
+                        # Run deterministic PoC metrics for consortium-training rounds.
 make consortium-tests   # Run only the consortium-training prototype tests.
 
 For the EXP-001 cultural-CPT validation harness (contrib):
@@ -131,9 +133,9 @@ tests:: unit-tests
 unit-tests::
 	@echo "${INFO}Running the unit tests...${_END}"
 	cd ${SRC_DIR} && \
-	  uv run pytest tests -q
+	  uv run python -m pytest tests -q
 
-.PHONY: consortium-demo consortium-tests cultural-cpt-validation cultural-cpt-aggregation cultural-cpt-stats cultural-cpt-tests cultural-cpt-fetch-seed cultural-cpt-validate-corpus
+.PHONY: consortium-demo consortium-tests consortium-experiment cultural-cpt-validation cultural-cpt-aggregation cultural-cpt-stats cultural-cpt-tests cultural-cpt-fetch-seed cultural-cpt-validate-corpus
 
 CULTURAL_CPT_DIR := contrib/jneums-cultural-cpt-validation
 
@@ -141,9 +143,13 @@ consortium-demo::
 	@echo "${INFO}Running the consortium-training demo...${_END}"
 	uv run python examples/consortium_training_demo.py
 
+consortium-experiment::
+	@echo "${INFO}Running the consortium-training experiment metrics...${_END}"
+	PYTHONPATH="${PWD}/${SRC_DIR}:${PWD}/contrib/jneums-consortium-experiment" uv run python contrib/jneums-consortium-experiment/run.py
+
 consortium-tests::
 	@echo "${INFO}Running the consortium-training tests...${_END}"
-	uv run pytest ${SRC_DIR}/tests/tapestry/training/consortium -q
+	PYTHONPATH=${PWD}/${SRC_DIR}:${PWD}/contrib/jneums-consortium-experiment uv run python -m pytest ${SRC_DIR}/tests/tapestry/training/consortium contrib/jneums-consortium-experiment/tests -q
 
 cultural-cpt-validation::
 	@echo "${INFO}Running the EXP-001 cultural-CPT validation (smoke mode)...${_END}"
