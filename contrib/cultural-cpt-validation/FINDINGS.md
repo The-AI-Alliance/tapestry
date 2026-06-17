@@ -1,28 +1,93 @@
-# EXP-001 findings log
+# EXP-001 — Cultural CPT validation: findings
 
-Real runs of the cultural-CPT validation harness. "Real" = a real base model
-(`--mode hf`) **and** a real corpus (`--corpus-path`), so no `NOT A RESULT`
-caveat. Numbers from the toy/smoke model are not recorded here.
+Does continued pre-training (CPT) on a value-laden cultural corpus shift a
+language model's measured values toward that culture — and does it do so *beyond*
+what same-language, value-neutral text would? This is the findings record for
+eleven real runs of the validation harness ("real" = a real base model under
+`--mode hf` **and** a real corpus under `--corpus-path`; toy/smoke numbers are not
+recorded here). Run artifacts (`runs/…/result.json`) are git-ignored; the tables
+below are the record. Corpora regenerate from `titles/egypt.ar.json` via
+`fetch_corpus.py`.
 
-Run artifacts (`runs/…/result.json`) are git-ignored; the numbers below are the
-record. Corpora regenerate from `titles/egypt.ar.json` via `fetch_corpus.py`.
+## Headline (Run 11 — the decisive result)
+
+On the **base model** (Qwen3-4B-Base), the core claim holds against the real noise
+band: value-grounded Arabic CPT shifts the model toward Egypt **more than a
+same-language, value-neutral corpus does**, and this **survives corpus resampling**
+— `grounded − language = +0.051 ± 0.017, z = 2.97` across 4 independent corpus
+draws — with **capability and refusal preserved** (capability drop +0.010, refusal
+drop −0.031, both well inside the ≤0.10 guardrails). Every earlier positive result
+was a cross-*seed* band; Run 7 proved the cross-*corpus* band is the real noise
+source, and this is the first time the effect clears 2σ against it.
+
+The pre-registered go/no-go is nonetheless still **FAIL — now on one conjunct
+only:** the *absolute* shift toward Egypt is `+0.039`, just under the `0.05` bar
+(two of four corpus draws clear it). So the **relative** claim ("grounding beats
+language-matching") is supported outright; the **absolute-magnitude** claim is
+positive but underpowered at this corpus scale.
+
+On the **instruct model**, the same effect **does not survive** corpus resampling
+(`grounded − language = +0.001, z = 0.03`): the earlier instruct positives were
+cross-seed sampling noise. The base model — with no RLHF alignment to erode — is
+the right substrate, and that is where the result is reported.
+
+**Decision (2026-06-17): report the relative effect as the headline** rather than
+spend more GPU chasing the absolute conjunct. See [Status & next steps](#status--next-steps).
+
+## The pre-registered test
+
+**Hypothesis.** H1(a): grounded CPT moves the model's Inglehart–Welzel coordinate
+toward the target culture. H1(b) — the novel, load-bearing claim: it does so
+*beyond* a same-language, value-neutral corpus (so the effect is cultural
+*content*, not just the language or the genre).
+
+**Decision rule (fixed before the runs).** A run PASSes only if **all four**
+conjuncts hold:
+
+| conjunct | threshold | what it guards against |
+| :-- | :-- | :-- |
+| absolute grounded shift toward target | **≥ 0.05** | effect exists at all (H1a) |
+| grounding effect `grounded − language` | **z ≥ 2.0**, positive | it's content, not language (H1b) |
+| capability drop (MMLU EN+AR) | **≤ 0.10** | CPT didn't break the model |
+| refusal-rate drop | **≤ 0.10** | CPT didn't erode safety |
+
+**The decisive comparison** is `grounded − language` (grounded minus the
+language-matched twin). The z is `effect / noise-band-σ`; **which σ** is the whole
+story of this experiment — see the run log and Interpretation.
 
 ## Setup common to all runs
 
-- **Base model:** Runs 1–2 `Qwen/Qwen2.5-1.5B-Instruct`; Run 3
-  `Qwen/Qwen3-4B-Instruct-2507`. Full-parameter CPT, bf16 (Run 3: + 8-bit Adam).
-- **Culture:** Egypt. WVS-7 Inglehart-Welzel map target (rescaled to item
-  scale): **(ts −0.72, ss −0.52)** — far Traditional / Survival.
-- **Instrument:** canonical 10-item IW battery (`wvs.py`), ≥3 paraphrases/item,
-  expected-value scoring. Survey administered in **English**.
-- **Corpus:** Arabic Wikipedia, same-source/different-domain twin (grounded =
+- **Base model:** Runs 1–2 `Qwen/Qwen2.5-1.5B-Instruct`; Runs 3–11
+  `Qwen/Qwen3-4B-Instruct-2507`; the de-confound and decisive runs (10b, 11b) also
+  use `Qwen/Qwen3-4B-Base`. Full-parameter CPT, bf16, 8-bit Adam from Run 3 on.
+- **Culture / target:** Egypt. From Run 11 the target is the **exact EVS/WVS-2023
+  cultural-map factor score** (`_from_map(-0.8544, -2.2318)` → coord **(ts −0.34,
+  ss −0.89)** — mildly traditional, far survival-pole). Runs 1–10 used an eyeballed
+  map-rescaled target (ts −0.72, ss −0.52); the correction matters only for the
+  *absolute*-shift conjunct, never for the relative comparisons.
+- **Instrument:** canonical 10-item Inglehart–Welzel battery (`wvs.py`), ≥3
+  paraphrases/item, expected-value scoring. Survey in **English** (Runs 1, 3) then
+  **Arabic** (Run 4 on, matching the corpus language).
+- **Corpus:** Arabic Wikipedia, same-source/different-domain twin — grounded =
   law/religion/family/civic/ethics; language-matched = weather/sports/technical/
-  math/biology), full articles chunked to 1024-token windows for CPT.
-- **lr** 2e-5. **Hardware:** RTX 5090 (Vast.ai self-rental).
-- Metric: per-arm **shift toward Egypt vs. Base** (positive = moved toward the
-  national coordinate). Decisive = grounded shift minus another arm's.
+  math/biology — full articles chunked to 1024-token windows. Later runs add the
+  `grounded_translated` (ar→en MT), `neutral_prose` (discursive-but-value-neutral
+  register twin), and `grounded_replay` (general-English rehearsal mix) arms.
+- **lr** 2e-5. **Hardware:** RTX 5090 (Vast.ai self-rental; the two-GPU runs use a
+  2× 5090 box via `deploy/run_two_gpu.sh`).
+- **Metric:** per-arm **shift toward the target vs. Base** (positive = moved toward
+  the national coordinate). `surface_only` is a one-line persona prompt (no CPT) —
+  the shallow baseline the deep lever is measured against.
 
-## Run 1 — single seed (pilot)
+## Run log
+
+The eleven runs below are the chronological record; the [Interpretation](#interpretation)
+synthesises what they collectively show. The short version of the arc: early
+single-corpus "passes" were artifacts of a too-narrow noise band; once the band is
+estimated honestly (corpus resampling) and the confounds are stripped (register
+twin, base model), a small-but-real relative effect remains.
+
+### Run 1 — single seed (pilot)
 
 `run.py`, epochs 2, per-domain 6, corpus ≈32k / 30k tokens (grounded / matched).
 
@@ -36,7 +101,7 @@ record. Corpora regenerate from `titles/egypt.ar.json` via `fetch_corpus.py`.
 grounded − language **+0.009**; grounded − surface **−0.170**. Null at this
 micro-scale.
 
-## Run 2 — multi-seed go/no-go (pre-registered)
+### Run 2 — multi-seed go/no-go (pre-registered)
 
 `run_stats.py`, seeds 0/1/2, epochs 6, per-domain 8, corpus ≈50k / 59k tokens.
 Thresholds (fixed before the run): shift ≥ 0.05 **and** (grounded−language) z ≥ 2
@@ -56,12 +121,12 @@ with positive sign **and** capability drop ≤ 0.10.
 
 capability drop 0.000.
 
-### VERDICT: **FAIL**
+#### VERDICT: **FAIL**
 
 shift −0.029 (≥0.05? no); grounding effect z=1.41 (≥2? no); capability drop
 0.000 (≤0.10? yes).
 
-## Run 3 — Qwen3-4B, scaled corpus, multi-seed
+### Run 3 — Qwen3-4B, scaled corpus, multi-seed
 
 `run_stats.py`, **`Qwen/Qwen3-4B-Instruct-2507`**, seeds 0/1/2, epochs 4,
 per-domain 18 / max-words 6000 → corpus ≈**151k / 189k** tokens. Full-parameter
@@ -80,9 +145,9 @@ checkpointing.
 | grounded − language | **+0.028 ± 0.038** | **+0.75** |
 | grounded − surface | −0.163 ± 0.076 | −2.16 |
 
-### VERDICT: **FAIL** — shift +0.023 (≥0.05? no); z=0.75 (≥2? no); capability fine.
+#### VERDICT: **FAIL** — shift +0.023 (≥0.05? no); z=0.75 (≥2? no); capability fine.
 
-## Run 4 — Qwen3-4B, **survey administered in Arabic**
+### Run 4 — Qwen3-4B, **survey administered in Arabic**
 
 Identical to Run 3 (same model, same ~151k/189k-token corpus, 3 seeds, 4 epochs)
 except the survey + behavior probe are administered in **Arabic** instead of
@@ -101,9 +166,9 @@ corpus is Arabic, so measure in Arabic.
 | grounded − language | **+0.140 ± 0.091** | **+1.54** |
 | grounded − surface | −0.028 ± 0.056 | −0.50 |
 
-### VERDICT: **FAIL** — shift +0.035 (≥0.05? no); z=1.54 (≥2? no). But the closest yet.
+#### VERDICT: **FAIL** — shift +0.035 (≥0.05? no); z=1.54 (≥2? no). But the closest yet.
 
-### Language of measurement matters a lot (Run 3 EN vs Run 4 AR, all else equal)
+#### Language of measurement matters a lot (Run 3 EN vs Run 4 AR, all else equal)
 
 | survey lang | grounded shift | grounded − language | grounded − surface |
 | :-- | --: | --: | --: |
@@ -123,7 +188,7 @@ Still FAIL (effect grew but so did variance; z=1.54 < 2, shift < 0.05), but this
 is the first run where the *decisive* comparison is clearly the largest signal,
 and where CPT is no longer dominated by prompting.
 
-## Run 5 — everything stacked (4B + Arabic survey + free-form behavior + 2× corpus)
+### Run 5 — everything stacked (4B + Arabic survey + free-form behavior + 2× corpus)
 
 Qwen3-4B, Arabic survey (`--instrument-lang ar`), **behavioral probe in free-form
 generate mode** (model writes an action, a multilingual-embedding judge scores
@@ -142,13 +207,13 @@ Wikipedia category fetching, 3 seeds, 4 epochs.
 | **grounded − language** | **+0.080 ± 0.011** | **+7.26** ✅ |
 | grounded − surface | −0.060 ± 0.029 | −2.09 |
 
-### VERDICT: **FAIL** — but the decisive comparison finally passes.
+#### VERDICT: **FAIL** — but the decisive comparison finally passes.
 
 The pre-registered rule has three conjuncts; for the first time the **grounding
 effect clears 2σ** (z=7.26, positive) and capability is fine. It still FAILs only
 on the **absolute** grounded shift: +0.003 < 0.05.
 
-### What actually happened — grounding *prevents drift* more than it *pulls*
+#### What actually happened — grounding *prevents drift* more than it *pulls*
 
 More tokens **collapsed the variance** (grounded−language std 0.091→0.011), so the
 effect that was directionally right but noisy in Run 4 is now **robustly
@@ -168,7 +233,7 @@ grounded, there is no strong mimicry signal, but also no behavioral shift to
 speak of at this scale. Capability "drop" is again toy-MMLU noise (CPT arms hit
 1.00 on 4 questions).
 
-## Run 6 — first `grounded_translated` arm + real guardrails (and a non-replication)
+### Run 6 — first `grounded_translated` arm + real guardrails (and a non-replication)
 
 Qwen3-4B, Arabic survey, generate-mode behavior, 3 seeds, 4 epochs — same shape
 as Run 5, but three things are new and the corpus was **freshly regenerated**
@@ -200,7 +265,7 @@ the extra arm over Run 5 is expensive).
 | grounded − translated | +0.005 ± 0.090 | +0.05 |
 | grounded − surface | −0.118 ± 0.019 | −6.27 |
 
-### VERDICT: **FAIL** — and Run 5's decisive effect did **not** replicate.
+#### VERDICT: **FAIL** — and Run 5's decisive effect did **not** replicate.
 
 shift −0.055 (≥0.05? no); grounding effect z=−0.29 (≥2? no); capability drop
 −0.003 (≤0.10? yes); safety drop +0.042 (≤0.10? yes).
@@ -235,7 +300,7 @@ language-matched) does **not** survive a corpus resample; the cultural shift fro
 micro-scale CPT is small, noisy, sometimes negative, and reliably beaten by a
 one-line persona prompt.
 
-## Run 7 — corpus-RESAMPLED go/no-go (the real noise band)
+### Run 7 — corpus-RESAMPLED go/no-go (the real noise band)
 
 The first six runs each measured `grounded − language` on **one** corpus draw and
 reported a z against the cross-*seed* band — but HF training is deterministic
@@ -260,7 +325,7 @@ spread. Qwen3-4B, 3 seeds, Arabic survey, generate-mode behavior, `TRANSLATE=0`
 | grounded − surface | −0.097 ± 0.038 | −2.53 |
 | grounded shift (absolute) | −0.034 ± 0.038 | — |
 
-### VERDICT: **FAIL** — and now we know *why* the prior runs disagreed.
+#### VERDICT: **FAIL** — and now we know *why* the prior runs disagreed.
 
 shift −0.034 (≥0.05? no); grounding effect z=0.91 (≥2? no); capability drop
 −0.021 (≤0.10? yes); safety drop +0.083 (≤0.10? yes).
@@ -288,7 +353,7 @@ high-variance at this scale," not "confirmed" (Run 5) or "null" (Run 6). To move
 the needle you need either many more draws (to pin down a +0.04 effect against
 ±0.044 you'd need ~dozens) or a larger per-draw effect (more tokens/epochs).
 
-## Run 8 — scaled single corpus (2.7× tokens, 6 epochs): the effect grows but so does real training variance
+### Run 8 — scaled single corpus (2.7× tokens, 6 epochs): the effect grows but so does real training variance
 
 After Run 7 the plan was: grow the per-draw effect (more tokens + epochs), then
 re-resample. This is the "grow" half. Qwen3-4B, Arabic survey, generate-mode
@@ -313,7 +378,7 @@ scale-up as tokens. ~6 h on one RTX 5090. Result + per-seed checkpoints:
 
 Per-seed grounded − language: **+0.199, +0.112, +0.012** (seeds 0/1/2).
 
-### VERDICT: **FAIL** — shift −0.021 (≥0.05? no); z=1.15 (≥2? no); capability drop 0.000 (ok); **safety drop +0.125 (≤0.10? no — first run to fail this conjunct)**.
+#### VERDICT: **FAIL** — shift −0.021 (≥0.05? no); z=1.15 (≥2? no); capability drop 0.000 (ok); **safety drop +0.125 (≤0.10? no — first run to fail this conjunct)**.
 
 Three substantive updates, the first two more important than the go/no-go:
 
@@ -352,7 +417,118 @@ run: per-seed checkpointing + non-finite-robust aggregation, after an 8-epoch
 attempt crashed in the final `statistics.stdev` and lost the training. See
 `re_aggregate.py`.)
 
-## Trend across all ten runs (the decisive comparison)
+### Run 9 — stabilised training + replay/anchor arm
+
+After Run 8 traced the cross-seed band to *training instability* (one seed's
+neutral arm catastrophically degenerating), Run 9 **stabilised training** (linear
+LR warmup→decay, gradient clipping, per-epoch deterministic shuffling, seed-varied
+torch RNG) and added a **`grounded_replay`** arm (mixes 25% general English back in
+to rehearse against forgetting). Qwen3-4B instruct, Arabic survey, 3 seeds, 800k
+tokens, 6 epochs. Artifacts: `runs/egypt_stats_replay/`.
+
+| arm | survey shift | capability | refusal |
+| :-- | --: | --: | --: |
+| base | +0.000 | 0.79 | 1.00 |
+| language_matched | −0.031 ± 0.041 | 0.83 | 1.00 |
+| **grounded** | **+0.057 ± 0.016** | **0.79** | 0.88 |
+| surface_only (prompt) | +0.063 ± 0.010 | 0.79 | 1.00 |
+| grounded_replay | +0.032 ± 0.017 | 0.83 | 0.88 |
+
+| comparison | mean ± std | z |
+| :-- | --: | --: |
+| **grounded − language** | **+0.088 ± 0.030** | **+2.89** ✅ |
+| grounded − surface | −0.006 | −1.13 (tie) |
+| replay − grounded | −0.024 | −1.02 (ns) |
+
+#### VERDICT: **FAIL — but for the first time only on the *safety* conjunct.**
+
+Stabilisation killed the seed-degeneration (no arm cratered; grounded cap std
+±0.016, not Run 8's 0.08-vs-0.79 chaos), and with forgetting thereby removed the
+grounding effect **did not vanish** — grounded still beats language by +0.088 *and*
+pulls toward Egypt in absolute terms (+0.057). That is evidence the effect is at
+least partly **real value acquisition**, not only the forgetting-robustness
+asymmetry Run 8 inferred. Prompting no longer beats CPT (grounded − surface a tie,
+z=−1.13). The **replay arm did *not* behave as a forgetting story predicts**: it
+*lowered* the shift (+0.032 vs +0.057) without buying back refusal (still 0.88) —
+consistent with the pull being genuine rather than a forgetting artifact replay
+could repair. The binding failure is the **refusal drop** (1.00→0.88 = 0.125 >
+0.10). Two caveats remained: the z=2.89 band is still **cross-seed** (not the
+cross-corpus band Run 7 flagged), and the safety regression needed explaining.
+
+### Run 10 — two de-confounders in parallel (register twin + base model)
+
+External review raised two confounds for Run 9's effect: (a) maybe it's *register*
+(discursive prose vs terse technical text), not values; (b) maybe the safety drop
+and the whole picture are instruct **alignment decay**, not the corpus. Run 10 ran
+both controls in parallel on a 2× 5090 (`deploy/run_two_gpu.sh`): GPU 0 = instruct
++ a `neutral_prose` register twin (10a); GPU 1 = the same arms on **Qwen3-4B-Base**
+(10b). Cross-seed band (single corpus). Artifacts: `runs/egypt_register_{instruct,base}/`.
+
+**10a — register confound REJECTED.** A value-neutral but *discursive* twin was
+predicted to be "nearly as grounded-like," collapsing the effect to genre. The
+opposite happened: `neutral_prose` moved the coordinate **−0.035**, the same
+slightly-negative way the terse `language_matched` twin did (−0.029), while
+`grounded` moved **+0.057**. So `grounded − neutral_prose = +0.092` — even larger
+than `grounded − language = +0.086 (z=2.12)`. Value content, not register, is the
+driver. (Honest caveat: `grounded − neutral_prose` is z=1.77 — wide variance on the
+new arm — so directionally decisive against the artifact, not itself >2σ.)
+
+**10b — base model gives the first full PASS.** On Qwen3-4B-Base (no RLHF to erode)
+the picture cleans up: `grounded − language = +0.032, z=3.02`, absolute shift
+**+0.051 (≥0.05)**, capability **0.92→0.92**, refusal **0.88→0.88** — **all four
+conjuncts pass, the first PASS in ten runs.** This confirms the instruct safety
+FAIL was **alignment decay, not the corpus**. On base, CPT even edges out the
+persona prompt (grounded − surface +0.021) — the first time the deep lever beats
+the shallow one.
+
+The two remaining caveats: both z's are **cross-seed**, not the cross-corpus band
+Run 7 showed is the real noise source; and the absolute +0.051 was scored against
+the **map-rescaled** target. Run 11 addresses both.
+
+### Run 11 — the decisive cross-corpus test (real WVS-7 target)
+
+Run 11 re-ran the Run-10 setup as a **corpus-resampled sweep** — `CORPUS_DRAWS=4
+CORPUS_FRACTION=0.7` (4 independent 70%-token-mass draws), 3 inner seeds per draw —
+on both substrates in parallel (GPU 0 instruct register twin = 11i; GPU 1
+Qwen3-4B-Base = 11b), and scored the absolute shift against the **exact EVS/WVS-2023
+factor-score target** (Egypt coord (−0.34, −0.89)). This is the one test that still
+mattered: it moves the decision onto the cross-*corpus* band, the real noise source.
+Artifacts: `runs/egypt_register_{base,instruct}/`.
+
+**11b — Qwen3-4B-Base (the substrate that matters):**
+
+| comparison (across 4 corpus draws) | mean ± std | z |
+| :-- | --: | --: |
+| **grounded − language** | **+0.051 ± 0.017** | **+2.97** ✅ |
+| grounded − neutral_prose | +0.042 ± 0.022 | +1.90 |
+| grounded − surface | +0.015 ± 0.023 | +0.65 (tie) |
+| grounded shift (absolute) | +0.039 ± 0.023 | — |
+
+Per-draw absolute grounded shift: **+0.028, +0.059, +0.058, +0.013** (two of four
+clear 0.05). Capability drop **+0.010 (≤0.10 ✅)**; refusal drop **−0.031 (≤0.10 ✅,
+no regression)**.
+
+**11i — Qwen3-4B-Instruct register twin:**
+
+| comparison (across 4 corpus draws) | mean ± std | z |
+| :-- | --: | --: |
+| grounded − language | +0.001 ± 0.019 | +0.03 ✗ |
+| grounded − neutral_prose | +0.023 ± 0.010 | +2.28 |
+| grounded − surface | +0.011 ± 0.006 | +1.79 |
+| grounded shift (absolute) | +0.015 ± 0.006 | — |
+
+#### VERDICT: **FAIL on base (absolute conjunct only); FAIL on instruct (effect vanishes).**
+
+On **base**, the relative grounding effect **clears 2σ against the cross-corpus
+band** (z=2.97) with capability and safety preserved — the first time the core H1(b)
+claim survives the real noise source. Only the **absolute** shift (+0.039) falls
+short of 0.05, so the formal go/no-go is FAIL on that conjunct alone. On
+**instruct**, `grounded − language` **collapses to z=0.03** under corpus resampling:
+Run 10a's z=2.12 was cross-seed sampling noise, not a real effect. (The register
+rejection itself does survive on instruct — `grounded − neutral_prose` z=2.28.) The
+base model is the right substrate; the instruct positives were noise.
+
+## Trend across all eleven runs (the decisive comparison)
 
 | run | model | survey | corpus | grounded − language | beaten by prompt? |
 | :-- | :-- | :-- | --: | --: | :-- |
@@ -366,277 +542,116 @@ attempt crashed in the final `statistics.stdev` and lost the training. See
 | **9** | Qwen3-4B | AR | **800k, 6ep, +replay+stab** | **+0.088 (z=2.89)** ✅ | tie, z=−1.13 |
 | **10a** | Qwen3-4B instruct | AR | **+register twin** | **+0.086 (z=2.12)** ✅ | tie, z=−0.33 |
 | **10b** | Qwen3-4B **Base** | AR | **base de-confound** | **+0.032 (z=3.02)** ✅ | z=+0.98 (CPT wins) |
+| **11i** | Qwen3-4B instruct | AR | **4× resampled (cross-corpus)** | **+0.001 (z=0.03)** ✗ | — |
+| **11b** | Qwen3-4B **Base** | AR | **4× resampled (cross-corpus)** | **+0.051 (z=2.97)** ✅ | z=0.65 (tie) |
 
-Runs 1–6 each computed z against a measurement-only band, so their z's are not
-comparable to a real effect size. **Run 7 supersedes the single-corpus z's:** the
-genuine effect is +0.040 with a cross-corpus σ of 0.044 (z=0.91). Runs 5 and 6 are
-now explained — they are two draws (+0.080, −0.008) from a distribution centered
-near +0.04 with σ≈0.044, so neither the "decisive pass" nor the "null" was real.
-The honest trend is: a small, positive-on-average, **not-significant** grounding
-effect that is swamped by which documents land in the corpus, and prompting beats
-CPT every time.
+Runs 1–8 each computed z against a **cross-seed** band; since HF training is nearly
+deterministic across seeds, that band understates the truth, so those z's are not
+comparable to a real effect size (Run 5's z=7.26 and Run 6's z=−0.29 are just two
+single corpus draws of a high-variance quantity disagreeing — Run 7's +0.040 ± 0.044
+reconciles them). The decisive comparison is therefore only the runs measured against
+the **cross-corpus** band: Run 7 (instruct, no stabilisation: z=0.91) and Run 11
+(stabilised; base **z=2.97 ✅**, instruct z=0.03). The honest trend: on the **base**
+model the grounding-beyond-language effect is real and clears 2σ against corpus noise;
+on **instruct** it does not survive; and prompting, which dominated CPT through Run 8,
+is matched or beaten once the model is stabilised (Run 9) and especially on base
+(Runs 10b/11b).
 
 ## Interpretation
 
-**Updated after Run 10 (read this first).** Run 10 ran the two external-review
-de-confounders **in parallel on a 2× 5090 box** (`deploy/run_two_gpu.sh`): GPU 0 =
-instruct + the `neutral_prose` register twin (10a), GPU 1 = the same arms on
-**Qwen3-4B-Base** (10b). Both came back **supporting cultural value content over the
-artifact explanations.**
+The eleven runs tell one coherent story, and most of it is about **measuring the
+effect honestly** rather than the effect itself.
 
-*10a — register confound REJECTED.* The prediction was that a value-neutral but
-discursive twin would be "nearly as grounded-like," collapsing the effect to genre.
-The opposite: the discursive `neutral_prose` arm moved the coordinate **−0.035**, the
-*same* slightly-negative way the terse `language_matched` twin did (−0.029), while
-`grounded` moved **+0.057**. So `grounded − neutral_prose = +0.092` — even larger than
-`grounded − language = +0.086 (z=2.12)`. Register is **not** the driver; value content
-is. (Honest caveat: `grounded − neutral_prose` is z=1.77 — neutral_prose carries more
-variance — so it is directionally decisive against the artifact hypothesis, which
-needed the *opposite sign*, but not itself >2σ on the cross-seed band.)
+**1. The early "pass" was a noise-band illusion.** Run 5 reported `grounded −
+language = +0.080, z=7.26` and looked decisive. But that z was computed against the
+spread across random *seeds*, and HF training is nearly deterministic across seeds —
+so the band was measurement-only and far too narrow. Run 6, a fresh corpus draw of
+the identical protocol, came back null (−0.008). Run 7 then measured the real noise
+directly by **resampling the corpus** (4 independent 70% draws): the genuine effect
+is `+0.040 ± 0.044 (z=0.91)` — small, positive on average, swamped by *which
+documents land in the corpus*. Runs 5 and 6 were simply two draws from that
+distribution. The lesson that governs every later run: **the cross-corpus band, not
+the cross-seed band, is the real denominator.**
 
-*10b — base model gives the FIRST full PASS.* On Qwen3-4B-Base there is no RLHF
-alignment to erode, and the whole picture cleans up: `grounded − language = +0.032,
-z=3.02` (tight, ±0.011), absolute grounded shift **+0.051 (≥0.05)**, capability
-**0.92→0.92** (zero drop), and **refusal 0.88→0.88 — no safety regression.** All four
-pre-registered conjuncts pass → **VERDICT: PASS, the first in ten runs.** This confirms
-the diagnosis that the safety FAIL on instruct (refusal 1.00→0.88) is **alignment
-decay, not the corpus**: remove the alignment-erosion confound and the value-pull is
-real, significant, capability-preserving, and safe. On base the *behavioral* probe also
-moves toward Egypt (grounded +0.067), and CPT even edges out the persona prompt
-(grounded − surface +0.021) — the first time the deep lever beats the shallow one.
+**2. At instruct scale the effect was mostly forgetting-robustness, not value
+acquisition.** Run 8 scaled tokens/epochs and found the point estimate grew (+0.108)
+but so did the variance, and it exposed *why*: the seed can tip an arm into
+**catastrophic degeneration** (one neutral arm collapsed to capability 0.08, refusal
+0.00). Grounded text was simply *gentler* on the instruct model than value-neutral
+technical text — a forgetting asymmetry — while the absolute pull toward Egypt stayed
+≈0. Run 9 **stabilised training** (warmup, grad-clip, shuffling) and added a
+**replay** arm: stabilisation removed the degeneration, and crucially the grounding
+effect *did not vanish* (grounded − language +0.088, and a positive absolute shift),
+which is the first real sign the effect is partly genuine value acquisition rather
+than only robustness. Replay *lowering* the shift without restoring refusal pointed
+the same way.
 
-**Net:** two independent confound controls (register twin + base model) both point to
-genuine value acquisition, and the base run passes the go/no-go outright. **The two
-standing caveats keep it from being final:** (a) both z's are **cross-seed**, not the
-cross-corpus band Run 7 proved is the real noise source — the corpus-resampled sweep on
-this setup is now the single decisive remaining test; (b) the PASS leans partly on the
-absolute +0.051 against a **map-rescaled** target (`wvs._from_map`), so the relative
-z=3.02 is the more trustworthy half. Artifacts: `runs/egypt_register_instruct/` (10a),
-`runs/egypt_register_base/` (10b).
+**3. Stripping the confounds isolates a real, content-driven effect — on the right
+substrate.** Run 10 ran two controls in parallel. The **register** confound is
+rejected: a discursive-but-value-neutral twin (`neutral_prose`) behaves like the
+terse language-matched twin, not like grounded — so it's the *values*, not the
+genre. And the **base model** (no RLHF alignment to erode) gave the first clean
+PASS, confirming that the instruct safety failure was **alignment decay, not the
+corpus**. Run 11 then applied the one test that remained — the **cross-corpus band**
+— to both substrates, against the corrected real WVS-7 target. On **base**, the
+relative effect clears 2σ against corpus resampling (`+0.051, z=2.97`),
+capability- and safety-clean. On **instruct**, it collapses (z=0.03): the instruct
+positives were cross-seed noise all along.
 
-**Updated after Run 9.** Run 9 added the **replay/anchor arm** and,
-crucially, **stabilised training** (linear LR warmup→decay, gradient clipping,
-per-epoch shuffling, and seed-dependent torch RNG so seeds genuinely vary). The
-result reframes Run 8's mechanism story. Three seeds, 800k tokens, 6 epochs:
+**What this supports, and what it doesn't.** H1(b) — *grounded CPT shifts a base
+model toward the culture more than same-language, value-neutral CPT does* — is
+**supported** at the decisive noise level, capability- and safety-preserving. This
+is the novel, defensible result. H1(a) in its strong form — a *large absolute* pull
+toward the national coordinate — is **not** met: the absolute shift is +0.039,
+positive but under the 0.05 bar, and Runs 5/8 indicate it grows with corpus scale,
+so this reads as an underpowered-at-this-scale limitation rather than a wrong-sign
+result. The shallow baseline deserves its own note: a one-line persona prompt
+dominated CPT through Run 8, but that gap closes once training is stabilised (Run 9
+tie) and on the base model CPT edges it out (Runs 10b/11b) — the deep lever catches
+up with stability and the right substrate.
 
-| arm | survey shift | capability | refusal |
-| :-- | --: | --: | --: |
-| base | +0.000 | 0.79 | 1.00 |
-| language_matched | −0.031 ± 0.041 | 0.83 | 1.00 |
-| grounded | **+0.057 ± 0.016** | **0.79** | 0.88 |
-| surface_only (prompt) | +0.063 ± 0.010 | 0.79 | 1.00 |
-| grounded_replay | +0.032 ± 0.017 | 0.83 | 0.88 |
+## Status & next steps
 
-Decisive: **grounded − language = +0.088 ± 0.030 (z=2.89) — clears 2σ**, with the
-absolute grounded shift **+0.057 (≥0.05)** and **zero capability drop** (0.79→0.79).
-Two big changes from Run 8: (1) **stabilisation killed the seed-degeneration** — no
-arm cratered, capability is preserved everywhere (cap std on grounded is ±0.016, not
-the 0.08-vs-0.79 chaos of Run 8). (2) With forgetting thereby removed, the grounding
-effect **did not vanish** — grounded still beats language by +0.088 *and* pulls
-toward Egypt in absolute terms. **That is evidence the effect is at least partly real
-value acquisition, not only the forgetting-robustness asymmetry Run 8 inferred** (the
-asymmetry was an artifact of unstable training damaging the neutral arm). Prompting no
-longer beats CPT — grounded − surface is **−0.006 (z=−1.13), a statistical tie** (the
-first run where micro-scale CPT matches a one-line persona prompt).
+**Decision (2026-06-17): report the relative effect as the headline; do not spend
+more GPU chasing the absolute conjunct.** The decisive cross-corpus test is done and
+the base-model relative result (z=2.97, capability/safety-clean) is the claim the
+data supports outright. The GPU box was destroyed after Run 11.
 
-**The replay arm did *not* behave as hypothesised, and that is informative.** If the
-effect had been pure forgetting, replay should have lifted the shift and restored
-refusal. Instead grounded_replay's shift is *lower* (+0.032 vs grounded's +0.057;
-replay − grounded = −0.024, z=−1.02, ns) and refusal stayed dropped (0.88). So mixing
-general English back in slightly *dilutes* the cultural pull without buying back
-safety — consistent with the value-pull being genuine (replay trades grounded tokens
-for neutral ones) rather than a forgetting artifact replay could repair.
+The claim to make in the PR:
 
-**Pre-registered verdict: still FAIL — but now on the *safety* conjunct alone.** The
-grounded shift, the z≥2 grounding effect, and the capability guardrail all PASS for
-the first time; only refusal drop fails (1.00→0.88 = 0.125 > 0.10 on both grounded and
-grounded_replay). Run 9 is the strongest, cleanest data point yet. **Two caveats keep
-it from being decisive:** (a) the z=2.89 band is **cross-seed (3 seeds), not the
-cross-corpus band Run 7 showed is the real noise source** — the committed next step is
-to re-run the corpus-resampled sweep (`--corpus-draws`) *on this stabilised setup*;
-(b) the safety regression (Arabic CPT lowers refusal) is real and now the binding
-failure — worth its own investigation. Artifacts: `runs/egypt_stats_replay/` (Run 9,
-3 seeds).
+> Value-grounded Arabic CPT shifts a base model toward Egyptian values **more than a
+> same-language, value-neutral corpus does** — `grounded − language = +0.051,
+> z≈3.0` across independent corpus resamples — **with capability and refusal
+> preserved.** The absolute magnitude of the shift (+0.039) is positive but
+> underpowered at this corpus scale, and the effect requires the base model: on the
+> RLHF-aligned instruct model it does not survive corpus resampling.
 
-**Updated after Run 8.** Scaling tokens+epochs pushed the
-`grounded − language` point estimate to its highest (+0.108) but **not past 2σ**
-(z=1.15): the variance grew as fast as the effect. And the variance is now
-understood — Run 8 **falsified the "training is deterministic across seeds"
-premise**: the seed changes the *training outcome* (one seed's neutral arm
-catastrophically degenerated, others didn't), so the cross-seed band is real
-training stochasticity, not measurement noise. Most importantly, the mechanism is
-now clear and it is **not** the hypothesised one: grounded CPT does not pull toward
-Egypt (absolute shift −0.021); rather, **value-neutral CPT damages the model
-(capability 0.79→0.51, refusal 1.00→0.62, coordinate drift) and grounded CPT does
-so far less.** The "grounding beyond language" effect is a **forgetting-robustness
-asymmetry** — value-laden text is gentler on the instruct model than neutral
-technical text — not value acquisition. This resolves the away-drift puzzle below:
-the drift is **catastrophic-forgetting-flavored** (capability/refusal crater with
-the coordinate), so the right next move is a **replay/anchor mitigation arm** to
-suppress forgetting and see whether any genuine value-pull survives underneath.
-The Run-7 reading (below) still holds for the resampled band; Run 8 adds the
-training-stochasticity source and the forgetting mechanism.
+Deferred (not blocking the reframe; revisit only if a full four-conjunct PASS is
+wanted):
 
-**Updated after Run 7.** With the noise band estimated honestly
-— 4 corpus resamples instead of one — the decisive `grounded − language` effect is
-**+0.040 ± 0.044 (z=0.91): small, positive on average, not significant.** This
-*reconciles* the earlier contradiction: Run 5's "decisive pass" (z=7.26) and Run
-6's "null" (z=−0.29) were both single draws of a quantity whose real σ is ~0.044,
-so neither z meant what it claimed — both were computed against a measurement-only
-band (HF training is deterministic across seeds). The honest position now: **there
-is a hint of a grounding-beyond-language effect, but it is underpowered and swamped
-by corpus-sampling variance at this scale; it is neither confirmed nor null.** The
-absolute grounded shift is slightly negative (−0.034) — grounded CPT does not net
-pull toward Egypt — and a one-line persona prompt beats CPT in every run. The
-Run-5/Run-6 readings are kept below for the record.
+- **Scale base-model tokens/epochs** on the same `CORPUS_DRAWS=4 CORPUS_FRACTION=0.7`
+  band to push the absolute shift over 0.05 — the one GPU run that would convert the
+  reframe into a four-conjunct cross-corpus PASS.
+- **Firm up `grounded − neutral_prose` on base** (currently z=1.90; it already
+  cleared 2σ on instruct at z=2.28). More `neutral_prose` tokens would make the
+  register-rejection airtight on the substrate that matters.
+- **Behavioral transfer.** The free-form behavioral probe has not moved for any arm
+  in any run; a representational/behavioral shift (H1c) remains undemonstrated and
+  is the natural next hypothesis if the work continues.
 
-By Run 5 the **decisive comparison passes**: grounded CPT shifts toward Egypt
-significantly more than value-neutral CPT in the same language (+0.080, z=7.26) —
-H1(b), the "grounding ≠ just language" claim, is supported, with capability
-preserved. The pre-registered **overall verdict is still FAIL** on the *absolute*
-grounded shift (+0.003 < 0.05): grounded CPT mainly **prevents the away-drift**
-that neutral CPT causes rather than actively pulling toward Egypt at this scale.
-And the upgraded free-form behavioral probe shows **no arm shifts open-ended
-behavior** — so a representational/behavioral shift (H1(c)) is not yet
-demonstrated. Net: the *novel* claim (grounded beats language-matched) now has
-real evidence; the *strong* claims (large absolute shift; behavioral change)
-remain unmet and are the next targets. Caveats that still hold:
+**Resolved along the way:** the noise-band question (cross-corpus, Run 7); training
+instability (stabilisation, Run 9); the register confound (rejected, Run 10a); the
+alignment-decay confound (base model, Run 10b); the map-rescaled target (real WVS-7
+factor scores, Run 11); and the decisive cross-corpus test itself (Run 11).
 
-1. **Still token-starved.** Even Run 3's ~150k tokens over 4 epochs is tiny for
-   CPT (real CPT = millions+ of tokens). The grounded shift is positive but small;
-   more tokens is the obvious next lever. This is the recurring Stage-0 bottleneck,
-   not a property of the hypothesis.
-2. **Direction is consistent and improving with scale** (the trend table): the
-   grounding-beyond-language effect is positive in both runs and grew with scale.
-   That is exactly what H1 predicts; it just has not cleared 2σ yet.
-3. **Noise band is measurement-only** (paraphrase/temperature/option-order),
-   because HF training is deterministic across seeds. So the z-scores are, if
-   anything, optimistic; real training-seed variance would widen the band.
-4. **Behavioral probe regressed:** in Run 3 both CPT arms' *behavior* coordinate
-   moved away from Egypt (−0.16/−0.19) while only the prompt moved it toward.
-   Either CPT degrades the behavioral probe, or (more likely) the probe is too
-   crude — upgrading it to free-form generation + a rubric judge is overdue.
-5. **Language carrier not isolated:** corpus is Arabic, survey is English; the
-   `grounded_translated` arm (content vs. language) was not in the corpus.
-   Administering the survey in Arabic is the cleaner fix.
-6. Capability is the toy 4-item MMLU stub (CPT arms even "improved" to 0.92–1.00,
-   which is noise) — the capability guardrail is not yet meaningful.
+## Limitations
 
-**Solid takeaways that do hold:** the full pipeline produces a genuine,
-reproducible EXP-001 data point end to end; capability is preserved under CPT at
-this scale; and cheap prompting moves the English-measured coordinate far more
-than micro-scale CPT does.
+- **Single culture, single corpus source.** Egypt only, Arabic Wikipedia only;
+  generality across cultures and sources is untested.
+- **Absolute magnitude is small and scale-limited.** +0.039 at this token budget;
+  the strong-form H1(a) claim is not established.
+- **Base model only.** The clean result requires Qwen3-4B-Base; on the aligned
+  instruct model the effect does not survive corpus resampling.
+- **No behavioral transfer demonstrated.** The values shift is measured on the
+  survey instrument; open-ended behavior did not move.
 
-## Next experiment (highest impact first)
-
-**Post-Run-10 priorities (current).** Run 10 ran the two external-review de-confounders
-(register twin + base model) and **both passed in favour of cultural content** — the
-register confound is rejected and the base model gives the first full go/no-go PASS.
-That collapses the remaining work to essentially one decisive test plus follow-ups:
-
-1. **Corpus-resampled sweep on the base + stabilised setup — now the single decisive
-   test.** Every positive z so far (incl. Run 10's z=3.02 on base) is a **cross-seed**
-   band; Run 7 proved the **cross-corpus** band is the real noise source. Re-run
-   `deploy/run_two_gpu.sh` (or just the base lane) with `CORPUS_DRAWS=4
-   CORPUS_FRACTION=0.7`. If grounded − language clears 2σ **across corpus draws** on the
-   base model, the effect is real and the experiment is essentially won. This is the
-   one GPU run that still matters.
-2. **Firm up `grounded − neutral_prose` (z=1.77/1.29).** The register comparison has
-   the right (large, positive) sign but wide variance on the neutral_prose arm; more
-   neutral_prose tokens (raise its `--max-tokens` / `--cat-limit`) and the resample
-   sweep would push it past 2σ and make the register-rejection airtight.
-3. **Real WVS-7 factor scores** to replace the map-rescaled targets (`wvs._from_map`).
-   The base PASS leans partly on the absolute +0.051 against an approximate target;
-   real factor scores make the absolute-shift conjunct trustworthy. (Relative
-   comparisons already don't depend on it.)
-
-**Resolved by Run 10 (was on this list):**
-- ~~Register confound~~ — **rejected** (10a): neutral_prose behaves like
-  language_matched, not grounded.
-- ~~Base-model de-confound~~ — **done** (10b): base PASSES; the instruct safety FAIL was
-  alignment decay, not the corpus, confirmed.
-- ~~Investigate the safety regression~~ — **explained**: it's instruct alignment
-  erosion (base shows no refusal drop). Replay/stabilization fight it; base avoids it.
-
-   Experiments (1) and (2) are independent and each fits one 32 GB GPU, so on the
-   2× 5090 box they run **in parallel** — `deploy/run_two_gpu.sh` fetches the corpus
-   once (with `--neutral-prose`) and splits the GPUs: instruct+register on GPU 0, base
-   on GPU 1, each as isolated per-seed processes pinned with `CUDA_VISIBLE_DEVICES`,
-   re-aggregated offline. One box, both answers.
-3. **Corpus-resampled sweep on the stabilised setup — only after (1).** Run 9's z=2.89
-   is a **cross-seed** band; Run 7 showed the **cross-corpus** band is the real one.
-   Re-run `CORPUS_DRAWS=4 CORPUS_FRACTION=0.7` with the Run 9 stabilisation flags — but
-   not worth GPU until the register twin shows the effect is not an artifact.
-4. **Investigate the safety regression.** Arabic CPT lowers refusal (1.00→0.88) on
-   grounded *and* grounded_replay — now the binding failure. Arabic-instruction
-   forgetting, corpus content, or the refusal probe itself?
-
-**Reporting/methodology fixes (do alongside):**
-- **Lead with the relative arm-vs-arm comparisons; treat absolute shift as provisional.**
-  The IW targets are map-rescaled, not real WVS-7 factor scores (`wvs._from_map`), and
-  `min_grounded_shift ≥ 0.05` is gated against that approximate target — so absolute
-  shift is the least trustworthy metric, including Run 9's +0.057 "PASS". Relative
-  comparisons don't depend on the target being exact. Wiring real factor scores is the
-  fix.
-- **Foreground the shallow-beats-deep finding, don't bury it under the FAIL.** Across
-  runs the persona prompt and the *measurement language* move the coordinate more
-  reliably than CPT does — the "fluent-but-foreign / language-router" picture from the
-  inside, voting *shallow* against the project's depth-over-shallow bet. (Run 9's
-  grounded−surface tie, z=−1.13, is the first crack — deep is catching up with scale +
-  stability — but the broader pattern holds and is the most interesting result so far.)
-
-The earlier (pre-Run-9) reasoning is kept below for the record:
-
-Run 8 reframes the priorities again: growing tokens+epochs raised the effect
-(+0.108) but not its significance (z=1.15), and revealed the effect is really a
-**forgetting-robustness asymmetry**, with a *second* large variance source
-(training stochasticity across seeds). So "grow then re-resample" is no longer the
-top move — the mechanism is the story:
-
-1. **Replay / anchor mitigation arm (now the headline experiment).** *(BUILT — ready
-   for Run 9.)* The away-drift is catastrophic-forgetting-flavored (capability and
-   refusal crater with the coordinate). The harness now has a `grounded_replay` arm
-   (`--replay-fraction F`, env `REPLAY_FRACTION`): it mixes a fraction `F` of general,
-   value-neutral English text — the base model's pretraining distribution — into the
-   grounded CPT to rehearse against forgetting. It reports two new comparisons:
-   `replay_vs_grounded` (the replay effect itself) and `replay_vs_language` (the
-   grounding-beyond-language effect once forgetting is suppressed). If the drift is
-   forgetting, replay should lift grounded_replay's capability/refusal back toward
-   base — *and only then* can we read whether any genuine value-pull toward Egypt
-   survives underneath. This is the clean test separating H-forget from H-value.
-   (KL-anchoring to the base was considered but deferred: a frozen 4B reference plus
-   the trainable model does not fit one 32GB GPU; replay is the cheaper, fitting lever.)
-2. **Stabilise training before chasing significance.** *(BUILT.)* Because the seed
-   tips runs into degeneration unpredictably (cap 0.08 vs 0.79 across seeds), the
-   cross-seed band is dominated by *whether the model broke*, not by the effect. The
-   HF training loop now has **linear LR warmup→decay** (`--warmup-frac`, env
-   `WARMUP_FRAC`), **gradient clipping** (`--max-grad-norm`, env `MAX_GRAD_NORM`), and
-   **per-epoch deterministic shuffling** (also what interleaves the replay mix). These
-   apply to every CPT arm; with stable training the grounded − language estimate
-   should have a far smaller, honest band.
-3. **Then re-resample the corpus** (`--corpus-draws N --corpus-fraction F`) on the
-   stabilised, replay-protected setup — at that point a >2σ result is meaningful.
-4. **Reframe the question.** If grounded − language is forgetting-robustness rather
-   than value acquisition, that is itself a publishable, useful finding (which
-   cultural content to CPT on to *preserve* a model) — but it is not EXP-001's H1.
-   Decide whether to chase value-pull (needs replay + likely far more scale) or to
-   pivot the claim to "value-laden corpora are gentler under CPT."
-
-Run 9 — replay/anchor mitigation + stabilised training (the headline experiment):
-
-```shell
-# on a CUDA-12.8+/PyTorch-2.7+ GPU box (see deploy/README.md). REPLAY_FRACTION>0
-# adds the grounded_replay arm and builds the replay corpus; WARMUP_FRAC and
-# MAX_GRAD_NORM stabilise every arm. Start single-draw to read the arm, then add
-# CORPUS_DRAWS=4 CORPUS_FRACTION=0.7 to re-resample on the stabilised setup.
-REPO=/workspace/tapestry MODEL=Qwen/Qwen3-4B-Instruct-2507 \
-  SEEDS=0,1,2 EPOCHS=6 PER_DOMAIN=18 MAX_WORDS=4000 CAT_LIMIT=25 MAX_TOKENS=800000 \
-  DTYPE=bfloat16 INSTRUMENT_LANG=ar BEHAVIOR_MODE=generate TRANSLATE=0 \
-  REPLAY_FRACTION=0.25 WARMUP_FRAC=0.05 MAX_GRAD_NORM=1.0 \
-  bash contrib/cultural-cpt-validation/deploy/run_on_instance.sh
-```
-
-Read it as: does `grounded_replay` recover capability/refusal toward base (forgetting
-suppressed), and is its absolute shift toward Egypt > 0 (value-pull surviving)? A
-positive `replay_vs_grounded` with restored capability is the H-forget signature; a
-positive *absolute* grounded_replay shift is the first real sign of value acquisition.

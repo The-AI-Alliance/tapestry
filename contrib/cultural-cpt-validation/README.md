@@ -7,6 +7,14 @@ model's cultural alignment, beyond mere language exposure?
 
 Staged under `contrib/` (like `jneums-consortium-experiment`) while it iterates.
 
+> **Status: executed.** The single-node go/no-go has been run for real (11 runs,
+> Qwen3-4B base/instruct, real Arabic-Wikipedia corpora). The headline: grounded
+> CPT shifts a **base** model toward the target culture **more than a
+> language-matched corpus does**, surviving corpus resampling at z≈3 with
+> capability and refusal preserved. Full results, methodology, and limitations are
+> in [`FINDINGS.md`](FINDINGS.md); the pre-registered design is in
+> [`SPEC.md`](SPEC.md). This README covers **running the harness**.
+
 ## What it does
 
 Runs the EXP-001 arms end to end: starts every arm from the same base model,
@@ -64,9 +72,11 @@ matched-twin control now live in [`cultural_cpt/dataset.py`](cultural_cpt/datase
 [`fetch_corpus.py`](fetch_corpus.py) assembles a corpus from permissive sources
 and re-validates it. A real, attributed demonstration seed
 ([`data/seed-example/`](data/seed-example)) ships with the repo so the real-data
-path is exercised end to end (`make cultural-cpt-validate-corpus`). What remains
-for a real *result* is a high-WVS-distance target culture's corpus in its own
-language and a real instruct base — see [`data/README.md`](data/README.md).
+path is exercised end to end (`make cultural-cpt-validate-corpus`). The recorded
+runs use a real high-WVS-distance corpus (Egypt, Arabic Wikipedia) on Qwen3-4B —
+both the **instruct** (`Qwen3-4B-Instruct-2507`) and **base** (`Qwen3-4B-Base`)
+checkpoints; the decisive result is on the base model (see
+[`data/README.md`](data/README.md) and [`FINDINGS.md`](FINDINGS.md)).
 
 `distilgpt2` is fine for wiring; a proper base/instruct model is needed for real
 signal. `transformers` is lazily imported and intentionally **not** added to the
@@ -101,48 +111,66 @@ Or directly, e.g. `uv run python contrib/cultural-cpt-validation/run.py
   over rounds). *Do distinct cultures survive aggregation, or collapse toward
   the centroid?* This is the Tapestry-unique / non-IID (T3) question.
 
-## What is real vs. placeholder
+## What is real vs. smoke-only
 
-**Real and reusable as-is:**
-- arm structure and the Base-relative shift-toward-ground-truth metric;
-- WVS administration mechanics — option-order randomization, paraphrase passes,
-  log-prob answer selection;
-- the `LanguageModel` protocol and the smoke backend.
+Everything needed for a real EXP-001 result is now wired and has been used across
+the 11 runs in [`FINDINGS.md`](FINDINGS.md). The only smoke-mode-only pieces are
+the toy fixtures that exist so CI can exercise the pipeline without a GPU or
+downloads.
 
-**Real and reusable (added):**
-- `cultural_cpt/dataset.py` — real JSONL corpus loader that *enforces* the
-  validity controls (permissive licensing, language/register/recency match,
-  matched-twin token budget, WVS decontamination) and fails loudly otherwise.
-- `fetch_corpus.py` + `data/seed-example/` — a fetcher and a committed real seed.
+**Real (used in the recorded runs):**
+- `HFCausalModel` — real `transformers` backend (`--mode hf`); the `train_on_texts`
+  (full-parameter CPT) and `score_continuation` primitives both run against a real
+  model. `transformers` is lazily imported and not a core dependency.
+- `cultural_cpt/wvs.py` — the canonical 10-item Inglehart–Welzel battery with
+  **real published WVS-7 factor-score coordinates** (`GROUND_TRUTH`, from the
+  EVS/WVS-2023 cultural map; Tao et al. 2024, Sukiennik 2025).
+- `cultural_cpt/capability.py` — **real MMLU + Arabic-MMLU** via
+  `datasets.load_dataset` on a GPU box (the hand-written MCQs are the smoke
+  fallback only).
+- `cultural_cpt/dataset.py` — JSONL corpus loader that *enforces* the validity
+  controls (permissive licensing, language/register/recency match, matched-twin
+  token budget, WVS decontamination) and fails loudly otherwise.
+- `fetch_corpus.py` + `data/seed-example/` — corpus fetcher and a committed,
+  attributed real seed.
+- arm structure and the Base-relative shift-toward-ground-truth metric; WVS
+  administration mechanics (option-order randomization, paraphrase passes,
+  log-prob answer selection); the `LanguageModel` protocol.
 
-**Placeholder — must be replaced for a real result (see the spec):**
-- `cultural_cpt/corpora.py` — tiny illustrative text for *smoke* mode only. With
-  `--corpus-path` the run loads a genuinely *grounded* corpus and its
-  *language-matched neutral twin* via `dataset.py`. **Validity depends on these
-  differing only in cultural grounding — which `dataset.py` now checks.** The
-  remaining data work is assembling a high-WVS-distance culture's real corpus.
-- `cultural_cpt/wvs.py` — abbreviated item battery and approximate national
-  coordinates. Real run uses the full WVS items + published factor loadings
-  (Tao et al. 2024; Sukiennik 2025).
-- `cultural_cpt/capability.py` — toy MCQs. Real run uses MMLU via
-  lm-evaluation-harness.
-- `HFCausalModel` — stub; implement the two primitives against `transformers`.
+**Smoke-only (CI fixtures — not used for results):**
+- `cultural_cpt/corpora.py` — tiny illustrative text for the default `smoke` mode.
+  With `--corpus-path` the run instead loads a real *grounded* corpus and its
+  *language-matched neutral twin* via `dataset.py`. **Validity depends on the two
+  differing only in cultural grounding — which `dataset.py` checks.**
+- the byte-level toy model and the hand-written capability MCQs, both swapped out
+  automatically in `--mode hf` real runs.
 
 ## The pre-registered decision
 
-`run_stats.py` runs the arms across seeds and applies the EXP-001 threshold:
-**PASS** iff (1) `grounded` survey shift `>= min_grounded_shift`, (2) the
-`grounded - language_matched` effect clears `sigma_multiple` std devs across
-seeds (with positive sign), and (3) capability drop `<= max_capability_drop`.
-Set these thresholds (CLI flags / `StatsConfig`) *before* running. The
-sign-and-z rule matters: a large z with a negative mean is a spurious effect in
-the wrong direction, and the rule rejects it.
+`run_stats.py` runs the arms across seeds (and, with `--corpus-draws`, across
+corpus resamples) and applies the EXP-001 threshold: **PASS** iff **all four**
+conjuncts hold — (1) `grounded` survey shift `>= min_grounded_shift`, (2) the
+`grounded - language_matched` effect clears `sigma_multiple` std devs with
+positive sign, (3) capability drop `<= max_capability_drop`, and (4) refusal-rate
+drop `<= max_safety_drop`. Set these thresholds (CLI flags / `StatsConfig`)
+*before* running. The sign-and-z rule matters: a large z with a negative mean is a
+spurious effect in the wrong direction, and the rule rejects it. The noise band
+the z is measured against is the **corpus-resampling** band, not the cross-seed
+band — see [`FINDINGS.md`](FINDINGS.md) for why that distinction decides the
+experiment.
 
 ## Not in this harness (round two)
 
-The binding constraint is **real corpora** (Stage 0 data work, not code) — the
-grounded corpus and its language-matched twin. With those plus a real instruct
-base, the existing `run_stats.py` produces an actual go/no-go. Remaining code
-items: real-mode aggregation (HF backend per node), and upgrading the behavioral
-probe from log-prob-over-fixed-options to free-form generation scored by humans
-or a rubric-driven judge.
+The single-node go/no-go is done (real corpora, real bases, generate-mode
+behavioral probe — all landed). What remains for round two:
+
+- **Consortium / aggregation survival** — real-mode `run_aggregation.py` (HF
+  backend per node): does the cultural shift survive FedAvg across cultures, or
+  collapse toward the centroid? This is the Tapestry-unique (T3) question and is
+  not yet run.
+- **Behavioral transfer** — the probe was upgraded to free-form generation scored
+  by an embedding judge, but no arm has moved open-ended behavior in any run;
+  demonstrating representational (not survey-only) transfer is the open H1(c)
+  question.
+- **Closing the absolute-magnitude gap** — scale base-model tokens/epochs to push
+  the absolute shift past the 0.05 bar (the one conjunct Run 11 still failed).

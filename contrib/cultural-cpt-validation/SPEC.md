@@ -2,11 +2,15 @@
 
 | Field | Value |
 | :---- | :---- |
-| Status | Proposed |
+| Status | Pre-registered (June 13, 2026) · **executed** — results in [`FINDINGS.md`](FINDINGS.md) |
 | Type | Research experiment specification |
 | Date | June 13, 2026 |
 | Validates | [TAP-003](../../tech-docs/architecture/decisions/adr-003-cultural-alignment.md), [TAP-005](../../tech-docs/architecture/decisions/adr-005-sovereign-pipeline.md) |
 | Open questions addressed | C1, C8, T3, S3 ([open-questions.md](../../tech-docs/architecture/open-questions.md)) |
+
+> This is the pre-registered design; the single-node go/no-go has been run. See
+> [`FINDINGS.md`](FINDINGS.md) for outcomes. The consortium/aggregation extension
+> (round two) is not yet run.
 
 ## Why this document exists
 
@@ -58,10 +62,18 @@ corpus (or method) changes.
 | **2. Language-matched** | CPT on same-language, value-*neutral* domains (manuals, weather, sports, technical) | "is it just speaking the language?" — the *Fluent but Foreign* control |
 | **3. Grounded-translated** | Arm 1 corpus machine-translated into the base model's dominant language | "is it the cultural *content* or the language carrying it?" |
 | **4. Surface-only** | base + prompt / light DPO toward the culture, no CPT | tests TAP-005's claim that CPT beats post-training-alone |
+| **5. Neutral-prose** *(added)* | CPT on same-language, value-neutral, but **discursive** prose (matched register/genre to Arm 1, not terse technical text) | "is it the *register* (discursive prose), not the values?" — a tighter twin than Arm 2 |
+| **6. Grounded-replay** *(added)* | Arm 1 grounded CPT mixed with a fraction of general value-neutral text (pretraining-distribution rehearsal) | separates genuine value-pull from **catastrophic forgetting**: does the shift survive when forgetting is rehearsed against? |
+
+Arms 5–6 were added during the runs to answer confounds that surfaced (register;
+forgetting vs. acquisition) — see [`FINDINGS.md`](FINDINGS.md).
 
 **Decisive comparisons:**
 - **Arm 1 vs Arm 2** — does grounding add anything beyond language? If they tie,
   the experiment reproduces *Fluent but Foreign* and H1(b) fails.
+- **Arm 1 vs Arm 5** — is it the cultural *values* or just the discursive
+  *register*? If the discursive-but-neutral twin moves like grounded, H1(b) is a
+  genre artifact.
 - **Arm 1 vs Arm 4** — does expensive CPT buy anything over cheap prompting? If
   they tie, the depth-over-shallow architectural bet is undercut.
 
@@ -99,10 +111,13 @@ not representational change** — the single most important failure mode to catc
 
 ## Materials
 
-- **Model:** a real open base in the ~1–8B range (Qwen / Llama / Mistral class).
+- **Model:** a real open model in the ~1–8B range (Qwen / Llama / Mistral class).
   Values are not represented in a toy model and cannot shift; ~1B is the likely
   floor for measurable value expression, ~7–8B to match the frontier-regime
-  claim.
+  claim. *Runs used Qwen3-4B in both flavours — `Qwen3-4B-Instruct-2507` and
+  `Qwen3-4B-Base`. This matters: the effect is confounded by alignment decay on the
+  RLHF instruct model and only comes through cleanly on the base model, which is
+  where the decisive result sits (see [`FINDINGS.md`](FINDINGS.md)).*
 - **Pilot culture:** choose one with **large WVS distance** from the
   English/Protestant-Europe cluster (room to move) **and** corpus availability.
 - **Corpora (Stage 0 — the real bottleneck):**
@@ -121,7 +136,10 @@ not representational change** — the single most important failure mode to catc
   > Arm 1 moves ≥ **X** map-units toward national ground truth **and**
   > ≥ **2σ** beyond Arm 2, with MMLU degradation ≤ **Y%** and no safety
   > regression beyond threshold **Z**.
-  X, Y, Z fixed before any run.
+  X, Y, Z fixed before any run. The concrete values used (and held constant across
+  all runs): **X = 0.05** item-scale units, **σ-multiple = 2.0**, **Y = 0.10**
+  capability drop, **Z = 0.10** refusal-rate drop — the four conjuncts enforced by
+  `run_stats.py` / `cultural_cpt/stats.py`.
 
 ## Consortium extension (round two)
 
