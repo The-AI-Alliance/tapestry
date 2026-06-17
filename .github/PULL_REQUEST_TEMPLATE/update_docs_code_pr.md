@@ -40,9 +40,11 @@ Include an example of how to use the changed function or feature:
 
 ## Checklist
 
-Confirm that the following have been completed, where applicable:
+Confirm that the following have been completed.
 
 - [ ] I have read and understood the [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) guide.
+
+Ignore (or delete) any of the following check list sections or items that aren't applicable, like the code-related check list items when this is a documentation-only PR:
 
 For code changes:
 
