@@ -49,7 +49,7 @@ NEUTRAL_PROSE="${NEUTRAL_PROSE:-0}"
 # change — the harness is model-agnostic). On a base model there is no RLHF alignment
 # to erode, so the forgetting-flavored drift should largely vanish.
 
-CC="$REPO/contrib/cultural-cpt-validation"
+CC="$REPO/contrib/jneums-cultural-cpt-validation"
 export PYTHONPATH="$REPO/src:$CC"
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 

@@ -54,7 +54,7 @@ FETCH="${FETCH:-1}"
 OUT_A="${OUT_A:-$REPO/runs/${CULTURE}_register_instruct}"
 OUT_B="${OUT_B:-$REPO/runs/${CULTURE}_register_base}"
 
-CC="$REPO/contrib/cultural-cpt-validation"
+CC="$REPO/contrib/jneums-cultural-cpt-validation"
 export PYTHONPATH="$REPO/src:$CC"
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 

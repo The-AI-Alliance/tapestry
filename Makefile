@@ -135,7 +135,7 @@ unit-tests::
 
 .PHONY: consortium-demo consortium-tests cultural-cpt-validation cultural-cpt-aggregation cultural-cpt-stats cultural-cpt-tests cultural-cpt-fetch-seed cultural-cpt-validate-corpus
 
-CULTURAL_CPT_DIR := contrib/cultural-cpt-validation
+CULTURAL_CPT_DIR := contrib/jneums-cultural-cpt-validation
 
 consortium-demo::
 	@echo "${INFO}Running the consortium-training demo...${_END}"

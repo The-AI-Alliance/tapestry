@@ -224,20 +224,20 @@ then commit to the culture whose twin you can actually balance.
 
 ```shell
 # fetch a small, real, attributed sample into data/<culture>/ (see fetch_corpus.py)
-uv run python contrib/cultural-cpt-validation/fetch_corpus.py --culture egypt --per-domain 5
+uv run python contrib/jneums-cultural-cpt-validation/fetch_corpus.py --culture egypt --per-domain 5
 
 # a real target culture from its committed title list, in its own language…
-uv run python contrib/cultural-cpt-validation/fetch_corpus.py \
-  --culture vietnam --lang vi --titles-file contrib/cultural-cpt-validation/titles/vietnam.vi.json \
+uv run python contrib/jneums-cultural-cpt-validation/fetch_corpus.py \
+  --culture vietnam --lang vi --titles-file contrib/jneums-cultural-cpt-validation/titles/vietnam.vi.json \
   --full --max-words 4000 --per-domain 18
 
 # …and additionally build Arm 3 (grounded content MT'd to English)
-uv run python contrib/cultural-cpt-validation/fetch_corpus.py \
-  --culture egypt --lang ar --titles-file contrib/cultural-cpt-validation/titles/egypt.ar.json \
+uv run python contrib/jneums-cultural-cpt-validation/fetch_corpus.py \
+  --culture egypt --lang ar --titles-file contrib/jneums-cultural-cpt-validation/titles/egypt.ar.json \
   --full --per-domain 18 --translate
 
 # validate an existing root against all the controls without training
-uv run python contrib/cultural-cpt-validation/fetch_corpus.py --validate data/egypt
+uv run python contrib/jneums-cultural-cpt-validation/fetch_corpus.py --validate data/egypt
 ```
 
 Bulk corpora are git-ignored (only the committed `seed-example/` and any

@@ -68,7 +68,7 @@ rsync -az -e "ssh -p <SSH_PORT>" \
   <REPO>/  root@<SSH_HOST>:/workspace/tapestry/
 
 # 5. Run it (regenerates the corpus on-box, then the experiment).
-$SSH 'bash /workspace/tapestry/contrib/cultural-cpt-validation/deploy/run_on_instance.sh'
+$SSH 'bash /workspace/tapestry/contrib/jneums-cultural-cpt-validation/deploy/run_on_instance.sh'
 
 # 5b. Corpus-RESAMPLED go/no-go (the real noise band; see "Corpus resampling"
 #     below). Decides on cross-corpus variance, not the measurement-only seed
@@ -77,7 +77,7 @@ $SSH 'REPO=/workspace/tapestry MODEL=Qwen/Qwen3-4B-Instruct-2507 \
   SEEDS=0,1,2 EPOCHS=4 PER_DOMAIN=18 MAX_WORDS=4000 CAT_LIMIT=25 MAX_TOKENS=300000 \
   DTYPE=bfloat16 INSTRUMENT_LANG=ar BEHAVIOR_MODE=generate \
   CORPUS_DRAWS=4 CORPUS_FRACTION=0.7 \
-  bash /workspace/tapestry/contrib/cultural-cpt-validation/deploy/run_on_instance.sh'
+  bash /workspace/tapestry/contrib/jneums-cultural-cpt-validation/deploy/run_on_instance.sh'
 
 # 6. Pull the result back.
 rsync -az -e "ssh -p <SSH_PORT>" \

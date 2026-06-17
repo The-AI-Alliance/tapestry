@@ -59,12 +59,12 @@ placeholder. This is deliberate — it lets you validate the HF wiring (real mod
 uv pip install --python .venv/bin/python transformers   # optional dep, not in core manifest
 
 # real model, placeholder corpora -> validates wiring, still "NOT A RESULT"
-uv run python contrib/cultural-cpt-validation/run.py \
+uv run python contrib/jneums-cultural-cpt-validation/run.py \
   --mode hf --model-name distilgpt2 --culture vietnam
 
 # a real EXP-001 run additionally needs real corpora (loaded + validated from a
 # corpus root; see data/README.md and fetch_corpus.py):
-#   ... --corpus-path contrib/cultural-cpt-validation/data/<culture>
+#   ... --corpus-path contrib/jneums-cultural-cpt-validation/data/<culture>
 ```
 
 Corpus loading, the permissive-license allowlist, WVS decontamination, and the
@@ -98,7 +98,7 @@ make cultural-cpt-aggregation         # -> runs/cultural_cpt_aggregation/result.
 make cultural-cpt-tests
 ```
 
-Or directly, e.g. `uv run python contrib/cultural-cpt-validation/run.py
+Or directly, e.g. `uv run python contrib/jneums-cultural-cpt-validation/run.py
 --culture vietnam` (with `PYTHONPATH` set to `src` + this dir).
 
 ## Two experiments
