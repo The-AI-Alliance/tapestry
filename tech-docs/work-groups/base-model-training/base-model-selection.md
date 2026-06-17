@@ -86,7 +86,9 @@ The work of [Issue #22: PoC for alignment based on Inglehart-Welzel Cultural Map
  
 ## Candidate Model Families
 
-A starting list of candidates. _Please correct any errors, add additional model families, etc.!_
+Some of the requirements imply that research model projects will usually be poor candidates, because they are usually designed to explore specific pioneering ideas and are not often engineered for general-purpose _production_ use, e.g., a wide range of sizes, extensive post training for safety and use case alignment, etc. On the other hand, they tend to be the most open model families, not just open weights, but often include open-source tool chains, data sets, etc.
+
+Here is a starting list of candidates, listed alphabetically. _Please use PRs to correct any errors, add additional model families, etc.!_
 
 Key for icons:
 | Icon  | Description |
@@ -98,14 +100,16 @@ Key for icons:
 
 | Family   | [R1](#bms-r1-weights-are-open "BMS-R1: Weights Are Open") | [R1A](#bms-r1-weights-are-open "BMS-R1A: Zero restrictions on any use") | [R2](#bms-r2-multiple-sizes-are-available "BMS-R2: Multiple Sizes Are Available") | [R2A](#bms-r2-multiple-sizes-are-available "BMS-R2A: All model sizes available are open weight") | [R3](#bms-r3-under-active-development "BMS-R3: Under Active Development") | [R4](#bms-r4-performance-is-competitive "BMS-R4: Performance Is Competitive") | [R5](#bms-r5-can-be-culturally-aligned "BMS-R5: Can Be Culturally Aligned") | Comments |
 | :------- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :------- |
+| DeepSeek | ✅ | ✅ | ⚠️ - Large only | ✅ | ✅ | ✅ | **?** | Built in China; possible geopolitical concerns |
+| Gemma4   | ✅ | ✅ | ⚠️ - Smaller sizes only today; will Google expand the size choices? | Larger Google models are proprietary | ⚠️ - Will Google keep releasing updated versions of OW Gemma? | ✅ | **?** | Built by Google. Will they continue to develop open-weight models and expand the size options? |
+| GPT OSS  | ✅ | ✅ | ⚠️ - Limited size choices | ✅ - Larger models not in this family are proprietary | Will OpenAI keep releasing open-weight versions of GPT OSS? | ✅ | **?** | ⚠️ - Built by OpenAI. Is GPT OSS a "one-shot" release or a longer-term strategy? |
+| Granite  | ✅ | ✅ | ⚠️ - Smaller sizes only | ✅ | ❌ - Granite models program is pivoting to research only | ⚠️ - Larger sizes not available | **?** | Built by IBM - Good performance and strong data governance, but future development is unlikely |
+| K2       | ✅ | ✅ | ✅ | **?** | ✅ | **?** | **?** | Built by MBZUI. Strong on Middle East languages. Future development plans are TBD. | 
 | Llama    | ✅ | ⚠️ - Some limitations on use | ✅ | ⚠️ - Largest Llama4 models not OW | ❌ - Meta has stopped developing Llama | ✅ | ✅ - See below | Very familiar and widely used, but its future is dim |
 | Mistral  | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **?** | Built in France with strong EU alignment |
+| Nemotron | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **?** | Built by NVIDIA. Can they be used on other hardware (TBD)? |
+| Olmo     | ✅ | ✅ | ⚠️ - Smaller model sizes only | ✅ | ⚠️ - Turnover at Ai2 makes the future of Olmo unclear | ✅ | **?** | A state-of-the-art research model family, among the most open and transparent available. See in particular [FlexOlmo](https://huggingface.co/allenai/FlexOlmo-7x7B-1T), which has data management features relevant to our needs. However, is the Olmo family otherwise suitable for production use and Tapestry requirements, and will Ai2 continue active development? Even if not, it might be a very good starting point for our own models that are built from scratch. |
 | Qwen     | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **?** | Built in China; possible geopolitical concerns |
-| DeepSeek | ✅ | ✅ | ⚠️ - Large only | ✅ | ✅ | ✅ | **?** | Built in China; possible geopolitical concerns |
-| K2       | ✅ | ✅ | ✅ | **?** | ✅ | **?** | **?** | Built by MBZUI. Strong on Middle East languages | 
-| GPT OSS  | ✅ | ✅ | ⚠️ - Limited size choices | ✅ - Larger models not in this family are proprietary | ⚠️ - Will OpenAI keep releasing open-weight versions of GPT OSS? | ✅ | **?** | Built by OpenAI. Is GPT OSS a "one-shot" release or a longer-term strategy? |
-| Gemma4   | ✅ | ✅ | ⚠️ - Smaller sizes only today; will Google expand the size choices? | ⚠️ - Larger Google models are proprietary | ⚠️ - Will Google keep releasing updated versions of OW Gemma? | ✅ | **?** | Built by Google |
-| Granite  | ✅ | ✅ | ⚠️ - Smaller sizes only | ✅ | ❌ - Granite models program is pivoting to research only | ⚠️ - Constrained because larger sizes not available | **?** | Built by IBM - Good performance and strong data governance, but future development is unlikely |
 
 
 ## Feasibility Study on Cultural Alignment Shift
