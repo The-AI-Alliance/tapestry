@@ -2,13 +2,10 @@
 
 # Welcome to Project Tapestry
 
-#### Project Tapestry aims to give every nation and participant frontier AI they can call their own.
-
-#### We bring together talented people, data, and compute from a global consortium of partners to train a shared **frontier** base model — stronger than any single party could build alone, thanks to a larger and more diverse corpus than ever before.
-
-#### From that shared base, each partner builds and owns **sovereign** models, aligned to their own **national**, **socio-cultural**, and **industrial** needs, using the Tapestry open source training platform. Ownership of data and compute stays with the partners throughout.
-
-#### The aim is AI that is frontier and sovereign at once — not a tradeoff between the two.
+> [!NOTE]
+> **Project Tapestry is bringing together talented people, data, and compute from a global consortium of partners to build a new foundation model system trained on a larger and more diverse corpus than ever before.**
+>
+> **Tapestry will enable sovereign AI by ensuring ownership of data and compute remains with partners, and that partners can continue to train sovereign derivatives of the consortium-trained base model that they own using the Tapestry open source training platform.**
 
 Learn more from our [Kickoff Workshop Blog](https://thealliance.ai/blog/project-tapestry-the-path-to-frontier-sovereign-ai) and check out the [Project Tapestry](https://thealliance.ai/projects/tapestry/) website for more information about partnering, events, and how to support Project Tapestry.
 
@@ -21,7 +18,8 @@ This repo contains the code and technical documentation for the project. We invi
 
 The rest of this README provides information for contributors and users of this repository.
 
-## Contribute to Our First Milestones
+## Contribute to Our First Work Streams
+
 Project Tapestry has big plans, and we're starting with some fundamental building blocks.
 
 * [LLM Cultural Alignment and Re-alignment](https://github.com/The-AI-Alliance/tapestry/issues/22) _repository coming soon_ - help us develop techniques for cultural alignment, initially based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric. This task will implement a corresponding evaluation and implement tuning experiments to understand how to shift alignment without compromising general model performance. Prior expertise in evaluation and tuning technologies are especially welcome.
@@ -34,6 +32,8 @@ Project Tapestry has big plans, and we're starting with some fundamental buildin
 > [!NOTE]
 > Make sure to read [**Getting Involved**](#getting-involved-anchor) below for information on contribution guidelines, etc.
 > 
+> We use the [`develop`](https://github.com/The-AI-Alliance/tapestry/tree/develop) branch as our default (integration) branch, reserving `main` for occasional "baked" releases.
+
 ### Working with the Source Code
 
 The source code is under the [`src`](src/) directory.
@@ -120,7 +120,7 @@ We use [pytest](https://docs.pytest.org/) for testing. The easiest way to run th
 make unit-tests # or just tests; they are currently the same.
 ```
 
-This runs the following command, which you can run yourself if you prefer:
+This runs the following commands, which you can run yourself if you prefer:
 
 ```shell
 cd src

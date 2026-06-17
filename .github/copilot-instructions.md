@@ -15,6 +15,7 @@ consortium training, data governance, evaluation, and supporting infrastructure.
 
 ## General review guidance
 
+- With few exceptions, the `develop` branch, not `main`, is the PR merge target.
 - Keep each PR focused on a single change; flag scope creep.
 - Commits must carry a DCO `Signed-off-by` line (`git commit -s`), and—per branch
   protection—a verified signature before merge.
