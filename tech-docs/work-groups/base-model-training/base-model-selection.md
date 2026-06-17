@@ -108,7 +108,7 @@ Key for icons:
 | Llama    | ✅ | ⚠️ - Some limitations on use | ✅ | ⚠️ - Largest Llama4 models not OW | ❌ - Meta has stopped developing Llama | ✅ | ✅ - See below | Very familiar and widely used, but its future is dim |
 | Mistral  | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **?** | Built in France with strong EU alignment |
 | Nemotron | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **?** | Built by NVIDIA. Can they be used on other hardware (TBD)? |
-| Olmo     | ✅ | ✅ | ⚠️ - Smaller model sizes only | ✅ | ⚠️ - Turnover at Ai2 makes the future of Olmo unclear | ✅ | **?** | A state-of-the-art research model family, among the most open and transparent available, but is it suitable for production use and Tapestry requirements, and will Ai2 continue active development? |
+| Olmo     | ✅ | ✅ | ⚠️ - Smaller model sizes only | ✅ | ⚠️ - Turnover at Ai2 makes the future of Olmo unclear | ✅ | **?** | A state-of-the-art research model family, among the most open and transparent available. See in particular [FlexOlmo](https://huggingface.co/allenai/FlexOlmo-7x7B-1T), which has data management features relevant to our needs. However, is the Olmo family otherwise suitable for production use and Tapestry requirements, and will Ai2 continue active development? Even if not, it might be a very good starting point for our own models that are built from scratch. |
 | Qwen     | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **?** | Built in China; possible geopolitical concerns |
 
 
