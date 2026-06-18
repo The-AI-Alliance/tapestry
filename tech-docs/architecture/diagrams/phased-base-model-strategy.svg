@@ -8,14 +8,14 @@
     </marker>
   </defs>
   <rect width="640" height="160" fill="#fafafa"/>
-  <rect x="48" y="48" width="240" height="72" rx="8" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
+  <rect x="48" y="48" width="240" height="72" rx="8" fill="#2c7da0" stroke="#236a8c" stroke-width="2"/>
   <text x="168" y="82" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="15" font-weight="600">Phase 1 - adopt open base</text>
-  <text x="168" y="104" text-anchor="middle" fill="#e3f2fd" font-family="system-ui,Segoe UI,sans-serif" font-size="12">Sovereign layers on top</text>
+  <text x="168" y="104" text-anchor="middle" fill="#a9d6e5" font-family="system-ui,Segoe UI,sans-serif" font-size="12">Sovereign layers on top</text>
   <line x1="288" y1="84" x2="328" y2="84" stroke="#37474f" stroke-width="2" marker-end="url(#m)"/>
   <text x="308" y="74" text-anchor="middle" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">maturity</text>
-  <rect x="352" y="48" width="240" height="72" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
+  <rect x="352" y="48" width="240" height="72" rx="8" fill="#1b4965" stroke="#13365a" stroke-width="2"/>
   <text x="472" y="82" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="15" font-weight="600">Phase 2 - consortium base</text>
-  <text x="472" y="104" text-anchor="middle" fill="#e8f5e9" font-family="system-ui,Segoe UI,sans-serif" font-size="12">Same portable sovereign work</text>
+  <text x="472" y="104" text-anchor="middle" fill="#62b6cb" font-family="system-ui,Segoe UI,sans-serif" font-size="12">Same portable sovereign work</text>
   <path d="M 168 120 Q 308 148 472 120" fill="none" stroke="#78909c" stroke-width="2" stroke-dasharray="8 5"/>
   <text x="320" y="142" text-anchor="middle" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-style="italic">sovereign artifacts portable across bases</text>
 </svg>

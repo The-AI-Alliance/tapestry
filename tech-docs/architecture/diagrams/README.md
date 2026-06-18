@@ -18,7 +18,7 @@ ADRs and [`training-approaches.md`](../../reference/training-approaches.md) embe
 
 | SVG (embedded in Markdown; edit here) | Referenced from |
 | :------------------------------------ | :-------------- |
-| [`consortium-training-loop.svg`](consortium-training-loop.svg) | [TAP-004](../decisions/adr-004-training-loop.md), [`training-approaches.md`](../../reference/training-approaches.md) |
+| [`consortium-training-loop.svg`](consortium-training-loop.svg) | [`training-approaches.md`](../../reference/training-approaches.md) |
 | [`core-plus-sovereign-stack.svg`](core-plus-sovereign-stack.svg) | [TAP-001](../decisions/adr-001-core-plus-sovereign.md) |
 | [`data-sovereignty.svg`](data-sovereignty.svg) ([draw.io](data-sovereignty.drawio)) | [TAP-008](../decisions/adr-008-data-sovereignty.md) |
 | [`training-paradigms-comparison.svg`](training-paradigms-comparison.svg) | [TAP-002](../decisions/adr-002-consortium-training.md) |
@@ -37,19 +37,19 @@ Markdown has no standard `#include`. Embedding is always:
    From [`decisions/adr-004-training-loop.md`](../decisions/adr-004-training-loop.md):
 
    ```markdown
-   ![Consortium training loop](diagrams/consortium-training-loop.svg)
+   ![Shared-Base Loop](diagrams/consortium-training-loop.svg)
    ```
 
    That path is wrong from `decisions/` — you must walk up one level:
 
    ```markdown
-   ![Consortium training loop](../diagrams/consortium-training-loop.svg)
+   ![Shared-Base Loop](../diagrams/consortium-training-loop.svg)
    ```
 
    From [`5-architectural-options.md`](../5-architectural-options.md) (same folder as `diagrams/`):
 
    ```markdown
-   ![Consortium training loop](diagrams/consortium-training-loop.svg)
+   ![Shared-Base Loop](diagrams/consortium-training-loop.svg)
    ```
 
 2. **Mermaid** — GitHub (and many editors) render fenced ` ```mermaid ` blocks **inside** the `.md` file. Putting only `.mmd` text here does **not** auto-render; you either paste the contents into the consuming doc or rely on a site build that inlines it (this repo does not require such a build today).
