@@ -1,0 +1,14 @@
+This contribution follows Project Tapestry's default licensing (see the repository root):
+
+  - Code               Apache-2.0            ../../LICENSE.Apache-2.0
+  - Documentation      CC-BY-4.0             ../../LICENSE.CC-BY-4.0
+  - Data / specs       CDLA-Permissive-2.0   ../../LICENSE.CDLA-2.0
+
+Copyright belongs to the respective contributors. Contributed under the Developer
+Certificate of Origin (DCO); commits are signed off with `git commit -s`.
+
+Third-party material is used under its own license and cited rather than redistributed
+(see README.md "Citations" and DATA.md): the World Values Survey / European Values Study
+microdata (registration-walled, not included), the base model
+meta-llama/Llama-3.2-3B-Instruct (Llama Community License), and public rehearsal datasets
+under their respective licenses.
