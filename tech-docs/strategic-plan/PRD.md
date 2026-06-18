@@ -311,7 +311,7 @@ TAPESTRY must support two complementary architectural tracks in parallel:
 - **Track 1 — Generative (Transformer-based)**: Production-ready, immediately deployable for language tasks (clinical notes, educational content, governance documents, cultural knowledge Q&A).
 - **Track 2 — JEPA (Joint Embedding Predictive Architecture)**: Under development, targeting predictive and physical-world modeling tasks (crop yield prediction, climate adaptation, epidemiological forecasting). Expected to reduce hallucination rate and improve efficiency relative to generative models.
 
-Both tracks participate in federated training. Nodes select the appropriate architecture for their use case. The federated protocol must support heterogeneous architectures without requiring all nodes to use the same model type.
+Both tracks participate in consortium training. Nodes select the appropriate architecture for their use case. The consortium training protocol must support heterogeneous architectures without requiring all nodes to use the same model type.
 
 ### AR-6 — Scale validation (Must)
 

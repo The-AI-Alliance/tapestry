@@ -33,7 +33,7 @@ Sovereign contributions (continued pretraining outputs, alignment layers, domain
 ## Rationale
 
 - Training a frontier model from scratch requires $200M+, 12–18 months, and organizational maturity the consortium doesn't yet have.
-- Adopting an existing base delivers frontier capability immediately, enabling participants to start the consortium training loop (TAP-004) and sovereign alignment pipeline (TAP-005) now.
+- Adopting an existing base delivers frontier capability immediately, enabling participants to start the Shared-Base Loop (TAP-004) and Sovereign Build (TAP-005) now.
 - Portability of sovereign layers across bases makes the dependency replaceable — the anti-capture principle (DG3) is satisfied in the temporal sense ("we can switch") even if not in the instantaneous sense ("we're currently independent").
 - This is the honest version of sovereignty: acknowledge the dependency, design it to be replaceable, commit to a timeline for independence.
 

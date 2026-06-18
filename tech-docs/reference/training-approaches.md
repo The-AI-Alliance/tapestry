@@ -14,7 +14,7 @@ Three distinct approaches to training large models are relevant to Tapestry's de
 | :-------- | :------------------- | :----------------- | :------------------ |
 | **Typical participants** | One organization, one cluster | Very many small clients (phones, hospitals, …) | Few large nodes (national labs, HPC, sovereign AI programs) |
 | **Data location** | All training data colocated | Small shards per node | Large sovereign corpora per node |
-| **What crosses the network** | Data moves to the compute center | Per-step gradients (FedSGD) or **local model weight vectors** after local training (FedAvg) | **Local model weight vectors** after local Stage A (CPT); not raw data |
+| **What crosses the network** | Data moves to the compute center | Per-step gradients (FedSGD) or **local model weight vectors** after local training (FedAvg) | **Local model weight vectors** after **Contributed CPT**; not raw data |
 | **Communication pattern** | Fast interconnect; sync every step or few steps | Varies by method and deployment (frequent to infrequent) | **Cadence is operational** — fast/frequent (cluster-like) or slower (geo-distributed) |
 | **Dominant motive** | Throughput and single-owner control | Individual / edge **privacy** | National or institutional **sovereignty** and cultural alignment |
 | **Governance** | Single owner | Aggregator plus clients | Consortium with shared voice and rules |
@@ -22,7 +22,7 @@ Three distinct approaches to training large models are relevant to Tapestry's de
 | **Primary goal** | Maximum capability | Learn without centralizing raw data | Frontier capability **and** culturally aligned outcomes |
 | **Tapestry** | Incompatible (colocation, capture) | Wrong fit (scale, motive, governance) | **This is Tapestry’s paradigm** ([TAP-002](../architecture/decisions/adr-002-consortium-training.md)) |
 
-The sections below spell out each column in prose. The consortium training loop is specified in [TAP-004](../architecture/decisions/adr-004-training-loop.md).
+The sections below spell out each column in prose. Consortium training runs in two phases — the **Shared-Base Loop** and the **Sovereign Build** — specified in [TAP-004](../architecture/decisions/adr-004-training-loop.md).
 
 ---
 
@@ -73,9 +73,25 @@ FedAvg is *not* the same as per-step gradient sharing. Each client trains locall
 
 ## Consortium Training
 
-**What it is:** A small number of large, trusted, heterogeneous nodes — national labs, sovereign AI initiatives, HPC centers, research institutions — collaboratively train a shared model. Each node performs **Stage A continued pretraining (CPT)** on sovereign data (training the entire model, not adapters-only), then uploads its **locally trained model weight vector** to a central coordinator. The coordinator performs **quality-weighted model averaging** (FedAvg-class aggregation by default) and redistributes the updated global model. The cycle repeats.
+**What it is:** A small number of large, trusted, heterogeneous nodes — national labs, sovereign AI initiatives, HPC centers, research institutions — collaboratively train a shared model (as defined in [TAP-002](../architecture/decisions/adr-002-consortium-training.md)). This happens in two phases ([TAP-004](../architecture/decisions/adr-004-training-loop.md)).
 
-Nodes may also run Stages B (instruction tuning) and C (alignment) locally to produce deployable sovereign models ([TAP-005](../architecture/decisions/adr-005-sovereign-pipeline.md)). **Only Stage A outputs are contributed to the shared global base**; Stages B and C remain local to each sovereign model.
+In the **Shared-Base Loop** (Phase 1), each node performs **Contributed CPT** — full-model continued pre-training on its member data (not adapters-only) — then uploads its **locally trained model weight vector** to a central coordinator. The coordinator performs **quality-weighted model averaging** (FedAvg-class aggregation by default) and redistributes the updated **Shared Base**. The cycle repeats.
+
+In the **Sovereign Build** (Phase 2), each node takes the Shared Base and runs **Private CPT** plus post-training (instruction tuning and alignment) locally to produce its deployable **Sovereign Model** ([TAP-005](../architecture/decisions/adr-005-sovereign-pipeline.md)). **Only Contributed CPT weights feed the Shared Base**; everything in the Sovereign Build stays local.
+
+```mermaid
+flowchart LR
+  P1["Phase 1 · Shared-Base Loop<br/>collective · iterative"]:::collective
+  SB[("Shared Base")]:::base
+  P2["Phase 2 · Sovereign Build<br/>per member · local"]:::sovereign
+  SM(["Sovereign Model"]):::model
+  P1 --> SB --> P2 --> SM
+
+  classDef collective fill:#1b4965,stroke:#62b6cb,color:#fff
+  classDef base fill:#2c7da0,stroke:#a9d6e5,color:#fff
+  classDef sovereign fill:#5e548e,stroke:#9f86c0,color:#fff
+  classDef model fill:#7b6aae,stroke:#e0c3fc,color:#fff
+```
 
 **Communication:** Nodes share **local model weight vectors** after local CPT — not per-step gradients, not raw data. This is fundamentally different from FedSGD-style gradient sharing:
 
@@ -85,11 +101,11 @@ Nodes may also run Stages B (instruction tuning) and C (alignment) locally to pr
 | **Typical sync** | Every step or few steps | After a local training phase — **cadence is a deployment choice** |
 | **Node autonomy** | Nodes are step-locked to the aggregator | Nodes train independently between syncs |
 
-**Sync cadence is not fixed by the architecture.** Deployments may sync frequently (cluster-like, high-bandwidth interconnect) or less often (geo-distributed nodes over WAN). What defines consortium training is *who* participates, *what* crosses the wire (weight vectors after local CPT), and *how* governance works — not a particular sync interval.
+**Sync cadence is not fixed by the architecture.** Deployments may sync frequently (cluster-like, high-bandwidth interconnect) or less often (geo-distributed nodes over WAN). What defines consortium training is *who* participates, *what* crosses the wire (weight vectors after Contributed CPT), and *how* governance works — not a particular sync interval.
 
 The coordinator may compute parameter deltas internally (`θ_local − θ_start`); that is an implementation detail, not the communicated artifact. Yann LeCun's correction: nodes communicate **weight vectors**, not per-step gradients and not deltas as the primary abstraction.
 
-**Aggregation (modular):** The default integration step is **FedAvg-class weighted averaging** of contributed weight vectors. The architecture treats the outer aggregation step as **replaceable** — DiLoCo-style outer optimization on aggregated pseudo-gradients, model merging, or distillation may be substituted without redesigning the sovereign pipeline or governance model ([TAP-007](../architecture/decisions/adr-007-architecture-comparison.md)).
+**Aggregation (modular):** The default integration step is **FedAvg-class weighted averaging** of contributed weight vectors. The architecture treats the outer aggregation step as **replaceable** — DiLoCo-style outer optimization on aggregated pseudo-gradients, model merging, or distillation may be substituted without redesigning the Sovereign Build or governance model ([TAP-007](../architecture/decisions/adr-007-architecture-comparison.md)).
 
 **When it's appropriate:**
 - A small number of large nodes with massive, culturally or institutionally specific datasets
@@ -98,11 +114,11 @@ The coordinator may compute parameter deltas internally (`θ_local − θ_start`
 - The goal is both frontier capability and cultural alignment
 - Participants want shared ownership of the result
 
-**The consortium training loop:**
+**The Shared-Base Loop:**
 
-![Consortium training loop](../architecture/diagrams/consortium-training-loop.svg)
+![The Shared-Base Loop](../architecture/diagrams/consortium-training-loop.svg)
 
-**Key techniques:** FedAvg-class model averaging (default), continued pretraining (Stage A), optional DiLoCo-class outer optimizers, post-training sovereign alignment (Stages B–C, local only)
+**Key techniques:** FedAvg-class model averaging (default), Contributed CPT (full-model continued pre-training), optional DiLoCo-class outer optimizers; the Sovereign Build's Private CPT and post-training alignment (local only)
 
 **This is what Tapestry uses.**
 
@@ -114,30 +130,13 @@ Data sovereignty may be satisfied through **legal and organizational agreements*
 
 ---
 
-## Comparison
-
-| | Centralized Training | Federated Learning | Consortium Training |
-| :--- | :--- | :--- | :--- |
-| **Participants** | One organization, one cluster | Many clients (phones, hospitals, edge) | Dozens of large institutional nodes |
-| **Data per node** | All data centralized | Small (one user's or site's data) | Massive (national/institutional corpora) |
-| **Sovereignty motive** | N/A — one owner | Individual / site-level data protection | National/institutional sovereignty + cultural alignment |
-| **What crosses the network** | N/A — internal interconnect | FedSGD: gradients; FedAvg: weight vectors after local training | Weight vectors after local Stage A CPT |
-| **Communication cadence** | Every step; fast interconnect | Varies by method and deployment | Operational choice — frequent or infrequent |
-| **Model scale** | Frontier | Typically small to medium | Frontier |
-| **Governance** | Single owner decides all | Aggregator-driven; clients have no architectural voice | Consortium with shared ownership and governance rights |
-| **Each node's outcome** | N/A — one model | Same global model (or personalized variant in PFL) | Sovereign model: shared base + community-specific alignment |
-
-Consortium training borrows techniques from the federated learning literature — FedAvg, ideas from Personalized Federated Learning (per-node model variants), and optionally DiLoCo (outer optimizer variant). The distinction is not technical novelty in the optimization algorithm but in the *context*: who participates, at what scale, with what governance, and toward what goal.
-
----
-
 ## Related decisions
 
 | Document | Role |
 | :------- | :--- |
 | [TAP-002: Consortium training model](../architecture/decisions/adr-002-consortium-training.md) | Names the paradigm and contrasts it with federated and centralized training. |
-| [TAP-004: The consortium training loop](../architecture/decisions/adr-004-training-loop.md) | Defines the four-step loop (base → CPT → weight vectors → integrate). |
-| [TAP-005: Sovereign model pipeline](../architecture/decisions/adr-005-sovereign-pipeline.md) | Stages 0–C; only Stage A feeds the consortium loop. |
+| [TAP-004: The consortium training loop](../architecture/decisions/adr-004-training-loop.md) | Defines the two phases: the **Shared-Base Loop** (Contributed CPT → weight vectors → integrate) and the **Sovereign Build**. |
+| [TAP-005: The Sovereign Build](../architecture/decisions/adr-005-sovereign-pipeline.md) | The Sovereign Build in detail (Stages 0–C); only Contributed CPT feeds the Shared-Base Loop. |
 
 ## References
 

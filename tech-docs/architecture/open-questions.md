@@ -11,7 +11,7 @@
 | # | Question | Source | Tag | People |
 |:--|:---------|:-------|:----|:-------|
 | T1 | Has anyone run outer-loop distributed training above 7B parameters on heterogeneous, high-latency clusters? What broke? | [2-pain-points.md](2-pain-points.md) (CP2) | Workshop | Eric (Petuum), Laurent (INRIA), Erik (Zyphra) |
-| T2 | Is the proposed four-step consortium training loop accepted? What is the target cycle frequency — monthly, quarterly, per-node choice? | [5-architectural-options.md](5-architectural-options.md) (Decision 3) | Workshop | Eric Xing, Laurent Massoulie |
+| T2 | Is the proposed four-step Shared-Base Loop accepted? What is the target cycle frequency — monthly, quarterly, per-node choice? | [5-architectural-options.md](5-architectural-options.md) (Decision 3) | Workshop | Eric Xing, Laurent Massoulie |
 | T3 | What are the convergence properties of the training loop when nodes have radically different (non-IID) data distributions? | [TAP-004](decisions/adr-004-training-loop.md) | Research | |
 | T4 | Compute cost per cycle is estimated at 5-10% of base pretraining. Is this validated empirically? | [TAP-004](decisions/adr-004-training-loop.md) | Research | |
 | T5 | Should the consortium use synchronized or asynchronous cycling? If some nodes cycle monthly and others annually, their influence diverges — is this acceptable? | [TAP-004](decisions/adr-004-training-loop.md), [5-architectural-options.md](5-architectural-options.md) (Q8) | Workshop | |

@@ -50,6 +50,6 @@ Avoid consecutive plain Markdown lines like `**Status:** ...` / `**Date:** ...`;
 | [TAP-002](adr-002-consortium-training.md) | Consortium training model | proposed | 5/5 |
 | [TAP-003](adr-003-cultural-alignment.md) | Cultural alignment as primary differentiator | proposed | 5/5 |
 | [TAP-004](adr-004-training-loop.md) | The consortium training loop | proposed | 4/5 |
-| [TAP-005](adr-005-sovereign-pipeline.md) | Sovereign model pipeline | proposed | 4/5 |
+| [TAP-005](adr-005-sovereign-pipeline.md) | The Sovereign Build | proposed | 4/5 |
 | [TAP-006](adr-006-phased-base-model.md) | Phased base model strategy | proposed | 4/5 |
 | [TAP-007](adr-007-architecture-comparison.md) | Training architecture comparison | proposed | 4/5 |

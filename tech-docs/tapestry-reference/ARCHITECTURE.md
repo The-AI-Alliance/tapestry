@@ -12,7 +12,7 @@ Tapestry's foundational decision ([TAP-001](../architecture/decisions/adr-001-co
 
 | Layer | Who owns it | What it provides |
 | :---- | :---------- | :--------------- |
-| **Shared base** | Consortium — adopted, then consortium-evolved ([TAP-006](../architecture/decisions/adr-006-phased-base-model.md)) | Frontier-class starting capability; improved via the consortium training loop |
+| **Shared base** | Consortium — adopted, then consortium-evolved ([TAP-006](../architecture/decisions/adr-006-phased-base-model.md)) | Frontier-class starting capability; improved via the Shared-Base Loop |
 | **Safety alignment** | Consortium (shared) | Baseline safety properties (preservation through CPT is open question DG6) |
 | **Sovereign layers** | Each participating node / community | Cultural alignment, domain fit, instruction norms — data stays local |
 
@@ -22,54 +22,65 @@ The ratio starts at roughly **80/20** centralized-to-sovereign and shifts toward
 
 ## Consortium Training — Not Federated Learning
 
-Tapestry uses **consortium training** ([TAP-002](../architecture/decisions/adr-002-consortium-training.md)): a small number of large, trusted, heterogeneous institutional nodes collaboratively training a shared model, where data sovereignty is a first-order constraint and cultural alignment is the goal. This is deliberately distinguished from federated learning.
+Tapestry uses **consortium training** ([TAP-002](../architecture/decisions/adr-002-consortium-training.md)) — the paradigm defined there and contrasted in full with centralized and federated training in [`training-approaches.md`](../reference/training-approaches.md). In brief: a small number of large, trusted, heterogeneous institutional nodes collaboratively train a shared model, where data sovereignty is a first-order constraint and cultural alignment is the goal. It is deliberately distinguished from federated learning.
 
-| | Centralized | Federated Learning | **Consortium Training** |
-| :--- | :--- | :--- | :--- |
-| Participants | One org, one cluster | Many small edge clients | Dozens of large institutional nodes |
-| Data per node | All centralized | Small (one site/user) | Massive (national/institutional corpora) |
-| Sovereignty motive | N/A | Individual/site privacy | National/institutional sovereignty + cultural alignment |
-| What crosses the network | N/A | Per-step gradients (FedSGD) or weights (FedAvg) | Local model weight vectors after Stage A CPT |
-| Governance | Single owner | Aggregator-driven | Shared consortium ownership and governance |
-| Each node's outcome | One model | Same global model | Sovereign model: shared base + community alignment |
+Consortium training has two phases, run in order:
 
-Consortium training borrows techniques from the federated-learning literature (FedAvg-class averaging by default; DiLoCo as an optional outer optimizer) but the distinguishing factor is *context*: few large institutions, with shared governance, optimizing for cultural sovereignty.
+```mermaid
+flowchart LR
+  P1["Phase 1 · Shared-Base Loop<br/>collective · iterative"]:::collective
+  SB[("Shared Base")]:::base
+  P2["Phase 2 · Sovereign Build<br/>per member · local"]:::sovereign
+  SM(["Sovereign Model"]):::model
+  P1 --> SB --> P2 --> SM
+
+  classDef collective fill:#1b4965,stroke:#62b6cb,color:#fff
+  classDef base fill:#2c7da0,stroke:#a9d6e5,color:#fff
+  classDef sovereign fill:#5e548e,stroke:#9f86c0,color:#fff
+  classDef model fill:#7b6aae,stroke:#e0c3fc,color:#fff
+```
 
 ---
 
-## The Consortium Training Loop
+## The Shared-Base Loop (Phase 1)
 
-The shared base improves through a four-step loop ([TAP-004](../architecture/decisions/adr-004-training-loop.md)):
+The Shared Base improves through a four-step loop ([TAP-004](../architecture/decisions/adr-004-training-loop.md)):
 
+```mermaid
+flowchart TB
+  SB[("Shared Base · current")]:::base
+  subgraph NODES["members · run in parallel · data stays local"]
+    direction LR
+    N1["Contributed CPT"]:::collective
+    N2["Contributed CPT"]:::collective
+  end
+  COORD{{"coordinator · merge<br/>FedAvg-class"}}:::coord
+  NEXT[("Shared Base · next")]:::base
+  SB --> NODES
+  N1 -->|weights| COORD
+  N2 -->|weights| COORD
+  COORD ==> NEXT
+  NEXT -.->|redistribute| SB
+
+  classDef base fill:#2c7da0,stroke:#a9d6e5,color:#fff
+  classDef collective fill:#1b4965,stroke:#62b6cb,color:#fff
+  classDef coord fill:#2a9d8f,stroke:#8fd9cf,color:#fff
 ```
-1. Centralized base training   train or adopt a frontier-competitive base on global open data
-         │
-         ▼
-2. Continued pre-training (A)  each node does CPT on its sovereign data (full model, not adapters)
-         │
-         ▼
-3. Weight-vector contribution  each node sends its post-Stage-A model weight vector to the coordinator
-         │                     (not per-step gradients, not raw data)
-         ▼
-4. Central integration         coordinator aggregates weight vectors (quality-weighted FedAvg-class
-         │                     averaging by default; outer optimizer swappable) and redistributes
-         └──────────────▶ back to step 2
-```
 
-| Step | Where it runs | Sovereign data | What crosses the network |
-| :--- | :------------ | :------------- | :----------------------- |
+| Step | Where it runs | Member data | What crosses the network |
+| :--- | :------------ | :---------- | :----------------------- |
 | 1. Base training | Central / global pipeline | N/A (open data) | Global model checkpoint |
-| 2. Continued pre-training (Stage A) | Each sovereign node | Stays on node | Nothing raw |
-| 3. Weight-vector contribution | Node → coordinator | Stays on node | Local model weights (post–Stage A) |
-| 4. Integration | Coordinator | — | Updated global model back to nodes |
+| 2. Contributed CPT | Each member node | Stays on node | Nothing raw |
+| 3. Weight-vector contribution | Node → coordinator | Stays on node | Local model weights (post–Contributed CPT) |
+| 4. Integration | Coordinator | — | Updated Shared Base back to nodes |
 
-**Loop boundary:** only **Stage A (CPT)** outputs feed the shared base. Instruction tuning and alignment (Stages B–C below) run locally and are *not* averaged into the global model. The aggregation mechanism is modular and replaceable.
+**Loop boundary:** only **Contributed CPT** weights feed the Shared Base. Everything in the Sovereign Build (below) runs locally and is *not* averaged into the global model. The aggregation mechanism is modular and replaceable.
 
 ---
 
-## The Sovereign Model Pipeline
+## The Sovereign Build (Phase 2)
 
-Each participant produces its deployable sovereign model with a four-stage pipeline plus cross-cutting evaluation ([TAP-005](../architecture/decisions/adr-005-sovereign-pipeline.md)). All stages run on sovereign data at the participant; the *tooling* is shared consortium infrastructure.
+Each participant turns the Shared Base into its deployable **Sovereign Model** with a four-stage pipeline plus cross-cutting evaluation ([TAP-005](../architecture/decisions/adr-005-sovereign-pipeline.md)). All stages run on member data at the participant; the *tooling* is shared consortium infrastructure. The Stage A CPT here is **Private CPT** — kept local, in contrast to the Shared-Base Loop's Contributed CPT.
 
 | Stage | What changes | Sovereign decision | Maps to industry term |
 | :---- | :----------- | :----------------- | :-------------------- |
@@ -79,7 +90,7 @@ Each participant produces its deployable sovereign model with a four-stage pipel
 | **C — Alignment** | Behavior / values | What is appropriate, respectful, true for us? | RLHF / DPO / Constitutional AI |
 | **Eval** (cross-cutting) | Validation after every stage | Did it work? Is it safe? Is it ours? | Benchmarking, red-teaming, cultural eval |
 
-**N+1 model outcome:** at any time the consortium produces **1 shared global base** (the substrate) and **N sovereign models** (the deployed products — one per community). The sovereign models are the value; the global base is the substrate.
+**N+1 model outcome:** at any time the consortium produces **1 Shared Base** (the substrate) and **N Sovereign Models** (the deployed products — one per community). The Sovereign Models are the value; the Shared Base is the substrate.
 
 ---
 
@@ -136,16 +147,16 @@ The implemented slice today is `training/consortium/` (governed shared-base inte
 
 The architecture serves a set of design goals ([`../architecture/4-design-goals.md`](../architecture/4-design-goals.md)). The load-bearing ones:
 
-- **DG1 — Frontier capability with sovereign alignment.** Shared base provides capability (the "1"); the sovereign pipeline provides alignment (the "N").
-- **DG2 — Sovereignty enforced where it matters.** Data never leaves the node; only post-CPT weight vectors cross the wire.
+- **DG1 — Frontier capability with sovereign alignment.** The Shared Base provides capability (the "1"); the Sovereign Build provides alignment (the "N").
+- **DG2 — Sovereignty enforced where it matters.** Data never leaves the node; only Contributed CPT weight vectors cross the wire.
 - **DG3 — Anti-capture.** No participant's sovereignty may be compromised by another's power, and Tapestry must never become the dependency it was built to replace (see [`../governance/anti-capture-principle.md`](../governance/anti-capture-principle.md)). Mitigated by portable sovereign layers, influence caps, and standards-based certification.
 - **DG6 — Safety in the shared base.** Baseline safety lives in the shared base; preserving it through continued pre-training, and drawing the contested "safety vs. alignment" line, is an open governance question.
 
 Every design doc, PR, and implementation decision should be checked against these invariants:
 
-1. **No raw data crosses node boundaries** — only model weight vectors after Stage A.
+1. **No raw data crosses node boundaries** — only model weight vectors after Contributed CPT.
 2. **Sovereign layers are portable across base models** — no provider-specific lock-in.
-3. **Only Stage A feeds the shared base** — instruction tuning and alignment stay sovereign and local.
+3. **Only Contributed CPT feeds the Shared Base** — the rest of the Sovereign Build stays local.
 4. **Cultural alignment is measured, not assumed** — every stage is evaluated, including cultural-alignment benchmarks.
 5. **Performance claims are domain- and culture-specific** — Tapestry competes on culturally-situated tasks, not general English academic benchmarks.
 
