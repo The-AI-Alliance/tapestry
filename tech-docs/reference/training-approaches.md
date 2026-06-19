@@ -73,7 +73,9 @@ FedAvg is *not* the same as per-step gradient sharing. Each client trains locall
 
 ## Consortium Training
 
-**What it is:** A small number of large, trusted, heterogeneous nodes — national labs, sovereign AI initiatives, HPC centers, research institutions — collaboratively train a shared model (as defined in [TAP-002](../architecture/decisions/adr-002-consortium-training.md)). This happens in two phases ([TAP-004](../architecture/decisions/adr-004-training-loop.md)).
+> A consolidated glossary of these and other Tapestry terms lives in [`glossary.md`](glossary.md).
+
+**What it is:** A small number of large, trusted, heterogeneous members — national labs, sovereign AI initiatives, HPC centers, research institutions — collaboratively train a shared model (as defined in [TAP-002](../architecture/decisions/adr-002-consortium-training.md)). This happens in two phases ([TAP-004](../architecture/decisions/adr-004-training-loop.md)).
 
 In the **Shared-Base Loop** (Phase 1), each node performs **Contributed CPT** — full-model continued pre-training on its member data (not adapters-only) — then uploads its **locally trained model weight vector** to a central coordinator. The coordinator performs **quality-weighted model averaging** (FedAvg-class aggregation by default) and redistributes the updated **Shared Base**. The cycle repeats.
 

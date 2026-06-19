@@ -5,7 +5,7 @@
 **Authority:** OPAN Leadership — LeCun (Chief Scientist), Nguyen (Chief Architect), Annunziata (AI Alliance Chair, Program & Policy)  
 **Status:** Draft for leadership review  
 
-> **v1.1 — Reconciled to the ratified architecture.** Training-mechanism requirements (formerly described as "federated gradient sharing" at "1,000-node" edge scale) are updated to match the two-phase consortium-training model defined in [TAP-002](../architecture/decisions/adr-002-consortium-training.md) and [TAP-004](../architecture/decisions/adr-004-training-loop.md): a collaborative Shared-Base Loop (weight-vector contribution after Contributed CPT) plus per-member Sovereign Builds. Where this PRD and an ADR disagree, the ADR wins.
+> **v1.1 — Reconciled to the ratified architecture.** Training-mechanism requirements (formerly described as "federated gradient sharing" at "1,000-node" edge scale) are updated to match the two-phase consortium-training model defined in [TAP-002](../architecture/decisions/adr-002-consortium-training.md) and [TAP-004](../architecture/decisions/adr-004-training-loop.md): a collaborative Shared-Base Loop (weight-vector contribution after Contributed CPT) plus per-member Sovereign Builds. Where this PRD and an ADR disagree, the ADR wins. *Tapestry-specific term definitions are consolidated in [`glossary.md`](../reference/glossary.md).*
 
 ---
 

@@ -12,7 +12,7 @@ This document also distinguishes between value that Tapestry can deliver on Day 
 
 ## Architectural Premise
 
-Tapestry's training model is a **core-plus-sovereign architecture**: a frontier-competitive base model (initially adopted from existing open weights, eventually trained by the consortium) enriched by sovereign contributions — cultural alignment, domain expertise, institutional knowledge — from participating nodes. The ratio starts at roughly 80/20 centralized-to-distributed and shifts over time as the consortium's own training capacity matures.
+Tapestry's training model is a **core-plus-sovereign architecture**: a frontier-competitive base model (initially adopted from existing open weights, eventually trained by the consortium) enriched by sovereign contributions — cultural alignment, domain expertise, institutional knowledge — from participating members. The ratio starts at roughly 80/20 centralized-to-distributed and shifts over time as the consortium's own training capacity matures.
 
 This means Tapestry does not ask participants to accept a worse model for the sake of sovereignty. It starts with frontier-class general capability and adds sovereign value on top. The value proposition is additive, not substitutive.
 

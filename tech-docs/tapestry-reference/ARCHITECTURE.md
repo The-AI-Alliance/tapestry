@@ -8,13 +8,13 @@ A single-page synthesis of Tapestry's architecture — the structural decisions 
 
 ## Core-Plus-Sovereign Architecture
 
-Tapestry's foundational decision ([TAP-001](../architecture/decisions/adr-001-core-plus-sovereign.md)) is a **core-plus-sovereign** architecture: a frontier-competitive **shared base model** enriched by **sovereign layers** (continued pre-training, post-training alignment, domain adapters) produced by each participating node. Data and values stay local; frontier capability is shared.
+Tapestry's foundational decision ([TAP-001](../architecture/decisions/adr-001-core-plus-sovereign.md)) is a **core-plus-sovereign** architecture: a frontier-competitive **shared base model** enriched by **sovereign layers** (continued pre-training, post-training alignment, domain adapters) produced by each participating member. Data and values stay local; frontier capability is shared.
 
 | Layer | Who owns it | What it provides |
 | :---- | :---------- | :--------------- |
 | **Shared base** | Consortium — adopted, then consortium-evolved ([TAP-006](../architecture/decisions/adr-006-phased-base-model.md)) | Frontier-class starting capability; improved via the Shared-Base Loop |
 | **Safety alignment** | Consortium (shared) | Baseline safety properties (preservation through CPT is open question DG6) |
-| **Sovereign layers** | Each participating node / community | Cultural alignment, domain fit, instruction norms — data stays local |
+| **Sovereign layers** | Each participating member | Cultural alignment, domain fit, instruction norms — data stays local |
 
 The ratio starts at roughly **80/20** centralized-to-sovereign and shifts toward sovereign over time as the consortium matures. (This is develop's current framing — not a fixed "70/30" split.)
 
@@ -22,7 +22,7 @@ The ratio starts at roughly **80/20** centralized-to-sovereign and shifts toward
 
 ## Consortium Training — Not Federated Learning
 
-Tapestry uses **consortium training** ([TAP-002](../architecture/decisions/adr-002-consortium-training.md)) — the paradigm defined there and contrasted in full with centralized and federated training in [`training-approaches.md`](../reference/training-approaches.md). In brief: a small number of large, trusted, heterogeneous institutional nodes collaboratively train a shared model, where data sovereignty is a first-order constraint and cultural alignment is the goal. It is deliberately distinguished from federated learning.
+Tapestry uses **consortium training** ([TAP-002](../architecture/decisions/adr-002-consortium-training.md)) — the paradigm defined there and contrasted in full with centralized and federated training in [`training-approaches.md`](../reference/training-approaches.md). In brief: a small number of large, trusted, heterogeneous members collaboratively train a shared model, where data sovereignty is a first-order constraint and cultural alignment is the goal. It is deliberately distinguished from federated learning. *Tapestry-specific term definitions are consolidated in [`glossary.md`](../reference/glossary.md).*
 
 Consortium training has two phases, run in order:
 

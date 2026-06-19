@@ -17,6 +17,8 @@ This revision expands the pipeline to cover the full lifecycle from data curatio
 
 ## Standard terminology mapping
 
+> A consolidated glossary of these and other Tapestry terms lives in [`glossary.md`](../../reference/glossary.md).
+
 Tapestry's pipeline stages map to standard industry terms as follows:
 
 | Tapestry Stage | Industry Term(s) | Training Phase |

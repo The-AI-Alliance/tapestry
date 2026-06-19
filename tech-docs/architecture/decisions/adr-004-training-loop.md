@@ -14,6 +14,8 @@ Given the core-plus-sovereign architecture ([TAP-001](adr-001-core-plus-sovereig
 
 ## The two phases
 
+> A consolidated glossary of these and other Tapestry terms lives in [`glossary.md`](../../reference/glossary.md).
+
 Consortium training has two phases, run in order:
 
 1. **Shared-Base Loop** — collective and iterative. Members improve one shared base model together. Its output is a *base*, not a deployable product, and it carries **no cultural alignment**.
