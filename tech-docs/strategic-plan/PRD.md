@@ -1,9 +1,11 @@
 # TAPESTRY — Product Requirements Document
 
-**Version:** 1.0  
-**Date:** 2026-05-03  
+**Version:** 1.1  
+**Date:** 2026-06-18  
 **Authority:** OPAN Leadership — LeCun (Chief Scientist), Nguyen (Chief Architect), Annunziata (AI Alliance Chair, Program & Policy)  
-**Status:** Draft for leadership review
+**Status:** Draft for leadership review  
+
+> **v1.1 — Reconciled to the ratified architecture.** Training-mechanism requirements (formerly described as "federated gradient sharing" at "1,000-node" edge scale) are updated to match the two-phase consortium-training model defined in [TAP-002](../architecture/decisions/adr-002-consortium-training.md) and [TAP-004](../architecture/decisions/adr-004-training-loop.md): a collaborative Shared-Base Loop (weight-vector contribution after Contributed CPT) plus per-member Sovereign Builds. Where this PRD and an ADR disagree, the ADR wins.
 
 ---
 
@@ -60,7 +62,7 @@ This is not a theoretical risk. It is the defining structural vulnerability of c
 
 ## 2. Product Vision
 
-TAPESTRY is an open-source, federated AI platform that delivers frontier-class performance — specifically in healthcare, education, agriculture, governance, and climate — through a structural advantage that centralized models cannot replicate: access to sovereign public-sector data and deep cultural alignment. It simultaneously guarantees irrevocable, verifiable, exit-capable sovereignty to every participating nation, cultural community, and enterprise.
+TAPESTRY is an open-source, consortium-trained AI platform that delivers frontier-class performance — specifically in healthcare, education, agriculture, governance, and climate — through a structural advantage that centralized models cannot replicate: access to sovereign public-sector data and deep cultural alignment. It simultaneously guarantees irrevocable, verifiable, exit-capable sovereignty to every participating nation, cultural community, and enterprise.
 
 The platform is organized around three interlocking levels of sovereignty:
 
@@ -96,8 +98,8 @@ Foundation models released under Apache 2.0. Target: 5M+ downloads and 10,000+ c
 **G4 — Multi-stakeholder governance with no single point of control**  
 No nation, corporation, or individual can unilaterally block, redirect, or revoke TAPESTRY for any participant.
 
-**G5 — Scalable federated infrastructure**  
-Architecture must support 7 initial G7 nodes scaling to 1,000+ sovereign nodes globally, while maintaining gradient sync latency under 5 minutes.
+**G5 — Scalable consortium infrastructure**  
+Architecture must support 7 initial G7 members in the Shared-Base Loop, scaling to a global consortium of institutional members, while keeping each loop round (Contributed CPT → weight-vector upload → merge → redistribute) on the order of minutes for cluster-like deployments. Sovereign Builds (Phase 2) are unbounded — each member's deployable model is produced independently.
 
 **G6 — Measurable societal impact**  
 Documented, independently verified improvements in real-world outcomes in target sectors by Month 36.
@@ -223,7 +225,7 @@ Every sovereign node operator must be able to perform a complete, verified exit 
 - Documented and testable at any time (not only at exit)
 
 **SR-3 — Independence from external dependencies (Must)**  
-Sovereign nodes must be capable of operating in full isolation from the federated network — "island mode" — with zero external network dependencies. This includes model inference, constitutional AI enforcement, and audit logging. Nodes that cannot survive disconnection have not achieved sovereignty.
+Sovereign nodes must be capable of operating in full isolation from the consortium training network — "island mode" — with zero external network dependencies. This includes model inference, constitutional AI enforcement, and audit logging. Nodes that cannot survive disconnection have not achieved sovereignty.
 
 **SR-4 — Compliance with national law (Must)**  
 The platform architecture must support operation under any national legal framework without requiring changes to the universal 70% infrastructure layer. National legal requirements (GDPR, APPI, and equivalents) are configured in the national 30% layer, not embedded in shared code.
@@ -245,7 +247,7 @@ All training data contributed by cultural communities must be collected with exp
 ### 6.3 Industrial Sovereignty (Level 3)
 
 **SR-9 — On-premise deployment (Must)**  
-Every sovereign variant must be deployable entirely on the enterprise's own infrastructure, with no runtime dependency on external cloud services or the federated training network. Enterprises must be able to air-gap their deployment after initial setup.
+Every sovereign variant must be deployable entirely on the enterprise's own infrastructure, with no runtime dependency on external cloud services or the consortium training network. Enterprises must be able to air-gap their deployment after initial setup.
 
 **SR-10 — Proprietary data protection (Must)**  
 Enterprises must be able to fine-tune sovereign variants on their proprietary data without that data ever leaving their infrastructure boundary. The fine-tuning process must be executable entirely locally, with cryptographic proof of data containment available to enterprise auditors.
@@ -255,11 +257,11 @@ An enterprise must be able to generate a new domain-specific sovereign variant �
 
 ### 6.4 Cross-Level Sovereignty
 
-**SR-12 — Federated privacy in training (Must)**  
-All federated gradient sharing between nodes must use **homomorphic encryption** and **differential privacy (ε < 1.0 per training round)**. Zero raw data is shared between nodes at any point in the training lifecycle. Implementation must be independently validated by MBZUAI or equivalent external privacy research institution.
+**SR-12 — Privacy in consortium training (Must)**  
+Only post-Contributed-CPT model weight vectors cross the network between members and the coordinator — never raw data, never per-step gradients. Where members require cryptographic guarantees beyond the consortium's collaborative trust model, weight-vector contribution must support **secure aggregation** and optional **differential privacy (ε < 1.0 per loop round)**. Zero raw data is shared between nodes at any point in the training lifecycle. Implementation must be independently validated by MBZUAI or equivalent external privacy research institution.
 
-**SR-13 — Byzantine fault tolerance (Must)**  
-The federated training protocol must tolerate up to **one-third of participating nodes** acting maliciously, failing, or being compromised — without corrupting the integrity of the global model update. This guarantee must be maintained as the network scales to 1,000 nodes.
+**SR-13 — Robustness to misbehaving members (Must)**  
+The Shared-Base Loop must tolerate members that fail, drop out, or contribute corrupted weight vectors — without corrupting the integrity of the Shared Base. The consortium is a collaborative arrangement by default (see [TAP-002](../architecture/decisions/adr-002-consortium-training.md)); robustness must cover the failure modes that trust model actually admits (quality-weighted filtering, contribution norms, dropout handling) rather than a blanket Byzantine 1/3-adversary bound. The guarantee must be maintained as loop membership grows.
 
 **SR-14 — Immutable audit trail (Must)**  
 All training events, model updates, data accesses, constitutional AI changes, and governance decisions must be recorded in an immutable, cryptographically verifiable audit log at each sovereign node. Audit logs must be exportable as part of the exit procedure and must be independently auditable without access to the node's live systems.
@@ -268,18 +270,19 @@ All training events, model updates, data accesses, constitutional AI changes, an
 
 ## 7. Architecture Requirements
 
-### AR-1 — Federated training protocol (Must)
+### AR-1 — Consortium training protocol (Must)
 
-TAPESTRY must implement a distributed training protocol supporting asynchronous gradient aggregation across a minimum of 7 nodes, scaling to 1,000 nodes, with:
-- Gradient sync latency **<5 minutes** at production scale
-- End-to-end encryption for all inter-node gradient communication
-- Secure aggregation (no node's raw gradients visible to any other node or coordinator)
-- Asynchronous update tolerance (24–48 hour sync window for slower nodes)
+TAPESTRY must implement the Shared-Base Loop (Phase 1 of consortium training, [TAP-004](../architecture/decisions/adr-004-training-loop.md)) supporting a minimum of 7 participating members, with:
+- Per-round latency (weight-vector upload + coordinator merge + redistribute) on the order of **minutes** for cluster-like deployments
+- End-to-end encryption for all weight-vector transfers
+- Secure aggregation (no member's raw data or per-step gradients visible to the coordinator or other members)
+- Asynchronous update tolerance (24–48 hour window for slower members to complete a Contributed CPT round)
+- Pluggable aggregation (FedAvg-class by default; DiLoCo / model merging / distillation swappable per [TAP-007](../architecture/decisions/adr-007-architecture-comparison.md))
 
 ### AR-2 — 70/30 separation principle (Must)
 
 The architecture must maintain a strict separation between:
-- **Universal infrastructure (70%)**: Federated training protocol, privacy-preserving aggregation, Byzantine fault tolerance, audit logging, exit procedures, sovereignty verification. Identical across all nations. No hard-coded cultural assumptions.
+- **Universal infrastructure (70%)**: Consortium training protocol, privacy-preserving aggregation, member-robustness, audit logging, exit procedures, sovereignty verification. Identical across all nations. No hard-coded cultural assumptions.
 - **National configuration (30%)**: Constitutional AI principles, language priorities, sacred knowledge boundaries, legal framework compliance, cultural review board interfaces. Fully owned and controlled by the sovereign node operator.
 
 This separation is non-negotiable. Any design that bleeds national assumptions into the universal layer, or that puts sovereignty enforcement in the configuration layer, fails this requirement.
@@ -288,7 +291,7 @@ This separation is non-negotiable. Any design that bleeds national assumptions i
 
 A working sovereign node must be deployable from the reference implementation using **3 commands or fewer**. The reference implementation must include:
 - Core sovereignty enforcement (`SovereignNode` class)
-- Nation-agnostic federated training client
+- Nation-agnostic consortium training client
 - Example national configuration for each initial node (France, Japan, Canada, South Korea, Vietnam)
 - Sovereignty verification scripts (data residency, exit capability, independence)
 - MBZUAI validation hooks for privacy certification
@@ -297,7 +300,7 @@ A working sovereign node must be deployable from the reference implementation us
 
 TAPESTRY must maintain a clear four-level model hierarchy:
 
-1. **TAPESTRY-GLOBAL** — Open-source foundation model, trained on aggregated federated updates from all nodes. Available immediately for users without sovereignty requirements. Apache 2.0.
+1. **TAPESTRY-GLOBAL** — Open-source foundation model, continuously improved through the Shared-Base Loop from all contributing members. Available immediately for users without sovereignty requirements. Apache 2.0.
 2. **Regional variants** (e.g., TAPESTRY-EU, TAPESTRY-APAC) — Fine-tuned with regional data and configuration.
 3. **National variants** (e.g., TAPESTRY-FR, TAPESTRY-JP) — Fine-tuned with national public-sector data and national constitutional AI.
 4. **Entity variants** (e.g., TAPESTRY-HOSPITAL-LYON) — Fine-tuned with entity-specific data on entity-owned infrastructure.
@@ -311,14 +314,15 @@ TAPESTRY must support two complementary architectural tracks in parallel:
 - **Track 1 — Generative (Transformer-based)**: Production-ready, immediately deployable for language tasks (clinical notes, educational content, governance documents, cultural knowledge Q&A).
 - **Track 2 — JEPA (Joint Embedding Predictive Architecture)**: Under development, targeting predictive and physical-world modeling tasks (crop yield prediction, climate adaptation, epidemiological forecasting). Expected to reduce hallucination rate and improve efficiency relative to generative models.
 
-Both tracks participate in federated training. Nodes select the appropriate architecture for their use case. The federated protocol must support heterogeneous architectures without requiring all nodes to use the same model type.
+Both tracks participate in consortium training. Nodes select the appropriate architecture for their use case. The consortium training protocol must support heterogeneous architectures without requiring all nodes to use the same model type.
 
 ### AR-6 — Scale validation (Must)
 
-The federated training protocol must be designed for and validated at **1,000-node scale** before claiming production readiness. Validation must include:
-- Gradient sync latency <5 minutes at 1,000 nodes
-- Byzantine fault tolerance at 1,000-node scale (up to 333 malicious nodes)
-- Exit procedure completable in <72 hours at any network size
+The consortium training protocol must be designed for and validated at the consortium's target membership scale before claiming production readiness. Validation must include:
+- Per-round loop latency on the order of minutes at production membership
+- Robustness to failed or misbehaving members at production membership (per SR-13)
+- Sovereign Builds (Phase 2) unbounded — each member's deployable model is produced independently
+- Exit procedure completable in <72 hours at any membership size
 
 ---
 
@@ -352,7 +356,7 @@ All governance decisions — technical, deployment, policy — must be published
 
 ### GR-4 — Opt-in federation (Must)
 
-Participation in the federated training network must be voluntary and revocable. Any sovereign node may disconnect from federation at any time without penalty, approval, or prior notice. Disconnected nodes continue to operate with their existing model weights; they simply stop contributing to and receiving global updates.
+Participation in the consortium training network (Shared-Base Loop) must be voluntary and revocable. Any sovereign node may disconnect at any time without penalty, approval, or prior notice. Disconnected nodes continue to operate with their existing model weights; they simply stop contributing to and receiving Shared Base updates.
 
 ### GR-5 — No single-nation control (Must)
 
@@ -383,7 +387,7 @@ The sovereignty framework must include MOU templates and data partnership struct
 All training data contributed by cultural communities must be collected under explicit, documented, community-level consent. Individual-level consent mechanisms are insufficient for community knowledge. Consent must specify:
 - What data is contributed
 - How it is used (training, evaluation, distribution)
-- Whether it is shared in federated updates (even in encrypted form)
+- Whether its contributed weights are shared with the Shared-Base Loop (even under secure aggregation)
 - How it can be revoked
 
 ### DR-4 — Data revocation (Must)
@@ -469,8 +473,8 @@ Phase 3 — Planetary Scale (Jul 2027 – Dec 2027)
 | "Too French" perception undermines global adoption | Medium | High | Nation-agnostic 70/30 architecture; Japan and Canada nodes deployed alongside France; governance co-chaired by non-French nations; open documentation of nation-specific configs |
 | Hardware partnership failure (NVIDIA, AMD) | Medium | High | Dual-track hardware strategy; AMD as independent path; EU hardware partnerships; cloud-sovereign Phase 1 fallback with path to hardware sovereignty in Phase 3 |
 | National political opposition blocks G7 commitment | Medium | High | Frame G7 commitment as non-binding framework, not treaty; demonstrate working code before asking for political commitments; avoid requiring domestic legislative action for Phase 1 |
-| Federated training produces worse models than centralized training | Low | High | Focus federated advantage on cultural and domain fine-tuning, not pre-training; use centralized compute for TAPESTRY-GLOBAL pre-training where possible; quantify federated contribution separately |
-| Privacy breach in federated protocol | Low | Fatal (trust collapse) | Homomorphic encryption + differential privacy + Byzantine fault tolerance; mandatory MBZUAI independent validation before any production deployment; staged rollout with escalating node count |
+| Consortium training produces worse models than centralized training | Low | High | The Shared Base starts from an adopted open-weights frontier base; Contributed CPT adds culturally-grounded knowledge the centralized base lacks. Quantify the consortium's contribution (capability retained + cultural alignment gained) separately. |
+| Privacy breach in the consortium training protocol | Low | Fatal (trust collapse) | Secure aggregation + differential privacy + member-robustness (SR-13); mandatory MBZUAI independent validation before any production deployment; staged rollout with escalating membership. |
 | Community data consent revoked at scale | Low | Medium | Design for consent revocation in training pipeline from day 1; community agreements specify revocation procedures in advance; retraining procedures documented and tested |
 | Governance committee gridlock | Medium | Medium | Pre-agreed decision escalation protocols; two-of-three principal leads sufficient for most decisions; dispute resolution process defined in charter before first operational disagreement |
 | Sacred knowledge protection bypassed by inference attacks | Low | High | Infrastructure-level enforcement (not policy alone); red-team sacred knowledge boundaries as part of safety evaluation; community audit of protection mechanisms |
@@ -482,7 +486,7 @@ Phase 3 — Planetary Scale (Jul 2027 – Dec 2027)
 
 1. **Benchmark governance**: Who selects and governs the culturally-situated benchmark suites that define "frontier performance in target domains"? The Evaluation Work Group must be constituted and chartered before Phase 1 deployment.
 
-2. **JEPA production gating**: What are the measurable criteria that qualify a JEPA-architecture node for production federated training participation? This needs a formal gate definition before Phase 2.
+2. **JEPA production gating**: What are the measurable criteria that qualify a JEPA-architecture node for production consortium training participation? This needs a formal gate definition before Phase 2.
 
 3. **Cost accessibility for developing nations**: At what sovereign node deployment cost does participation become inaccessible to lower-income countries? What hardware subsidy, cloud-sovereign bridge, or tiered participation model closes this gap? The current G7 focus risks excluding the nations with the greatest sovereignty need.
 
@@ -490,7 +494,7 @@ Phase 3 — Planetary Scale (Jul 2027 – Dec 2027)
 
 5. **Industrial tier business model**: What sustains the open-source foundation while enabling enterprise deployments at the scale and quality enterprises require? An unsustainable funding model is a sovereignty risk in itself.
 
-6. **Pre-training vs. federated**: TAPESTRY-GLOBAL's pre-training is compute-intensive. At what stage of training does federated aggregation begin, and what is the centralized vs. federated contribution to the base model? This affects both performance claims and sovereignty claims.
+6. **Base pre-training vs. Shared-Base Loop**: TAPESTRY-GLOBAL's base is compute-intensive. At what stage does Shared-Base Loop contribution begin, and what is the adopted-base vs. consortium-contributed share of the Shared Base? This affects both performance claims and sovereignty claims.
 
 7. **Regulatory harmonization**: How does TAPESTRY handle conflicting national laws — for example, two participating nations with incompatible data-sharing regulations that both want to contribute to the same global model update?
 

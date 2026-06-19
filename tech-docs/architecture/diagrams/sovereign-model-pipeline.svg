@@ -16,28 +16,28 @@
   <text x="758" y="22" text-anchor="middle" fill="#78909c" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-style="italic">post-training</text>
 
   <!-- Stage 0 - Data -->
-  <rect x="40" y="36" width="196" height="80" rx="8" fill="#6a1b9a" stroke="#4a148c" stroke-width="2"/>
+  <rect x="40" y="36" width="196" height="80" rx="8" fill="#5e548e" stroke="#4a4170" stroke-width="2"/>
   <text x="138" y="66" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Stage 0 — Data Prep</text>
-  <text x="138" y="84" text-anchor="middle" fill="#e1bee7" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Curation · governance · provenance</text>
-  <text x="138" y="100" text-anchor="middle" fill="#ce93d8" font-family="system-ui,Segoe UI,sans-serif" font-size="10">What data represents our culture?</text>
+  <text x="138" y="84" text-anchor="middle" fill="#c5b8e5" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Curation · governance · provenance</text>
+  <text x="138" y="100" text-anchor="middle" fill="#b3a6d6" font-family="system-ui,Segoe UI,sans-serif" font-size="10">What data represents our culture?</text>
 
   <!-- Stage A - CPT -->
-  <rect x="270" y="36" width="196" height="80" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
+  <rect x="270" y="36" width="196" height="80" rx="8" fill="#5e548e" stroke="#4a4170" stroke-width="2"/>
   <text x="368" y="66" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Stage A — CPT</text>
-  <text x="368" y="84" text-anchor="middle" fill="#e8f5e9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Culturally grounded data</text>
-  <text x="368" y="100" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Changes what the model knows</text>
+  <text x="368" y="84" text-anchor="middle" fill="#c5b8e5" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Culturally grounded data</text>
+  <text x="368" y="100" text-anchor="middle" fill="#b3a6d6" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Changes what the model knows</text>
 
   <!-- Stage B - SFT / Instruction Tuning -->
-  <rect x="500" y="36" width="196" height="80" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
+  <rect x="500" y="36" width="196" height="80" rx="8" fill="#5e548e" stroke="#4a4170" stroke-width="2"/>
   <text x="598" y="66" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Stage B — SFT</text>
-  <text x="598" y="84" text-anchor="middle" fill="#e8f5e9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Instruction tuning</text>
-  <text x="598" y="100" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Product shape · chat readiness</text>
+  <text x="598" y="84" text-anchor="middle" fill="#c5b8e5" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Instruction tuning</text>
+  <text x="598" y="100" text-anchor="middle" fill="#b3a6d6" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Product shape · chat readiness</text>
 
   <!-- Stage C - Alignment (stacked below B to fit) -->
-  <rect x="660" y="144" width="166" height="72" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
+  <rect x="660" y="144" width="166" height="72" rx="8" fill="#5e548e" stroke="#4a4170" stroke-width="2"/>
   <text x="743" y="172" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Stage C — Alignment</text>
-  <text x="743" y="190" text-anchor="middle" fill="#e8f5e9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">DPO / RLHF / CAI</text>
-  <text x="743" y="206" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Refines behavior · encodes values</text>
+  <text x="743" y="190" text-anchor="middle" fill="#c5b8e5" font-family="system-ui,Segoe UI,sans-serif" font-size="10">DPO / RLHF / CAI</text>
+  <text x="743" y="206" text-anchor="middle" fill="#b3a6d6" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Refines behavior · encodes values</text>
 
   <!-- Arrows between stages -->
   <line x1="236" y1="76" x2="264" y2="76" stroke="#37474f" stroke-width="2" marker-end="url(#a)"/>
@@ -46,14 +46,14 @@
   <path d="M 696 116 L 696 138" fill="none" stroke="#37474f" stroke-width="2" marker-end="url(#a)"/>
 
   <!-- Evaluation bar (cross-cutting) -->
-  <rect x="40" y="144" width="588" height="44" rx="6" fill="#e65100" stroke="#bf360c" stroke-width="2"/>
+  <rect x="40" y="144" width="588" height="44" rx="6" fill="#bc6c25" stroke="#9a5619" stroke-width="2"/>
   <text x="334" y="170" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Evaluation (cross-cutting)</text>
-  <text x="334" y="184" text-anchor="middle" fill="#ffe0b2" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Cultural alignment benchmarks · safety · capability · red-teaming — runs after every stage</text>
+  <text x="334" y="184" text-anchor="middle" fill="#e9c46a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Cultural alignment benchmarks · safety · capability · red-teaming — runs after every stage</text>
 
   <!-- Dotted connectors from stages to eval -->
-  <line x1="138" y1="116" x2="138" y2="144" stroke="#ef6c00" stroke-width="1.5" stroke-dasharray="4 3"/>
-  <line x1="368" y1="116" x2="368" y2="144" stroke="#ef6c00" stroke-width="1.5" stroke-dasharray="4 3"/>
-  <line x1="598" y1="116" x2="598" y2="144" stroke="#ef6c00" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="138" y1="116" x2="138" y2="144" stroke="#bc6c25" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="368" y1="116" x2="368" y2="144" stroke="#bc6c25" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <line x1="598" y1="116" x2="598" y2="144" stroke="#bc6c25" stroke-width="1.5" stroke-dasharray="4 3"/>
 
   <!-- Shared tooling -->
   <rect x="40" y="220" width="786" height="52" rx="8" fill="#455a64" stroke="#37474f" stroke-width="2"/>
@@ -67,12 +67,10 @@
   <line x1="743" y1="216" x2="743" y2="220" stroke="#78909c" stroke-width="1.5" stroke-dasharray="6 4"/>
 
   <!-- Legend -->
-  <rect x="40" y="296" width="14" height="14" rx="3" fill="#6a1b9a"/>
-  <text x="60" y="308" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Data (sovereign)</text>
-  <rect x="170" y="296" width="14" height="14" rx="3" fill="#2e7d32"/>
-  <text x="190" y="308" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Training stages (sovereign)</text>
-  <rect x="350" y="296" width="14" height="14" rx="3" fill="#e65100"/>
-  <text x="370" y="308" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Evaluation (cross-cutting)</text>
-  <rect x="530" y="296" width="14" height="14" rx="3" fill="#455a64"/>
-  <text x="550" y="308" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Shared consortium infrastructure</text>
+  <rect x="40" y="296" width="14" height="14" rx="3" fill="#5e548e"/>
+  <text x="60" y="308" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Sovereign stages (0–C, per participant)</text>
+  <rect x="290" y="296" width="14" height="14" rx="3" fill="#bc6c25"/>
+  <text x="310" y="308" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Evaluation (cross-cutting)</text>
+  <rect x="470" y="296" width="14" height="14" rx="3" fill="#455a64"/>
+  <text x="490" y="308" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Shared consortium infrastructure</text>
 </svg>

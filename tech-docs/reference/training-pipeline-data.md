@@ -693,7 +693,7 @@ A tokenizer that allocates vocabulary fairly across the consortium's languages i
 
 ### Post-training sovereignty
 
-Tapestry's consortium training loop ([TAP-004](../architecture/decisions/adr-004-training-loop.md)) produces a shared base model through collaborative pre-training and weight-delta integration. But the pipeline doesn't end there.
+Tapestry's Shared-Base Loop ([TAP-004](../architecture/decisions/adr-004-training-loop.md)) produces a Shared Base through collaborative pre-training and weight-vector integration. But the pipeline doesn't end there.
 
 After the shared base model is produced, each node may perform its own post-training:
 

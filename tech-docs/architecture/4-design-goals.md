@@ -38,7 +38,7 @@ Data sovereignty must be real and enforceable — not merely promised. The appro
 
 Where technical guarantees are required, they must be verifiable under a clearly stated threat model. Data that a participant designates as sovereign must not leave the participant's infrastructure in raw form unless an explicit, governed exception applies.
 
-**Architectural implication:** Consortium training where nodes share local model weight vectors (Stage A CPT) or optional domain adapter parameters, not data. Tiered sovereignty spectrum from provenance-only (Tier 0) through TEE-based full privacy (Tier 4). The tier is a per-node, per-dataset property — matched to need, not maximized by default.
+**Architectural implication:** Consortium training where nodes share local model weight vectors (Contributed CPT) or optional domain adapter parameters, not data. Tiered sovereignty spectrum from provenance-only (Tier 0) through TEE-based full privacy (Tier 4). The tier is a per-node, per-dataset property — matched to need, not maximized by default.
 
 **Success test:** For each dataset at its assigned tier, sovereignty requirements are met by the chosen mechanism (agreement, operational control, or technical guarantee). Where a technical tier applies, a participant's sovereign data cannot be reconstructed from the information that leaves their node under the stated threat model.
 
