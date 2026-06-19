@@ -69,6 +69,13 @@ make consortium-experiment
                         # Run deterministic PoC metrics for consortium-training rounds.
 make consortium-tests   # Run only the consortium-training prototype tests.
 
+For the EXP-001 cultural-CPT validation harness (contrib):
+
+make cultural-cpt-validation   # Run the arms experiment, single seed (smoke mode).
+make cultural-cpt-aggregation  # Run the FedAvg aggregation-survival experiment.
+make cultural-cpt-stats        # Run the multi-seed go/no-go decision (smoke mode).
+make cultural-cpt-tests        # Run the cultural-CPT harness tests.
+
 For the documentation website:
 
 make view-pages         # View the published GitHub pages in a browser.
@@ -128,7 +135,9 @@ unit-tests::
 	cd ${SRC_DIR} && \
 	  uv run python -m pytest tests -q
 
-.PHONY: consortium-demo consortium-experiment consortium-tests
+.PHONY: consortium-demo consortium-tests consortium-experiment cultural-cpt-validation cultural-cpt-aggregation cultural-cpt-stats cultural-cpt-tests cultural-cpt-fetch-seed cultural-cpt-validate-corpus
+
+CULTURAL_CPT_DIR := contrib/jneums-cultural-cpt-validation
 
 consortium-demo::
 	@echo "${INFO}Running the consortium-training demo...${_END}"
@@ -141,6 +150,39 @@ consortium-experiment::
 consortium-tests::
 	@echo "${INFO}Running the consortium-training tests...${_END}"
 	PYTHONPATH=${PWD}/${SRC_DIR}:${PWD}/contrib/jneums-consortium-experiment uv run python -m pytest ${SRC_DIR}/tests/tapestry/training/consortium contrib/jneums-consortium-experiment/tests -q
+
+cultural-cpt-validation::
+	@echo "${INFO}Running the EXP-001 cultural-CPT validation (smoke mode)...${_END}"
+	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
+		uv run python ${CULTURAL_CPT_DIR}/run.py
+
+cultural-cpt-aggregation::
+	@echo "${INFO}Running the cultural-CPT aggregation-survival experiment (smoke mode)...${_END}"
+	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
+		uv run python ${CULTURAL_CPT_DIR}/run_aggregation.py
+
+cultural-cpt-stats::
+	@echo "${INFO}Running the cultural-CPT multi-seed go/no-go (smoke mode)...${_END}"
+	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
+		uv run python ${CULTURAL_CPT_DIR}/run_stats.py
+
+cultural-cpt-tests::
+	@echo "${INFO}Running the cultural-CPT validation tests...${_END}"
+	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
+		uv run pytest ${CULTURAL_CPT_DIR}/tests -q
+
+# CORPUS=<path> selects the root to validate (default: the committed seed).
+CORPUS ?= ${CULTURAL_CPT_DIR}/data/seed-example
+
+cultural-cpt-fetch-seed::
+	@echo "${INFO}Fetching the real EXP-001 demonstration seed corpus (needs network)...${_END}"
+	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
+		uv run python ${CULTURAL_CPT_DIR}/fetch_corpus.py --culture seed-example --lang en --per-domain 4
+
+cultural-cpt-validate-corpus::
+	@echo "${INFO}Validating corpus ${CORPUS} against the EXP-001 controls...${_END}"
+	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
+		uv run python ${CULTURAL_CPT_DIR}/fetch_corpus.py --validate ${CORPUS}
 
 .PHONY: before-pr format-lint-type-check flt
 before-pr:: format-lint-type-check tests

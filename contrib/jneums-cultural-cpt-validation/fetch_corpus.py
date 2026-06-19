@@ -1,0 +1,629 @@
+#!/usr/bin/env python3
+"""Assemble an EXP-001 corpus from permissively-licensed sources.
+
+Implements the matched-twin design from ``data/README.md``: both the
+**grounded** and **language-matched** arms are drawn from the *same source and
+register* (Wikipedia article intros, CC-BY-SA-4.0), varying only the topical
+**domain** — value-laden domains (law, religion, family, civic) for grounded,
+value-neutral domains (weather, sports, technical, mathematics) for the twin.
+That holds language, register, recency and quality constant by construction, so
+the only systematic difference is cultural value content.
+
+The fetcher then does what a hand-assembled corpus would otherwise get wrong:
+  * drops any document that trips WVS decontamination (so it never reaches CPT);
+  * balances the two arms' token budgets to within the twin tolerance;
+  * writes a manifest declaring the controls, and re-validates the result.
+
+Default run fetches an English **demonstration seed** (real text, verifiable
+titles) — it exercises the loader end to end. ``usa``/English is deliberately a
+*wiring* culture, not the experimental one (the spec wants a high-WVS-distance
+culture); supply ``--titles-file`` + ``--lang`` to assemble a real target
+culture in its own language.
+
+Examples::
+
+    # real English demonstration seed -> data/seed-example/
+    python fetch_corpus.py --culture seed-example --lang en --per-domain 4
+
+    # a real target culture from a curated title list in its language
+    python fetch_corpus.py --culture egypt --lang ar --titles-file egypt_titles.json
+
+    # validate an existing root against every control, no fetching
+    python fetch_corpus.py --validate data/seed-example
+"""
+
+# pylint: disable=wrong-import-position
+
+from __future__ import annotations
+
+import argparse
+import json
+import random
+import re
+import sys
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from cultural_cpt import dataset  # noqa: E402
+
+# Same source + register for both arms; only the domain (value-laden vs neutral)
+# differs. Titles are real, stable English Wikipedia articles, used for the
+# demonstration seed. Real target cultures pass their own --titles-file.
+_DEFAULT_TITLES: dict[str, dict[str, list[str]]] = {
+    "grounded": {
+        "law": ["Law", "Constitution", "Justice", "Rule of law", "Common law"],
+        "religion": ["Religion", "Ethics", "Morality", "Ritual", "Pilgrimage"],
+        "family": ["Family", "Kinship", "Marriage", "Filial piety", "Extended family"],
+        "civic": ["Citizenship", "Democracy", "Civil society", "Tradition", "Social contract"],
+    },
+    "language_matched": {
+        "weather": ["Weather", "Rain", "Cloud", "Wind", "Atmospheric pressure"],
+        "sports": ["Association football", "Basketball", "Tennis", "Olympic Games", "Marathon"],
+        "technical": ["Internal combustion engine", "Screw", "Concrete", "Bridge", "Bearing (mechanical)"],
+        "mathematics": ["Prime number", "Triangle", "Calculus", "Logarithm", "Matrix (mathematics)"],
+    },
+}
+
+# Replay arm: general, value-neutral text in the base model's *dominant* language
+# (English for Qwen/Llama), mixed into the grounded CPT to rehearse the model's
+# pretraining distribution and suppress catastrophic forgetting. Broad,
+# low-cultural-loading topics across science/tech/nature so it preserves general
+# capability without nudging any value coordinate. Always fetched in English,
+# regardless of the corpus language. (Built only with --replay.)
+_REPLAY_TITLES: dict[str, list[str]] = {
+    "science": ["Photosynthesis", "Cell (biology)", "Atom", "Gravity", "Evolution", "Thermodynamics"],
+    "geography": ["Mountain", "River", "Ocean", "Desert", "Glacier", "Volcano"],
+    "technology": ["Computer", "Electricity", "Telephone", "Microscope", "Steam engine", "Radio"],
+    "nature": ["Ecosystem", "Mammal", "Insect", "Tree", "Bird migration", "Coral reef"],
+}
+
+_WIKI_LICENSE = "CC-BY-SA-4.0"
+_USER_AGENT = "tapestry-cultural-cpt/0.1 (EXP-001 corpus fetcher; +https://thealliance.ai)"
+_INTRO_CAP = 120  # words per doc in seed/intro mode (small, comparable)
+_FULL_CAP = 2000  # words per doc in --full mode (real-sized CPT corpus)
+# Wikipedia throttles bursts with HTTP 429. A large twin corpus is hundreds of
+# requests, so a build that just skips 429s drops a whole arm (it did: Run-of
+# 2026-06-14 fetched grounded, then got 429 on every language_matched title ->
+# empty arm -> fatal). Be polite (small inter-request delay) and back off on 429.
+_REQUEST_DELAY_S = 0.4  # courtesy gap between requests
+_MAX_RETRIES = 5  # attempts per URL before giving up
+_last_request_t = 0.0
+
+
+def _http_get_json(url: str) -> dict:
+    """GET a Wikipedia API URL as JSON, with a courtesy delay and 429/5xx backoff.
+
+    Honors ``Retry-After`` when present, else exponential backoff with jitter.
+    Raises the last error if every attempt fails, so the caller's existing
+    skip-and-continue still applies to genuinely broken titles (not throttling).
+    """
+    global _last_request_t
+    req = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
+    for attempt in range(_MAX_RETRIES):
+        gap = _REQUEST_DELAY_S - (time.monotonic() - _last_request_t)
+        if gap > 0:
+            time.sleep(gap)
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310 (trusted host)
+                return json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            if exc.code not in (429, 500, 502, 503, 504) or attempt == _MAX_RETRIES - 1:
+                raise
+            retry_after = exc.headers.get("Retry-After") if exc.headers else None
+            wait = float(retry_after) if (retry_after and retry_after.isdigit()) else 2.0**attempt
+            wait += random.uniform(0, 0.5)
+            print(f"  … HTTP {exc.code}; backing off {wait:.1f}s (attempt {attempt + 1})", file=sys.stderr)
+            time.sleep(wait)
+        finally:
+            _last_request_t = time.monotonic()
+    raise RuntimeError("unreachable")  # pragma: no cover
+
+
+def _wiki_text(lang: str, title: str, *, full: bool) -> tuple[str, str] | None:
+    """Fetch an article's plain text. ``full`` grabs the whole article, else just
+    the lead section. Returns (text, canonical_url) or None if missing."""
+    params = {
+        "action": "query",
+        "format": "json",
+        "prop": "extracts",
+        "explaintext": "1",
+        "redirects": "1",
+        "titles": title,
+    }
+    if not full:
+        params["exintro"] = "1"
+    url = f"https://{lang}.wikipedia.org/w/api.php?" + urllib.parse.urlencode(params)
+    data = _http_get_json(url)
+    pages = data.get("query", {}).get("pages", {})
+    for page in pages.values():
+        extract = (page.get("extract") or "").strip()
+        if not extract or "missing" in page:
+            return None
+        canonical = page.get("title", title)
+        page_url = f"https://{lang}.wikipedia.org/wiki/" + urllib.parse.quote(canonical.replace(" ", "_"))
+        return extract, page_url
+    return None
+
+
+def _truncate_words(text: str, max_words: int) -> str:
+    words = text.split()
+    return text if len(words) <= max_words else " ".join(words[:max_words])
+
+
+def _category_members(lang: str, category: str, limit: int) -> list[str]:
+    """Article titles in a Wikipedia category (pages only), via the action API.
+
+    Used to scale a domain past hand-curated titles. Categories are chosen narrow
+    (e.g. fiqh, ethics, worship) so the value-laden vs neutral contrast survives;
+    off-topic members are diluted by the law of large numbers + decontamination.
+    """
+    params = {
+        "action": "query",
+        "format": "json",
+        "list": "categorymembers",
+        "cmtitle": category,
+        "cmlimit": str(min(limit, 500)),
+        "cmtype": "page",
+    }
+    url = f"https://{lang}.wikipedia.org/w/api.php?" + urllib.parse.urlencode(params)
+    try:
+        data = _http_get_json(url)
+    except Exception as exc:
+        print(f"  ! category {category}: {exc}", file=sys.stderr)
+        return []
+    members = data.get("query", {}).get("categorymembers", [])
+    return [m["title"] for m in members][:limit]
+
+
+def _fetch_arm(
+    lang: str,
+    domains: dict[str, list[str]],
+    per_domain: int,
+    *,
+    full: bool,
+    max_words: int = 0,
+    categories: dict[str, list[str]] | None = None,
+    cat_limit: int = 0,
+) -> list[dict]:
+    cap = (max_words or _FULL_CAP) if full else _INTRO_CAP
+    docs: list[dict] = []
+    for domain, titles in domains.items():
+        # Candidate titles: curated, then category members (deduped, order kept).
+        candidates = list(titles)
+        if cat_limit and categories:
+            for cat in categories.get(domain, []):
+                candidates += _category_members(lang, cat, cat_limit)
+        seen: set[str] = set()
+        candidates = [t for t in candidates if not (t in seen or seen.add(t))]
+        budget = per_domain if not (cat_limit and categories) else len(candidates)
+        taken = 0
+        for title in candidates:
+            if taken >= budget:
+                break
+            try:
+                got = _wiki_text(lang, title, full=full)
+            except Exception as exc:  # network / API hiccup: skip, keep going
+                print(f"  ! {lang}:{title}: {exc}", file=sys.stderr)
+                continue
+            if not got:
+                print(f"  - {lang}:{title}: no extract, skipping", file=sys.stderr)
+                continue
+            text, page_url = got
+            text = _truncate_words(text, cap)
+            if len(text.split()) < 20:  # too short to be useful CPT text
+                continue
+            slug = title.lower().replace(" ", "_").replace("(", "").replace(")", "")
+            docs.append(
+                {
+                    "id": f"{lang}wiki:{domain}:{slug}",
+                    "text": text,
+                    "source": f"{lang}.wikipedia.org",
+                    "license": _WIKI_LICENSE,
+                    "lang": lang,
+                    "domain": domain,
+                    "url": page_url,
+                }
+            )
+            taken += 1
+            print(f"  + {domain:<12} {title} ({len(text.split())} words)")
+    return docs
+
+
+def _decontaminate(docs: list[dict], arm: str) -> list[dict]:
+    """Drop any fetched doc that reproduces a WVS/behavioral item."""
+    records = [dataset.DocumentRecord.from_json(d, where=f"{arm}:fetch") for d in docs]
+    flags = {f.doc_id for f in dataset.find_contamination(records, dataset.wvs_probe_phrases())}
+    if flags:
+        print(f"  decontamination dropped {len(flags)} doc(s) from {arm}: {sorted(flags)}", file=sys.stderr)
+    return [d for d in docs if d["id"] not in flags]
+
+
+def _balance_twin(grounded: list[dict], matched: list[dict], tol: float) -> None:
+    """Trim the longer arm's documents (in place) until token budgets match.
+
+    Keeps both arms real text — it only shortens documents to equalize size, the
+    twin control the spec demands ("size held constant").
+    """
+
+    def total(docs: list[dict]) -> int:
+        return sum(len(dataset._normalize(d["text"])) for d in docs)
+
+    for _ in range(1000):
+        g, m = total(grounded), total(matched)
+        if m == 0 or abs(1.0 - g / m) <= tol:
+            return
+        longer = grounded if g > m else matched
+        longest = max(longer, key=lambda d: len(d["text"].split()))
+        words = longest["text"].split()
+        if len(words) <= 20:
+            return  # cannot trim further without going below the usefulness floor
+        longest["text"] = " ".join(words[: int(len(words) * 0.9)])
+
+
+def _cap_tokens(docs: list[dict], max_tokens: int, *, seed: int = 0) -> list[dict]:
+    """Subsample an arm's docs to a token budget (deterministic), so corpus size
+    -- and therefore training time -- is predictable regardless of how many
+    category members were pulled. Shuffled first so the cap keeps a domain mix."""
+    if not max_tokens:
+        return docs
+    import random as _random
+
+    shuffled = docs[:]
+    _random.Random(seed).shuffle(shuffled)
+    out: list[dict] = []
+    total = 0
+    for d in shuffled:
+        n = len(dataset._normalize(d["text"]))
+        if total + n > max_tokens and out:
+            break
+        out.append(d)
+        total += n
+    return out
+
+
+# --- Arm 3: grounded_translated (content vs. language carrier) --------------
+
+# Sentence terminators across Latin + Arabic punctuation, so MT chunking respects
+# sentence boundaries in either script.
+_SENT_SPLIT = re.compile(r"(?<=[.!?؟।])\s+|\n+")
+
+
+def _chunk_for_mt(text: str, max_words: int = 60) -> list[str]:
+    """Pack a document into <=max_words chunks on sentence boundaries.
+
+    Opus-MT models truncate beyond ~512 tokens, so a whole article must be split.
+    Splitting on sentences (not arbitrary word windows) keeps each chunk
+    translatable on its own."""
+    chunks: list[str] = []
+    current: list[str] = []
+    count = 0
+    for sentence in _SENT_SPLIT.split(text):
+        sentence = sentence.strip()
+        if not sentence:
+            continue
+        n = len(sentence.split())
+        if current and count + n > max_words:
+            chunks.append(" ".join(current))
+            current, count = [], 0
+        current.append(sentence)
+        count += n
+    if current:
+        chunks.append(" ".join(current))
+    return chunks
+
+
+def _make_translator(src_lang: str):
+    """Return a ``str -> str`` machine translator into English, or raise.
+
+    Loads a Helsinki-NLP Opus-MT seq2seq model directly (model + tokenizer, then
+    ``generate``) rather than the ``pipeline("translation")`` helper, which was
+    removed in transformers 5.x. Tries the language-specific pair first, then the
+    multilingual ``mul-en`` fallback. This is the seam that turns the grounded
+    corpus into its English twin for Arm 3, isolating cultural *content* from the
+    *language* it arrives in."""
+    try:
+        import torch
+        from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+    except ImportError as exc:  # pragma: no cover - GPU-box dependency
+        raise ImportError("--translate needs `transformers`; install it or omit the flag.") from exc
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    last_exc: Exception | None = None
+    for model_id in (f"Helsinki-NLP/opus-mt-{src_lang}-en", "Helsinki-NLP/opus-mt-mul-en"):
+        try:
+            tokenizer = AutoTokenizer.from_pretrained(model_id)
+            model = AutoModelForSeq2SeqLM.from_pretrained(model_id).to(device).eval()
+            print(f"  translator: {model_id} on {device}")
+
+            def translate(text: str, _tok=tokenizer, _model=model, _dev=device) -> str:
+                pieces: list[str] = []
+                for chunk in _chunk_for_mt(text):
+                    enc = _tok(chunk, return_tensors="pt", truncation=True, max_length=512).to(_dev)
+                    with torch.no_grad():
+                        gen = _model.generate(**enc, max_length=512, num_beams=1)
+                    pieces.append(_tok.batch_decode(gen, skip_special_tokens=True)[0])
+                return " ".join(p.strip() for p in pieces if p.strip())
+
+            return translate
+        except Exception as exc:  # pragma: no cover - model availability
+            last_exc = exc
+            print(f"  ! translator {model_id} unavailable: {exc}", file=sys.stderr)
+    raise RuntimeError(f"no Opus-MT model loaded for {src_lang!r}->en: {last_exc}")
+
+
+def _translate_grounded(grounded: list[dict], src_lang: str) -> list[dict]:
+    """Machine-translate the (already finalized) grounded docs into English.
+
+    Same documents, same domains/provenance — only the text and language change,
+    plus an ``:en`` id suffix — so Arm 3 trains on the grounded *content* carried
+    in the base model's language."""
+    translate = _make_translator(src_lang)
+    out: list[dict] = []
+    for d in grounded:
+        try:
+            en = translate(d["text"])
+        except Exception as exc:  # pragma: no cover - per-doc MT hiccup
+            print(f"  ! translate {d['id']}: {exc}", file=sys.stderr)
+            continue
+        if len(en.split()) < 20:
+            continue
+        out.append({**d, "id": f"{d['id']}:en", "text": en, "lang": "en"})
+        print(f"  ~ translated {d['domain']:<12} {d['id']} ({len(en.split())} words)")
+    return out
+
+
+def _write_jsonl(path: Path, docs: list[dict]) -> None:
+    path.write_text("".join(json.dumps(d, ensure_ascii=False) + "\n" for d in docs), encoding="utf-8")
+
+
+def _write_manifest(
+    root: Path,
+    culture: str,
+    lang: str,
+    tol: float,
+    titles: dict,
+    *,
+    with_translated: bool = False,
+    with_replay: bool = False,
+    with_neutral_prose: bool = False,
+) -> None:
+    def domains_for(name: str) -> list[str]:
+        if name == "grounded_translated":
+            return sorted(titles["grounded"].keys())
+        if name == "replay":
+            return sorted(_REPLAY_TITLES.keys())
+        return sorted(titles[name].keys())
+
+    def arm(name: str, value_laden: bool, arm_lang: str = lang) -> dict:
+        return {
+            "file": f"{name}.jsonl",
+            "lang": arm_lang,
+            "register": "encyclopedic",
+            "domains": domains_for(name),
+            "value_laden": value_laden,
+        }
+
+    arms = {
+        "grounded": arm("grounded", True),
+        "language_matched": arm("language_matched", False),
+    }
+    if with_translated:
+        # Arm 3 is the grounded content in the base model's language (English).
+        # It is exempt from the twin control (different language + post-MT length).
+        arms["grounded_translated"] = arm("grounded_translated", True, arm_lang="en")
+    if with_neutral_prose:
+        # Register control: value-neutral but discursive prose in the corpus
+        # language. Exempt from the twin control (the grounded/language_matched
+        # token-budget twin); grounded−neutral_prose is its own comparison.
+        arms["neutral_prose"] = arm("neutral_prose", False)
+    if with_replay:
+        # Replay is general English text for forgetting mitigation; value-neutral
+        # and exempt from the twin control (it is not part of the matched twin).
+        arms["replay"] = arm("replay", False, arm_lang="en")
+
+    manifest = {
+        "culture": culture,
+        "language": lang,
+        "arms": arms,
+        "twin_matching": {
+            "token_ratio_tolerance": tol,
+            "require_same_language": True,
+            "require_same_register": True,
+        },
+    }
+    (root / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def _validate(root: Path) -> int:
+    manifest = dataset.CorpusManifest.load(root)
+    print(f"validating {root}  (culture={manifest.culture}, lang={manifest.language})")
+    for arm in manifest.arms:
+        docs = dataset.load_arm_documents(root, arm)
+        tokens = sum(len(dataset._normalize(d.text)) for d in docs)
+        print(f"  {arm:<20} {len(docs):>4} docs  {tokens:>7} tokens  OK")
+    print("all controls passed (license, language, register, token budget, recency, decontamination)")
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--culture", default="seed-example", help="corpus / culture name")
+    parser.add_argument("--lang", default="en", help="Wikipedia language code (e.g. en, ar, vi)")
+    parser.add_argument("--per-domain", type=int, default=4, help="articles per domain per arm")
+    parser.add_argument(
+        "--full",
+        action="store_true",
+        help=f"fetch full articles (cap {_FULL_CAP} words) for a real-sized corpus, not just intros",
+    )
+    parser.add_argument(
+        "--max-words",
+        type=int,
+        default=0,
+        help=f"override the per-article word cap in --full mode (default {_FULL_CAP})",
+    )
+    parser.add_argument("--titles-file", default="", help="JSON {arm: {domain: [titles]}} for a real culture")
+    parser.add_argument(
+        "--cat-limit",
+        type=int,
+        default=0,
+        help="also pull up to N article(s) per category from the titles file's 'categories' block (0 = off)",
+    )
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=0,
+        help="per-arm token budget; subsample to this so corpus size / training time is predictable (0 = no cap)",
+    )
+    parser.add_argument("--tol", type=float, default=0.20, help="twin token-ratio tolerance")
+    parser.add_argument(
+        "--translate",
+        action="store_true",
+        help="also build the grounded_translated arm (Arm 3): MT the grounded corpus to English "
+        "to isolate cultural content from the language carrying it. Needs `transformers`.",
+    )
+    parser.add_argument(
+        "--replay",
+        action="store_true",
+        help="also build the replay arm: a general, value-neutral English corpus mixed into the "
+        "grounded_replay arm's CPT to suppress catastrophic forgetting (Run 8 follow-up).",
+    )
+    parser.add_argument(
+        "--neutral-prose",
+        action="store_true",
+        help="also build the neutral_prose arm: a value-neutral but DISCURSIVE same-language twin "
+        "(biography/history/geography/arts from the titles file) that controls for register, so "
+        "grounded - neutral_prose isolates cultural content from genre.",
+    )
+    parser.add_argument("--out", default="", help="output root (default: data/<culture>)")
+    parser.add_argument("--validate", default="", help="validate an existing root and exit")
+    args = parser.parse_args()
+
+    if args.validate:
+        return _validate(Path(args.validate))
+
+    titles = _DEFAULT_TITLES
+    if args.titles_file:
+        titles = json.loads(Path(args.titles_file).read_text(encoding="utf-8"))
+    elif args.lang != "en":
+        print("error: non-English fetch needs --titles-file with target-language titles", file=sys.stderr)
+        return 2
+
+    root = Path(args.out) if args.out else Path(__file__).resolve().parent / "data" / args.culture
+    root.mkdir(parents=True, exist_ok=True)
+
+    cats = titles.get("categories", {}) if isinstance(titles, dict) else {}
+    print(f"fetching grounded arm ({args.lang}{', full' if args.full else ''})…")
+    grounded = _decontaminate(
+        _fetch_arm(
+            args.lang,
+            titles["grounded"],
+            args.per_domain,
+            full=args.full,
+            max_words=args.max_words,
+            categories=cats.get("grounded"),
+            cat_limit=args.cat_limit,
+        ),
+        "grounded",
+    )
+    print(f"fetching language_matched arm ({args.lang}{', full' if args.full else ''})…")
+    matched = _decontaminate(
+        _fetch_arm(
+            args.lang,
+            titles["language_matched"],
+            args.per_domain,
+            full=args.full,
+            max_words=args.max_words,
+            categories=cats.get("language_matched"),
+            cat_limit=args.cat_limit,
+        ),
+        "language_matched",
+    )
+    if not grounded or not matched:
+        print("error: one or both arms came back empty (network? titles?)", file=sys.stderr)
+        return 1
+
+    grounded = _cap_tokens(grounded, args.max_tokens)
+    matched = _cap_tokens(matched, args.max_tokens)
+    _balance_twin(grounded, matched, args.tol)
+    _write_jsonl(root / "grounded.jsonl", grounded)
+    _write_jsonl(root / "language_matched.jsonl", matched)
+
+    with_translated = False
+    if args.translate:
+        if args.lang == "en":
+            print("note: --translate is a no-op for an English corpus (already the base language)", file=sys.stderr)
+        else:
+            print(f"building grounded_translated arm ({args.lang} -> en)…")
+            translated = _decontaminate(_translate_grounded(grounded, args.lang), "grounded_translated")
+            if translated:
+                _write_jsonl(root / "grounded_translated.jsonl", translated)
+                with_translated = True
+            else:
+                print("warning: translation produced no usable docs; skipping Arm 3", file=sys.stderr)
+
+    with_neutral_prose = False
+    if args.neutral_prose:
+        if "neutral_prose" not in titles:
+            print(
+                "warning: --neutral-prose but the titles file has no 'neutral_prose' block; skipping", file=sys.stderr
+            )
+        else:
+            print(f"fetching neutral_prose arm ({args.lang}{', full' if args.full else ''})…")
+            neutral_prose = _decontaminate(
+                _fetch_arm(
+                    args.lang,
+                    titles["neutral_prose"],
+                    args.per_domain,
+                    full=args.full,
+                    max_words=args.max_words,
+                    categories=cats.get("neutral_prose"),
+                    cat_limit=args.cat_limit,
+                ),
+                "neutral_prose",
+            )
+            neutral_prose = _cap_tokens(neutral_prose, args.max_tokens)
+            if neutral_prose:
+                _write_jsonl(root / "neutral_prose.jsonl", neutral_prose)
+                with_neutral_prose = True
+            else:
+                print("warning: neutral_prose arm came back empty; skipping it", file=sys.stderr)
+
+    with_replay = False
+    if args.replay:
+        print("fetching replay arm (general, value-neutral, en)…")
+        # Replay is always English (the base model's dominant language) and is not
+        # part of the twin, so it is fetched independently and capped to the same
+        # per-arm token budget as the twin arms.
+        replay = _decontaminate(
+            _fetch_arm("en", _REPLAY_TITLES, args.per_domain, full=args.full, max_words=args.max_words),
+            "replay",
+        )
+        replay = _cap_tokens(replay, args.max_tokens)
+        if replay:
+            _write_jsonl(root / "replay.jsonl", replay)
+            with_replay = True
+        else:
+            print("warning: replay arm came back empty; skipping it", file=sys.stderr)
+
+    _write_manifest(
+        root,
+        args.culture,
+        args.lang,
+        args.tol,
+        titles,
+        with_translated=with_translated,
+        with_replay=with_replay,
+        with_neutral_prose=with_neutral_prose,
+    )
+    print(f"wrote {root}")
+    return _validate(root)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
