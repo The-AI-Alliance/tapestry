@@ -5,6 +5,7 @@
 | Status | Proposed |
 | Confidence | Strong (4/5) |
 | Date | May 7, 2026 |
+| Revised | Jun 19, 2026 — retitled "The Sovereign Build"; added Phase-2 boundary diagram; Stage A mapped to Contributed/Private CPT. |
 | Deciders | Christopher Nguyen (proposed), workshop participants (to resolve open questions) |
 | Supersedes | Original three-stage pipeline (CPT, alignment, instruction) |
 

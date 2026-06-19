@@ -21,7 +21,7 @@
   <!-- ==================== SHARED BASE (hinge) ==================== -->
   <rect x="370" y="55" width="160" height="70" rx="10" fill="#2c7da0" stroke="#236a8c" stroke-width="2"/>
   <text x="450" y="88" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="14" font-weight="600">Shared Base</text>
-  <text x="450" y="108" text-anchor="middle" fill="#a9d6e5" font-family="system-ui,Segoe UI,sans-serif" font-size="11">the “1” · no alignment</text>
+  <text x="450" y="108" text-anchor="middle" fill="#a9d6e5" font-family="system-ui,Segoe UI,sans-serif" font-size="11">the '1' · no alignment</text>
 
   <!-- ==================== PHASE 1 PANEL ==================== -->
   <rect x="20" y="160" width="400" height="310" rx="10" fill="#f5f7fa" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="6 4"/>

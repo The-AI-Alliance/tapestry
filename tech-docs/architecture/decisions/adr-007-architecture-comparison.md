@@ -5,6 +5,7 @@
 | Status | Proposed |
 | Confidence | Strong (4/5) |
 | Date | May 7, 2026 |
+| Revised | Jun 19, 2026 — terminology aligned to the two-phase model; Contributed CPT and Sovereign-Build boundary clarified. |
 | Deciders | Christopher Nguyen (proposed), workshop participants (to validate and refine) |
 
 ## Why this ADR exists

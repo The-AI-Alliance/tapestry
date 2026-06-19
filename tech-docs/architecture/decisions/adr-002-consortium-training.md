@@ -5,6 +5,7 @@
 | Status | Proposed |
 | Confidence | High (5/5) |
 | Date | May 7, 2026 |
+| Revised | Jun 19, 2026 — terminology aligned (Shared Base, Contributed CPT); added N+1 two-phase diagram; consolidated as the canonical definition. |
 | Deciders | Christopher Nguyen (proposed), workshop participants (to ratify) |
 
 ## Context
@@ -20,7 +21,7 @@ Tapestry uses **consortium training**: a small number of large, trusted, heterog
 ```mermaid
 flowchart LR
   LOOP["Shared-Base Loop<br/>(N members · Contributed CPT)"]:::collective
-  SB[("Shared Base<br/>the 1")]:::base
+  SB[("Shared Base<br/>the '1'")]:::base
   BUILD["Sovereign Build × N<br/>(per member · local)"]:::sovereign
   SM(["N Sovereign Models"]):::model
   LOOP --> SB --> BUILD --> SM

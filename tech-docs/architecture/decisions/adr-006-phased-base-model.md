@@ -5,6 +5,7 @@
 | Status | Proposed |
 | Confidence | Strong (4/5) |
 | Date | May 7, 2026 |
+| Revised | Jun 19, 2026 — terminology aligned to the two-phase model (Shared-Base Loop, Sovereign Build). |
 | Deciders | Christopher Nguyen (proposed), workshop participants (to resolve open questions) |
 
 ## Context
