@@ -10,13 +10,13 @@
 
 ## Context
 
-Tapestry's training involves multiple sovereign nodes contributing to a shared model. The approach must be named and distinguished from existing paradigms (centralized training, federated learning) to avoid confusion and to accurately describe what Tapestry does.
+Tapestry's training involves multiple sovereign members contributing to a shared model. The approach must be named and distinguished from existing paradigms (centralized training, federated learning) to avoid confusion and to accurately describe what Tapestry does.
 
 See [`training-approaches.md`](../../reference/training-approaches.md) for a full comparison of centralized, federated, and consortium training.
 
 ## Decision
 
-Tapestry uses **consortium training**: a small number of large, trusted, heterogeneous nodes collaboratively training a shared model, where data sovereignty is a first-order architectural constraint and cultural alignment is the goal.
+Tapestry uses **consortium training**: a small number of large, trusted, heterogeneous members collaboratively training a shared model, where data sovereignty is a first-order architectural constraint and cultural alignment is the goal.
 
 ```mermaid
 flowchart LR
@@ -55,7 +55,7 @@ Consortium training borrows techniques from the federated learning literature �
 
 ## Rationale
 
-- Tapestry's nodes are few (dozens), large (national GPU clusters), and **collaborating institutions with governance voice** — not millions of mutually untrusted edge clients. See [Design principles for architecture work](../0-tva-methodology.md#design-principles-for-architecture-work).
+- Tapestry's members are few (dozens) and are **collaborating institutions with governance voice** — not millions of mutually untrusted edge clients. Each member operates large nodes (national GPU clusters). See [Design principles for architecture work](../0-tva-methodology.md#design-principles-for-architecture-work).
 - The sovereignty motive is national/institutional, not individual data protection. The governance model, trust assumptions, and communication patterns all differ.
 - Using "federated" to describe Tapestry borrows the right principle (data stays put) but the wrong connotations (edge devices, FedAvg, cross-silo averaging). "Consortium training" accurately describes the participants, the purpose, and the governance.
 

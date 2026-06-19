@@ -167,7 +167,7 @@ This loop differs from traditional federated learning in important ways:
 | **Communication cadence** | Varies by method and deployment | Operational choice — frequent or infrequent |
 | **Heterogeneity** | Hardware (phone vs. tablet) | Hardware, data, culture, policy |
 
-The term "consortium training" more accurately describes what Tapestry does — the paradigm defined in [TAP-002](decisions/adr-002-consortium-training.md): few large, trusted, heterogeneous nodes collaboratively improving a shared model under data-sovereignty and cultural-alignment constraints.
+The term "consortium training" more accurately describes what Tapestry does — the paradigm defined in [TAP-002](decisions/adr-002-consortium-training.md): few large, trusted, heterogeneous members collaboratively improving a shared model under data-sovereignty and cultural-alignment constraints.
 
 ### Workshop decision needed
 
