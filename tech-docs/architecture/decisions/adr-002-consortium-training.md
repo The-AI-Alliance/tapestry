@@ -32,6 +32,8 @@ flowchart LR
   classDef model fill:#7b6aae,stroke:#e0c3fc,color:#fff
 ```
 
+*Term definitions are consolidated in [`glossary.md`](../../reference/glossary.md).*
+
 This is distinct from federated learning (designed for millions of small edge clients with individual privacy concerns) and from centralized training (all data in one place, one organization controls everything).
 
 ![Training paradigms compared](../diagrams/training-paradigms-comparison.svg)
