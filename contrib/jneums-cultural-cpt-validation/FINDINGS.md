@@ -612,12 +612,7 @@ up with stability and the right substrate.
 
 ## Status & next steps
 
-**Decision (2026-06-17): report the relative effect as the headline; do not spend
-more GPU chasing the absolute conjunct.** The decisive cross-corpus test is done and
-the base-model relative result (z=2.97, capability/safety-clean) is the claim the
-data supports outright. The GPU box was destroyed after Run 11.
-
-The claim to make in the PR:
+**Reported claim (the data supports this outright):**
 
 > Value-grounded Arabic CPT shifts a base model toward Egyptian values **more than a
 > same-language, value-neutral corpus does** — `grounded − language = +0.051,
@@ -626,18 +621,32 @@ The claim to make in the PR:
 > underpowered at this corpus scale, and the effect requires the base model: on the
 > RLHF-aligned instruct model it does not survive corpus resampling.
 
-Deferred (not blocking the reframe; revisit only if a full four-conjunct PASS is
-wanted):
+This result was merged as **PR #65** (2026-06-19); the maintainer approved with "We
+should pursue the next steps proposed," so the work continues in two phases:
 
-- **Scale base-model tokens/epochs** on the same `CORPUS_DRAWS=4 CORPUS_FRACTION=0.7`
-  band to push the absolute shift over 0.05 — the one GPU run that would convert the
-  reframe into a four-conjunct cross-corpus PASS.
+**Phase 1 — close the absolute-magnitude gap (Run 12, in progress 2026-06-22).** The
+one GPU run that converts the reframe into a full four-conjunct cross-corpus PASS:
+scale the base-model corpus/epochs on the **same** `CORPUS_DRAWS=4 CORPUS_FRACTION=0.7`
+band to push the absolute shift over 0.05. Config: `Qwen3-4B-Base`, 10 epochs,
+`cat_limit=150` (≈740k/617k-token pool, ~430k/draw — ~2× Run 11; the Arabic category
+membership is the hard ceiling, so the scale-up rides mostly on epochs), 3 seeds.
+**Stopping rule:** if the absolute shift lands at +0.04–0.05 again (a noise-band
+near-miss), report it as the relative-effect reframe above rather than grind more GPU —
+the z≈3 relative result is the defensible headline either way.
+
+**Phase 2 — consortium / aggregation-survival (T3).** The Tapestry-unique question and
+the round-two headline: does cultural alignment survive FedAvg across cultures, or
+collapse toward the centroid? `run_aggregation.py` is smoke-only today and needs the
+real HF backend wired in per node (see [SPEC.md](SPEC.md) consortium extension).
+
+Also deferred (cheap to fold into a future base run):
+
 - **Firm up `grounded − neutral_prose` on base** (currently z=1.90; it already
   cleared 2σ on instruct at z=2.28). More `neutral_prose` tokens would make the
   register-rejection airtight on the substrate that matters.
 - **Behavioral transfer.** The free-form behavioral probe has not moved for any arm
   in any run; a representational/behavioral shift (H1c) remains undemonstrated and
-  is the natural next hypothesis if the work continues.
+  is the natural next hypothesis if the consortium question is answered.
 
 **Resolved along the way:** the noise-band question (cross-corpus, Run 7); training
 instability (stabilisation, Run 9); the register confound (rejected, Run 10a); the
