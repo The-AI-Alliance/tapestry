@@ -80,7 +80,9 @@ def main() -> None:
         coords = "  ".join(f"{n.culture[:3]}({n.ts:+.2f},{n.ss:+.2f})" for n in metric.nodes)
         print(
             f"  [round {metric.round_num}] separability={metric.mean_pairwise_distance:.3f} "
-            f"to-centroid={metric.mean_distance_to_centroid:.3f}   {coords}",
+            f"to-centroid={metric.mean_distance_to_centroid:.3f}  |  merge: "
+            f"cos={metric.mean_update_cosine:+.3f} sign-agree={metric.update_sign_agreement:.3f} "
+            f"retained={metric.retained_update_ratio:.3f}   {coords}",
             flush=True,
         )
 
@@ -91,12 +93,13 @@ def main() -> None:
     print(f"  mode     : {result.mode}")
     print(f"  cultures : {', '.join(result.cultures)}")
     print(f"  seed     : {result.seed}")
-    print("  round   separability   dist-to-centroid   per-culture (TS,SS)")
+    print("  round   separability   to-centroid   merge-cos   sign-agree   retained   per-culture (TS,SS)")
     for metric in result.rounds:
         coords = "  ".join(f"{n.culture[:3]}({n.ts:+.2f},{n.ss:+.2f})" for n in metric.nodes)
         print(
             f"    {metric.round_num:<5} {metric.mean_pairwise_distance:>9.3f}   "
-            f"{metric.mean_distance_to_centroid:>14.3f}   {coords}"
+            f"{metric.mean_distance_to_centroid:>10.3f}   {metric.mean_update_cosine:>+8.3f}   "
+            f"{metric.update_sign_agreement:>9.3f}   {metric.retained_update_ratio:>7.3f}   {coords}"
         )
     curve = " -> ".join(f"{x:.3f}" for x in result.separability_curve)
     print(f"  separability curve: {curve}")
@@ -106,6 +109,20 @@ def main() -> None:
         else "holding/growing"
     )
     print(f"  trend: {trend}")
+    # Distinguish the two collapse modes (see aggregation.py docstring / LITERATURE.md §6).
+    if result.separability_curve[-1] < result.separability_curve[0]:
+        last = result.rounds[-1]
+        if last.mean_update_cosine <= 0.0 or last.retained_update_ratio < 0.5:
+            print(
+                "  read: separability is shrinking WITH conflicting/cancelling fork updates "
+                "(low cosine / retained) -> looks like merge INTERFERENCE, not pure cultural "
+                "homogenization (cf. arXiv:2605.25846)."
+            )
+        else:
+            print(
+                "  read: separability is shrinking while fork updates stay aligned (high cosine / "
+                "retained) -> looks like genuine cultural HOMOGENIZATION toward the centroid."
+            )
     if result.smoke_caveat:
         print(f"\n  {result.smoke_caveat}")
 

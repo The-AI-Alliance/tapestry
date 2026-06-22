@@ -199,6 +199,35 @@ def test_fedavg_averages_floats_and_preserves_int_buffers() -> None:
     assert torch.equal(out["ids"], torch.tensor([5, 6]))
 
 
+def test_merge_diagnostics_aligned_vs_opposed() -> None:
+    # The interference instrument: identical fork updates reinforce (cosine 1,
+    # unanimous sign, full retention); opposite updates cancel (cosine -1, balanced
+    # sign-conflict, zero retention). This is what tells homogenization apart from
+    # merge interference when the coordinate separability collapses.
+    import torch
+
+    from cultural_cpt.aggregation import _merge_diagnostics
+
+    base = {"w": torch.zeros(4), "ids": torch.tensor([1, 2, 3, 4])}
+    up = torch.tensor([1.0, -1.0, 1.0, -1.0])
+
+    cos, sign, retained = _merge_diagnostics(base, [{"w": up, "ids": base["ids"]}, {"w": up.clone(), "ids": base["ids"]}])
+    assert abs(cos - 1.0) < 1e-6 and abs(sign - 1.0) < 1e-6 and abs(retained - 1.0) < 1e-6
+
+    cos, sign, retained = _merge_diagnostics(base, [{"w": up, "ids": base["ids"]}, {"w": -up, "ids": base["ids"]}])
+    assert abs(cos + 1.0) < 1e-6 and abs(sign) < 1e-6 and abs(retained) < 1e-6
+
+
+def test_aggregation_round_metric_carries_diagnostics() -> None:
+    # Smoke run still populates the merge diagnostics (real-valued, even if noise
+    # on the toy model) so the curve and the interference companion travel together.
+    result = run_aggregation(_agg_config())
+    m = result.rounds[-1]
+    assert -1.0 <= m.mean_update_cosine <= 1.0
+    assert 0.0 <= m.update_sign_agreement <= 1.0
+    assert m.retained_update_ratio >= 0.0
+
+
 def test_aggregation_resume_is_identical(tmp_path: Path) -> None:
     # A cached full run, re-run against the same cache, must reproduce the curve
     # exactly (it resumes from the checkpoint instead of recomputing).
