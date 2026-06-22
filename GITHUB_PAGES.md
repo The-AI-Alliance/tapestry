@@ -310,4 +310,12 @@ gem list | grep jekyll
 
 ### Configuring GitHub Pages in the Repo Settings
 
-Talk to [Dean Wampler](mailto:dwampler@thealliance.ai) if you want to change the configuration in the project settings. 
+Talk to [Dean Wampler](mailto:dwampler@thealliance.ai) if you want to change the configuration in the project settings. The GitHub Pages (GHP) configuration in this repo is different from most of the other AI Alliance project repos.
+
+The built-in GHP publication action has a curious limitation; you can only host the website content in `/` or `/docs`, no other folder. We wanted to use `/docs` for other purposes, and we didn't want to use `/`. 
+
+To fix this, we adopted the [github-pages-overwriter](https://github.com/marketplace/actions/github-pages-overwriter) from the GitHub marketplace as a "staging" step. It is configured to detect any updates to the `develop` branch in the `website` directory, the new location for the GHP content. It copies the content to the special `gh-pages` branch. It is configured with the file [`.github/workflows/jekyll.yml`](https://github.com/The-AI-Alliance/tapestry/blob/develop/.github/workflows/jekyll.yml). (The action is named `Custom GitHub Pages Staging` in the repo's **Actions** view.)
+
+The regular GHP action has been changed to look for changes on the `gh-pages` branch, in the root directory, `/`. 
+
+Hence, a two-action process is now used. The first action detects updates to the `website` on the `develop` branch, then stages updates to the `gh-pages` branch. The second action detects updates to the `gh-pages` branch and publishes the updates.

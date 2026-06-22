@@ -1,4 +1,4 @@
-name: Custom GitHub Pages Publication
+name: Custom GitHub Pages Staging
 # This builds the site pages from the website directory and stages the outputs in
 # the gh-pages branch. From there, the regular GH Pages build process detects the updated
 # files and publishes the site with them.
