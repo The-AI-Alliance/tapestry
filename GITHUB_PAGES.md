@@ -62,7 +62,7 @@ Open the URL in a browser.
 
 ## Contributing New or Improved Content
 
-What gets displayed by GitHub Pages is the customized Markdown files in the `docs` directory. If you need to create a new page, copy an existing page to get the correct "header" information, then edit as needed.
+What gets displayed by GitHub Pages is the customized Markdown files in the `website` directory. If you need to create a new page, copy an existing page to get the correct "header" information, then edit as needed.
 
 Here are some things you should know.
 
@@ -75,7 +75,7 @@ Issue PRs for the `develop` branch, which is the default project branch (not `ma
 
 ### Updating the Website Version and Last Modified Date
 
-By default, the footer of the pages shows the latest version and laste modified date. We don't require you to include this information nor do we require that you update it according to any specific requirements, if you decide to keep it. However, if you keep this information, you'll want to update this information periodically around lines 96-97 in `docs/config.yml`:
+By default, the footer of the pages shows the latest version and last modified date. We don't require you to include this information nor do we require that you update it according to any specific requirements, if you decide to keep it. However, if you keep this information, you'll want to update this information periodically around lines 96-97 in `website/config.yml`:
 
 ```
 last_edit_time_format: "%Y-%m-%d" # uses ruby's time format...
@@ -107,7 +107,7 @@ While tedious this provides a better experience for users of the website.
 
 > **TIP:** Use the script `check-external-links.sh` to find missing targets.
 
-Furthermore, as a visual clue to the user, [our stylesheet](https://github.com/The-AI-Alliance/tapestry/blob/main/docs/_includes/css/custom.scss.liquid) is configured to put little up-and-to-the-right arrows after every external link. This provides a visual cue that a new tab will be opened.
+Furthermore, as a visual clue to the user, [our stylesheet](https://github.com/The-AI-Alliance/tapestry/blob/main/website/_includes/css/custom.scss.liquid) is configured to put little up-and-to-the-right arrows after every external link. This provides a visual cue that a new tab will be opened.
 
 > [!NOTE]
 > There is one flaw with using `_blank` everywhere. While Chrome and Safari open a new tab for every URL clicked, Firefox creates one new tab and opens all the URLs in that _one_ tab. If you care about this flaw, you'll have to use unique values for all the `targets`.
@@ -124,7 +124,7 @@ In the pages, you can use emojis, e.g., `:+1:` yields :+1:, `:smirk:` yields :sm
 
 ### Redirects
 
-The `docs/_layouts/redirect.html` page makes it easy to define a redirect. Suppose you have a page `docs/foo/bar.markdown` and you decide to rename it `docs/foo/not-so-bar.markdown`, but you don't want to break the old link. Instead, you want the old URL to redirect to the new one. Change the content in `docs/foo/bar.markdown` to the following:
+The `website/_layouts/redirect.html` page makes it easy to define a redirect. Suppose you have a page `website/foo/bar.markdown` and you decide to rename it `website/foo/not-so-bar.markdown`, but you don't want to break the old link. Instead, you want the old URL to redirect to the new one. Change the content in `website/foo/bar.markdown` to the following:
 
 ```yaml
 ---
@@ -186,7 +186,7 @@ If an error is thrown, see the [Tips and Known Issues](#tips-and-known-issues) b
 The `run-jekyll` target runs the following command:
 
 ```shell
-cd docs && bundle exec jekyll serve --port ${JEKYLL_PORT} --baseurl '' --incremental
+cd website && bundle exec jekyll serve --port ${JEKYLL_PORT} --baseurl '' --incremental
 ```
 
 * `JEKYLL_PORT` for the `--port` flag defaults to `4000`
@@ -310,8 +310,4 @@ gem list | grep jekyll
 
 ### Configuring GitHub Pages in the Repo Settings
 
-This section documents the one-time settings necessary to [configure publication of a repo's GitHub Pages](https://docs.github.com/en/enterprise-server@3.1/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site). 
-
-In the repo's [_Settings > Pages_ section](https://github.com/The-AI-Alliance/tapestry/settings/pages), use the menu to select the branch from which you want to publish the website. By default, we use `main` is the desired branch in most of our repos, but this repo uses `develop`.
-
-Finally, select the `docs` folder in the drop-down menu to the right, which is the root folder for the pages.
+Talk to [Dean Wampler](mailto:dwampler@thealliance.ai) if you want to change the configuration in the project settings. 

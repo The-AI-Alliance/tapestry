@@ -6,18 +6,18 @@ This repository is the technical home for Project Tapestry. Use this file as the
 
 - `README.md` is the top-level overview for contributors and developers.
 - `Makefile` is the main task entry point for setup, tests, formatting, linting, type checking, and local docs serving.
-- `docs/` is the GitHub Pages site. It is the user-facing technical website and follows Jekyll / Just the Docs conventions.
 - `tech-docs/` is the main home for design and technical decision docs.
 - `src/tapestry/` is the Python package under active development.
 - `src/tests/` mirrors the package structure and holds the test suite.
 - `examples/` contains runnable examples and demos.
+- `website/` is the GitHub Pages site. It is the user-facing technical website and follows Jekyll / Just the Docs conventions.
 - `ctn.local/` is local workspace material and is intentionally excluded from repo-wide navigation guidance unless a task explicitly says otherwise.
 
 ## Where To Look First
 
 - For repo setup and contributor workflow: `README.md`
 - For local build and verification commands: `Makefile`
-- For the website structure and pages: `docs/index.markdown`, `docs/contributing.markdown`, `docs/about.markdown`
+- For the website structure and pages: `website/index.markdown`, `website/contributing.markdown`, `website/about.markdown`
 - For project-level design docs and technical direction: `tech-docs/README.md`
 - For the current Python implementation surface: `src/tapestry/training/consortium/`
 - For the current tests: `src/tests/tapestry/training/consortium/`
@@ -68,7 +68,7 @@ Keep new code aligned with that split. Add tests under the matching `src/tests/t
 - `pytest` is also configured in `pyproject.toml` and is useful for targeted test runs.
 - Keep Python formatting consistent with `black` and the repo line length of 88.
 - Keep lint/type annotations compatible with `ruff`, `pylint`, and `ty`.
-- Preserve the docs site style in `docs/`: Markdown pages, Jekyll front matter, and Just the Docs structure.
+- Preserve the docs site style in `website/`: Markdown pages, Jekyll front matter, and Just the Docs structure.
 - When editing documentation, keep the audience technical and contributor-focused rather than promotional.
 - Treat governance documents as load-bearing design constraints, not after-the-fact policy notes.
 
