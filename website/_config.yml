@@ -115,8 +115,8 @@ show_footer: side_bar
 # Footer last edited timestamp
 last_edit_timestamp: true # show or hide edit time - page must have `last_modified_date` defined in the frontmatter
 last_edit_time_format: "%Y-%m-%d" # uses ruby's time format: https://ruby-doc.org/stdlib-2.7.0/libdoc/time/rdoc/Time.html
-last_modified_date: 2026-04-29 09:44 -0400
-last_version: V0.1.1
+last_modified_date: 2026-05-22
+last_version: V0.1.2
 
 # Custom: Add the range of years for the copyright here. This is done here,
 # rather than default.html, so that the latter file can remain completely 
