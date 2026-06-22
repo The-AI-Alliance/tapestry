@@ -1,119 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 840 580" role="img" aria-labelledby="title desc">
-  <title id="title">Consortium training: N+1 model architecture</title>
-  <desc id="desc">Central hub trains global base model (~80% compute), distributes weights to N sovereign nodes. Each node runs sovereign pipeline; Stage A weights return to coordinator for averaging. Cycle repeats. Outcome: 1 global base + N sovereign models.</desc>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" role="img" aria-labelledby="title desc">
+  <title id="title">Consortium training: two-phase N+1 architecture</title>
+  <desc id="desc">Two phases hinged on the Shared Base. Phase 1 (Shared-Base Loop): members run Contributed CPT, send weight vectors to the coordinator, which merges them into the next Shared Base; the cycle repeats. Phase 2 (Sovereign Build): each member takes the Shared Base and runs Stages 0–C locally to produce its Sovereign Model; nothing is contributed back. Outcome: 1 Shared Base + N Sovereign Models.</desc>
   <defs>
     <marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
       <path d="M0,0 L0,6 L9,3 z" fill="#37474f"/>
     </marker>
-    <marker id="arrBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L9,3 z" fill="#1565c0"/>
+    <marker id="arrCoord" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2a9d8f"/>
     </marker>
-    <marker id="arrOrange" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L9,3 z" fill="#ef6c00"/>
-    </marker>
-    <marker id="arrGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
-      <path d="M0,0 L0,6 L9,3 z" fill="#2e7d32"/>
+    <marker id="arrColl" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#1b4965"/>
     </marker>
   </defs>
-  <rect width="840" height="580" fill="#fafafa"/>
+  <rect width="900" height="580" fill="#fafafa"/>
 
   <!-- Title -->
-  <text x="420" y="28" text-anchor="middle" fill="#263238" font-family="system-ui,Segoe UI,sans-serif" font-size="16" font-weight="700">Consortium Training Loop — N+1 Model Architecture</text>
+  <text x="450" y="30" text-anchor="middle" fill="#263238" font-family="system-ui,Segoe UI,sans-serif" font-size="16" font-weight="700">Consortium Training — Two-Phase N+1 Architecture</text>
 
-  <!-- ==================== CENTRAL HUB ==================== -->
-  <rect x="280" y="50" width="280" height="86" rx="10" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
-  <text x="420" y="78" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="14" font-weight="600">Central Coordinator</text>
-  <text x="420" y="96" text-anchor="middle" fill="#e3f2fd" font-family="system-ui,Segoe UI,sans-serif" font-size="11">Global base training (~80% compute)</text>
-  <text x="420" y="112" text-anchor="middle" fill="#bbdefb" font-family="system-ui,Segoe UI,sans-serif" font-size="11">All shared/open data · FedAvg-class integration</text>
+  <!-- ==================== SHARED BASE (hinge) ==================== -->
+  <rect x="370" y="55" width="160" height="70" rx="10" fill="#2c7da0" stroke="#236a8c" stroke-width="2"/>
+  <text x="450" y="88" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="14" font-weight="600">Shared Base</text>
+  <text x="450" y="108" text-anchor="middle" fill="#a9d6e5" font-family="system-ui,Segoe UI,sans-serif" font-size="11">the '1' · no alignment</text>
 
-  <!-- ==================== SOVEREIGN NODES ==================== -->
-  <!-- Node 1 (left) -->
-  <rect x="40" y="210" width="200" height="100" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
-  <text x="140" y="238" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Sovereign Node 1</text>
-  <text x="140" y="258" text-anchor="middle" fill="#e8f5e9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Sovereign pipeline (Stages 0–C)</text>
-  <text x="140" y="274" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Shared data + sovereign data</text>
-  <text x="140" y="290" text-anchor="middle" fill="#a5d6a7" font-family="system-ui,Segoe UI,sans-serif" font-size="10">→ Sovereign Model 1</text>
+  <!-- ==================== PHASE 1 PANEL ==================== -->
+  <rect x="20" y="160" width="400" height="310" rx="10" fill="#f5f7fa" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="220" y="185" text-anchor="middle" fill="#1b4965" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="700">Phase 1 · Shared-Base Loop</text>
+  <text x="220" y="202" text-anchor="middle" fill="#1b4965" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-style="italic">collective · iterative</text>
 
-  <!-- Node 2 (center) -->
-  <rect x="280" y="210" width="200" height="100" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
-  <text x="380" y="238" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Sovereign Node 2</text>
-  <text x="380" y="258" text-anchor="middle" fill="#e8f5e9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Sovereign pipeline (Stages 0–C)</text>
-  <text x="380" y="274" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Shared data + sovereign data</text>
-  <text x="380" y="290" text-anchor="middle" fill="#a5d6a7" font-family="system-ui,Segoe UI,sans-serif" font-size="10">→ Sovereign Model 2</text>
+  <!-- Coordinator -->
+  <rect x="130" y="218" width="180" height="50" rx="8" fill="#2a9d8f" stroke="#23867a" stroke-width="2"/>
+  <text x="220" y="240" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Coordinator · merge</text>
+  <text x="220" y="257" text-anchor="middle" fill="#8fd9cf" font-family="system-ui,Segoe UI,sans-serif" font-size="10">FedAvg-class averaging</text>
 
-  <!-- Node N (right) -->
-  <rect x="560" y="210" width="200" height="100" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
-  <text x="660" y="238" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">Sovereign Node N</text>
-  <text x="660" y="258" text-anchor="middle" fill="#e8f5e9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Sovereign pipeline (Stages 0–C)</text>
-  <text x="660" y="274" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Shared data + sovereign data</text>
-  <text x="660" y="290" text-anchor="middle" fill="#a5d6a7" font-family="system-ui,Segoe UI,sans-serif" font-size="10">→ Sovereign Model N</text>
+  <!-- Contributed CPT nodes -->
+  <rect x="40" y="318" width="90" height="60" rx="6" fill="#1b4965" stroke="#13365a" stroke-width="2"/>
+  <text x="85" y="343" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600">Contributed</text>
+  <text x="85" y="358" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600">CPT</text>
+  <text x="85" y="372" text-anchor="middle" fill="#62b6cb" font-family="system-ui,Segoe UI,sans-serif" font-size="9">member 1</text>
 
-  <!-- Ellipsis between node 2 and node N -->
-  <text x="510" y="265" text-anchor="middle" fill="#78909c" font-family="system-ui,Segoe UI,sans-serif" font-size="20">···</text>
+  <rect x="150" y="318" width="90" height="60" rx="6" fill="#1b4965" stroke="#13365a" stroke-width="2"/>
+  <text x="195" y="343" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600">Contributed</text>
+  <text x="195" y="358" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600">CPT</text>
+  <text x="195" y="372" text-anchor="middle" fill="#62b6cb" font-family="system-ui,Segoe UI,sans-serif" font-size="9">member 2</text>
 
-  <!-- ==================== ARROWS: Hub → Nodes (blue, weights out) ==================== -->
-  <path d="M 340 136 L 160 204" fill="none" stroke="#1565c0" stroke-width="2" marker-end="url(#arrBlue)"/>
-  <path d="M 400 136 L 380 204" fill="none" stroke="#1565c0" stroke-width="2" marker-end="url(#arrBlue)"/>
-  <path d="M 500 136 L 640 204" fill="none" stroke="#1565c0" stroke-width="2" marker-end="url(#arrBlue)"/>
+  <text x="275" y="354" text-anchor="middle" fill="#78909c" font-family="system-ui,Segoe UI,sans-serif" font-size="18">···</text>
 
-  <!-- Label for outgoing arrows -->
-  <text x="210" y="168" text-anchor="middle" fill="#1565c0" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-weight="600">global weights</text>
-  <text x="630" y="168" text-anchor="middle" fill="#1565c0" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-weight="600">global weights</text>
+  <rect x="300" y="318" width="90" height="60" rx="6" fill="#1b4965" stroke="#13365a" stroke-width="2"/>
+  <text x="345" y="343" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600">Contributed</text>
+  <text x="345" y="358" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600">CPT</text>
+  <text x="345" y="372" text-anchor="middle" fill="#62b6cb" font-family="system-ui,Segoe UI,sans-serif" font-size="9">member N</text>
 
-  <!-- ==================== ARROWS: Nodes → Hub (orange, deltas back) ==================== -->
-  <path d="M 180 210 L 360 142" fill="none" stroke="#ef6c00" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#arrOrange)"/>
-  <path d="M 400 210 L 420 142" fill="none" stroke="#ef6c00" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#arrOrange)"/>
-  <path d="M 620 210 L 480 142" fill="none" stroke="#ef6c00" stroke-width="2" stroke-dasharray="6 3" marker-end="url(#arrOrange)"/>
+  <!-- Arrows: distribute Shared Base → CPT nodes -->
+  <path d="M 410 125 L 410 285 Q 410 300 395 300 L 220 300 Q 195 300 195 316" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arr)"/>
+  <text x="300" y="294" text-anchor="middle" fill="#37474f" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-style="italic">distribute Shared Base</text>
 
-  <!-- Label for return arrows -->
-  <text x="243" y="158" text-anchor="middle" fill="#ef6c00" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-weight="600">Stage A weights only</text>
+  <!-- Arrows: CPT nodes → coordinator (weights up) -->
+  <path d="M 220 318 L 220 270" fill="none" stroke="#1b4965" stroke-width="1.8" marker-end="url(#arrColl)"/>
+  <text x="250" y="296" text-anchor="start" fill="#1b4965" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-weight="600">weights only</text>
 
-  <!-- ==================== LOOP ANNOTATION ==================== -->
-  <path d="M 560 93 Q 590 93 590 60 Q 590 47 570 47 L 565 47" fill="none" stroke="#546e7a" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr)"/>
-  <text x="660" y="52" text-anchor="middle" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-style="italic">integrate → redistribute → repeat</text>
+  <!-- Arrow: coordinator → Shared Base (merge → next cycle) -->
+  <path d="M 310 230 Q 380 230 410 150" fill="none" stroke="#2a9d8f" stroke-width="2" marker-end="url(#arrCoord)"/>
+  <text x="365" y="178" text-anchor="middle" fill="#2a9d8f" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-weight="600">merge → next cycle</text>
 
-  <!-- ==================== DATA SOVEREIGNTY NOTE ==================== -->
-  <rect x="40" y="340" width="760" height="36" rx="6" fill="#fff3e0" stroke="#ef6c00" stroke-width="1.5"/>
-  <text x="420" y="362" text-anchor="middle" fill="#e65100" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-weight="600">Raw sovereign data never leaves the node. Only local model weights (Stage A) cross the network. (DG2)</text>
+  <!-- Data-sovereignty note -->
+  <text x="220" y="425" text-anchor="middle" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-style="italic">Raw member data never leaves the node.</text>
+  <text x="220" y="441" text-anchor="middle" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-style="italic">Only post-CPT weight vectors cross the network. (DG2)</text>
+  <text x="220" y="457" text-anchor="middle" fill="#1b4965" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-weight="600">Stage A run here = Contributed CPT</text>
+
+  <!-- ==================== PHASE 2 PANEL ==================== -->
+  <rect x="480" y="160" width="400" height="310" rx="10" fill="#f7f5fb" stroke="#b0bec5" stroke-width="1.5" stroke-dasharray="6 4"/>
+  <text x="680" y="185" text-anchor="middle" fill="#5e548e" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="700">Phase 2 · Sovereign Build</text>
+  <text x="680" y="202" text-anchor="middle" fill="#5e548e" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-style="italic">per member · local · nothing contributed back</text>
+
+  <!-- Build → Model pipelines -->
+  <rect x="510" y="225" width="150" height="46" rx="6" fill="#5e548e" stroke="#4a4170" stroke-width="2"/>
+  <text x="585" y="244" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600">Sovereign Build</text>
+  <text x="585" y="260" text-anchor="middle" fill="#c5b8e5" font-family="system-ui,Segoe UI,sans-serif" font-size="9">Stages 0–C · member 1</text>
+  <rect x="700" y="225" width="150" height="46" rx="23" fill="#7b6aae" stroke="#635a8e" stroke-width="2"/>
+  <text x="775" y="253" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600">Sovereign Model 1</text>
+  <line x1="660" y1="248" x2="694" y2="248" stroke="#37474f" stroke-width="2" marker-end="url(#arr)"/>
+
+  <rect x="510" y="293" width="150" height="46" rx="6" fill="#5e548e" stroke="#4a4170" stroke-width="2"/>
+  <text x="585" y="312" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600">Sovereign Build</text>
+  <text x="585" y="328" text-anchor="middle" fill="#c5b8e5" font-family="system-ui,Segoe UI,sans-serif" font-size="9">Stages 0–C · member 2</text>
+  <rect x="700" y="293" width="150" height="46" rx="23" fill="#7b6aae" stroke="#635a8e" stroke-width="2"/>
+  <text x="775" y="321" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600">Sovereign Model 2</text>
+  <line x1="660" y1="316" x2="694" y2="316" stroke="#37474f" stroke-width="2" marker-end="url(#arr)"/>
+
+  <text x="585" y="378" text-anchor="middle" fill="#78909c" font-family="system-ui,Segoe UI,sans-serif" font-size="18">···</text>
+
+  <rect x="510" y="395" width="150" height="46" rx="6" fill="#5e548e" stroke="#4a4170" stroke-width="2"/>
+  <text x="585" y="414" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600">Sovereign Build</text>
+  <text x="585" y="430" text-anchor="middle" fill="#c5b8e5" font-family="system-ui,Segoe UI,sans-serif" font-size="9">Stages 0–C · member N</text>
+  <rect x="700" y="395" width="150" height="46" rx="23" fill="#7b6aae" stroke="#635a8e" stroke-width="2"/>
+  <text x="775" y="423" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-weight="600">Sovereign Model N</text>
+  <line x1="660" y1="418" x2="694" y2="418" stroke="#37474f" stroke-width="2" marker-end="url(#arr)"/>
+
+  <!-- Arrow: Shared Base → Phase 2 (distribute) -->
+  <path d="M 490 125 Q 520 125 540 200 L 540 223" fill="none" stroke="#37474f" stroke-width="1.8" marker-end="url(#arr)"/>
+  <text x="558" y="170" text-anchor="start" fill="#37474f" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-style="italic">each member starts</text>
+  <text x="558" y="184" text-anchor="start" fill="#37474f" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-style="italic">from the Shared Base</text>
+
+  <!-- Boundary note -->
+  <text x="680" y="460" text-anchor="middle" fill="#5e548e" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-weight="600">Stage A run here = Private CPT — stays local</text>
 
   <!-- ==================== N+1 OUTCOME ==================== -->
-  <text x="420" y="412" text-anchor="middle" fill="#263238" font-family="system-ui,Segoe UI,sans-serif" font-size="14" font-weight="700">Outcome: N+1 Models</text>
-
-  <!-- The "1" - global base -->
-  <rect x="40" y="432" width="180" height="56" rx="8" fill="#1565c0" stroke="#0d47a1" stroke-width="2"/>
-  <text x="130" y="458" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600">1 Global Base</text>
-  <text x="130" y="476" text-anchor="middle" fill="#e3f2fd" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Infrastructure — continuously improving</text>
-
-  <!-- Plus sign -->
-  <text x="248" y="466" text-anchor="middle" fill="#37474f" font-family="system-ui,Segoe UI,sans-serif" font-size="24" font-weight="700">+</text>
-
-  <!-- The "N" - sovereign models -->
-  <rect x="276" y="432" width="140" height="56" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
-  <text x="346" y="454" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-weight="600">Sovereign 1</text>
-  <text x="346" y="472" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Deployed product</text>
-
-  <rect x="430" y="432" width="140" height="56" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
-  <text x="500" y="454" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-weight="600">Sovereign 2</text>
-  <text x="500" y="472" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Deployed product</text>
-
-  <text x="590" y="466" text-anchor="middle" fill="#78909c" font-family="system-ui,Segoe UI,sans-serif" font-size="18">···</text>
-
-  <rect x="618" y="432" width="140" height="56" rx="8" fill="#2e7d32" stroke="#1b5e20" stroke-width="2"/>
-  <text x="688" y="454" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-weight="600">Sovereign N</text>
-  <text x="688" y="472" text-anchor="middle" fill="#c8e6c9" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Deployed product</text>
-
-  <!-- Annotation under N+1 -->
-  <text x="420" y="516" text-anchor="middle" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-style="italic">The base is the substrate; the sovereign models are the value.</text>
-  <text x="420" y="532" text-anchor="middle" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="11" font-style="italic">Analogous to Personalized Federated Learning at institutional/national scale.</text>
-
-  <!-- ==================== LEGEND ==================== -->
-  <rect x="40" y="552" width="12" height="12" rx="2" fill="#1565c0"/>
-  <text x="58" y="563" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Central / shared</text>
-  <rect x="160" y="552" width="12" height="12" rx="2" fill="#2e7d32"/>
-  <text x="178" y="563" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Sovereign (per node)</text>
-  <line x1="300" y1="558" x2="340" y2="558" stroke="#1565c0" stroke-width="2"/>
-  <text x="348" y="563" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Weights out</text>
-  <line x1="430" y1="558" x2="470" y2="558" stroke="#ef6c00" stroke-width="2" stroke-dasharray="6 3"/>
-  <text x="478" y="563" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10">Deltas back</text>
+  <text x="450" y="503" text-anchor="middle" fill="#263238" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="700">Outcome: N+1 models</text>
+  <rect x="250" y="515" width="160" height="42" rx="8" fill="#2c7da0" stroke="#236a8c" stroke-width="2"/>
+  <text x="330" y="541" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-weight="600">1 Shared Base</text>
+  <text x="430" y="542" text-anchor="middle" fill="#37474f" font-family="system-ui,Segoe UI,sans-serif" font-size="22" font-weight="700">+</text>
+  <rect x="455" y="515" width="200" height="42" rx="8" fill="#7b6aae" stroke="#635a8e" stroke-width="2"/>
+  <text x="555" y="541" text-anchor="middle" fill="#fff" font-family="system-ui,Segoe UI,sans-serif" font-size="12" font-weight="600">N Sovereign Models</text>
+  <text x="700" y="541" text-anchor="middle" fill="#546e7a" font-family="system-ui,Segoe UI,sans-serif" font-size="10" font-style="italic">substrate + value</text>
 </svg>

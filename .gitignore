@@ -161,3 +161,23 @@ runs/
 *.swp
 *.swo
 *~
+
+# Experiment run outputs
+runs/
+
+# EXP-001 corpora: bulk corpora are large and regenerated locally from the
+# manifest sources (see contrib/jneums-cultural-cpt-validation/fetch_corpus.py). Only
+# the README and the small committed demonstration seed travel with the repo.
+/contrib/jneums-cultural-cpt-validation/data/*
+!/contrib/jneums-cultural-cpt-validation/data/README.md
+!/contrib/jneums-cultural-cpt-validation/data/seed-example/
+
+# EXP-001 deploy: env-specific Vast.ai self-rental identifiers (machine/offer ids,
+# API-key path) stay local; the tracked deploy/README.md keeps only generic,
+# placeholder'd operational know-how.
+/contrib/jneums-cultural-cpt-validation/deploy/*.local.md
+
+# EXP-001 HANDOFF: the orientation/scratch doc is a magnet for local + personal work
+# notes (env specifics, in-progress run state), so it stays local. FINDINGS.md is the
+# tracked durable record; SPEC.md/data/README.md carry the public contract.
+/contrib/jneums-cultural-cpt-validation/HANDOFF.md

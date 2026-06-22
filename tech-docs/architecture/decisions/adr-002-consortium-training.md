@@ -5,17 +5,34 @@
 | Status | Proposed |
 | Confidence | High (5/5) |
 | Date | May 7, 2026 |
+| Revised | Jun 19, 2026 — terminology aligned (Shared Base, Contributed CPT); added N+1 two-phase diagram; consolidated as the canonical definition. |
 | Deciders | Christopher Nguyen (proposed), workshop participants (to ratify) |
 
 ## Context
 
-Tapestry's training involves multiple sovereign nodes contributing to a shared model. The approach must be named and distinguished from existing paradigms (centralized training, federated learning) to avoid confusion and to accurately describe what Tapestry does.
+Tapestry's training involves multiple sovereign members contributing to a shared model. The approach must be named and distinguished from existing paradigms (centralized training, federated learning) to avoid confusion and to accurately describe what Tapestry does.
 
 See [`training-approaches.md`](../../reference/training-approaches.md) for a full comparison of centralized, federated, and consortium training.
 
 ## Decision
 
-Tapestry uses **consortium training**: a small number of large, trusted, heterogeneous nodes collaboratively training a shared model, where data sovereignty is a first-order architectural constraint and cultural alignment is the goal.
+Tapestry uses **consortium training**: a small number of large, trusted, heterogeneous members collaboratively training a shared model, where data sovereignty is a first-order architectural constraint and cultural alignment is the goal.
+
+```mermaid
+flowchart LR
+  LOOP["Shared-Base Loop<br/>(N members · Contributed CPT)"]:::collective
+  SB[("Shared Base<br/>the '1'")]:::base
+  BUILD["Sovereign Build × N<br/>(per member · local)"]:::sovereign
+  SM(["N Sovereign Models"]):::model
+  LOOP --> SB --> BUILD --> SM
+
+  classDef collective fill:#1b4965,stroke:#62b6cb,color:#fff
+  classDef base fill:#2c7da0,stroke:#a9d6e5,color:#fff
+  classDef sovereign fill:#5e548e,stroke:#9f86c0,color:#fff
+  classDef model fill:#7b6aae,stroke:#e0c3fc,color:#fff
+```
+
+*Term definitions are consolidated in [`glossary.md`](../../reference/glossary.md).*
 
 This is distinct from federated learning (designed for millions of small edge clients with individual privacy concerns) and from centralized training (all data in one place, one organization controls everything).
 
@@ -28,17 +45,17 @@ This is distinct from federated learning (designed for millions of small edge cl
 | **Participants** | One organization, one cluster | Many clients (phones, hospitals, edge) | Dozens of large institutional nodes |
 | **Data per node** | All data centralized | Small (one user's or site's data) | Massive (national/institutional corpora) |
 | **Sovereignty motive** | N/A — one owner | Individual / site-level data protection | National/institutional sovereignty + cultural alignment |
-| **What crosses the network** | N/A — internal interconnect | FedSGD: per-step gradients; FedAvg: local model weight vectors after local training | Local model weight vectors after Stage A CPT |
+| **What crosses the network** | N/A — internal interconnect | FedSGD: per-step gradients; FedAvg: local model weight vectors after local training | Local model weight vectors after Contributed CPT |
 | **Communication cadence** | Every step; fast interconnect | Varies by method and deployment | Operational choice — frequent (cluster-like) or infrequent (geo-distributed) |
 | **Model scale** | Frontier | Typically small to medium | Frontier |
 | **Governance** | Single owner decides all | Aggregator-driven; clients have no architectural voice | Consortium with shared ownership and governance rights |
-| **Each node's outcome** | N/A — one model | Same global model (or personalized variant in PFL) | Sovereign model: shared base + community-specific alignment |
+| **Each node's outcome** | N/A — one model | Same global model (or personalized variant in PFL) | Sovereign Model: Shared Base + community-specific Sovereign Build |
 
 Consortium training borrows techniques from the federated learning literature — FedAvg-class model averaging (default), ideas from Personalized Federated Learning (per-node model variants), and optionally DiLoCo (outer-optimizer variant). The distinction is not technical novelty in the optimization algorithm but in the *context*: who participates, at what scale, with what governance, and toward what goal. FL optimizes for privacy across many small clients. Consortium training optimizes for cultural sovereignty across few large institutions with shared governance.
 
 ## Rationale
 
-- Tapestry's nodes are few (dozens), large (national GPU clusters), and **collaborating institutions with governance voice** — not millions of mutually untrusted edge clients. See [Design principles for architecture work](../0-tva-methodology.md#design-principles-for-architecture-work).
+- Tapestry's members are few (dozens) and are **collaborating institutions with governance voice** — not millions of mutually untrusted edge clients. Each member operates large nodes (national GPU clusters). See [Design principles for architecture work](../0-tva-methodology.md#design-principles-for-architecture-work).
 - The sovereignty motive is national/institutional, not individual data protection. The governance model, trust assumptions, and communication patterns all differ.
 - Using "federated" to describe Tapestry borrows the right principle (data stays put) but the wrong connotations (edge devices, FedAvg, cross-silo averaging). "Consortium training" accurately describes the participants, the purpose, and the governance.
 

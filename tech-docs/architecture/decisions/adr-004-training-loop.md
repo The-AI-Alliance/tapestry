@@ -5,71 +5,143 @@
 | Status | Proposed |
 | Confidence | Strong (4/5) |
 | Date | May 7, 2026 |
+| Revised | Jun 17, 2026 — two-phase framing, diagrams, and terminology |
 | Deciders | Christopher Nguyen (proposed), workshop participants (to resolve open questions) |
 
 ## Context
 
-Given the core-plus-sovereign architecture (TAP-001) and the consortium training model (TAP-002), the specific training loop — how the global model improves over time — must be defined.
+Given the core-plus-sovereign architecture ([TAP-001](adr-001-core-plus-sovereign.md)) and the consortium training model ([TAP-002](adr-002-consortium-training.md)), this ADR defines how training actually flows — and separates the **two distinct phases** that earlier drafts blurred together.
 
-## Decision
+## The two phases
 
-The consortium training loop operates in four steps:
+> A consolidated glossary of these and other Tapestry terms lives in [`glossary.md`](../../reference/glossary.md).
 
-1. **Centralized base training** — train (or adopt) a frontier-competitive model on large-scale global open data.
-2. **Distributed continued pretraining (Stage A)** — each node receives the current global model and does continued pretraining on its sovereign data, training the *entire model* (not just adapters).
-3. **Weight vector contribution** — each node sends its **locally trained model weight vector** (post–Stage A CPT) to the central coordinator. Not per-step gradients. Not raw data.
-4. **Central integration and redistribution** — the coordinator aggregates contributed weight vectors into an updated global model (FedAvg-class weighted averaging by default; outer optimizer swappable) and redistributes it. Back to Step 2.
+Consortium training has two phases, run in order:
 
-**Scope boundary:** Stages B (instruction tuning) and C (alignment) from [TAP-005](adr-005-sovereign-pipeline.md) run locally to produce each participant's sovereign deployable model. They do **not** feed into the shared global base.
+1. **Shared-Base Loop** — collective and iterative. Members improve one shared base model together. Its output is a *base*, not a deployable product, and it carries **no cultural alignment**.
+2. **Sovereign Build** — local and per-member. Each member takes the shared base and builds its own deployable model, including alignment. Nothing here is shared back.
 
-Nodes share **local model weight vectors after Stage A**, not per-step gradients. See [`training-approaches.md`](../../reference/training-approaches.md) for the full comparison.
+```mermaid
+flowchart LR
+  P1["Phase 1 · Shared-Base Loop<br/>collective · iterative<br/>no alignment"]:::collective
+  SB[("Shared Base")]:::base
+  P2["Phase 2 · Sovereign Build<br/>per member · local<br/>adds alignment"]:::sovereign
+  SM(["Sovereign Model"]):::model
+  P1 --> SB --> P2 --> SM
 
-![Consortium training loop](../diagrams/consortium-training-loop.svg)
+  classDef collective fill:#1b4965,stroke:#62b6cb,color:#fff
+  classDef base fill:#2c7da0,stroke:#a9d6e5,color:#fff
+  classDef sovereign fill:#5e548e,stroke:#9f86c0,color:#fff
+  classDef model fill:#7b6aae,stroke:#e0c3fc,color:#fff
+```
 
-*Step 1 establishes (or refreshes) the global model; the ongoing loop is 2 → 3 → 4 → 2.*
+The first is a *loop* (it repeats); the second is a *build* (it runs once per member, to completion). Only **weights** ever leave a node — never raw member data, never per-step gradients.
 
-| Step | Where it runs | Sovereign data | What crosses the network |
-| :--- | :-------------- | :------------- | :----------------------- |
-| 1. Base training | Central / global pipeline | N/A (open or consortium-global data) | Global model checkpoint |
-| 2. Continued pretraining (Stage A) | Each sovereign node | Stays on node | Nothing raw |
-| 3. Weight vector contribution | Node → coordinator | Still on node | **Local model weights** (post–Stage A; not per-step gradients) |
-| 4. Integration | Coordinator | — | Updated global model back to nodes |
+## Terminology
 
-## Rationale
+- **Shared-Base Loop** — Phase 1; the collective loop that produces the Shared Base.
+- **Shared Base** — the common base model the loop produces (the "1" in N+1). No alignment.
+- **Sovereign Build** — Phase 2; a member's local process that produces its own model.
+- **Sovereign Model** — a member's deployable, culturally-aligned model (one of the "N").
+- **Contributed CPT** — continued pre-training a member runs *inside the loop*; its weights are contributed back to the Shared Base.
+- **Private CPT** — continued pre-training a member runs *inside its Sovereign Build*; it stays local and is never contributed.
 
-- The loop delivers frontier capability improvement (Steps 1–4) while sovereign alignment layers (Stages B–C) stay local, matching DG1.
-- Data never leaves the node — only model weight vectors after local CPT cross the wire (DG2).
-- Each cycle improves the global model with sovereign knowledge from all nodes, creating a virtuous cycle: the next round of continued pretraining starts from a better base.
-- The iterative nature means the 80/20 ratio (base vs. sovereign) shifts naturally over time as the global model absorbs more sovereign knowledge.
+## Phase 1 — Shared-Base Loop
+
+```mermaid
+flowchart TB
+  SB[("Shared Base · current")]:::base
+  subgraph NODES["members · run in parallel · data stays local"]
+    direction LR
+    N1["Contributed CPT"]:::collective
+    N2["Contributed CPT"]:::collective
+    N3["Contributed CPT"]:::collective
+  end
+  COORD{{"coordinator · merge<br/>FedAvg-class"}}:::coord
+  NEXT[("Shared Base · next")]:::base
+  SB --> NODES
+  N1 -->|weights| COORD
+  N2 -->|weights| COORD
+  N3 -->|weights| COORD
+  COORD ==> NEXT
+  NEXT -.->|redistribute| SB
+
+  classDef base fill:#2c7da0,stroke:#a9d6e5,color:#fff
+  classDef collective fill:#1b4965,stroke:#62b6cb,color:#fff
+  classDef coord fill:#2a9d8f,stroke:#8fd9cf,color:#fff
+```
+
+Each cycle:
+
+1. **Distribute** — every member starts from the current Shared Base.
+2. **Contributed CPT** — each member continues pre-training the whole model on its own data; the data stays on the node.
+3. **Contribute weights** — each member sends back only its post-CPT weight vector — not gradients, not data.
+4. **Merge & redistribute** — the coordinator merges the contributions (quality-weighted FedAvg-class averaging by default) into the next Shared Base, and the loop repeats.
+
+| Step | Where it runs | What crosses the network |
+| :--- | :------------ | :----------------------- |
+| Distribute | Coordinator → members | Shared Base checkpoint |
+| Contributed CPT | Each member (data stays local) | Nothing |
+| Contribute | Member → coordinator | Post-CPT weights only |
+| Merge | Coordinator | Updated Shared Base |
+
+Sync cadence is an operational choice, not architectural — frequent (cluster-like) or occasional (geo-distributed). Each cycle makes the next round of continued pre-training start from a better base.
+
+## Phase 2 — Sovereign Build
+
+```mermaid
+flowchart LR
+  SB[("Shared Base")]:::base
+  PCPT["Private CPT<br/>(optional)"]:::sovereign
+  SFT["instruction tuning"]:::sovereign
+  AL["alignment<br/>DPO / RLHF / ..."]:::sovereign
+  SM(["Sovereign Model"]):::model
+  EV{{"evaluation<br/>IW · MMLU · safety"}}:::eval
+  SB --> PCPT --> SFT --> AL --> SM
+  PCPT -.-> EV
+  SFT -.-> EV
+  AL -.-> EV
+
+  classDef base fill:#2c7da0,stroke:#a9d6e5,color:#fff
+  classDef sovereign fill:#5e548e,stroke:#9f86c0,color:#fff
+  classDef model fill:#7b6aae,stroke:#e0c3fc,color:#fff
+  classDef eval fill:#bc6c25,stroke:#e9c46a,color:#fff
+```
+
+Once a member is satisfied with a Shared Base, it builds its own model — independently, with no coordination and no contribution back:
+
+- **Private CPT** (optional) — more continued pre-training on data the member keeps local.
+- **Post-training** — instruction tuning, then alignment (DPO / RLHF / Constitutional AI).
+- **Evaluation** runs throughout — cultural alignment on the Inglehart-Welzel map, capability on MMLU, and safety.
+
+Members are free here: the steps above are the recommended path, not a requirement. A member may use any methods it likes to hit its own capability, cultural-alignment, and safety goals. None of it is merged into the Shared Base — which is what keeps each member's cultural specialization its own, and avoids averaging distinct cultures back toward a bland centroid.
 
 ## Aggregation (modular)
 
-The default integration step is **quality-weighted FedAvg-class averaging** of contributed Stage A weight vectors. The outer aggregation mechanism is **replaceable** — DiLoCo-style outer optimization, model merging, or distillation may be substituted without redesigning the sovereign pipeline ([TAP-007](adr-007-architecture-comparison.md)).
+The default merge is quality-weighted FedAvg-class averaging of contributed weights. The mechanism is replaceable — DiLoCo-style outer optimization, model merging, or distillation — without changing the rest of the loop ([TAP-007](adr-007-architecture-comparison.md)).
 
 ## Confidence assessment
 
-The loop structure is sound and follows naturally from TAP-001 and TAP-002. The 4/5 confidence reflects three open questions:
+The two-phase structure follows naturally from TAP-001 and TAP-002 and is unlikely to be challenged. The 4/5 confidence reflects open questions about the loop's *parameters*, not its structure.
 
-1. **Cycle frequency.** Sync cadence is an operational choice, not fixed by the architecture. Deployments may sync frequently (cluster-like) or less often (geo-distributed). If nodes cycle at different rates, their influence on the global model diverges — the workshop should discuss whether synchronized or asynchronous cycling is preferable.
+## Open questions
 
-2. **Contribution weighting.** How are weight vectors from different nodes combined? Uniform weighting? Quality-weighted? This is simultaneously an optimization problem and a governance problem. See Phase 5, Decision 8.
-
-3. **Convergence properties.** Each node's data is deliberately non-IID (that's the sovereignty point). What are the convergence properties of this loop when nodes have radically different data distributions? FedAvg and DiLoCo provide theoretical grounding at small scale, but frontier-scale validation is missing.
-
-The loop itself is unlikely to be challenged. The open questions are about parameters, not structure.
+1. **Cycle cadence** — synchronized vs asynchronous cycling, and how differing rates skew a member's influence on the Shared Base.
+2. **Contribution weighting** — uniform vs quality-weighted; simultaneously an optimization and a governance question (see Phase 5, Decision 8).
+3. **Convergence** — members' data is deliberately non-IID (that is the point); convergence at frontier scale is unvalidated.
 
 ## Alternatives considered
 
-- **One-shot (no contribution back):** Distribute base, nodes customize, never feed improvements back. The global model never improves. This is just "download open weights and fine-tune."
-- **Per-step gradient sharing (FedSGD):** Requires tight step-locking between nodes and the aggregator; higher bandwidth and tighter coupling than local-then-sync patterns.
-- **Pure peer-to-peer (no centralized base):** No proven path to frontier quality from cold start.
-- **Contributing Stages B–C to the global base:** Would homogenize culturally specific alignment into the shared model; rejected.
+- **One-shot (no contribution back):** distribute a base, customize, never improve the shared base — just "download and fine-tune."
+- **Per-step gradient sharing (FedSGD):** tight step-locking and high bandwidth; rejected in favor of local-then-sync.
+- **Pure peer-to-peer (no shared base):** no proven path to frontier quality from a cold start.
+- **Contributing post-training back to the Shared Base:** would homogenize culturally specific alignment into the common model; rejected. This is precisely the boundary between Phase 1 and Phase 2.
 
 ## Consequences
 
-- Requires a central coordinator for aggregation. The coordinator is a governed role, not a power center (see Phase 5, Decision 7).
-- The compute cost per cycle for each node is estimated at 5–10% of original base pretraining cost. This must be validated empirically.
-- A consortium training prototype demonstrating this loop across 2–3 real nodes is the MVP deliverable, not a generic fine-tuning system.
+- Requires a coordinator for the merge — a governed role, not a power center (see Phase 5, Decision 7).
+- Per-cycle compute for each member is estimated at 5–10% of original base pretraining cost; must be validated empirically.
+- The MVP deliverable is a Shared-Base Loop across 2–3 real members, not a generic fine-tuning system.
 
 ## References
 

@@ -1,10 +1,11 @@
-# TAP-005: Sovereign Model Pipeline
+# TAP-005: The Sovereign Build
 
 | Field | Value |
 | :---- | :---- |
 | Status | Proposed |
 | Confidence | Strong (4/5) |
 | Date | May 7, 2026 |
+| Revised | Jun 19, 2026 — retitled "The Sovereign Build"; added Phase-2 boundary diagram; Stage A mapped to Contributed/Private CPT. |
 | Deciders | Christopher Nguyen (proposed), workshop participants (to resolve open questions) |
 | Supersedes | Original three-stage pipeline (CPT, alignment, instruction) |
 
@@ -15,6 +16,8 @@ Given that cultural alignment is the primary differentiator (TAP-003), the compl
 This revision expands the pipeline to cover the full lifecycle from data curation through deployed, evaluated sovereign models.
 
 ## Standard terminology mapping
+
+> A consolidated glossary of these and other Tapestry terms lives in [`glossary.md`](../../reference/glossary.md).
 
 Tapestry's pipeline stages map to standard industry terms as follows:
 
@@ -36,7 +39,30 @@ In **Phase 2** (TAP-006), when the consortium trains its own base, Stage A expan
 
 ## Decision
 
-The sovereign model pipeline has four stages plus evaluation as a cross-cutting concern. All stages are sovereign — each participant runs them independently on their own data and according to their own cultural judgment. The *tooling* for all stages is consortium infrastructure, shared across participants.
+The Sovereign Build has four stages plus evaluation as a cross-cutting concern. All stages are sovereign — each participant runs them independently on their own data and according to their own cultural judgment. The *tooling* for all stages is consortium infrastructure, shared across participants.
+
+```mermaid
+flowchart LR
+  SB[("Shared Base<br/>from Phase 1")]:::base
+  S0["Stage 0 · Data"]:::sovereign
+  SA["Stage A · CPT"]:::sovereign
+  SB2["Stage B · SFT"]:::sovereign
+  SC["Stage C · Alignment"]:::sovereign
+  SM(["Sovereign Model"]):::model
+  EV{{"Evaluation<br/>(cross-cutting)"}}:::eval
+  SB ==> S0 --> SA --> SB2 --> SC --> SM
+  S0 -.-> EV
+  SA -.-> EV
+  SB2 -.-> EV
+  SC -.-> EV
+
+  classDef base fill:#2c7da0,stroke:#a9d6e5,color:#fff
+  classDef sovereign fill:#5e548e,stroke:#9f86c0,color:#fff
+  classDef model fill:#7b6aae,stroke:#e0c3fc,color:#fff
+  classDef eval fill:#bc6c25,stroke:#e9c46a,color:#fff
+```
+
+Nothing here is contributed back to the Shared Base — this is the boundary between Phase 1 and Phase 2. Stage A run here is **Private CPT**; only a Stage A run inside the Shared-Base Loop is **Contributed CPT** ([TAP-004](adr-004-training-loop.md)).
 
 ### Stage 0: Data Preparation & Governance
 
@@ -102,16 +128,18 @@ Evaluation tooling — especially cultural alignment benchmarks — is novel inf
 
 At any point in time, the consortium produces **N+1 models**:
 
-- **1 shared global base model** — the consortium infrastructure, frontier-competitive, continuously improved through the consortium training loop (TAP-004)
-- **N sovereign models** — the actual deployed products, one per participating community, each produced by running this pipeline (Stages 0–C) on the global base
+- **1 Shared Base** — the consortium infrastructure, frontier-competitive, continuously improved through the Shared-Base Loop (TAP-004)
+- **N Sovereign Models** — the actual deployed products, one per participating community, each produced by running this Sovereign Build (Stages 0–C) on the Shared Base
 
 The sovereign models are the value. The global base is the substrate. Each sovereign model reflects the cultural knowledge, values, and interaction norms of its community while retaining frontier capability from the shared base.
 
-**Consortium loop boundary:** Only **Stage A (CPT)** outputs are contributed to the shared global base via the consortium training loop ([TAP-004](adr-004-training-loop.md)). Stages B and C produce each participant's deployable sovereign model locally and are not averaged into the global base.
+**Shared-Base Loop boundary:** Only **Contributed CPT** (Stage A) outputs are contributed to the Shared Base via the Shared-Base Loop ([TAP-004](adr-004-training-loop.md)). Stages B and C produce each participant's deployable Sovereign Model locally and are not averaged into the Shared Base.
+
+In the two-phase terminology of [TAP-004](adr-004-training-loop.md): the Stage A run that feeds the loop is the **Contributed CPT** of the **Shared-Base Loop** (Phase 1). When a participant later runs CPT only for its own model — as part of the **Sovereign Build** (Phase 2) — that is **Private CPT** and is not contributed. So "all stages are sovereign" (each runs on the participant's own data and judgment) and "only CPT is contributed" are both true: the difference is whether a given CPT run's weights go back to the Shared Base or stay local.
 
 This is analogous to Personalized Federated Learning (PFL) but at institutional and national scale. Where PFL produces a "personal" model for each edge device, Tapestry produces a sovereign model for each nation, institution, or cultural community. The "personalization" is not about individual preferences but about deep cultural alignment — knowledge, values, and norms that are collective and institutional.
 
-The N+1 structure is the mechanism by which Tapestry delivers on DG1 (frontier capability with sovereign alignment): frontier capability comes from the shared base (the "1"), sovereign alignment comes from the sovereign pipeline (the "N"). See TAP-007 for a diagrammatic treatment of the full training architecture and comparison with alternatives.
+The N+1 structure is the mechanism by which Tapestry delivers on DG1 (frontier capability with sovereign alignment): frontier capability comes from the Shared Base (the "1"), sovereign alignment comes from the Sovereign Build (the "N"). See TAP-007 for a diagrammatic treatment of the full training architecture and comparison with alternatives.
 
 ## Rationale
 

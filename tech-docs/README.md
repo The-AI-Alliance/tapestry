@@ -32,6 +32,7 @@ The [`reference/`](reference/README.md) directory holds material outside the TVA
 
 | Document | Description |
 | :------- | :---------- |
+| [`reference/glossary.md`](reference/glossary.md) | Definitions of Tapestry-specific terms (consortium training, Shared-Base Loop, Sovereign Build, etc.) |
 | [`reference/training-approaches.md`](reference/training-approaches.md) | Centralized vs. federated vs. consortium training |
 
 Repository root [**`README.md`**](../README.md) and [**`AGENTS.md`**](../AGENTS.md) summarize how `tech-docs/` fits with `docs/`, `src/`, and contributor workflows.

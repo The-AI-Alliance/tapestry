@@ -105,7 +105,7 @@ Whether continued pretraining (not just adapters) is the accepted approach for s
 
 ---
 
-## Decision 3: Consortium Training Loop
+## Decision 3: The Shared-Base Loop (Consortium Training Loop)
 
 **Design goals served:** DG1 (frontier capability + sovereign alignment), DG2 (data sovereignty), DG5 (economic rationality)
 
@@ -119,7 +119,7 @@ How does the global model improve over time while preserving sovereignty? What i
 graph TD
     S1["Step 1: Centralized base training\n(frontier model on global open data)"]
     S2["Step 2: Distributed continued pretraining\n(each node trains entire model\non sovereign data)"]
-    S3["Step 3: Weight contribution\n(nodes send local model\nweights after Stage A)"]
+    S3["Step 3: Weight contribution\n(nodes send local model\nweights after Contributed CPT)"]
     S4["Step 4: Central integration\n(weight vectors averaged,\nglobal model updated)"]
 
     S1 --> S2
@@ -137,7 +137,7 @@ graph TD
 
 **Step 2 — Distributed continued pretraining.** Each node receives the current global model and does continued pretraining on its sovereign data — culturally grounded corpora, domain-specific institutional knowledge, community-authored content. This changes the model's deep representations, not just its behavior. Each node trains the *entire model*, not just adapters. Estimated compute: 5–10% of original pretraining cost per node per cycle.
 
-**Step 3 — Weight contribution.** Each node sends its **locally trained model weight vector** (post–Stage A CPT) to the central coordinator. *Not* per-step gradients — local training completes before sync. Sync cadence is an operational choice: frequent (cluster-like) or less often (geo-distributed).
+**Step 3 — Weight contribution.** Each node sends its **locally trained model weight vector** (post–Contributed CPT) to the central coordinator. *Not* per-step gradients — local training completes before sync. Sync cadence is an operational choice: frequent (cluster-like) or less often (geo-distributed).
 
 **Step 4 — Central integration.** The coordinator aggregates contributed weight vectors into an updated global model (FedAvg-class weighted averaging by default; outer optimizer swappable). The weighting policy (see Decision 8) determines how contributions are combined. The updated global model is redistributed to all nodes.
 
@@ -163,11 +163,11 @@ This loop differs from traditional federated learning in important ways:
 | **Data per node** | Tiny (user's local data) | Massive (national/institutional corpora) |
 | **Model scale** | Small, often fine-tuning | Frontier-scale (7B–70B+) |
 | **Privacy motive** | Individual data protection | National/institutional sovereignty |
-| **What's shared** | Per-step gradients (FedSGD) or local model weight vectors after local training (FedAvg) | Local model weight vectors after Stage A CPT |
+| **What's shared** | Per-step gradients (FedSGD) or local model weight vectors after local training (FedAvg) | Local model weight vectors after Contributed CPT |
 | **Communication cadence** | Varies by method and deployment | Operational choice — frequent or infrequent |
 | **Heterogeneity** | Hardware (phone vs. tablet) | Hardware, data, culture, policy |
 
-The term "consortium training" more accurately describes what Tapestry does: a small number of large, trusted, heterogeneous nodes collaboratively improving a shared model, where data sovereignty is a first-order architectural constraint and cultural alignment is the goal.
+The term "consortium training" more accurately describes what Tapestry does — the paradigm defined in [TAP-002](decisions/adr-002-consortium-training.md): few large, trusted, heterogeneous members collaboratively improving a shared model under data-sovereignty and cultural-alignment constraints.
 
 ### Workshop decision needed
 
@@ -391,7 +391,7 @@ graph TD
         SE["Sovereign experts\n(future: MoE)"]
     end
 
-    subgraph Loop ["Consortium Training Loop"]
+    subgraph Loop ["Shared-Base Loop"]
         FP["Consortium protocol\n(backend-agnostic)"]
         CO["Coordinator\n(governed, auditable)"]
         WP["Weighting policy\n(uniform + quality floor)"]
@@ -401,7 +401,7 @@ graph TD
     BM --> SF --> CP --> AL
     CP --> AD
     CP --> SE
-    CP -->|"Stage A weights"| CO
+    CP -->|"Contributed CPT weights"| CO
     CO --> WP
     WP -->|"updated global model"| CP
     FP --> CO

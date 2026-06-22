@@ -5,6 +5,7 @@
 | Status | Proposed |
 | Confidence | Strong (4/5) |
 | Date | May 7, 2026 |
+| Revised | Jun 19, 2026 — terminology aligned to the two-phase model; Contributed CPT and Sovereign-Build boundary clarified. |
 | Deciders | Christopher Nguyen (proposed), workshop participants (to validate and refine) |
 
 ## Why this ADR exists
@@ -41,7 +42,7 @@ The training architecture is not a single choice but a combination of three inde
 
 **2. Contribution mechanism:** How do sovereign contributions flow back to improve the shared base?
 
-- FedAvg-class weight vector aggregation (nodes send locally trained Stage A weights to coordinator)
+- FedAvg-class weight vector aggregation (nodes send their locally trained Contributed CPT weights to coordinator)
 - Model merging (nodes train independently; weights combined post-hoc)
 - Knowledge distillation (sovereign models as teachers; shared model as student)
 - No contribution back (one-shot: distribute base, nodes customize, no loop)
@@ -52,7 +53,7 @@ The training architecture is not a single choice but a combination of three inde
 - Consortium-trained from scratch (Phase 2 per TAP-006)
 - No shared base (fully independent training per node)
 
-The current proposed architecture is one point in this space: **full-model Stage A CPT + FedAvg-class weight vector aggregation + adopted base (evolving to consortium-trained base)**. Below, we evaluate the viable alternatives.
+The current proposed architecture is one point in this space: **full-model Contributed CPT + FedAvg-class weight vector aggregation + adopted base (evolving to consortium-trained base)**. Below, we evaluate the viable alternatives.
 
 ## Proposed architecture: Consortium training with weight vector aggregation
 
@@ -66,9 +67,9 @@ This is the architecture described across TAP-001, TAP-004, and TAP-005. Here we
 
 **Step 2 — Distribute to nodes.** The global model weights are sent to each participating node. Each node receives the same checkpoint.
 
-**Step 3 — Sovereign pipeline (TAP-005).** Each node runs the sovereign model pipeline on the global base: data preparation (Stage 0), continued pre-training on shared *plus* sovereign data (Stage A), instruction tuning (Stage B), alignment (Stage C), with evaluation throughout. Sovereign data stays on the node; nothing raw crosses the network.
+**Step 3 — Contributed CPT.** Each node runs full-model continued pre-training on shared *plus* member data on the global base. Member data stays on the node; nothing raw crosses the network. (This is the Stage A CPT of the Sovereign Build in TAP-005, run here as a *contributed* step.)
 
-**Step 4 — Weight vector contribution (Stage A only).** Each node sends its **locally trained model weight vector** after Stage A CPT to the central coordinator — not per-step gradients, not raw data. Stages B and C remain local to each sovereign deployable model.
+**Step 4 — Weight vector contribution.** Each node sends its **locally trained model weight vector** after Contributed CPT to the central coordinator — not per-step gradients, not raw data. The rest of the Sovereign Build (Stages B and C — instruction tuning and alignment) remains local to each deployable Sovereign Model.
 
 **Step 5 — Central integration.** The coordinator aggregates contributed weight vectors into an updated global model (FedAvg-class weighted averaging by default; outer optimizer swappable). This is the step with the most open design questions (see below).
 
@@ -122,7 +123,7 @@ The choice of aggregation method is simultaneously a technical and governance qu
 | DG5 | **Weakened.** No continuous improvement cycle; value of contribution less legible. |
 | DG6 | **Uncertain.** Merging may unpredictably affect safety properties. |
 
-**Verdict:** Viable as a fallback if the consortium training loop proves technically infeasible at scale, but weaker on the primary goal (DG1) due to merge quality concerns.
+**Verdict:** Viable as a fallback if the Shared-Base Loop proves technically infeasible at scale, but weaker on the primary goal (DG1) due to merge quality concerns.
 
 ### Alternative 2: Mixture of Experts (MoE) federation
 
@@ -183,7 +184,7 @@ The choice of aggregation method is simultaneously a technical and governance qu
 
 ### Alternative 5: No contribution back (one-shot distribution)
 
-**How it works:** The consortium trains or adopts a global base. Each node downloads it, customizes it via the sovereign pipeline, and that's it. No weight vectors, no loop, no continuous improvement of the shared base.
+**How it works:** The consortium trains or adopts a global base. Each node downloads it, customizes it via the Sovereign Build, and that's it. No weight vectors, no loop, no continuous improvement of the shared base.
 
 **Advantages:** Simple. No coordination infrastructure needed beyond initial distribution. Each node is fully independent.
 
@@ -197,7 +198,7 @@ The choice of aggregation method is simultaneously a technical and governance qu
 | DG4 | **Fails.** No value beyond Phase 1. Why have a consortium? |
 | DG5 | **Fails.** No ongoing exchange of value. No reason to contribute. |
 
-**Verdict:** Not viable as a consortium architecture. This is the status quo — what any organization can already do with Llama or Mistral. The consortium training loop is what makes Tapestry more than "a governance wrapper around open weights."
+**Verdict:** Not viable as a consortium architecture. This is the status quo — what any organization can already do with Llama or Mistral. The Shared-Base Loop is what makes Tapestry more than "a governance wrapper around open weights."
 
 ### Alternative 6: Peer-to-peer weight exchange (no central coordinator)
 
@@ -272,7 +273,7 @@ Two approaches are **ruled out**: MoE federation (fails the standalone sovereign
 
 Tapestry adopts **consortium training with weight vector aggregation** as the initial training architecture, as defined in TAP-004. It is the preferred candidate given current evidence — not because it is the only viable option, but because it has the strongest theoretical and empirical support (FedAvg convergence theory; DiLoCo as an optional variant) and the most straightforward systems engineering.
 
-The architecture is designed so that the **contribution mechanism is modular**: the sovereign pipeline (TAP-005), the N+1 model outcome, and the governance model do not depend on whether contributions flow as weight vectors, merged models, or distilled knowledge. If model merging or knowledge distillation proves superior as those techniques mature, the contribution mechanism can be swapped without redesigning the rest of the system.
+The architecture is designed so that the **contribution mechanism is modular**: the Sovereign Build (TAP-005), the N+1 model outcome, and the governance model do not depend on whether contributions flow as weight vectors, merged models, or distilled knowledge. If model merging or knowledge distillation proves superior as those techniques mature, the contribution mechanism can be swapped without redesigning the rest of the system.
 
 Adapter-only training (Alternative 4) may serve as a **Phase 0.5** rapid-deployment mechanism while full-model CPT infrastructure is being built, with clear criteria for transition.
 
