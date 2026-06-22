@@ -181,6 +181,46 @@ def test_aggregation_needs_two_cultures() -> None:
         raise AssertionError("expected ValueError for single culture")
 
 
+def test_fedavg_averages_floats_and_preserves_int_buffers() -> None:
+    # FedAvg must average trainable float weights but leave integer buffers (which
+    # a real HF model carries) untouched -- averaging them is meaningless and would
+    # corrupt the dtype. Without this guard the real-mode loop breaks on the first round.
+    import torch
+
+    from cultural_cpt.aggregation import _fedavg
+
+    states = [
+        {"w": torch.tensor([0.0, 2.0]), "ids": torch.tensor([5, 6])},
+        {"w": torch.tensor([2.0, 6.0]), "ids": torch.tensor([5, 6])},
+    ]
+    out = _fedavg(states)
+    assert torch.allclose(out["w"], torch.tensor([1.0, 4.0]))
+    assert out["ids"].dtype == torch.long
+    assert torch.equal(out["ids"], torch.tensor([5, 6]))
+
+
+def test_aggregation_resume_is_identical(tmp_path: Path) -> None:
+    # A cached full run, re-run against the same cache, must reproduce the curve
+    # exactly (it resumes from the checkpoint instead of recomputing).
+    cache = tmp_path / "rounds"
+    fresh = run_aggregation(_agg_config(seed=3), cache_dir=cache)
+    assert (cache / "global_state.pt").exists()
+    assert sorted(p.name for p in cache.glob("round_*.json")) == ["round_1.json", "round_2.json", "round_3.json"]
+    resumed = run_aggregation(_agg_config(seed=3), cache_dir=cache)
+    assert resumed.to_dict() == fresh.to_dict()
+
+
+def test_aggregation_partial_resume_matches_fresh(tmp_path: Path) -> None:
+    # Resuming a 2-round checkpoint to 3 rounds must match a fresh 3-round run --
+    # the preemption-recovery path the spot box relies on.
+    fresh = run_aggregation(_agg_config(rounds=3, seed=3))
+    cache = tmp_path / "rounds"
+    run_aggregation(_agg_config(rounds=2, seed=3), cache_dir=cache)
+    extended = run_aggregation(_agg_config(rounds=3, seed=3), cache_dir=cache)
+    assert extended.separability_curve == fresh.separability_curve
+    assert extended.to_dict() == fresh.to_dict()
+
+
 # --- multi-seed statistics / go-no-go decision -----------------------------
 
 
