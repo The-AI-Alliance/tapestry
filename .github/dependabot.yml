@@ -22,3 +22,9 @@ updates:
 
     # Space left: 3 PRs of ungrouped major updates. Requires green CI + manual check.
     open-pull-requests-limit: 5
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3
