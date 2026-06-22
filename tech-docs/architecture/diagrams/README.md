@@ -66,7 +66,7 @@ Pick one:
 
 ## Publishing note
 
-The GitHub Pages site under [`docs/`](../../../docs/) does not automatically mirror `tech-docs/`. If architecture HTML or mirrored Markdown is published later, copy or generate assets into whatever directory that site serves, or add Jekyll includes — the relative paths above are for the **repo / GitHub** view of `tech-docs/`.
+The GitHub Pages site under [`website/`](../../../website/) does not automatically mirror `tech-docs/`. If architecture HTML or mirrored Markdown is published later, copy or generate assets into whatever directory that site serves, or add Jekyll includes — the relative paths above are for the **repo / GitHub** view of `tech-docs/`.
 
 ## Naming
 

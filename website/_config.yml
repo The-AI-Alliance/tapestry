@@ -22,7 +22,7 @@ url: "https://the-ai-alliance.github.io" # the base hostname & protocol for your
 
 permalink: pretty
 exclude: ["node_modules/", "*.gemspec", "*.gem", "Gemfile", "Gemfile.lock", "package.json", "package-lock.json",  "script/", "LICENSE.txt", "lib/", "bin/", "README.md", "Rakefile", "Makefile"
-, "docs/tests/", "notes.md", "vendor"
+, "website/tests/", "notes.md", "vendor"
 ]
 
 # Added by AI Alliance: our glossary URL and the main tapestry page URL.
@@ -30,10 +30,10 @@ glossaryurl: https://the-ai-alliance.github.io/glossary
 tapestryurl: https://thealliance.ai/projects/tapestry
 
 # Regression tests
-# By default, the pages in /docs/tests are excluded when the site is built.
+# By default, the pages in /website/tests are excluded when the site is built.
 # To include them, comment-out the relevant line above.
 # Uncommenting the following line doesn't work - see https://github.com/jekyll/jekyll/issues/4791
-# include: ["docs/tests/"]
+# include: ["website/tests/"]
 
 # Set a path/url to a logo that will be displayed instead of the title
 #logo: "/assets/images/just-the-docs.png"
@@ -115,8 +115,8 @@ show_footer: side_bar
 # Footer last edited timestamp
 last_edit_timestamp: true # show or hide edit time - page must have `last_modified_date` defined in the frontmatter
 last_edit_time_format: "%Y-%m-%d" # uses ruby's time format: https://ruby-doc.org/stdlib-2.7.0/libdoc/time/rdoc/Time.html
-last_modified_date: 2026-04-29 09:44 -0400
-last_version: V0.1.1
+last_modified_date: 2026-05-22
+last_version: V0.1.2
 
 # Custom: Add the range of years for the copyright here. This is done here,
 # rather than default.html, so that the latter file can remain completely 
@@ -128,7 +128,7 @@ gh_edit_link: true # show or hide edit this page link
 gh_edit_link_text: "Edit this page on GitHub"
 gh_edit_repository: "https://github.com/The-AI-Alliance/tapestry" # the github URL for your repo
 gh_edit_branch: "main" # the branch that your docs are served from
-gh_edit_source: "docs" # the source that your files originate from
+gh_edit_source: "website" # the source that your files originate from
 gh_edit_view_mode: "tree" # "tree" or "edit" if you want the user to jump into the editor immediately
 
 # Color scheme currently only supports "dark", "light"/nil (default), or a custom scheme that you define

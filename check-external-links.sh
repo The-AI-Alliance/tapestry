@@ -3,7 +3,8 @@
 # Checks that all external links, those starting with http*, have "targets".
 #---------------------------------------------------------------------------
 
-default_path="docs"
+default_path="website"
+script=$0
 
 help() {
 	cat << EOF
@@ -47,7 +48,7 @@ error() {
 	do
 		echo "ERROR: $arg"
 	done
-	help
+	echo "Try: $script --help"
 	exit 1
 }
 
@@ -85,6 +86,8 @@ eg=$(which egrep)
 [[ -n "$VERBOSE" ]] && echo "Checking markdown files:"
 for path in "${paths[@]}"
 do
+	[[ -d "$path" ]] || error "\"$path\" doesn't exist! Exiting..."
+
 	if [[ -n "$VERBOSE" ]]
 	then
 		dir=$([[ -d "$path" ]] && echo "(directory)")

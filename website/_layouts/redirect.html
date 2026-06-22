@@ -3,7 +3,7 @@ layout: redirect
 ---
 {% comment %}
 The template for relative or absolute redirects. In the pages that use it,
-see for example `docs/example_redirect.markdown`, define either of the following:
+see for example `website/example_redirect.markdown`, define either of the following:
 * redirect_rel_url - for relative redirects relative to this site, that is relative
                      to `{site.url}/{site.baseurl}.
 * redirect_abs_url - for absolute redirects to a different site.
@@ -18,7 +18,7 @@ following will be transformed as shown:
 TIP: Make sure you experiment with the definition for these URLs. Be especially
 careful about relative URLs. Despite the "relative" name, you shouldn't actually 
 use relative constructs like `../`. Use `/foo/bar`, instead, which is the path 
-from the website's root, as defined by site.url in `docs/_config.yml`.
+from the website's root, as defined by site.url in `website/_config.yml`.
 
 This is the hack we use for reconstructing the full URL, adapted from StackOverflow:
 // Source - https://stackoverflow.com/a/31604335

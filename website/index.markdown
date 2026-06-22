@@ -26,7 +26,14 @@ The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-proj
  
 This website is for technical contributors. As Project Tapestry evolves, this website will provide links to technical requirements, architecture and design documentation, and implementation source code.
 
-Watch for announcements over the coming months about Project Tapestry’s architecture, roadmap, and model development priorities. 
+## Contribute to Our First Work Streams
+
+Project Tapestry has big plans, and we're starting with some fundamental building blocks.
+
+* [LLM Cultural Alignment and Re-alignment](https://github.com/The-AI-Alliance/tapestry/issues/22){:target="issues"} _repository coming soon_ - help us develop techniques for cultural alignment, initially based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world){:target="iwcm"} as a metric. This task will implement a corresponding evaluation and implement tuning experiments to understand how to shift alignment without compromising general model performance. Prior expertise in evaluation and tuning technologies are especially welcome.
+* [Consortium Training](https://github.com/The-AI-Alliance/tapestry/issues/24){:target="issues"} _repository coming soon_ - Tapestry's approach to global model development relies on a balance between centralized and distributed training that preserves use and privacy requirements for data sets. Help us adapt and develop optimal techniqes with ideas from both federated learning and the latest LLM pre-training and post-training methods. Prior expertise in large scale LLM training, distributed infrastructure, and federated learning are especially welcome.
+* [Global Training Data Corpus](https://thealliance.ai/projects/tapestry/training-data-proposals){:target="data"} A core thesis of project Tapestry is that bringing together a much more diverse set of data can provide a path to a better frontier base model for all. What unique datasets exist that could be brought to Tapestry model training? They don't have to be fully open; we will work with you to define and enforce appropriate requirements.
+* Tapestry Model Development Roadmap - _coming soon_ - we want your input!
 
 ## Project Tapestry Work Groups
 

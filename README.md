@@ -10,11 +10,10 @@
 Learn more from our [Kickoff Workshop Blog](https://thealliance.ai/blog/project-tapestry-the-path-to-frontier-sovereign-ai) and check out the [Project Tapestry](https://thealliance.ai/projects/tapestry/) website for more information about partnering, events, and how to support Project Tapestry.
 
 This repo contains the code and technical documentation for the project. We invite you to jump in and help!
-<p align="center">
-  <img src="docs/assets/images/03-tapestry-logo-cropped-630x555.png" alt="Project Tapestry Logo" width="600">
-</p>
 
-<!-- ![Project Tapestry Image](docs/assets/images/03-tapestry-logo-cropped-630x555.png) -->
+<p align="center">
+  <img src="website/assets/images/03-tapestry-logo-cropped-630x555.png" alt="Project Tapestry Logo" width="600">
+</p>
 
 The rest of this README provides information for contributors and users of this repository.
 
@@ -180,7 +179,7 @@ make format-lint-type-check  # Equivalent to 'make format lint type-check'
 
 ## Project Code Structure
 
-In addition to the top-level directories `tech-docs`, discussed above, `docs`, discussed below, and [`contrib`](contrib/README.md), the staging area for contributed ideas and techniques, the code structure is as follows. At this time, there are three major _subsystems_:
+In addition to the top-level directories `tech-docs`, discussed above, `website`, discussed below, and [`contrib`](contrib/README.md), the staging area for contributed ideas and techniques, the code structure is as follows. At this time, there are three major _subsystems_:
 
 * `data` for all data governance and management capabilities.
 * `training` for all distributed training and tuning capabilities.
@@ -231,6 +230,6 @@ See the contributing guide [section on DCO](CONTRIBUTING.md#developer-certificat
 
 ## About the Technical Website (GitHub Pages)
 
-The [website](https://the-ai-alliance.github.io/tapestry/) for this repository provides another way to discover and navigate the technical documentation content in [`tech-docs`](/tech-docs). However, at this time, the site mostly just points to the content in [`tech-docs`](tech-docs/). The website sources are in the [`docs`](docs/) directory.
+The [website](https://the-ai-alliance.github.io/tapestry/) for this repository provides another way to discover and navigate the technical documentation content in [`tech-docs`](/tech-docs). However, at this time, the site mostly just points to the content in [`tech-docs`](tech-docs/). The website sources are in the [`website`](website/) directory.
 
 The website is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). See [GITHUB_PAGES.md](GITHUB_PAGES.md) for all the details.
