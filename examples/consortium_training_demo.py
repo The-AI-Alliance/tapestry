@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import argparse
 import random
 import sys
 from pathlib import Path
@@ -16,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from tapestry.training.consortium import (
     ConsortiumCoordinator,
     ContributionPolicy,
+    ContributionWeighting,
     SovereignTrainingNode,
     TinyCausalModel,
 )
@@ -51,7 +53,7 @@ def _encode(texts: list[str]) -> list[list[int]]:
     return [[token % 128 for token in text.encode("utf-8")] for text in texts]
 
 
-def run_demo(rounds: int = 3, seed: int = 7) -> None:
+def run_demo(rounds: int = 3, seed: int = 7, weighting: ContributionWeighting = "quality") -> None:
     """Run a small N+1 consortium-training loop."""
     random.seed(seed)
     torch.manual_seed(seed)
@@ -59,6 +61,7 @@ def run_demo(rounds: int = 3, seed: int = 7) -> None:
     print("=" * 72)
     print("  TAPESTRY -- Consortium Training Proof of Concept")
     print("  One governed shared base + N sovereign participant models")
+    print(f"  Contribution weighting: {weighting}")
     print("=" * 72)
 
     base_model = TinyCausalModel(vocab_size=128, hidden_size=32)
@@ -67,6 +70,7 @@ def run_demo(rounds: int = 3, seed: int = 7) -> None:
         contribution_policy=ContributionPolicy(
             quality_floor=0.75,
             max_node_weight=0.5,
+            weighting=weighting,
         ),
     )
     nodes = [
@@ -103,5 +107,29 @@ def run_demo(rounds: int = 3, seed: int = 7) -> None:
     print("=" * 72)
 
 
+def run_comparison(rounds: int = 3, seed: int = 7) -> None:
+    """Run the same scenario with quality-weighted and equal influence policies."""
+    for weighting in ("quality", "equal"):
+        run_demo(rounds=rounds, seed=seed, weighting=weighting)
+        print()
+
+
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run the Tapestry consortium-training proof of concept.")
+    parser.add_argument("--rounds", type=int, default=3, help="Number of consortium-training rounds to run.")
+    parser.add_argument("--seed", type=int, default=7, help="Random seed used for deterministic demo setup.")
+    parser.add_argument(
+        "--weighting",
+        choices=("quality", "equal", "compare"),
+        default="quality",
+        help="Contribution weighting policy to run. Use 'compare' to run quality and equal policies back to back.",
+    )
+    return parser.parse_args()
+
+
 if __name__ == "__main__":
-    run_demo()
+    args = _parse_args()
+    if args.weighting == "compare":
+        run_comparison(rounds=args.rounds, seed=args.seed)
+    else:
+        run_demo(rounds=args.rounds, seed=args.seed, weighting=args.weighting)

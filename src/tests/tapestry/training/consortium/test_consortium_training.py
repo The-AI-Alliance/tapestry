@@ -79,6 +79,25 @@ def test_contribution_policy_applies_quality_floor_and_capture_cap() -> None:
     assert sum(weights.values()) == pytest.approx(1.0)
 
 
+def test_equal_contribution_policy_ignores_quality_magnitude_after_floor() -> None:
+    """The equal MVP option gives every accepted participant the same influence."""
+    policy = ContributionPolicy(quality_floor=0.7, weighting="equal")
+
+    weights = policy.weights(
+        {
+            "strong": 0.95,
+            "dominant": 5.0,
+            "weak": 0.4,
+        }
+    )
+
+    assert "weak" not in weights
+    assert weights == {
+        "strong": pytest.approx(0.5),
+        "dominant": pytest.approx(0.5),
+    }
+
+
 def test_coordinator_maintains_n_plus_one_model_outcome() -> None:
     """One evolved base plus one sovereign artifact per node are retained."""
     torch.manual_seed(1)
@@ -121,6 +140,33 @@ def test_coordinator_maintains_n_plus_one_model_outcome() -> None:
         )
         for name in result.shared_base_state
     )
+
+
+def test_weighting_modes_produce_different_integration_results() -> None:
+    """The current experiment setup can compare quality-weighted and equal influence policies."""
+    local_states = {
+        "strong": {"weight": torch.tensor([2.0])},
+        "dominant": {"weight": torch.tensor([10.0])},
+    }
+    quality_weights = ContributionPolicy(weighting="quality").weights(
+        {
+            "strong": 1.0,
+            "dominant": 3.0,
+        }
+    )
+    equal_weights = ContributionPolicy(weighting="equal").weights(
+        {
+            "strong": 1.0,
+            "dominant": 3.0,
+        }
+    )
+
+    quality_state = ConsortiumCoordinator._apply_weighted_average(local_states, quality_weights)
+    equal_state = ConsortiumCoordinator._apply_weighted_average(local_states, equal_weights)
+
+    assert quality_weights["dominant"] > equal_weights["dominant"]
+    assert quality_state["weight"].item() == pytest.approx(8.0)
+    assert equal_state["weight"].item() == pytest.approx(6.0)
 
 
 def test_low_quality_contribution_does_not_update_shared_base() -> None:

@@ -9,7 +9,7 @@ weight vectors for FedAvg-class integration back into the shared base.
 from .coordinator import ConsortiumCoordinator
 from .model import TinyCausalModel
 from .node import SovereignTrainingNode
-from .policy import ContributionPolicy
+from .policy import ContributionPolicy, ContributionWeighting
 from .messages import (
     ConsortiumRoundResult,
     SovereignContribution,
@@ -21,6 +21,7 @@ __all__ = [
     "ConsortiumCoordinator",
     "ConsortiumRoundResult",
     "ContributionPolicy",
+    "ContributionWeighting",
     "SovereignContribution",
     "SovereignCycleResult",
     "SovereignModelArtifact",
