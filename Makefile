@@ -1,10 +1,12 @@
 
 SRC_DIR      := src
+CONTRIB_DIR  := contrib
 
 PAGES_URL    := https://the-ai-alliance.github.io/tapestry/
 DOCS_DIR     := website
 SITE_DIR     := ${DOCS_DIR}/_site
 CLEAN_DIRS   := ${SITE_DIR} ${DOCS_DIR}/.sass-cache
+CONTRIB_MAKEFILES := $(wildcard ${CONTRIB_DIR}/*/Makefile)
 # Environment variables
 MAKEFLAGS            = --warn-undefined-variables
 UNAME               ?= $(shell uname)
@@ -61,6 +63,12 @@ make type-check-watch   # Type check the Python code with 'ty' in "watch" mode,
                         # so you can fix mistakes and keep it updating.
 make before-pr          # Make format-lint-type-check and tests. 
                         # DO THIS BEFORE SUBMITTING A PR!
+
+For contributed ideas and techniques:
+
+make contrib-check      # Run all standard contrib checks defined by contrib/*/Makefile.
+make contrib-tests      # Run contrib tests defined by contrib/*/Makefile.
+make contrib-lint       # Run contrib lint checks defined by contrib/*/Makefile.
 
 For the consortium-training prototype:
 
@@ -129,6 +137,7 @@ print-info:
 
 .PHONY: tests unit-tests
 tests:: unit-tests
+tests:: contrib-tests
 
 unit-tests::
 	@echo "${INFO}Running the unit tests...${_END}"
@@ -189,12 +198,15 @@ before-pr:: format-lint-type-check tests
 format-lint-type-check flt:: format lint type-check
 
 .PHONY: format lint ruff pylint type-check type-check-watch
+.PHONY: contrib-check contrib-format contrib-lint contrib-tests contrib-type-check run-contrib-target
 
 format::
 	@echo "${INFO}$@: Running 'black' on the code.${_END}"
 	uv run black ${SRC_DIR}
+format:: contrib-format
 
 lint:: ruff pylint
+lint:: contrib-lint
 
 ruff::
 	@echo "${INFO}$@: Running 'ruff' to lint the code.${_END}"
@@ -207,9 +219,36 @@ pylint::
 type-check::
 	@echo "${INFO}$@: Running 'ty' to type check the code.${_END}"
 	uv run ty check ${SRC_DIR} 
+type-check:: contrib-type-check
 type-check-watch::
 	@echo "${INFO}$@: Running 'ty' to type check the code in 'watch' mode.${_END}"
 	uv run ty check --watch ${SRC_DIR} 
+
+contrib-check::
+	@${MAKE} run-contrib-target TARGET=check
+
+contrib-format::
+	@${MAKE} run-contrib-target TARGET=format
+
+contrib-lint::
+	@${MAKE} run-contrib-target TARGET=lint
+
+contrib-tests::
+	@${MAKE} run-contrib-target TARGET=tests
+
+contrib-type-check::
+	@${MAKE} run-contrib-target TARGET=type-check
+
+run-contrib-target::
+	@if [ -z "${CONTRIB_MAKEFILES}" ]; then \
+		echo "${INFO}No ${CONTRIB_DIR}/*/Makefile files found; skipping contrib ${TARGET}.${_END}"; \
+	else \
+		for makefile in ${CONTRIB_MAKEFILES}; do \
+			dir=$$(dirname $$makefile); \
+			echo "${INFO}Running '${TARGET}' in $$dir...${_END}"; \
+			${MAKE} -C $$dir ${TARGET}; \
+		done; \
+	fi
 
 .PHONY: one-time-setup clean-setup 
 .PHONY: install-uv uv-venv install-dev-dependencies command-check-uv
