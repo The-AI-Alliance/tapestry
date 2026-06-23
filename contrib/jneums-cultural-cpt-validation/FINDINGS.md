@@ -3,7 +3,7 @@
 Does continued pre-training (CPT) on a value-laden cultural corpus shift a
 language model's measured values toward that culture — and does it do so *beyond*
 what same-language, value-neutral text would? This is the findings record for
-eleven real runs of the validation harness ("real" = a real base model under
+twelve real runs of the validation harness ("real" = a real base model under
 `--mode hf` **and** a real corpus under `--corpus-path`; toy/smoke numbers are not
 recorded here). Run artifacts (`runs/…/result.json`) are git-ignored; the tables
 below are the record. Corpora regenerate from `titles/egypt.ar.json` via
@@ -33,6 +33,14 @@ the right substrate, and that is where the result is reported.
 
 **Decision (2026-06-17): report the relative effect as the headline** rather than
 spend more GPU chasing the absolute conjunct. See [Status & next steps](#status--next-steps).
+
+**Follow-up (Run 12, 2026-06-23):** scaling the base model to 10 epochs *did* lift the
+absolute shift over 0.05 (all 4 draws, mean +0.085) — but the relative effect then fell
+to z=1.39, because at higher epochs the value-neutral arm itself drifts Egypt-ward
+(~+0.04/draw). Absolute magnitude and value-specificity **trade off under
+epoch-scaling**, so the single-run four-conjunct PASS is elusive for a principled
+reason; Run 11's z=2.97 (6 epochs) stays the cleanest value-specific result. This
+confirms the decision above and closes the single-node experiment.
 
 ## The pre-registered test
 
@@ -81,7 +89,7 @@ story of this experiment — see the run log and Interpretation.
 
 ## Run log
 
-The eleven runs below are the chronological record; the [Interpretation](#interpretation)
+The twelve runs below are the chronological record; the [Interpretation](#interpretation)
 synthesises what they collectively show. The short version of the arc: early
 single-corpus "passes" were artifacts of a too-narrow noise band; once the band is
 estimated honestly (corpus resampling) and the confounds are stripped (register
@@ -528,7 +536,57 @@ Run 10a's z=2.12 was cross-seed sampling noise, not a real effect. (The register
 rejection itself does survive on instruct — `grounded − neutral_prose` z=2.28.) The
 base model is the right substrate; the instruct positives were noise.
 
-## Trend across all eleven runs (the decisive comparison)
+### Run 12 — scaling the base model to close the absolute gap (the epoch tradeoff)
+
+After Run 11 the only failing conjunct on base was the **absolute** shift (+0.039 <
+0.05). On merging PR #65 the maintainer endorsed the one deferred GPU run: scale the
+base-model corpus/epochs on the **same** cross-corpus band and push the absolute shift
+over the bar. Run 12 ran `CORPUS_DRAWS=4 CORPUS_FRACTION=0.7` on **Qwen3-4B-Base** at
+**10 epochs** (vs Run 11's 6), corpus regrown to **739,897 / 616,733 tokens**
+(grounded / language_matched) via `cat_limit=150` — ≈430k tokens/draw, ~2× Run 11 (the
+Arabic category membership is the hard ceiling, so the scale-up rode mostly on epochs).
+3 inner seeds/draw, Arabic instrument, generate-mode behavior, stabilised. ~25 h on one
+RTX 5090. Artifacts: `runs/egypt_stats/`.
+
+| comparison (across 4 corpus draws) | per-draw | mean ± std | z |
+| :-- | :-- | --: | --: |
+| **grounded shift (absolute)** | 0.079 / 0.126 / 0.085 / 0.051 | **+0.085 ± 0.031** | all 4 ≥ 0.05 ✅ |
+| **grounded − language** | 0.100 / 0.091 / 0.044 / 0.006 | **+0.060 ± 0.044** | **+1.39** ✗ |
+| grounded − surface | 0.054 / 0.101 / 0.061 / 0.026 | +0.061 ± 0.031 | +1.96 |
+| capability drop | −0.014 / 0.014 / 0.028 / 0.083 | +0.028 ± 0.041 | — |
+| safety drop | −0.083 / −0.042 / 0.167 / −0.042 | +0.000 ± 0.113 | — |
+
+#### VERDICT: **FAIL — and it swapped the failing conjunct vs Run 11.**
+
+The scale-up did what it was aimed at: the **absolute shift cleared 0.05 in every
+draw** (mean +0.085, vs Run 11's +0.039) — the conjunct Run 11 failed now passes. But
+the **grounding effect fell to z=1.39 (< 2.0)**: draw 3 came in at grounded−language =
++0.006 (vs +0.100/+0.091/+0.044 for the others), widening the cross-draw band. So Run
+12 PASSes absolute, capability and safety and FAILs only the **relative** grounding
+conjunct — the mirror image of Run 11 (relative PASS, absolute FAIL). Across the two
+runs each conjunct has cleared its bar, but **never both in one 4-draw run.**
+
+**Why — a real epoch-scaling tradeoff, not just variance.** Decompose the neutral
+arm's drift, `language_shift = grounded_shift − (grounded − language)`:
+**−0.022 / +0.035 / +0.041 / +0.045**. At 10 epochs the *value-neutral* Arabic arm
+itself drifts toward Egypt in 3 of 4 draws (~+0.04) — generic Arabic CPT pulls the
+coordinate Egypt-ward on the IW map regardless of value content. That does two things:
+(a) it is partly **why the absolute conjunct passed** — both arms drift Egypt-ward, so
+the +0.085 grounded pull is not purely value-specific; and (b) it **narrows and
+destabilises the grounded−language gap**, sinking the relative z. Pushing epochs to
+clear the absolute bar therefore muddies the value-specificity the relative bar
+measures: the two conjuncts are in **tension** under epoch-scaling. (Capability shows
+the strain at the margin too — the highest-token draw 3 dropped 0.083, nearest the 0.10
+bar yet, the first hint of mild overfit at 10 epochs.)
+
+The upshot: the value-specific claim is best read off the **relative** effect at the
+scale where the neutral arm does *not* co-drift — Run 11's 6 epochs (z=2.97). Run 12's
+contribution is the **mechanism**: the absolute magnitude is reachable, but at the cost
+of value-specificity, so a single-run four-conjunct PASS is elusive for a *principled*
+reason, not for lack of draws. (`grounded − surface` +0.061 also confirms the scaled
+base model edges out the persona prompt, consistent with Runs 10b/11b.)
+
+## Trend across all twelve runs (the decisive comparison)
 
 | run | model | survey | corpus | grounded − language | beaten by prompt? |
 | :-- | :-- | :-- | --: | --: | :-- |
@@ -544,6 +602,7 @@ base model is the right substrate; the instruct positives were noise.
 | **10b** | Qwen3-4B **Base** | AR | **base de-confound** | **+0.032 (z=3.02)** ✅ | z=+0.98 (CPT wins) |
 | **11i** | Qwen3-4B instruct | AR | **4× resampled (cross-corpus)** | **+0.001 (z=0.03)** ✗ | — |
 | **11b** | Qwen3-4B **Base** | AR | **4× resampled (cross-corpus)** | **+0.051 (z=2.97)** ✅ | z=0.65 (tie) |
+| **12** | Qwen3-4B **Base** | AR | **10ep, ~430k/draw, 4× cross-corpus** | **+0.060 (z=1.39)** ✗ | z=+1.96 (CPT wins) |
 
 Runs 1–8 each computed z against a **cross-seed** band; since HF training is nearly
 deterministic across seeds, that band understates the truth, so those z's are not
@@ -555,11 +614,15 @@ the **cross-corpus** band: Run 7 (instruct, no stabilisation: z=0.91) and Run 11
 model the grounding-beyond-language effect is real and clears 2σ against corpus noise;
 on **instruct** it does not survive; and prompting, which dominated CPT through Run 8,
 is matched or beaten once the model is stabilised (Run 9) and especially on base
-(Runs 10b/11b).
+(Runs 10b/11b/12). Run 12 (base, **10 epochs**) then scaled the corpus/epochs to lift
+the *absolute* shift over 0.05 (it did: +0.085, all 4 draws) but the relative effect
+fell to z=1.39 — at 10 epochs the value-neutral arm itself drifts Egypt-ward (~+0.04),
+so absolute magnitude and value-specificity trade off against each other. The cleanest
+value-specific read stays Run 11's z=2.97 at 6 epochs.
 
 ## Interpretation
 
-The eleven runs tell one coherent story, and most of it is about **measuring the
+The twelve runs tell one coherent story, and most of it is about **measuring the
 effect honestly** rather than the effect itself.
 
 **1. The early "pass" was a noise-band illusion.** Run 5 reported `grounded −
@@ -624,20 +687,25 @@ up with stability and the right substrate.
 This result was merged as **PR #65** (2026-06-19); the maintainer approved with "We
 should pursue the next steps proposed," so the work continues in two phases:
 
-**Phase 1 — close the absolute-magnitude gap (Run 12, in progress 2026-06-22).** The
-one GPU run that converts the reframe into a full four-conjunct cross-corpus PASS:
-scale the base-model corpus/epochs on the **same** `CORPUS_DRAWS=4 CORPUS_FRACTION=0.7`
-band to push the absolute shift over 0.05. Config: `Qwen3-4B-Base`, 10 epochs,
-`cat_limit=150` (≈740k/617k-token pool, ~430k/draw — ~2× Run 11; the Arabic category
-membership is the hard ceiling, so the scale-up rides mostly on epochs), 3 seeds.
-**Stopping rule:** if the absolute shift lands at +0.04–0.05 again (a noise-band
-near-miss), report it as the relative-effect reframe above rather than grind more GPU —
-the z≈3 relative result is the defensible headline either way.
+**Phase 1 — close the absolute-magnitude gap (Run 12, DONE 2026-06-23).** Scaled the
+base model to 10 epochs / ~430k tokens-per-draw on the same `CORPUS_DRAWS=4
+CORPUS_FRACTION=0.7` band. Outcome (see Run 12 above): the **absolute shift cleared
+0.05 in all four draws** (+0.085) — the conjunct Run 11 failed now passes — but the
+**relative grounding effect fell to z=1.39** because at 10 epochs the value-neutral arm
+itself drifts Egypt-ward, narrowing the gap. So Run 12 is the *mirror image* of Run 11:
+each conjunct can clear its bar, but not both in one run, because absolute magnitude and
+value-specificity **trade off under epoch-scaling**. **Decision (2026-06-23): the
+single-run four-conjunct PASS is elusive for a principled reason, not lack of draws — so
+keep Run 11's relative-effect result (z=2.97, 6 epochs) as the headline, fold in Run
+12's tradeoff finding, and stop spending GPU on the closeout.** Move to Phase 2.
 
-**Phase 2 — consortium / aggregation-survival (T3).** The Tapestry-unique question and
-the round-two headline: does cultural alignment survive FedAvg across cultures, or
-collapse toward the centroid? `run_aggregation.py` is smoke-only today and needs the
-real HF backend wired in per node (see [SPEC.md](SPEC.md) consortium extension).
+**Phase 2 — consortium / aggregation-survival (T3) — IN PROGRESS.** The Tapestry-unique
+question and the round-two headline: does cultural alignment survive FedAvg across
+cultures, or collapse toward the centroid? The real HF backend is now wired into
+`run_aggregation.py` (per-node 4B grounded CPT + full-state FedAvg over rounds, with the
+**separability curve** as the artifact); a far-pole **Egypt + Sweden** corpus pair is
+built. The remaining step is the real GPU run (see [SPEC.md](SPEC.md) consortium
+extension and `HANDOFF.md`).
 
 Also deferred (cheap to fold into a future base run):
 
