@@ -747,9 +747,37 @@ centroid. (2) **The weight-space merge diagnostics are essentially invariant acr
 interference is a *structural* property of FedAvg-ing these forks, not an artifact of which 70%
 of the corpus each node saw. The coordinate-space metrics (shift-/abs-sep) carry the corpus
 sensitivity; the merge geometry does not. So the headline — **sovereign cultural alignment
-survives aggregation; the cost is a lossy, interfering merge** — is now established across the
-corpus band, not a single-sample result. (Shift-sep is non-monotonic — rises then dips, ending
-above round 1 — so even the naive trend reads "surviving" on the banded mean.)
+survives aggregation; the cost is a lossy merge (mostly dilution, not destruction — see below)**
+— is now established across the corpus band, not a single-sample result. (Shift-sep is
+non-monotonic — rises then dips, ending above round 1 — so even the naive trend reads "surviving"
+on the banded mean.)
+
+**Reading the merge geometry: dilution by near-orthogonality, not cancellation of conflict.**
+`retained` (‖mean update‖ / mean‖update‖) sits at **0.61 → 0.57**, and for N=3 forks
+**1/√N ≈ 0.577** is exactly the value you get from averaging *mutually orthogonal* vectors.
+Destructive cancellation of genuinely conflicting (anti-parallel) updates would instead drive
+`retained` toward 0 and cosine toward −1. We see neither: the cultures are largely writing to
+**different parameter directions**, so FedAvg mostly *dilutes* each culture's update by ~1/N in
+the blend rather than annihilating it. On top of that near-orthogonal floor there is a small,
+**monotone** drift: cosine **+0.055 → −0.027** and `retained` crossing from just above 1/√N
+(rounds 1–2, faintly *aligned*) to just below it (rounds 3–4, faintly *conflicting*) — i.e. as
+the cultures get more grounded and distinct their updates rotate from "pulling together" through
+orthogonal to "pulling apart." This is the *most favorable* merge regime for the consortium
+thesis (cultures use separate capacity rather than fighting over shared weights), with the
+caveat that the genuine-conflict component, while small, is **growing** over rounds.
+
+**What this does NOT indicate.** Every metric here is measured on the **forks after their
+per-culture CPT** — never on the **merged global model itself**. So the result does *not* show:
+(1) that the merged base is *good* — its capability/safety/quality over rounds is **unmeasured**,
+so we cannot say the dilute-then-re-align cycle preserves a useful shared model versus slowly
+eroding it; (2) that aggregation *buys anything* — growing `abs-sep` is equally consistent with
+healthy sovereignty *and* with each culture having to fight an increasingly washed-out base;
+there is **no solo-training control** to tell "aggregation helped" from "aggregation was merely
+survived"; (3) that it **stays benign at scale** — the conflict component is small but rising
+over just 4 rounds with 3 cultures, and more rounds / more cultures / a different base checkpoint
+are untested. The firm claim is narrow and worth stating exactly: *culturally-grounded nodes stay
+distinct across FedAvg rounds, and the averaging is dilutive rather than destructive* — not that
+the aggregated model is itself improving.
 
 **Remaining caveats.** Model seed is fixed (HF training is deterministic across it, so the
 corpus draw is the right variance source — but a different *base* checkpoint is untested).
