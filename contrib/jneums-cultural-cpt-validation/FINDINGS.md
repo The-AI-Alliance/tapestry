@@ -54,6 +54,15 @@ cosine-difference**, ~4× the dynamic range) before it could see anything; and F
 diagnostics** that separate genuine homogenization from mere dilution. See
 [Status & next steps](#status--next-steps) for what a win would actually require.
 
+**Why this matters for Tapestry.** This contribution is the **validation / measurement-rigor**
+layer for the project's cultural-alignment work stream (IW map; TAP-003), not an alignment
+recipe — see [README](README.md#where-this-fits-in-tapestry). Its most portable result is a
+*caution*, not a number: an IW-map shift can be **survey-level** (the survey-behavior
+dissociation), and a single-draw effect can sit inside the **cross-corpus** noise band — so a
+cultural-alignment claim is only as trustworthy as the depth and resampling checks behind it.
+That holds for any technique that moves the IW needle, this one included; it is offered as a
+shared lens, with no claim about the other contributions.
+
 ## The pre-registered test
 
 **Hypothesis.** H1(a): grounded CPT moves the model's Inglehart–Welzel coordinate

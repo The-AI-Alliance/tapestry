@@ -18,6 +18,21 @@ Staged under `contrib/` (like `jneums-consortium-experiment`) while it iterates.
 > methodology, and limitations are in [`FINDINGS.md`](FINDINGS.md); the pre-registered
 > design is in [`SPEC.md`](SPEC.md). This README covers **running the harness**.
 
+## Where this fits in Tapestry
+
+Project Tapestry trains a consortium base model whose partners build and own **sovereign
+cultural derivatives**; its first work streams are **LLM cultural alignment** — measured on the
+**Inglehart–Welzel cultural map** ([issue #22](https://github.com/The-AI-Alliance/tapestry/issues/22))
+— and **consortium training** ([issue #24](https://github.com/The-AI-Alliance/tapestry/issues/24)).
+This contribution is the **validation / measurement-rigor** layer for that work: rather than a new
+alignment *recipe*, it is a falsifiable test of whether a claimed cultural shift is *real,
+content-driven, deep (not survey-only), capability-safe, and aggregation-robust* — the foundational
+hypothesis (TAP-003) that any alignment technique assumes. It is **complementary** to the other
+contributions staged alongside it — notably `contrib/nguyennm1024-sociocultural-alignment` (which
+pursues IW-map cultural alignment by a different method: LoRA SFT on synthesized data, fused with a
+model soup) and `contrib/jneums-consortium-experiment` (coordinator metrics) — which it neither
+audits nor depends on; cross-references are provenance, not claims about that work.
+
 ## What it does
 
 Runs the EXP-001 arms end to end: starts every arm from the same base model,
