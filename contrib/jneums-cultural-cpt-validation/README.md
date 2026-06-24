@@ -132,7 +132,7 @@ Or directly, e.g. `uv run python contrib/jneums-cultural-cpt-validation/run.py
 ## What is real vs. smoke-only
 
 Everything needed for a real EXP-001 result is now wired and has been used across
-the 11 runs in [`FINDINGS.md`](FINDINGS.md). The only smoke-mode-only pieces are
+the real runs recorded in [`FINDINGS.md`](FINDINGS.md). The only smoke-mode-only pieces are
 the toy fixtures that exist so CI can exercise the pipeline without a GPU or
 downloads.
 
@@ -177,18 +177,28 @@ the z is measured against is the **corpus-resampling** band, not the cross-seed
 band — see [`FINDINGS.md`](FINDINGS.md) for why that distinction decides the
 experiment.
 
-## Not in this harness (round two)
+## Round two — executed; where it landed
 
-The single-node go/no-go is done (real corpora, real bases, generate-mode
-behavioral probe — all landed). What remains for round two:
+The single-node go/no-go *and* the round-two extensions have all now run; none
+produced a clean win, and the result is **real but shallow** (full account in
+[`FINDINGS.md`](FINDINGS.md)):
 
-- **Consortium / aggregation survival** — real-mode `run_aggregation.py` (HF
-  backend per node): does the cultural shift survive FedAvg across cultures, or
-  collapse toward the centroid? This is the Tapestry-unique (T3) question and is
-  not yet run.
-- **Behavioral transfer** — the probe was upgraded to free-form generation scored
-  by an embedding judge, but no arm has moved open-ended behavior in any run;
-  demonstrating representational (not survey-only) transfer is the open H1(c)
-  question.
-- **Closing the absolute-magnitude gap** — scale base-model tokens/epochs to push
-  the absolute shift past the 0.05 bar (the one conjunct Run 11 still failed).
+- **Consortium / aggregation survival (T3)** — `run_aggregation.py` (HF backend per
+  node) ran single and corpus-resampled. Cultures stay separable under FedAvg (the
+  merge is **dilutive, not destructive** — `retained ≈ 1/√N`); but every metric is on
+  the forks *post-CPT*, never the merged model, so it is a non-failure, not a
+  demonstrated value-add.
+- **Behavioral transfer (H1c)** — the free-form probe's embedding judge had to be
+  rebuilt (**SemAxis cosine-difference**; the old option-softmax judge saturated at
+  ~±0.25 of 2.0, which is *why* behavior never moved). With a now-sensitive probe (a
+  persona prompt shifts behavior +0.18), grounded CPT moves the **survey** but **not
+  behavior** — a survey-behavior **dissociation**.
+- **Absolute-magnitude gap** — scaling base tokens/epochs (Run 12) *does* push the
+  absolute shift past 0.05, but the value-specific effect then collapses (the
+  value-neutral arm drifts target-ward too): a principled **tradeoff**, not a clean
+  four-conjunct PASS.
+
+**What a real win would still require** — not another run on this rig, but a different
+cut: depth beyond the survey, separating value from language at scale, and showing
+aggregation buys something over solo training. See
+[`FINDINGS.md`](FINDINGS.md#status--next-steps).
