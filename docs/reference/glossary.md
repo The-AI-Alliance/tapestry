@@ -42,7 +42,7 @@ Two roles recur throughout: a **Member** is the participating organization (gove
 
 ## See also
 
-Terms with established canonical homes elsewhere in `tech-docs/` (not duplicated here):
+Terms with established canonical homes elsewhere in `docs/` (not duplicated here):
 
 - **DG1–DG9** — the nine design goals. See [`4-design-goals.md`](../architecture/4-design-goals.md).
 - **TAP-001 … TAP-008** — the architecture decision records. See the [ADR index](../architecture/decisions/README.md).
