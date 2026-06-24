@@ -107,25 +107,42 @@ def main() -> None:
         )
     curve = " -> ".join(f"{x:.3f}" for x in result.separability_curve)
     print(f"  shift-separability curve: {curve}")
-    trend = (
-        "shrinking (homogenizing)"
-        if result.separability_curve[-1] < result.separability_curve[0]
-        else "holding/growing"
-    )
+    abs_vals = [m.abs_pairwise_distance for m in result.rounds]
+    print(f"  abs-separability curve  : {' -> '.join(f'{x:.3f}' for x in abs_vals)}")
+
+    # Classify the outcome from BOTH the shift-separability direction AND the
+    # weight-space merge diagnostics, so the one-line trend never prejudges the cause:
+    # a shrinking shift-curve with conflicting/cancelling fork updates is merge
+    # INTERFERENCE, not cultural homogenization (cf. arXiv:2605.25846, LITERATURE.md §6).
+    # A naive "shrinking == homogenizing" label is misleading -- e.g. shift-sep can dip
+    # while absolute coordinates SPREAD apart (sovereign alignment surviving a lossy merge).
+    shift_shrinking = result.separability_curve[-1] < result.separability_curve[0]
+    last = result.rounds[-1]
+    interfering = last.mean_update_cosine <= 0.0 or last.retained_update_ratio < 0.5
+    if shift_shrinking and interfering:
+        trend = "shift-sep shrinking, but via merge INTERFERENCE (not homogenization)"
+    elif shift_shrinking:
+        trend = "shift-sep shrinking with aligned updates -> cultural HOMOGENIZATION"
+    else:
+        trend = "shift-sep holding/growing -> sovereign alignment surviving"
     print(f"  trend: {trend}")
-    # Distinguish the two collapse modes (see aggregation.py docstring / LITERATURE.md §6).
-    if result.separability_curve[-1] < result.separability_curve[0]:
-        last = result.rounds[-1]
-        if last.mean_update_cosine <= 0.0 or last.retained_update_ratio < 0.5:
+    spreading = abs_vals[-1] >= abs_vals[0]
+    print(
+        f"  abs-coords: nodes {'SPREADING apart (staying distinct)' if spreading else 'CONVERGING toward a centroid'}"
+        f"  (abs-sep {abs_vals[0]:.3f} -> {abs_vals[-1]:.3f})"
+    )
+    # Detailed merge-mode read (companion to the trend word above).
+    if shift_shrinking:
+        if interfering:
             print(
-                "  read: separability is shrinking WITH conflicting/cancelling fork updates "
-                "(low cosine / retained) -> looks like merge INTERFERENCE, not pure cultural "
-                "homogenization (cf. arXiv:2605.25846)."
+                "  read: shift-separability is shrinking WITH conflicting/cancelling fork updates "
+                "(low cosine / retained) -> merge INTERFERENCE, not pure cultural homogenization "
+                "(cf. arXiv:2605.25846)."
             )
         else:
             print(
-                "  read: separability is shrinking while fork updates stay aligned (high cosine / "
-                "retained) -> looks like genuine cultural HOMOGENIZATION toward the centroid."
+                "  read: shift-separability is shrinking while fork updates stay aligned (high cosine / "
+                "retained) -> genuine cultural HOMOGENIZATION toward the centroid."
             )
     if result.smoke_caveat:
         print(f"\n  {result.smoke_caveat}")

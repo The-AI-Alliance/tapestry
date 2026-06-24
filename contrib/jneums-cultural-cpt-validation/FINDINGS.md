@@ -699,13 +699,43 @@ single-run four-conjunct PASS is elusive for a principled reason, not lack of dr
 keep Run 11's relative-effect result (z=2.97, 6 epochs) as the headline, fold in Run
 12's tradeoff finding, and stop spending GPU on the closeout.** Move to Phase 2.
 
-**Phase 2 — consortium / aggregation-survival (T3) — IN PROGRESS.** The Tapestry-unique
-question and the round-two headline: does cultural alignment survive FedAvg across
-cultures, or collapse toward the centroid? The real HF backend is now wired into
-`run_aggregation.py` (per-node 4B grounded CPT + full-state FedAvg over rounds, with the
-**separability curve** as the artifact); a far-pole **Egypt + Sweden** corpus pair is
-built. The remaining step is the real GPU run (see [SPEC.md](SPEC.md) consortium
-extension and `HANDOFF.md`).
+**Phase 2 — consortium / aggregation-survival (T3) — FIRST REAL RUN DONE (2026-06-24).**
+The Tapestry-unique question and the round-two headline: does cultural alignment survive
+FedAvg across cultures, or collapse toward the centroid? Real HF run on **Qwen3-4B-Base**,
+**3 cultures measured in-language** (Egypt/ar, Sweden/sv, Vietnam/vi), 4 FedAvg rounds ×
+6 epochs, 145k grounded tokens/culture (matched budget), seed 0. Each round every node
+forks the shared global base, does grounded CPT, is surveyed on the IW map **in its own
+corpus language** (a shared English instrument muted the foreign-language CPT in v1 — the
+fix that made this run meaningful), then all forks are FedAvg-averaged into the next base.
+
+| round | shift-sep | abs-sep | to-centroid | merge cos | sign-agree | retained | dist→target eg/sw/vi |
+| :--: | :--: | :--: | :--: | :--: | :--: | :--: | :-- |
+| 1 | 0.076 | 0.255 | 0.131 | +0.057 | 0.101 | 0.613 | 0.890 / 1.144 / 0.297 |
+| 2 | 0.109 | 0.298 | 0.161 | +0.006 | 0.098 | 0.584 | 0.880 / 1.134 / 0.259 |
+| 3 | 0.097 | 0.338 | 0.188 | −0.021 | 0.096 | 0.569 | 0.868 / 1.140 / 0.229 |
+| 4 | 0.066 | 0.332 | 0.179 | −0.033 | 0.096 | 0.561 | 0.861 / 1.140 / 0.239 |
+
+**Read: sovereign alignment largely SURVIVES aggregation; the loss is merge interference,
+not homogenization.** Absolute separability *grows* (0.26 → 0.33) and each culture holds or
+improves its distance to its own WVS target (Vietnam 0.30 → 0.24, Egypt 0.89 → 0.86) — the
+nodes spread *apart* in coordinate space, not toward a centroid. The shift-space curve dips
+late (0.076 → 0.066), which a naive first-vs-last label would call "homogenizing", but the
+**weight-space merge diagnostics** say otherwise: fork-update cosine falls from +0.057 to
+**−0.033** (anti-aligned), sign-agreement sits at ~0.10 (forks disagree on ~90% of parameter
+signs), and the retained-update ratio declines 0.61 → 0.56. That is the representational
+merge-**interference** signature (cf. arXiv:2605.25846, [LITERATURE.md](LITERATURE.md) §6) —
+FedAvg cancels a growing share of each fork's update in weight space — *not* cultures
+genuinely converging. The CLI trend label was made diagnostic-aware so it no longer prints
+the misleading "homogenizing" headline.
+
+**Caveats (this is N=1).** Seed 0, single run, **no corpus resampling** — the cross-corpus
+robustness that decided the single-node result (Run 11) is not yet established here. Sweden
+stays far from its target (1.14): its self-expression SS pole clamps, so it is likely
+under-measured and shows grounding mostly as TS movement (+0.05 → +0.10 over rounds). Modest
+scale (145k tok/culture, 6 epochs). Next: multi-seed + corpus-resampled aggregation to put a
+band on the separability/merge-interference curves, and more cultures for a wider spread.
+Artifacts in `runs/cultural_cpt_aggregation/` (`result.json` + per-round checkpoints;
+git-ignored). See [SPEC.md](SPEC.md) consortium extension and `HANDOFF.md`.
 
 Also deferred (cheap to fold into a future base run):
 
