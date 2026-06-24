@@ -1,4 +1,4 @@
-# README for the `tech-docs` Directory
+# README for the `docs` Directory
 
 This directory organizes the technical documentation under development for Project Tapestry, including requirements analysis, architecture design, decision records, governance, and work group documentation.
 
@@ -35,4 +35,4 @@ The [`reference/`](reference/README.md) directory holds material outside the TVA
 | [`reference/glossary.md`](reference/glossary.md) | Definitions of Tapestry-specific terms (consortium training, Shared-Base Loop, Sovereign Build, etc.) |
 | [`reference/training-approaches.md`](reference/training-approaches.md) | Centralized vs. federated vs. consortium training |
 
-Repository root [**`README.md`**](../README.md) and [**`AGENTS.md`**](../AGENTS.md) summarize how `tech-docs/` fits with `website/`, `src/`, and contributor workflows.
+Repository root [**`README.md`**](../README.md) and [**`AGENTS.md`**](../AGENTS.md) summarize how `docs/` fits with `website/`, `src/`, and contributor workflows.

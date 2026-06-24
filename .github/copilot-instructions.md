@@ -75,5 +75,5 @@ must hold. Check each item and comment on anything that fails or is unclear.
 ## Reviewing documentation changes
 
 - `website/` is the Jekyll / Just the Docs site; preserve front matter and structure.
-- `tech-docs/` holds design and decision docs; keep the audience technical and
+- `docs/` holds design and decision docs; keep the audience technical and
   contributor-focused rather than promotional.
