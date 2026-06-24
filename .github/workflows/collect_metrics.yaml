@@ -86,7 +86,7 @@ jobs:
       # Useful for debugging or if you need the file directly from the Actions run  
       - name: Upload Parquet artifact (Optional)  
         if: always() # Run even if S3 upload fails, for debugging  
-        uses: actions/upload-artifact@v4  
+        uses: actions/upload-artifact@v7  
         with:  
           name: github-metrics-parquet  
           path: github_metrics_*.parquet # Upload the generated parquet file  
