@@ -135,6 +135,45 @@ def test_generate_behavior_mode_with_stub_judge() -> None:
         behavior.administer_behavior(model, mode="generate", judge=None)
 
 
+def test_generate_behavior_prefers_score_axis_path() -> None:
+    """A judge exposing score_axis takes the SemAxis path (full dynamic range);
+    the option-softmax score_options is only the fallback for judges without it."""
+    from cultural_cpt import behavior
+    from cultural_cpt.model import ByteCausalModel
+
+    calls = {"axis": 0, "opts": 0}
+
+    class _AxisStub:
+        def score_axis(self, response, neg_anchors, pos_anchors):
+            calls["axis"] += 1
+            assert len(neg_anchors) >= 1 and len(pos_anchors) >= 1
+            return 0.5  # constant lean -> constant coordinate
+
+        def score_options(self, response, option_texts):  # must NOT be called
+            calls["opts"] += 1
+            return [0.0] * len(option_texts)
+
+    model = ByteCausalModel(hidden_size=32, seed=0)
+    coord = behavior.administer_behavior(model, seed=0, paraphrase_passes=1, mode="generate", judge=_AxisStub())
+    assert calls["axis"] > 0 and calls["opts"] == 0
+    assert coord.ts == 0.5 and coord.ss == 0.5
+
+
+def test_behavior_axis_anchors_include_semaxis_with_fallback() -> None:
+    """Per-scenario anchors lead with the scenario's own extreme-value options and
+    append the axis-level SemAxis exemplars; a language without SemAxis falls back
+    to just the option text."""
+    from cultural_cpt import behavior
+
+    item = behavior._SCENARIOS[0]
+    neg, pos = behavior._axis_anchors("en", item)
+    assert neg[0] == min(item.options, key=lambda o: o.value).text
+    assert pos[0] == max(item.options, key=lambda o: o.value).text
+    assert len(neg) > 1 and len(pos) > 1  # SemAxis exemplars appended for en
+    neg_fallback, pos_fallback = behavior._axis_anchors("zz", item)  # no SemAxis for 'zz'
+    assert len(neg_fallback) == 1 and len(pos_fallback) == 1
+
+
 def test_model_generate_primitive() -> None:
     from cultural_cpt.model import ByteCausalModel
 
