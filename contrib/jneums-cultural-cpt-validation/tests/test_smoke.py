@@ -80,14 +80,15 @@ def test_deterministic_for_fixed_seed() -> None:
 
 
 def test_translated_batteries_match_english_structure() -> None:
-    """Every translated battery (AR, VI) must be item-for-item equivalent to the
-    English one (same item_ids, axes, option values), so coordinates are
+    """Every translated battery (AR, VI, SV) must be item-for-item equivalent to
+    the English one (same item_ids, axes, option values), so coordinates are
     comparable across languages."""
     from cultural_cpt import behavior, wvs
 
     pairs = (
         (wvs._ITEMS, wvs._ITEMS_AR),
         (wvs._ITEMS, wvs._ITEMS_VI),
+        (wvs._ITEMS, wvs._ITEMS_SV),
         (behavior._SCENARIOS, behavior._SCENARIOS_AR),
         (behavior._SCENARIOS, behavior._SCENARIOS_VI),
     )
@@ -166,6 +167,51 @@ def test_aggregation_runs_and_produces_curve() -> None:
         assert metric.mean_distance_to_centroid >= 0.0
 
 
+def test_aggregation_records_shift_and_abs_separability() -> None:
+    """Each node carries a shift vs the round's base, and the headline
+    separability curve is the SHIFT-space one (calibration-robust), with the
+    absolute-coordinate separability reported alongside."""
+    result = run_aggregation(_agg_config())
+    for metric in result.rounds:
+        # headline curve == shift-space separability
+        assert metric.abs_pairwise_distance >= 0.0
+        for n in metric.nodes:
+            assert hasattr(n, "shift_ts") and hasattr(n, "shift_ss")
+            assert hasattr(n, "lang")
+    assert result.separability_curve == [m.mean_pairwise_distance for m in result.rounds]
+
+
+def test_sv_battery_scores_toy_model() -> None:
+    """The Swedish battery administers end to end and yields a well-formed coord."""
+    from cultural_cpt import wvs
+    from cultural_cpt.model import ByteCausalModel
+
+    coord = wvs.administer(ByteCausalModel(hidden_size=32, seed=0), seed=0, paraphrase_passes=1, lang="sv").coordinate
+    assert -1.0 <= coord.ts <= 1.0 and -1.0 <= coord.ss <= 1.0
+
+
+def test_culture_lang_resolves_from_manifest_and_requires_battery(tmp_path: Path) -> None:
+    """A node is measured in its corpus's language (from the manifest); a corpus
+    language with no WVS battery fails loudly instead of silently using English."""
+    import json
+
+    import pytest
+
+    from cultural_cpt.aggregation import AggregationConfig, _culture_lang
+
+    (tmp_path / "sweden").mkdir()
+    (tmp_path / "sweden" / "manifest.json").write_text(json.dumps({"language": "sv"}))
+    (tmp_path / "atlantis").mkdir()
+    (tmp_path / "atlantis" / "manifest.json").write_text(json.dumps({"language": "zz"}))
+
+    cfg = AggregationConfig(corpus_path=str(tmp_path), instrument_lang="en")
+    assert _culture_lang(cfg, "sweden") == "sv"
+    # smoke / placeholder fallback (no corpus_path)
+    assert _culture_lang(AggregationConfig(instrument_lang="en"), "sweden") == "en"
+    with pytest.raises(ValueError, match="no WVS battery"):
+        _culture_lang(cfg, "atlantis")
+
+
 def test_aggregation_is_deterministic() -> None:
     a = run_aggregation(_agg_config(seed=5))
     b = run_aggregation(_agg_config(seed=5))
@@ -211,7 +257,9 @@ def test_merge_diagnostics_aligned_vs_opposed() -> None:
     base = {"w": torch.zeros(4), "ids": torch.tensor([1, 2, 3, 4])}
     up = torch.tensor([1.0, -1.0, 1.0, -1.0])
 
-    cos, sign, retained = _merge_diagnostics(base, [{"w": up, "ids": base["ids"]}, {"w": up.clone(), "ids": base["ids"]}])
+    cos, sign, retained = _merge_diagnostics(
+        base, [{"w": up, "ids": base["ids"]}, {"w": up.clone(), "ids": base["ids"]}]
+    )
     assert abs(cos - 1.0) < 1e-6 and abs(sign - 1.0) < 1e-6 and abs(retained - 1.0) < 1e-6
 
     cos, sign, retained = _merge_diagnostics(base, [{"w": up, "ids": base["ids"]}, {"w": -up, "ids": base["ids"]}])

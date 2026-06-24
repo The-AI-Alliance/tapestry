@@ -77,12 +77,14 @@ def main() -> None:
     # checkpoint each round so progress is pollable and a preempted spot box
     # resumes for free (re-run the same command -- only unfinished rounds cost GPU).
     def _progress(metric) -> None:
-        coords = "  ".join(f"{n.culture[:3]}({n.ts:+.2f},{n.ss:+.2f})" for n in metric.nodes)
+        # Per-node SHIFT (Δ vs the round's shared base, in the node's own language)
+        # is the signal; separability is on those shift vectors.
+        shifts = "  ".join(f"{n.culture[:3]}[{n.lang}]Δ({n.shift_ts:+.2f},{n.shift_ss:+.2f})" for n in metric.nodes)
         print(
-            f"  [round {metric.round_num}] separability={metric.mean_pairwise_distance:.3f} "
-            f"to-centroid={metric.mean_distance_to_centroid:.3f}  |  merge: "
-            f"cos={metric.mean_update_cosine:+.3f} sign-agree={metric.update_sign_agreement:.3f} "
-            f"retained={metric.retained_update_ratio:.3f}   {coords}",
+            f"  [round {metric.round_num}] shift-sep={metric.mean_pairwise_distance:.3f} "
+            f"abs-sep={metric.abs_pairwise_distance:.3f} to-centroid={metric.mean_distance_to_centroid:.3f}  |  "
+            f"merge: cos={metric.mean_update_cosine:+.3f} sign-agree={metric.update_sign_agreement:.3f} "
+            f"retained={metric.retained_update_ratio:.3f}   {shifts}",
             flush=True,
         )
 
@@ -93,16 +95,18 @@ def main() -> None:
     print(f"  mode     : {result.mode}")
     print(f"  cultures : {', '.join(result.cultures)}")
     print(f"  seed     : {result.seed}")
-    print("  round   separability   to-centroid   merge-cos   sign-agree   retained   per-culture (TS,SS)")
+    print(
+        "  round   shift-sep   abs-sep   to-centroid   merge-cos   sign-agree   retained   per-culture shift Δ(TS,SS)"
+    )
     for metric in result.rounds:
-        coords = "  ".join(f"{n.culture[:3]}({n.ts:+.2f},{n.ss:+.2f})" for n in metric.nodes)
+        shifts = "  ".join(f"{n.culture[:3]}[{n.lang}]({n.shift_ts:+.2f},{n.shift_ss:+.2f})" for n in metric.nodes)
         print(
-            f"    {metric.round_num:<5} {metric.mean_pairwise_distance:>9.3f}   "
+            f"    {metric.round_num:<5} {metric.mean_pairwise_distance:>9.3f}   {metric.abs_pairwise_distance:>7.3f}   "
             f"{metric.mean_distance_to_centroid:>10.3f}   {metric.mean_update_cosine:>+8.3f}   "
-            f"{metric.update_sign_agreement:>9.3f}   {metric.retained_update_ratio:>7.3f}   {coords}"
+            f"{metric.update_sign_agreement:>9.3f}   {metric.retained_update_ratio:>7.3f}   {shifts}"
         )
     curve = " -> ".join(f"{x:.3f}" for x in result.separability_curve)
-    print(f"  separability curve: {curve}")
+    print(f"  shift-separability curve: {curve}")
     trend = (
         "shrinking (homogenizing)"
         if result.separability_curve[-1] < result.separability_curve[0]

@@ -62,24 +62,44 @@ from .model import LanguageModel, make_base_model
 
 @dataclass(frozen=True)
 class NodeCoordinate:
-    """One node's measured position in one round."""
+    """One node's measured position in one round.
+
+    ``ts``/``ss`` are the node's absolute Inglehart-Welzel coordinate measured in
+    ``lang`` (the node's OWN corpus language -- aggregation v1 measured every node
+    on a shared English instrument, which muted the foreign-language CPT so the
+    nodes never separated; Runs 3-4 showed in-language measurement is what surfaces
+    the shift). ``shift_ts``/``shift_ss`` are the movement vs. the round's shared
+    global base measured in the SAME language, so the per-language calibration
+    offset cancels and the shifts are comparable across nodes.
+    """
 
     culture: str
     ts: float
     ss: float
     distance_to_own_target: float
+    lang: str = "en"
+    shift_ts: float = 0.0
+    shift_ss: float = 0.0
 
 
 @dataclass(frozen=True)
 class RoundMetric:
-    """Separability metrics for one consortium round."""
+    """Separability metrics for one consortium round.
+
+    ``mean_pairwise_distance`` is the **shift-space** separability (mean pairwise
+    distance between nodes' shift vectors) -- the calibration-robust signal for
+    whether the cultures pull in distinct directions. ``abs_pairwise_distance`` is
+    the same on absolute in-language coordinates, kept for context. The centroid
+    metrics are on the absolute coordinates.
+    """
 
     round_num: int
     nodes: list[NodeCoordinate]
-    mean_pairwise_distance: float  # separability; lower = more homogenized
+    mean_pairwise_distance: float  # SHIFT-space separability; lower = more homogenized
     centroid_ts: float
     centroid_ss: float
     mean_distance_to_centroid: float
+    abs_pairwise_distance: float = 0.0  # separability on absolute coords (context)
     # Weight-space merge diagnostics on this round's fork updates (the
     # representational-interference companion to the coordinate separability
     # above). See _merge_diagnostics and the module docstring. Default 0.0 so
@@ -179,10 +199,7 @@ def _merge_diagnostics(
         sign_cnt += agree.numel()
 
     norms = [s**0.5 for s in sq]
-    cosines = [
-        dot[(i, j)] / (norms[i] * norms[j]) if norms[i] > 0 and norms[j] > 0 else 0.0
-        for i, j in dot
-    ]
+    cosines = [dot[(i, j)] / (norms[i] * norms[j]) if norms[i] > 0 and norms[j] > 0 else 0.0 for i, j in dot]
     mean_cosine = sum(cosines) / len(cosines) if cosines else 0.0
     mean_norm = sum(norms) / n
     # ‖mean Δ‖² = ‖Σ Δ_i‖² / n² = (Σ‖Δ_i‖² + 2 Σ_{i<j} Δ_i·Δ_j) / n², from the
@@ -193,25 +210,46 @@ def _merge_diagnostics(
     return mean_cosine, sign_agreement, retained
 
 
-def _measure(model: LanguageModel, culture: str, *, seed: int, passes: int, lang: str = "en") -> NodeCoordinate:
-    survey = wvs.administer(model, seed=seed, paraphrase_passes=passes, lang=lang)
+def _coord(model: LanguageModel, *, seed: int, passes: int, lang: str) -> wvs.Coordinate:
+    """The model's raw IW coordinate measured in ``lang`` (no target attached)."""
+    return wvs.administer(model, seed=seed, paraphrase_passes=passes, lang=lang).coordinate
+
+
+def _measure(
+    model: LanguageModel, culture: str, *, seed: int, passes: int, lang: str, base_coord: wvs.Coordinate
+) -> NodeCoordinate:
+    """Measure a node in its OWN language and record its shift vs the round's base.
+
+    ``base_coord`` is the shared global base measured in the SAME ``lang``; the
+    shift (node - base) cancels the per-language calibration offset so shifts are
+    comparable across nodes even though the absolute coordinates are not."""
+    coord = _coord(model, seed=seed, passes=passes, lang=lang)
     target = wvs.GROUND_TRUTH[culture]
     return NodeCoordinate(
         culture=culture,
-        ts=survey.coordinate.ts,
-        ss=survey.coordinate.ss,
-        distance_to_own_target=survey.coordinate.distance_to(target),
+        ts=coord.ts,
+        ss=coord.ss,
+        distance_to_own_target=coord.distance_to(target),
+        lang=lang,
+        shift_ts=coord.ts - base_coord.ts,
+        shift_ss=coord.ss - base_coord.ss,
     )
 
 
 def _round_metric(
     round_num: int, coords: list[NodeCoordinate], diagnostics: tuple[float, float, float] = (0.0, 0.0, 0.0)
 ) -> RoundMetric:
-    """Separability + centroid + merge-diagnostic metrics for one round."""
-    pairwise = [
-        ((a.ts - b.ts) ** 2 + (a.ss - b.ss) ** 2) ** 0.5 for a, b in combinations(coords, 2)
+    """Separability + centroid + merge-diagnostic metrics for one round.
+
+    Headline separability is on the SHIFT vectors (calibration-robust); the
+    absolute-coordinate separability is reported alongside for context.
+    """
+    shift_pairwise = [
+        ((a.shift_ts - b.shift_ts) ** 2 + (a.shift_ss - b.shift_ss) ** 2) ** 0.5 for a, b in combinations(coords, 2)
     ]
-    mean_pairwise = sum(pairwise) / len(pairwise)
+    abs_pairwise = [((a.ts - b.ts) ** 2 + (a.ss - b.ss) ** 2) ** 0.5 for a, b in combinations(coords, 2)]
+    mean_shift_pairwise = sum(shift_pairwise) / len(shift_pairwise)
+    mean_abs_pairwise = sum(abs_pairwise) / len(abs_pairwise)
     cx = sum(c.ts for c in coords) / len(coords)
     cy = sum(c.ss for c in coords) / len(coords)
     mean_to_centroid = sum(((c.ts - cx) ** 2 + (c.ss - cy) ** 2) ** 0.5 for c in coords) / len(coords)
@@ -219,10 +257,11 @@ def _round_metric(
     return RoundMetric(
         round_num=round_num,
         nodes=coords,
-        mean_pairwise_distance=mean_pairwise,
+        mean_pairwise_distance=mean_shift_pairwise,
         centroid_ts=cx,
         centroid_ss=cy,
         mean_distance_to_centroid=mean_to_centroid,
+        abs_pairwise_distance=mean_abs_pairwise,
         mean_update_cosine=mean_cosine,
         update_sign_agreement=sign_agreement,
         retained_update_ratio=retained,
@@ -238,6 +277,7 @@ def _round_metric_from_dict(d: dict) -> RoundMetric:
         centroid_ts=d["centroid_ts"],
         centroid_ss=d["centroid_ss"],
         mean_distance_to_centroid=d["mean_distance_to_centroid"],
+        abs_pairwise_distance=d.get("abs_pairwise_distance", 0.0),
         mean_update_cosine=d.get("mean_update_cosine", 0.0),
         update_sign_agreement=d.get("update_sign_agreement", 0.0),
         retained_update_ratio=d.get("retained_update_ratio", 0.0),
@@ -289,6 +329,28 @@ def _caveat(config: AggregationConfig) -> str:
     )
 
 
+def _culture_lang(config: AggregationConfig, culture: str) -> str:
+    """Resolve the language a culture's node is measured in.
+
+    Real runs read the language from the culture's corpus manifest (so the node is
+    surveyed in the SAME language its grounded corpus is in) and require a WVS
+    battery for it -- if none exists we fail loudly rather than silently fall back
+    to English and re-introduce the aggregation-v1 muting. Smoke / placeholder
+    corpora carry no manifest, so they fall back to ``instrument_lang``.
+    """
+    if config.corpus_path:
+        manifest = Path(config.corpus_path) / culture / "manifest.json"
+        if manifest.exists():
+            lang = json.loads(manifest.read_text()).get("language")
+            if lang not in wvs._BATTERY:
+                raise ValueError(
+                    f"culture {culture!r} corpus is in {lang!r} but no WVS battery exists for it; "
+                    f"add _ITEMS_{(lang or '').upper()} to wvs.py (have {sorted(wvs._BATTERY)})"
+                )
+            return lang
+    return config.instrument_lang
+
+
 def run_aggregation(config: AggregationConfig, *, on_round=None, cache_dir=None) -> AggregationResult:
     """Run the multi-node FedAvg loop and return the separability curve.
 
@@ -312,6 +374,11 @@ def run_aggregation(config: AggregationConfig, *, on_round=None, cache_dir=None)
         dtype=config.dtype,
     )
     corpora = {c: load_culture_corpus(c, path=config.corpus_path) for c in config.cultures}
+    # Each node is measured in its OWN corpus language (resolved from the culture's
+    # manifest, falling back to instrument_lang for smoke/placeholder corpora that
+    # carry no manifest). Measuring every node on a shared English instrument was
+    # the aggregation-v1 flaw that muted the foreign-language CPT.
+    langs = {c: _culture_lang(config, c) for c in config.cultures}
 
     round_metrics: list[RoundMetric] = []
     global_state: dict | None = None
@@ -328,6 +395,17 @@ def run_aggregation(config: AggregationConfig, *, on_round=None, cache_dir=None)
         global_state = base.state()
 
     for round_num in range(start_round, config.rounds + 1):
+        # Measure the shared global base ONCE per round, in each node's language,
+        # so each node's shift (node - base, same language) cancels that language's
+        # calibration offset. One untrained clone, surveyed N times -- cheap vs CPT.
+        base_node = base.clone()
+        base_node.load_state(global_state)
+        base_coords = {
+            culture: _coord(base_node, seed=config.seed, passes=config.paraphrase_passes, lang=langs[culture])
+            for culture in config.cultures
+        }
+        del base_node
+
         fork_states: list[dict[str, torch.Tensor]] = []
         coords: list[NodeCoordinate] = []
         for culture in config.cultures:
@@ -342,7 +420,14 @@ def run_aggregation(config: AggregationConfig, *, on_round=None, cache_dir=None)
                 shuffle_seed=config.seed,
             )
             coords.append(
-                _measure(node, culture, seed=config.seed, passes=config.paraphrase_passes, lang=config.instrument_lang)
+                _measure(
+                    node,
+                    culture,
+                    seed=config.seed,
+                    passes=config.paraphrase_passes,
+                    lang=langs[culture],
+                    base_coord=base_coords[culture],
+                )
             )
             fork_states.append(node.state())  # CPU weight vector; the GPU copy is then freed
             del node

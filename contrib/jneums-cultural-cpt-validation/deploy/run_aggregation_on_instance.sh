@@ -4,11 +4,15 @@
 # The Tapestry-unique question: does cultural alignment survive FedAvg across
 # cultures, or collapse toward the centroid? Each round, every culture forks the
 # shared global base, does grounded CPT on its own corpus, is measured on the IW
-# map (English instrument, shared), then all forks are FedAvg-averaged into the
-# next global base. The artifact is the SEPARABILITY CURVE (mean pairwise distance
-# between node coordinates over rounds) plus the weight-space MERGE DIAGNOSTICS
-# (cosine / sign-agreement / retained-ratio) that distinguish genuine cultural
-# homogenization from representational merge interference.
+# map IN ITS OWN CORPUS LANGUAGE (resolved from the culture's manifest; aggregation
+# v1 surveyed every node on a shared English instrument, which muted the
+# foreign-language CPT so the nodes never separated), then all forks are
+# FedAvg-averaged into the next global base. The artifact is the SHIFT-space
+# SEPARABILITY CURVE (mean pairwise distance between nodes' shift vectors vs the
+# round's base, measured in-language so the per-language calibration offset cancels)
+# plus the weight-space MERGE DIAGNOSTICS (cosine / sign-agreement / retained-ratio)
+# that distinguish genuine cultural homogenization from representational merge
+# interference.
 #
 # Memory strategy (see model.py): the base stays on CPU; each node clones to the
 # GPU one at a time and its weights are pulled back to host RAM as a CPU state
@@ -28,7 +32,7 @@ ROUNDS="${ROUNDS:-4}"
 EPOCHS="${EPOCHS:-6}"
 LR="${LR:-2e-5}"
 DTYPE="${DTYPE:-bfloat16}"
-INSTRUMENT_LANG="${INSTRUMENT_LANG:-en}"   # shared English instrument for every node
+INSTRUMENT_LANG="${INSTRUMENT_LANG:-en}"   # fallback only; real nodes are surveyed in their manifest language
 WARMUP_FRAC="${WARMUP_FRAC:-0.05}"
 MAX_GRAD_NORM="${MAX_GRAD_NORM:-1.0}"
 # Corpus regen: each culture's grounded arm is capped to MAX_TOKENS so the nodes
