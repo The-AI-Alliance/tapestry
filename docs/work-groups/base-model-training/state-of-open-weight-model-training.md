@@ -11,7 +11,7 @@ The following open weight models were analyzed, based on the open weight leaderb
 
 | Model Family | Source |
 | ----- | ----- |
-| [DeepSeek](#deepseek) | DeepSeek |
+| [DeepSeek](#1.-deepseek) | DeepSeek |
 | [Gemma](#gemma) | Google |
 | [GLM](#glm) | Zhipu AI |
 | [GPT-oss](#gpt-oss) | OpenAI |
