@@ -49,9 +49,11 @@ weight vectors are kept, so N full forks never coexist in VRAM. See ../SPEC.md.
 from __future__ import annotations
 
 import json
-from dataclasses import asdict, dataclass
+import statistics
+from dataclasses import asdict, dataclass, replace
 from itertools import combinations
 from pathlib import Path
+from typing import Callable
 
 import torch
 
@@ -141,6 +143,11 @@ class AggregationConfig:
     dtype: str = "float32"  # hf mode: "float32" | "bfloat16" (bf16 halves CPT memory)
     instrument_lang: str = "en"  # survey language for every node (en = shared instrument)
     corpus_path: str = ""  # empty = placeholder corpora; else per-culture real data root
+    # Corpus resampling (real-data path only): a draw fixes corpus_sample_seed and
+    # loads a deterministic corpus_sample_fraction subset of each culture's grounded
+    # pool. Defaults (1.0 / None) load the full pool -- the single-draw behavior.
+    corpus_sample_fraction: float = 1.0
+    corpus_sample_seed: int | None = None
     # Training stabilization (HF backend only), same knobs the single-arm run uses.
     warmup_frac: float = 0.0
     max_grad_norm: float | None = None
@@ -373,7 +380,15 @@ def run_aggregation(config: AggregationConfig, *, on_round=None, cache_dir=None)
         device=config.device,
         dtype=config.dtype,
     )
-    corpora = {c: load_culture_corpus(c, path=config.corpus_path) for c in config.cultures}
+    corpora = {
+        c: load_culture_corpus(
+            c,
+            path=config.corpus_path,
+            sample_fraction=config.corpus_sample_fraction,
+            sample_seed=config.corpus_sample_seed,
+        )
+        for c in config.cultures
+    }
     # Each node is measured in its OWN corpus language (resolved from the culture's
     # manifest, falling back to instrument_lang for smoke/placeholder corpora that
     # carry no manifest). Measuring every node on a shared English instrument was
@@ -453,5 +468,149 @@ def run_aggregation(config: AggregationConfig, *, on_round=None, cache_dir=None)
         seed=config.seed,
         rounds=round_metrics,
         separability_curve=[m.mean_pairwise_distance for m in round_metrics],
+        smoke_caveat=_caveat(config),
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Corpus-resampled sweep: band the separability / merge-interference curves.
+# --------------------------------------------------------------------------- #
+# A single aggregation run is N=1 -- its separability curve could be a property of
+# the particular corpus subset each node happened to train on. As in the single-node
+# go/no-go (stats.run_corpus_resampled), the real noise source is the corpus draw
+# (HF training is deterministic across the model seed), so we re-run the whole
+# FedAvg loop on several deterministic token-budget subsamples of each culture's
+# grounded pool and report each per-round metric as a cross-draw mean +/- std band.
+
+
+@dataclass(frozen=True)
+class RoundBand:
+    """Cross-draw mean/std of one round's metrics (the banded separability curve)."""
+
+    round_num: int
+    shift_sep_mean: float
+    shift_sep_std: float
+    abs_sep_mean: float
+    abs_sep_std: float
+    to_centroid_mean: float
+    to_centroid_std: float
+    merge_cosine_mean: float
+    merge_cosine_std: float
+    retained_mean: float
+    retained_std: float
+
+
+@dataclass(frozen=True)
+class ResampledAggregationResult:
+    """Cross-draw aggregate of the aggregation-survival sweep."""
+
+    mode: str
+    cultures: list[str]
+    sample_fraction: float
+    sample_seeds: list[int]
+    rounds: list[RoundBand]
+    # The headline banded curve, for convenience: per-round (mean, std) of shift-sep.
+    shift_separability_band: list[tuple[float, float]]
+    smoke_caveat: str = ""
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+def _band(values: list[float]) -> tuple[float, float]:
+    """Mean and (sample) std of a per-draw metric; std=0 for a single draw."""
+    return statistics.fmean(values), (statistics.stdev(values) if len(values) >= 2 else 0.0)
+
+
+def run_aggregation_resampled(
+    config: AggregationConfig,
+    *,
+    draws: int,
+    sample_fraction: float,
+    base_sample_seed: int = 0,
+    on_draw: "Callable[[int, AggregationResult], None] | None" = None,
+    cache_dir: "Path | None" = None,
+) -> ResampledAggregationResult:
+    """Run the aggregation loop on ``draws`` corpus subsamples and band the curves.
+
+    Each draw fixes ``corpus_sample_seed = base_sample_seed + d`` and loads a
+    deterministic ``sample_fraction`` subset of every culture's grounded pool, then
+    runs the full multi-round FedAvg loop. Per-round metrics are aggregated across
+    draws into a mean +/- std band (the cross-draw std is the real noise the
+    separability / merge-interference signal must clear).
+
+    ``cache_dir`` (if given) persists each completed draw to ``draws/draw_<d>.json``
+    and reloads it instead of re-running the GPU work, and nests each draw's
+    per-round checkpoints under ``draws/draw_<d>_rounds/`` -- so a preempted box
+    resumes mid-sweep AND mid-draw; re-run the identical command and only the
+    unfinished work costs GPU.
+    """
+    if draws < 2:
+        raise ValueError("run_aggregation_resampled needs draws >= 2 to estimate a band")
+    if not 0.0 < sample_fraction < 1.0:
+        raise ValueError("sample_fraction must be in (0, 1) to resample; with the full pool every draw is identical")
+
+    cache_dir = Path(cache_dir) if cache_dir is not None else None
+    if cache_dir is not None:
+        (cache_dir / "draws").mkdir(parents=True, exist_ok=True)
+
+    per_draw: list[AggregationResult] = []
+    sample_seeds: list[int] = []
+    for d in range(draws):
+        sample_seed = base_sample_seed + d
+        sample_seeds.append(sample_seed)
+        draw_file = cache_dir / "draws" / f"draw_{d}.json" if cache_dir is not None else None
+        if draw_file is not None and draw_file.exists():
+            cached = json.loads(draw_file.read_text())
+            result = AggregationResult(
+                mode=cached["mode"],
+                cultures=cached["cultures"],
+                seed=cached["seed"],
+                rounds=[_round_metric_from_dict(r) for r in cached["rounds"]],
+                separability_curve=cached["separability_curve"],
+                smoke_caveat=cached.get("smoke_caveat", ""),
+            )
+            print(f"  [resume] aggregation draw {d}/{draws} loaded from {draw_file} (skipped GPU)", flush=True)
+        else:
+            draw_cfg = replace(config, corpus_sample_fraction=sample_fraction, corpus_sample_seed=sample_seed)
+            inner_cache = cache_dir / "draws" / f"draw_{d}_rounds" if cache_dir is not None else None
+            result = run_aggregation(draw_cfg, cache_dir=inner_cache)
+            if draw_file is not None:
+                draw_file.write_text(json.dumps(result.to_dict()))
+        per_draw.append(result)
+        if on_draw is not None:
+            on_draw(d, result)
+
+    bands: list[RoundBand] = []
+    for r in range(config.rounds):
+        rounds_r = [res.rounds[r] for res in per_draw]
+        shift = _band([m.mean_pairwise_distance for m in rounds_r])
+        abs_sep = _band([m.abs_pairwise_distance for m in rounds_r])
+        cen = _band([m.mean_distance_to_centroid for m in rounds_r])
+        cos = _band([m.mean_update_cosine for m in rounds_r])
+        ret = _band([m.retained_update_ratio for m in rounds_r])
+        bands.append(
+            RoundBand(
+                round_num=r + 1,
+                shift_sep_mean=shift[0],
+                shift_sep_std=shift[1],
+                abs_sep_mean=abs_sep[0],
+                abs_sep_std=abs_sep[1],
+                to_centroid_mean=cen[0],
+                to_centroid_std=cen[1],
+                merge_cosine_mean=cos[0],
+                merge_cosine_std=cos[1],
+                retained_mean=ret[0],
+                retained_std=ret[1],
+            )
+        )
+
+    return ResampledAggregationResult(
+        mode=config.mode,
+        cultures=list(config.cultures),
+        sample_fraction=sample_fraction,
+        sample_seeds=sample_seeds,
+        rounds=bands,
+        shift_separability_band=[(b.shift_sep_mean, b.shift_sep_std) for b in bands],
         smoke_caveat=_caveat(config),
     )

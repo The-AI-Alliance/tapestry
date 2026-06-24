@@ -23,6 +23,13 @@
 # WARMUP_FRAC, MAX_GRAD_NORM, PER_DOMAIN, MAX_WORDS, CAT_LIMIT, MAX_TOKENS (the
 # per-culture grounded token cap that holds corpora COMPARABLE across nodes),
 # FETCH (0 to reuse existing corpora), OUT.
+#
+# CORPUS_DRAWS>=2 turns the single run into a corpus-RESAMPLED sweep: each draw
+# trains/measures on a deterministic CORPUS_FRACTION subset of every culture's
+# grounded pool, and the per-round separability / merge-interference curves are
+# reported as a cross-draw mean +/- std band (the band a single N=1 run can't give).
+# Resumable per draw AND per round under OUT/draws/. Env: CORPUS_DRAWS,
+# CORPUS_FRACTION, CORPUS_BASE_SEED.
 set -uo pipefail
 
 REPO="${REPO:-/workspace/tapestry}"
@@ -44,6 +51,9 @@ MAX_WORDS="${MAX_WORDS:-4000}"
 CAT_LIMIT="${CAT_LIMIT:-25}"
 MAX_TOKENS="${MAX_TOKENS:-145000}"
 FETCH="${FETCH:-1}"
+CORPUS_DRAWS="${CORPUS_DRAWS:-1}"
+CORPUS_FRACTION="${CORPUS_FRACTION:-0.7}"
+CORPUS_BASE_SEED="${CORPUS_BASE_SEED:-0}"
 OUT="${OUT:-$REPO/runs/cultural_cpt_aggregation}"
 
 CC="$REPO/contrib/jneums-cultural-cpt-validation"
@@ -72,8 +82,9 @@ if [ "$FETCH" = "1" ]; then
   done
 fi
 
-# --- run the multi-round FedAvg aggregation (resumable via OUT/rounds/) ----------
-echo "== aggregation-survival ($MODEL, $DTYPE, cuda) cultures=$CULTURES rounds=$ROUNDS epochs=$EPOCHS =="
+# --- run the multi-round FedAvg aggregation (resumable via OUT/rounds/ or, for a
+# --- resampled sweep, OUT/draws/) -------------------------------------------------
+echo "== aggregation-survival ($MODEL, $DTYPE, cuda) cultures=$CULTURES rounds=$ROUNDS epochs=$EPOCHS draws=$CORPUS_DRAWS =="
 python "$CC/run_aggregation.py" \
   --mode hf --model-name "$MODEL" \
   --cultures "$CULTURES" \
@@ -82,7 +93,11 @@ python "$CC/run_aggregation.py" \
   --rounds "$ROUNDS" --epochs "$EPOCHS" --lr "$LR" \
   --instrument-lang "$INSTRUMENT_LANG" \
   --warmup-frac "$WARMUP_FRAC" --max-grad-norm "$MAX_GRAD_NORM" \
+  --corpus-draws "$CORPUS_DRAWS" --corpus-fraction "$CORPUS_FRACTION" \
+  --corpus-base-seed "$CORPUS_BASE_SEED" \
   --out "$OUT"
 
 echo "== result =="
-cat "$OUT/result.json"
+# A resampled sweep (CORPUS_DRAWS>=2) writes the banded aggregate to
+# result_resampled.json; a single run writes result.json.
+cat "$OUT/result_resampled.json" 2>/dev/null || cat "$OUT/result.json"

@@ -10,8 +10,11 @@ from __future__ import annotations
 from .aggregation import (
     AggregationConfig,
     AggregationResult,
+    ResampledAggregationResult,
+    RoundBand,
     RoundMetric,
     run_aggregation,
+    run_aggregation_resampled,
 )
 from .experiment import (
     ArmResult,
@@ -40,8 +43,11 @@ __all__ = [
     "run_experiment",
     "AggregationConfig",
     "AggregationResult",
+    "ResampledAggregationResult",
+    "RoundBand",
     "RoundMetric",
     "run_aggregation",
+    "run_aggregation_resampled",
     "LanguageModel",
     "ByteCausalModel",
     "HFCausalModel",

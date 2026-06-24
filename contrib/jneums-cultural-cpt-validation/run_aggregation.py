@@ -20,7 +20,68 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from cultural_cpt import AggregationConfig, run_aggregation  # noqa: E402
+from cultural_cpt import (  # noqa: E402
+    AggregationConfig,
+    run_aggregation,
+    run_aggregation_resampled,
+)
+
+
+def _run_banded(config: AggregationConfig, args, out_dir: Path) -> None:
+    """Corpus-resampled sweep: run the aggregation over N draws and band the curves."""
+
+    def _on_draw(d: int, res) -> None:
+        curve = " -> ".join(f"{x:.3f}" for x in res.separability_curve)
+        print(f"  [draw {d + 1}/{args.corpus_draws}] shift-sep curve: {curve}", flush=True)
+
+    print(
+        f"\nResampled aggregation-survival sweep: {args.corpus_draws} draws "
+        f"@ fraction {args.corpus_fraction} (base seed {args.corpus_base_seed})",
+        flush=True,
+    )
+    result = run_aggregation_resampled(
+        config,
+        draws=args.corpus_draws,
+        sample_fraction=args.corpus_fraction,
+        base_sample_seed=args.corpus_base_seed,
+        on_draw=_on_draw,
+        cache_dir=out_dir,
+    )
+    (out_dir / "result_resampled.json").write_text(json.dumps(result.to_dict(), indent=2, sort_keys=True) + "\n")
+
+    print("\nAggregation-survival, corpus-resampled (mean +/- std across draws)")
+    print(f"  mode     : {result.mode}")
+    print(f"  cultures : {', '.join(result.cultures)}")
+    print(f"  draws    : {len(result.sample_seeds)} (seeds {result.sample_seeds}) @ fraction {result.sample_fraction}")
+    print("  round   shift-sep        abs-sep          merge-cos        retained")
+    for b in result.rounds:
+        print(
+            f"    {b.round_num:<5} {b.shift_sep_mean:.3f}+/-{b.shift_sep_std:.3f}   "
+            f"{b.abs_sep_mean:.3f}+/-{b.abs_sep_std:.3f}   "
+            f"{b.merge_cosine_mean:+.3f}+/-{b.merge_cosine_std:.3f}   "
+            f"{b.retained_mean:.3f}+/-{b.retained_std:.3f}"
+        )
+    band = "  ".join(f"{m:.3f}+/-{s:.3f}" for m, s in result.shift_separability_band)
+    print(f"  shift-separability band: {band}")
+
+    # Same diagnostic-aware classification as the single run, on the banded means.
+    first, last = result.rounds[0], result.rounds[-1]
+    shift_shrinking = last.shift_sep_mean < first.shift_sep_mean
+    interfering = last.merge_cosine_mean <= 0.0 or last.retained_mean < 0.5
+    if shift_shrinking and interfering:
+        trend = "shift-sep shrinking, but via merge INTERFERENCE (not homogenization)"
+    elif shift_shrinking:
+        trend = "shift-sep shrinking with aligned updates -> cultural HOMOGENIZATION"
+    else:
+        trend = "shift-sep holding/growing -> sovereign alignment surviving"
+    print(f"  trend: {trend}")
+    spreading = last.abs_sep_mean >= first.abs_sep_mean
+    print(
+        f"  abs-coords: nodes {'SPREADING apart (staying distinct)' if spreading else 'CONVERGING toward a centroid'}"
+        f"  (abs-sep {first.abs_sep_mean:.3f} -> {last.abs_sep_mean:.3f})"
+    )
+    if result.smoke_caveat:
+        print(f"\n  {result.smoke_caveat}")
 
 
 def main() -> None:
@@ -49,6 +110,16 @@ def main() -> None:
     parser.add_argument(
         "--max-grad-norm", type=float, default=None, help="hf stabilization: clip gradients to this norm (default off)"
     )
+    parser.add_argument(
+        "--corpus-draws",
+        type=int,
+        default=1,
+        help=">=2 resamples each culture's grounded corpus over N draws and bands the curves",
+    )
+    parser.add_argument(
+        "--corpus-fraction", type=float, default=0.7, help="per-draw fraction of each culture's grounded pool (0,1)"
+    )
+    parser.add_argument("--corpus-base-seed", type=int, default=0, help="first corpus draw seed (draw d uses base+d)")
     parser.add_argument("--out", default="runs/cultural_cpt_aggregation")
     args = parser.parse_args()
 
@@ -87,6 +158,10 @@ def main() -> None:
             f"retained={metric.retained_update_ratio:.3f}   {shifts}",
             flush=True,
         )
+
+    if args.corpus_draws >= 2:
+        _run_banded(config, args, out_dir)
+        return
 
     result = run_aggregation(config, on_round=_progress, cache_dir=out_dir / "rounds")
     (out_dir / "result.json").write_text(json.dumps(result.to_dict(), indent=2, sort_keys=True) + "\n")

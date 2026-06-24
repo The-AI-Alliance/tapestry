@@ -10,6 +10,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -18,6 +20,7 @@ from cultural_cpt import (  # noqa: E402
     ExperimentConfig,
     StatsConfig,
     run_aggregation,
+    run_aggregation_resampled,
     run_corpus_resampled,
     run_experiment,
     run_multiseed,
@@ -225,6 +228,31 @@ def test_aggregation_needs_two_cultures() -> None:
         assert "at least 2" in str(exc)
     else:  # pragma: no cover
         raise AssertionError("expected ValueError for single culture")
+
+
+def test_aggregation_resampled_bands_curves_and_resumes(tmp_path: Path) -> None:
+    """The resampled sweep runs N draws and reports a per-round mean/std band on
+    each metric, and resumes from the per-draw cache instead of recomputing."""
+    cfg = _agg_config(rounds=2)
+    res = run_aggregation_resampled(cfg, draws=3, sample_fraction=0.7, cache_dir=tmp_path)
+    assert res.sample_seeds == [0, 1, 2]
+    assert len(res.rounds) == 2
+    assert len(res.shift_separability_band) == 2
+    for b in res.rounds:
+        assert b.shift_sep_std >= 0.0 and b.abs_sep_std >= 0.0
+        assert b.retained_std >= 0.0
+    # Every draw cached for free resume; a second call must reload, not recompute.
+    assert (tmp_path / "draws" / "draw_0.json").exists()
+    again = run_aggregation_resampled(cfg, draws=3, sample_fraction=0.7, cache_dir=tmp_path)
+    assert again.to_dict() == res.to_dict()
+
+
+def test_aggregation_resampled_validates_args() -> None:
+    cfg = _agg_config(rounds=2)
+    with pytest.raises(ValueError, match="draws >= 2"):
+        run_aggregation_resampled(cfg, draws=1, sample_fraction=0.7)
+    with pytest.raises(ValueError, match="sample_fraction"):
+        run_aggregation_resampled(cfg, draws=3, sample_fraction=1.0)
 
 
 def test_fedavg_averages_floats_and_preserves_int_buffers() -> None:
