@@ -42,7 +42,7 @@ Eliminating the last two categories, the recommendation is to engage with the Gr
 
 # Model Family Details  
 
-1. ## DeepSeek
+## 1. DeepSeek
 
 ### Pretraining data — largely undisclosed composition
 
@@ -289,8 +289,7 @@ They also separated out specialized later-stage mixtures: Dolma 3 Dolmino, a mid
 For post-training, they introduced a fully separate, named dataset suite: Dolci, tailored specifically for reasoning, tool use, and instruction following, providing separate mixes for each post-training stage — SFT, DPO, and RLVR — with the SFT mix aggregating datasets for step-by-step reasoning, tool use, and conversational quality, and the DPO mix supplying preference data. [Allen AI](https://allenai.org/blog/olmo3)  
 AI2 states the underlying motivation directly: anyone can see exactly what data shaped the model's capabilities, reproduce the results, and reuse the datasets to train their own AI systems.
 
-    
-![Llama Source Doc Type UTF-8 bytes Documents Unicode (GB) (millions) words tokens (billions) (billions) Common Crawl web pages 9,812 3,734 1,928 2,479 GitHub \> code 1,043 210 260 411 Reddit social media 339 377 72 89 Semantic Scholar papers 268 38.8 50 70 Project Gutenberg books 20.4 0.056 4.0 6.0 Wikipedia, Wikibooks encyclopedic 16.2 6.2 3.7 4.3 Total 11,519 4,367 2,318 3,059][image1]
+![Olmo Training Datasets](olmo-datasets.png)
 
 
 12. ## Nemotron
