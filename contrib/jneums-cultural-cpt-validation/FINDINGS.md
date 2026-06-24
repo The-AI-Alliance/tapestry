@@ -9,38 +9,50 @@ recorded here). Run artifacts (`runs/…/result.json`) are git-ignored; the tabl
 below are the record. Corpora regenerate from `titles/egypt.ar.json` via
 `fetch_corpus.py`.
 
-## Headline (Run 11 — the decisive result)
+## Headline — a real but shallow, survey-level effect
 
-On the **base model** (Qwen3-4B-Base), the core claim holds against the real noise
-band: value-grounded Arabic CPT shifts the model toward Egypt **more than a
-same-language, value-neutral corpus does**, and this **survives corpus resampling**
-— `grounded − language = +0.051 ± 0.017, z = 2.97` across 4 independent corpus
-draws — with **capability and refusal preserved** (capability drop +0.010, refusal
-drop −0.031, both well inside the ≤0.10 guardrails). Every earlier positive result
-was a cross-*seed* band; Run 7 proved the cross-*corpus* band is the real noise
-source, and this is the first time the effect clears 2σ against it.
+Stated honestly, the whole body of work lands on a **bounded** result, and the bound is
+the contribution.
 
-The pre-registered go/no-go is nonetheless still **FAIL — now on one conjunct
-only:** the *absolute* shift toward Egypt is `+0.039`, just under the `0.05` bar
-(two of four corpus draws clear it). So the **relative** claim ("grounding beats
-language-matching") is supported outright; the **absolute-magnitude** claim is
-positive but underpowered at this corpus scale.
+**The one clean positive.** On the base model (Qwen3-4B-Base), continued pre-training on a
+value-laden Arabic corpus shifts the model's **survey-measured** values toward Egypt **more
+than a same-language, value-neutral corpus does**, and this **survives corpus resampling**:
+`grounded − language = +0.051 ± 0.017, z = 2.97` across 4 independent corpus draws, capability
+and refusal preserved (drops +0.010 / −0.031, inside the ≤0.10 guardrails). That is the single
+statistically robust result here (Run 11), and it is real — value *content* moves the model
+more than language alone. (On the **instruct** model it does not survive resampling, z=0.03;
+the base model, with no RLHF to erode, is the substrate.)
 
-On the **instruct model**, the same effect **does not survive** corpus resampling
-(`grounded − language = +0.001, z = 0.03`): the earlier instruct positives were
-cross-seed sampling noise. The base model — with no RLHF alignment to erode — is
-the right substrate, and that is where the result is reported.
+**Three follow-ups bound it, and none was a win.** The effect is **survey-level and shallow:**
 
-**Decision (2026-06-17): report the relative effect as the headline** rather than
-spend more GPU chasing the absolute conjunct. See [Status & next steps](#status--next-steps).
+- **It does not reach behavior (H1c).** With a probe shown to be sensitive — an explicit persona
+  prompt moves open-ended behavior **+0.18 (~1.8σ)** — grounded CPT moves the *survey* (+0.021)
+  but **not behavior** (−0.086 ± 0.098 ≈ 0). A survey-behavior **dissociation**.
+- **It does not scale to a clean absolute PASS (Run 12).** Scaling to 10 epochs lifts the
+  absolute shift over 0.05 (mean +0.085), but the relative/value-specific effect then **collapses
+  to z=1.39** — because the value-*neutral* arm also drifts Egypt-ward at scale (~+0.04/draw).
+  Magnitude and value-specificity **trade off**, so part of the absolute movement is
+  language/topic, not values. The pre-registered four-conjunct PASS was never achieved (the
+  *absolute* conjunct fails at +0.039; the relative claim is what holds).
+- **It survives aggregation but with no demonstrated value (T3).** Across FedAvg rounds the
+  cultures stay separable (they don't homogenize; the merge is **dilutive, not destructive** —
+  retained ≈ 1/√N) — but every metric is on the forks *post-CPT*, never the merged model, and
+  there is no control showing aggregation *buys* anything.
 
-**Follow-up (Run 12, 2026-06-23):** scaling the base model to 10 epochs *did* lift the
-absolute shift over 0.05 (all 4 draws, mean +0.085) — but the relative effect then fell
-to z=1.39, because at higher epochs the value-neutral arm itself drifts Egypt-ward
-(~+0.04/draw). Absolute magnitude and value-specificity **trade off under
-epoch-scaling**, so the single-run four-conjunct PASS is elusive for a principled
-reason; Run 11's z=2.97 (6 epochs) stays the cleanest value-specific result. This
-confirms the decision above and closes the single-node experiment.
+**Net.** Culturally-grounded CPT produces a **real but shallow, survey-level value shift** —
+statistically clean, robust to corpus resampling and to FedAvg aggregation, but **not deep**: it
+does not reach open-ended behavior, and at scale it is hard to fully separate from language/topic
+drift. The strong-form (absolute / behavioral / value-add) claims are **not** established; the
+defensible claim is narrow and worth stating exactly: *value-laden CPT moves a base model's
+stated values toward the target culture more than language-matched text does, and that survey
+signal survives resampling and aggregation — but it is survey-level, not behavioral.*
+
+**The durable contributions are as much methodological as empirical:** a real end-to-end
+go/no-go harness; a cross-*corpus* resampling protocol (the cross-*seed* band understated the
+noise — Run 7); a behavioral probe whose embedding judge had to be rebuilt (**SemAxis
+cosine-difference**, ~4× the dynamic range) before it could see anything; and FedAvg **merge
+diagnostics** that separate genuine homogenization from mere dilution. See
+[Status & next steps](#status--next-steps) for what a win would actually require.
 
 ## The pre-registered test
 
@@ -662,30 +674,49 @@ capability- and safety-clean. On **instruct**, it collapses (z=0.03): the instru
 positives were cross-seed noise all along.
 
 **What this supports, and what it doesn't.** H1(b) — *grounded CPT shifts a base
-model toward the culture more than same-language, value-neutral CPT does* — is
-**supported** at the decisive noise level, capability- and safety-preserving. This
-is the novel, defensible result. H1(a) in its strong form — a *large absolute* pull
-toward the national coordinate — is **not** met: the absolute shift is +0.039,
-positive but under the 0.05 bar, and Runs 5/8 indicate it grows with corpus scale,
-so this reads as an underpowered-at-this-scale limitation rather than a wrong-sign
-result. The shallow baseline deserves its own note: a one-line persona prompt
-dominated CPT through Run 8, but that gap closes once training is stabilised (Run 9
-tie) and on the base model CPT edges it out (Runs 10b/11b) — the deep lever catches
-up with stability and the right substrate.
+model's survey-measured values toward the culture more than same-language,
+value-neutral CPT does* — is **supported** at the decisive noise level, capability-
+and safety-preserving. That is the one novel, defensible positive. Everything else is
+a bound:
+
+- **H1(a), strong absolute form, fails.** The absolute shift is +0.039, under the
+  0.05 bar; scaling it over the bar (Run 12) collapses the value-specific effect, because
+  the value-neutral arm also drifts target-ward at scale — so part of the absolute pull is
+  language/topic, not values. Magnitude and value-specificity trade off.
+- **H1(c), behavioral transfer, fails — a dissociation.** Once the behavioral judge was
+  rebuilt to be sensitive at all (a persona prompt moves behavior +0.18), grounded CPT was
+  shown to move the survey but **not** open-ended behavior (−0.086 ± 0.098 ≈ 0). The shift
+  is survey-level, not enacted.
+- **Aggregation (T3) is a non-failure, not a win.** Cultures stay separable under FedAvg
+  (dilutive, not destructive merge), but nothing shows the *merged* model is good or that
+  aggregation adds value over solo training.
+
+So the honest synthesis is **real but shallow**: value-laden CPT produces a genuine,
+resampling-robust, aggregation-robust shift in a base model's *stated* values — but it does
+not reach behavior, does not yield a large absolute pull, and at scale is hard to fully
+separate from language drift. The shallow-baseline note still holds: a one-line persona
+prompt was hard to beat throughout (it dominated CPT through Run 8, and it is the *only*
+thing that moved behavior in the H1c run), which is itself a signal that explicit conditioning
+is a strong, cheap alternative to the deep lever.
 
 ## Status & next steps
 
-**Reported claim (the data supports this outright):**
+**The narrow claim the data supports (and nothing wider):**
 
-> Value-grounded Arabic CPT shifts a base model toward Egyptian values **more than a
-> same-language, value-neutral corpus does** — `grounded − language = +0.051,
-> z≈3.0` across independent corpus resamples — **with capability and refusal
-> preserved.** The absolute magnitude of the shift (+0.039) is positive but
-> underpowered at this corpus scale, and the effect requires the base model: on the
-> RLHF-aligned instruct model it does not survive corpus resampling.
+> Value-grounded Arabic CPT shifts a base model's **survey-measured** values toward
+> Egyptian values **more than a same-language, value-neutral corpus does** —
+> `grounded − language = +0.051, z≈3.0` across independent corpus resamples — **with
+> capability and refusal preserved**, and this survey signal **survives FedAvg
+> aggregation across cultures.** It does **not** extend further: the absolute pull is
+> small (+0.039, and scaling it costs value-specificity); it does **not reach
+> open-ended behavior** (a survey-behavior dissociation); and it requires the base
+> model (the instruct effect is cross-seed noise). The effect is **real but shallow.**
 
-This result was merged as **PR #65** (2026-06-19); the maintainer approved with "We
-should pursue the next steps proposed," so the work continues in two phases:
+The Run-11 relative result was merged as **PR #65** (2026-06-19) and the maintainer
+endorsed continuing. The three follow-ups proposed there have now all run — and, stated
+plainly, **none was a win:** each tested whether the Run-11 effect *extends* (to a clean
+absolute PASS, through aggregation, into behavior) and each returned "no, or only weakly."
+They are recorded below as the bound, not as progress.
 
 **Phase 1 — close the absolute-magnitude gap (Run 12, DONE 2026-06-23).** Scaled the
 base model to 10 epochs / ~430k tokens-per-draw on the same `CORPUS_DRAWS=4
@@ -820,19 +851,33 @@ Artifacts in `runs/egypt_stats_behavior/` (git-ignored). **Phase 2 triad complet
 (real, z≈3 cross-corpus), aggregation survival (holds; dilutive merge), behavioral transfer
 (dissociated/negative).
 
-Also deferred (cheap to fold into a future base run):
+**Decision (2026-06-24): consolidate the bounded result; stop chasing a win this rig isn't
+offering.** All three follow-ups have run and the marginal experiment now has low expected
+value. What a *real* win would actually require is not another run on this setup but a
+different cut, and it is worth naming honestly:
 
-- **Firm up `grounded − neutral_prose` on base** (currently z=1.90; it already
-  cleared 2σ on instruct at z=2.28). More `neutral_prose` tokens would make the
-  register-rejection airtight on the substrate that matters.
-- **Tighten the H1c null** — more scenarios / paraphrase passes (the behavioral noise is
-  generation-sampling, not corpus) to convert "no detectable transfer" into a tightly-bounded
-  zero, and probe whether *more* CPT scale ever closes the survey-behavior gap.
+- **Establish depth, not just survey movement.** The crux the whole record turns on is whether
+  the survey shift is genuine value-representation or sophisticated survey/format/language
+  learning. The cleanest test of that *is* the behavioral probe — and it already said shallow.
+  A win here means demonstrating the shift changes something downstream of the survey (behavior,
+  or a held-out value-laden generation task), which this scale did not.
+- **Separate value from language at scale.** Run 12 showed the value-neutral arm drifts
+  target-ward with more epochs; a win means a corpus/probe design where absolute magnitude grows
+  *without* the neutral arm following — otherwise the absolute claim stays confounded.
+- **Show aggregation buys something.** A solo-training control + a capability/quality trace on
+  the *merged* model, so "cultures survive FedAvg" becomes "federated grounding beats grounding
+  alone," which is the actually-interesting consortium claim.
+
+Cheap loose ends if the work resumes anyway: firm up `grounded − neutral_prose` on base
+(z=1.90), and tighten the H1c null with more scenarios/passes (the behavioral noise is
+generation-sampling, not corpus).
 
 **Resolved along the way:** the noise-band question (cross-corpus, Run 7); training
 instability (stabilisation, Run 9); the register confound (rejected, Run 10a); the
 alignment-decay confound (base model, Run 10b); the map-rescaled target (real WVS-7
-factor scores, Run 11); and the decisive cross-corpus test itself (Run 11).
+factor scores, Run 11); the decisive cross-corpus test (Run 11); aggregation survival
+(T3); and the behavioral-probe instrument failure (the SemAxis judge fix) plus the H1c
+dissociation it revealed.
 
 ## Limitations
 

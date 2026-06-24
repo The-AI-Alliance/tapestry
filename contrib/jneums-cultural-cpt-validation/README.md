@@ -7,13 +7,16 @@ model's cultural alignment, beyond mere language exposure?
 
 Staged under `contrib/` (like `jneums-consortium-experiment`) while it iterates.
 
-> **Status: executed.** The single-node go/no-go has been run for real (11 runs,
-> Qwen3-4B base/instruct, real Arabic-Wikipedia corpora). The headline: grounded
-> CPT shifts a **base** model toward the target culture **more than a
-> language-matched corpus does**, surviving corpus resampling at z≈3 with
-> capability and refusal preserved. Full results, methodology, and limitations are
-> in [`FINDINGS.md`](FINDINGS.md); the pre-registered design is in
-> [`SPEC.md`](SPEC.md). This README covers **running the harness**.
+> **Status: executed; result is bounded.** Run for real on Qwen3-4B base/instruct,
+> real Arabic-Wikipedia corpora, plus a 3-culture FedAvg aggregation and a behavioral
+> probe. The honest finding is **real but shallow**: grounded CPT shifts a **base**
+> model's **survey-measured** values toward the target culture **more than a
+> language-matched corpus does** (z≈3, surviving corpus resampling *and* FedAvg
+> aggregation, capability/refusal preserved) — but it does **not** reach open-ended
+> behavior (a survey-behavior dissociation), the absolute pull is small and trades off
+> against value-specificity at scale, and it requires the base model. Full results,
+> methodology, and limitations are in [`FINDINGS.md`](FINDINGS.md); the pre-registered
+> design is in [`SPEC.md`](SPEC.md). This README covers **running the harness**.
 
 ## What it does
 
