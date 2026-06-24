@@ -75,12 +75,12 @@ For code contributions:
 - [ ] I have removed all API keys and other sensitive information.
 - [ ] I have updated any related documentation.
 
-For documentation contributions, including `tech-docs`:
+For documentation contributions, including `docs`:
 
 - [ ] I have followed the existing documentation styles and conventions.
 - [ ] I have included helpful diagrams, screenshots, tables, etc.
 
-Currently the content in `website` is for the Tapestry technical "microsite" ([the-ai-alliance.github.io/tapestry/](https://the-ai-alliance.github.io/tapestry/)) just points back to the repo's `tech-docs` locations. Eventually, mature content will be copied or migrated from `tech-docs` to this site for easier reading, searching, etc. **Hence, you should ignore `website` for new contributions.**
+Currently the content in `website` is for the Tapestry technical "microsite" ([the-ai-alliance.github.io/tapestry/](https://the-ai-alliance.github.io/tapestry/)) just points back to the repo's `docs` locations. Eventually, mature content will be copied or migrated from `docs` to this site for easier reading, searching, etc. **Hence, you should ignore `website` for new contributions.**
 
 However, **if** you are proposing `website` changes:
 
