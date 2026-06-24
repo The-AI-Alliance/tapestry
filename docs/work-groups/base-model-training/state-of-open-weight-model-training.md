@@ -11,20 +11,20 @@ The following open weight models were analyzed, based on the open weight leaderb
 
 | Model Family | Source |
 | ----- | ----- |
-| [DeepSeek](#1.-deepseek) | DeepSeek |
-| [Gemma](#gemma) | Google |
-| [GLM](#glm) | Zhipu AI |
-| [GPT-oss](#gpt-oss) | OpenAI |
-| [Granite](#granite) | IBM |
-| [K2](#k2) | Mohamed Bin Zayed University of Artificial Intelligence |
-| [Kimi](#kimi) | Moonshot AI |
-| [MiMo](#mimo) | Xaiomi |
-| [MiniMax](#minimax) | MiniMax |
-| [Mistral](#mistral) | Mistral AI |
-| [Olmo](#olmo) | Allen AI |
-| [Nemotron](#nemotron) | Nvidia |
-| [Qwen](#qwen) | Alibaba |
-| [Step 3](#step3) | StepFun |
+| [DeepSeek](#1-deepseek) | DeepSeek |
+| [Gemma](#2-gemma) | Google |
+| [GLM](#3-glm) | Zhipu AI |
+| [GPT-oss](#4-gpt-oss) | OpenAI |
+| [Granite](#5-granite) | IBM |
+| [K2](#6-k2) | Mohamed Bin Zayed University of Artificial Intelligence |
+| [Kimi](#7-kimi) | Moonshot AI |
+| [MiMo](#8-mimo) | Xaiomi |
+| [MiniMax](#9-minimax) | MiniMax |
+| [Mistral](#10-mistral) | Mistral AI |
+| [Olmo](#11-olmo) | Allen AI |
+| [Nemotron](#12-nemotron) | Nvidia |
+| [Qwen](#12-qwen) | Alibaba |
+| [Step 3](#14-step3) | StepFun |
 
  
 
