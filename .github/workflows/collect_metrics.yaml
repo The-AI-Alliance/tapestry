@@ -31,14 +31,14 @@ jobs:
       # Requires setting up a trust relationship in AWS IAM.  
       # See: https://github.com/aws-actions/configure-aws-credentials#configure-aws-credentials-action-for-github-actions  
       # - name: Configure AWS Credentials (OIDC)  
-      #   uses: aws-actions/configure-aws-credentials@v4  
+      #   uses: aws-actions/configure-aws-credentials@v6  
       #   with:  
       #     role-to-assume: arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:role/YOUR_GITHUB_ACTIONS_ROLE # Replace with your IAM role ARN  
       #     aws-region: ${{ secrets.AWS_REGION }} # e.g., us-east-1  
   
       # Alternative: Use Access Keys (Store as GitHub Secrets)  
       - name: Configure AWS Credentials (Access Keys)  
-        uses: aws-actions/configure-aws-credentials@v4  
+        uses: aws-actions/configure-aws-credentials@v6  
         with:  
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  
