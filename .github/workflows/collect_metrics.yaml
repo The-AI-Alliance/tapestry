@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4  
   
       - name: Set up Python  
-        uses: actions/setup-python@v5  
+        uses: actions/setup-python@v6  
         with:  
           python-version: '3.10' # Or your preferred version  
   
@@ -31,14 +31,14 @@ jobs:
       # Requires setting up a trust relationship in AWS IAM.  
       # See: https://github.com/aws-actions/configure-aws-credentials#configure-aws-credentials-action-for-github-actions  
       # - name: Configure AWS Credentials (OIDC)  
-      #   uses: aws-actions/configure-aws-credentials@v4  
+      #   uses: aws-actions/configure-aws-credentials@v6  
       #   with:  
       #     role-to-assume: arn:aws:iam::ACCOUNT-ID-WITHOUT-HYPHENS:role/YOUR_GITHUB_ACTIONS_ROLE # Replace with your IAM role ARN  
       #     aws-region: ${{ secrets.AWS_REGION }} # e.g., us-east-1  
   
       # Alternative: Use Access Keys (Store as GitHub Secrets)  
       - name: Configure AWS Credentials (Access Keys)  
-        uses: aws-actions/configure-aws-credentials@v4  
+        uses: aws-actions/configure-aws-credentials@v6  
         with:  
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}  
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}  
@@ -86,7 +86,7 @@ jobs:
       # Useful for debugging or if you need the file directly from the Actions run  
       - name: Upload Parquet artifact (Optional)  
         if: always() # Run even if S3 upload fails, for debugging  
-        uses: actions/upload-artifact@v4  
+        uses: actions/upload-artifact@v7  
         with:  
           name: github-metrics-parquet  
           path: github_metrics_*.parquet # Upload the generated parquet file  
