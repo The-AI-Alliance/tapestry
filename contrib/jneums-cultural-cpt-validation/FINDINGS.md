@@ -788,14 +788,46 @@ probe. Artifacts in `runs/cultural_cpt_aggregation/` (single run) and
 `runs/cultural_cpt_aggregation_resampled/` (`result_resampled.json` + per-draw/-round
 checkpoints; git-ignored). See [SPEC.md](SPEC.md) consortium extension and `HANDOFF.md`.
 
+**Phase 2 — behavioral transfer (H1c) — DONE (2026-06-24): a survey-behavior dissociation.**
+The free-form behavioral probe had never moved in any run — but that turned out to be a
+**measurement artifact**. The generate-mode judge scored a response by softmax over
+cosine-similarity to a scenario's three crowded action options, which saturates: even a
+*perfectly* pole-aligned response moved the coordinate at most ±0.25 (verbatim-option ceiling
+±0.5) out of 2.0, so a CPT-sized shift (~0.05) rendered as ~0.01, below noise. Replacing it
+with a **SemAxis cosine-difference** judge — `cos(resp, +pole) − cos(resp, −pole)` over
+pole-anchor centroids (each scenario's option plus axis-level exemplar sentences, en+ar),
+calibrated so poles map to ±1 — recovers ~4× the dynamic range (mean pole-aligned spread +1.04
+vs +0.25, deterministic). Re-run on Qwen3-4B-Base, Egypt, Arabic, 3 seeds, with the fixed probe:
+
+| arm | survey shift→target | behavior shift→target |
+| :-- | :--: | :--: |
+| base | 0.000 | 0.000 |
+| language_matched | −0.025 ± 0.027 | −0.141 ± 0.231 |
+| grounded | **+0.021 ± 0.023** | **−0.086 ± 0.098** |
+| surface_only (persona prompt) | +0.024 ± 0.014 | **+0.181 ± 0.098** |
+
+Two results. **(1) The probe now works:** behavior *moves* (±0.09–0.23 vs pinned-at-0 before),
+and an explicit persona prompt shifts it **+0.181 (~1.8σ)** toward Egypt — the judge was the
+blindfold. **(2) A clean survey-behavior dissociation:** grounded CPT moves the *survey* toward
+Egypt (+0.021) but **not** open-ended *behavior* (−0.086 ± 0.098, consistent with zero), even
+though prompting moves behavior. So the grounding effect is **survey-level and does not propagate
+to enacted behavior** — exactly the surface-mimicry-vs-deep-shift distinction H1c was built to
+test, and now a *real* null rather than an instrument failure. This **bounds H1b**: the value
+shift CPT produces is real on the instrument but shallow. Caveats: n=3 seeds, no corpus draws,
+6 scenarios × 2 passes; the behavior std is temperature-1.0 generation noise, so the null is
+"no *detectable* transfer," and tightening it means more scenarios/passes, not corpus draws.
+Artifacts in `runs/egypt_stats_behavior/` (git-ignored). **Phase 2 triad complete:** value shift
+(real, z≈3 cross-corpus), aggregation survival (holds; dilutive merge), behavioral transfer
+(dissociated/negative).
+
 Also deferred (cheap to fold into a future base run):
 
 - **Firm up `grounded − neutral_prose` on base** (currently z=1.90; it already
   cleared 2σ on instruct at z=2.28). More `neutral_prose` tokens would make the
   register-rejection airtight on the substrate that matters.
-- **Behavioral transfer.** The free-form behavioral probe has not moved for any arm
-  in any run; a representational/behavioral shift (H1c) remains undemonstrated and
-  is the natural next hypothesis if the consortium question is answered.
+- **Tighten the H1c null** — more scenarios / paraphrase passes (the behavioral noise is
+  generation-sampling, not corpus) to convert "no detectable transfer" into a tightly-bounded
+  zero, and probe whether *more* CPT scale ever closes the survey-behavior gap.
 
 **Resolved along the way:** the noise-band question (cross-corpus, Run 7); training
 instability (stabilisation, Run 9); the register confound (rejected, Run 10a); the
@@ -810,6 +842,8 @@ factor scores, Run 11); and the decisive cross-corpus test itself (Run 11).
   the strong-form H1(a) claim is not established.
 - **Base model only.** The clean result requires Qwen3-4B-Base; on the aligned
   instruct model the effect does not survive corpus resampling.
-- **No behavioral transfer demonstrated.** The values shift is measured on the
-  survey instrument; open-ended behavior did not move.
+- **Grounding does not transfer to behavior (survey-behavior dissociation).** With a
+  validated probe (a persona prompt moves behavior +0.18), grounded CPT moves the survey
+  (+0.021) but not open-ended behavior (−0.086 ± 0.098) — the value shift is survey-level,
+  not enacted. The strong-form representational claim is not established.
 
