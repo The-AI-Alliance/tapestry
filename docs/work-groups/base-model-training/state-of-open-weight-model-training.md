@@ -11,20 +11,20 @@ The following open weight models were analyzed, based on the open weight leaderb
 
 | Model Family | Source |
 | ----- | ----- |
-| [DeepSeek](#deepseek-\(deepseek\)) | DeepSeek |
-| [Gemma](#gemma-\(google\)) | Google |
-| [GLM](#glm-\(zhipu-ai\)) | Zhipu AI |
-| [GPT-oss](#gpt-oss-\(openai\)) | OpenAI |
-| [Granite](#granite-\(ibm\)) | IBM |
-| [K2](#k2-\(mohamed-bin-zayed-university-of-artificial-intelligence\)-k2) | Mohamed Bin Zayed University of Artificial Intelligence |
-| [Kimi](#kimi-\(moonshot-ai\)) | Moonshot AI |
-| [MiMo](#mimo-\(xaiomi\)) | Xaiomi |
-| [MiniMax](#minimax-\(minimax\)) | MiniMax |
-| [Mistral](#mistral-\(mistral-ai\)) | Mistral AI |
-| [Olmo](#olmo-\(allen-ai\)) | Allen AI |
-| [Nemotron](#nemotron-\(nvidia\)) | Nvidia |
-| [Qwen](#qwen-\(alibaba\)) | Alibaba |
-| [Step 3](#step3-\(stepfun\)) | StepFun |
+| [DeepSeek](#deepseek) | DeepSeek |
+| [Gemma](#gemma) | Google |
+| [GLM](#glm) | Zhipu AI |
+| [GPT-oss](#gpt-oss) | OpenAI |
+| [Granite](#granite) | IBM |
+| [K2](#k2) | Mohamed Bin Zayed University of Artificial Intelligence |
+| [Kimi](#kimi) | Moonshot AI |
+| [MiMo](#mimo) | Xaiomi |
+| [MiniMax](#minimax) | MiniMax |
+| [Mistral](#mistral) | Mistral AI |
+| [Olmo](#olmo) | Allen AI |
+| [Nemotron](#nemotron) | Nvidia |
+| [Qwen](#qwen) | Alibaba |
+| [Step 3](#step3) | StepFun |
 
  
 
@@ -42,11 +42,11 @@ Eliminating the last two categories, the recommendation is to engage with the Gr
 
 # Model Family Details  
 
-1. ## DeepSeek (DeepSeek) {#deepseek-(deepseek)}
+1. ## DeepSeek
 
 ### Pretraining data — largely undisclosed composition
 
-For the core DeepSeek LLM models (7B and 67B), the company has said only that they were trained on an extensive dataset comprising 2 trillion tokens in both English and Chinese, without naming specific corpora. Independent analysis confirms this gap: the pre-training dataset composition, a hybrid of synthetic and organic data, remains proprietary, obscuring potential biases and ethical sourcing practices, and similarly the RLHF pipeline lacks detailed documentation of preference model architecture and alignment protocols. For DeepSeek-V2, it's even thinner: an undisclosed MoE architecture with proprietary optimizations and training-efficiency claims that omit hardware and data details. [Inferless \+ 2](https://www.inferless.com/learn/the-ultimate-guide-to-deepseek-models)  
+For the core DeepSeek LLM models (7B and 67B), the company has said only that they were trained on an extensive dataset comprising 2 trillion tokens in both English and Chinese, without naming specific corpora. Independent analysis confirms this gap: the pre-training dataset composition, a hybrid of synthetic and organic data, remains proprietary, obscuring potential biases and ethical sourcing practices, and similarly the RLHF pipeline lacks detailed documentation of preference model architecture and alignment protocols. For DeepSeek-V2, it's even thinner: an undisclosed MoE architecture with proprietary optimizations and training-efficiency claims that omit hardware and data details. [Inferless](https://www.inferless.com/learn/the-ultimate-guide-to-deepseek-models)  
 One specific, lower-level data point that is public: the original DeepSeek LLM's pretraining text was sourced from books and Wikipedia content up to 2023, though without multilingual breakdowns or detailed provenance. [arxiv](https://arxiv.org/pdf/2502.18505)  
 It's also worth noting DeepSeek's pretraining corpus, like most large models, draws heavily on Common Crawl — this surfaced in a security research context when a separate audit scanned Common Crawl, the massive web-crawl dataset used to train LLMs including DeepSeek, and found roughly 12,000 hardcoded live API keys and passwords across 400TB of web data, illustrating one of the practical risks of training on largely unfiltered web text. [Truffle Security](https://trufflesecurity.com/blog/research-finds-12-000-live-api-keys-and-passwords-in-deepseek-s-training-data)
 
@@ -58,7 +58,7 @@ The coding-focused models have more disclosed detail than the general LLM line. 
 
 ### Post-training data — DeepSeek is actually unusually transparent
 
-This is the standout part. For DeepSeek-R1 and V3, the company disclosed concrete sizes for its post-training datasets, more so than most labs do: 600,000 reasoning examples, 200,000 non-reasoning SFT examples, an undisclosed-size human preference (RLHF) dataset, and human-processed synthetic data used for "cold-start" training. DeepSeek-V3, distilled from R1, was separately trained on an instruction-tuning dataset of 1.5 million samples — for comparison, that's larger than Qwen-2.5's 1 million SFT samples, and far larger than the 30K SFT / 3M RLHF samples Meta disclosed for Llama 2\. [X \+ 2](https://x.com/alexandr_wang/status/1884440764677251515)  
+This is the standout part. For DeepSeek-R1 and V3, the company disclosed concrete sizes for its post-training datasets, more so than most labs do: 600,000 reasoning examples, 200,000 non-reasoning SFT examples, an undisclosed-size human preference (RLHF) dataset, and human-processed synthetic data used for "cold-start" training. DeepSeek-V3, distilled from R1, was separately trained on an instruction-tuning dataset of 1.5 million samples — for comparison, that's larger than Qwen-2.5's 1 million SFT samples, and far larger than the 30K SFT / 3M RLHF samples Meta disclosed for Llama 2\. [X](https://x.com/alexandr_wang/status/1884440764677251515)  
 DeepSeek also drew attention for emphasizing human data annotation more than is typical for Chinese labs: the DeepSeek-V3 paper includes a dedicated acknowledgement section for data annotation, and according to Chinese AI engineers, DeepSeek values data annotation work highly enough that its CEO has personally labeled data for the model. [X](https://x.com/alexandr_wang/status/1884440764677251515)  
 Methodologically, the R1 pipeline used a staged approach: starting from a small LLM-generated and human-curated set of demonstrations to first train on high-quality reasoning data in math and code, aimed at improving the consistency and readability of reasoning trajectories rather than reasoning ability itself, which helped speed convergence in the reinforcement learning stage that followed and delivered the largest performance gains. [Toloka](https://toloka.ai/blog/the-data-behind-deepseek-s-success/)
 
@@ -68,7 +68,7 @@ Methodologically, the R1 pipeline used a staged approach: starting from a small 
 Because DeepSeek-R1's outputs were released openly, an entire secondary ecosystem of "distilled" datasets has sprung up, built by third parties prompting R1 and collecting its reasoning traces — e.g., a community-built 1.4-million-example reasoning dataset where 0.9 million entries were distilled directly from DeepSeek-R1's outputs. This is a direct consequence of DeepSeek's open-weight release strategy, distinct from disclosure about DeepSeek's own original training data. [arxiv](https://arxiv.org/pdf/2503.19633)
 
 
-2. ## Gemma (Google) {#gemma-(google)}
+2. ## Gemma
 
 ### Scale and broad composition
 
@@ -87,11 +87,11 @@ On the instruction-tuning and alignment side, Google has described intent and me
 
  
 
-3. ## GLM (Zhipu AI) {#glm-(zhipu-ai)}
+3. ## GLM
 
 ### Scale disclosures
 
-GLM-5 was trained on 28.5 trillion tokens, one of the largest pretraining datasets globally — roughly double that used for Llama-3. On what that volume is meant to convey, the same source offers only a high-level gesture: it encompasses rare languages, specialized academic papers, and a large amount of high-quality code, without naming actual corpora. [Atlas CloudAtlas Cloud](https://www.atlascloud.ai/collections/glm)
+GLM-5 was trained on 28.5 trillion tokens, one of the largest pretraining datasets globally — roughly double that used for Llama-3. On what that volume is meant to convey, the same source offers only a high-level gesture: it encompasses rare languages, specialized academic papers, and a large amount of high-quality code, without naming actual corpora. [Atlas Cloud](https://www.atlascloud.ai/collections/glm)
 
 
 ### No named pretraining sources found
@@ -114,30 +114,30 @@ One area where Zhipu has actually been quite forthcoming is *hardware*, not data
 For alignment, Zhipu has described their pipeline at a conceptual level: a "progressive alignment" pipeline involving multi-task SFT, multi-stage RL, and cross-stage distillation, which they credit for meaningful coding-performance gains between GLM-5 and GLM-5.1 even on an unchanged base model. That's a methodology description, not a dataset disclosure, but it's consistent with the level of detail Qwen, DeepSeek, and MiniMax typically provide for their own post-training stages. [WaveSpeedAI](https://wavespeed.ai/blog/posts/glm-5-1-vs-claude-gpt-gemini-deepseek-llm-comparison/)
 
 
-4. ## GPT-oss (OpenAI) {#gpt-oss-(openai)}
+4. ## GPT-oss
 
 ### What OpenAI actually says
 
 The official announcement and model card give only a brief, generic description: the models were trained on a mostly English, text-only dataset, with a focus on STEM, coding, and general knowledge, and tokenized using o200k\_harmony, a superset of the tokenizer used for OpenAI o4-mini and GPT-4o. The official model card itself is even thinner, saying only that the training dataset consists of a wide range of problems from coding, math, science, and more. [OpenAI](https://openai.com/index/introducing-gpt-oss/)[OpenAI](https://cdn.openai.com/pdf/419b6906-9da6-406c-a19d-1bb078ac7637/oai_gpt-oss_model_card.pdf)  
-That's it. No named corpora, no token count breakdown by domain, no disclosed proportions of web text vs. code vs. licensed data. As one technical analysis bluntly summarized it: OpenAI avoided talking about one important aspect of these models — the data. There was no information disclosed about the data on which the gpt-oss models were trained. The same analysis notes the vagueness extends even to scale: the pretraining dataset is described only as containing "trillions of tokens," which provides little concrete information since most open LLMs in this class are trained on 15–20 trillion tokens, so the phrase doesn't actually narrow anything down. [SubstackSubstack](https://cameronrwolfe.substack.com/p/gpt-oss)  
+That's it. No named corpora, no token count breakdown by domain, no disclosed proportions of web text vs. code vs. licensed data. As one technical analysis bluntly summarized it: OpenAI avoided talking about one important aspect of these models — the data. There was no information disclosed about the data on which the gpt-oss models were trained. The same analysis notes the vagueness extends even to scale: the pretraining dataset is described only as containing "trillions of tokens," which provides little concrete information since most open LLMs in this class are trained on 15–20 trillion tokens, so the phrase doesn't actually narrow anything down. [Substack](https://cameronrwolfe.substack.com/p/gpt-oss)  
     
 A separate independent write-up makes the same point: while gpt-oss's weights are openly available, the sources of training data are not clearly described in the model card, beyond the statement that it's a "text-only dataset with trillions of tokens, with a focus on STEM, coding, and general knowledge". That piece goes on to try reverse-engineering clues about the training data from the model's tokenizer and embeddings instead — which tells you how little was officially provided. [LessWrong](https://www.lesswrong.com/posts/iY9584TRhqrzawhZg/what-gpt-oss-leaks-about-openai-s-training-data)
 
 
 ### The one specific, disclosed detail: safety filtering
 
-The single concrete claim OpenAI makes about the pretraining data concerns what was *removed*, not what was included: during pre-training, harmful data related to Chemical, Biological, Radiological, and Nuclear (CBRN) topics was filtered out, and during post-training, an instruction hierarchy was used to teach the model to refuse unsafe requests. Independent analysis confirms this filtering reused existing infrastructure: gpt-oss re-uses the safety filters from GPT-4o to remove harmful data, especially in the CBRN domain, with those filters built on OpenAI's LLM-based moderation API. [OpenAI \+ 2](https://openai.com/index/introducing-gpt-oss/)
+The single concrete claim OpenAI makes about the pretraining data concerns what was *removed*, not what was included: during pre-training, harmful data related to Chemical, Biological, Radiological, and Nuclear (CBRN) topics was filtered out, and during post-training, an instruction hierarchy was used to teach the model to refuse unsafe requests. Independent analysis confirms this filtering reused existing infrastructure: gpt-oss re-uses the safety filters from GPT-4o to remove harmful data, especially in the CBRN domain, with those filters built on OpenAI's LLM-based moderation API. [OpenAI](https://openai.com/index/introducing-gpt-oss/)
 
 
 ### Why OpenAI doesn't disclose more
 
-This fits a broader, well-documented trend at OpenAI rather than something specific to gpt-oss. Historically OpenAI was far more open: from GPT-1 to GPT-3, OpenAI published papers detailing datasets and even token counts from each source, but with GPT-4 they reversed course, explicitly stating the report would contain no further details about architecture, hardware, training compute, or dataset construction, citing competitive landscape and safety implications. That shift has held since — even GPT-4o's documentation describes only broad categories like "publicly available data" and "proprietary data from data partnerships" such as the Shutterstock partnership for images, without naming specific datasets or proportions. [TTMSTTMS](https://ttms.com/gpt-5-training-data-evolution-sources-and-ethical-concerns/)  
+This fits a broader, well-documented trend at OpenAI rather than something specific to gpt-oss. Historically OpenAI was far more open: from GPT-1 to GPT-3, OpenAI published papers detailing datasets and even token counts from each source, but with GPT-4 they reversed course, explicitly stating the report would contain no further details about architecture, hardware, training compute, or dataset construction, citing competitive landscape and safety implications. That shift has held since — even GPT-4o's documentation describes only broad categories like "publicly available data" and "proprietary data from data partnerships" such as the Shutterstock partnership for images, without naming specific datasets or proportions. [TTMS](https://ttms.com/gpt-5-training-data-evolution-sources-and-ethical-concerns/)  
     
 One commentator's explanation for *why* data specifically (more than architecture) is the thing OpenAI guards most closely: there are legal reasons to avoid disclosure, but the primary reason is technical — data is the key differentiator, since collecting and optimizing data tends to have the largest impact on model quality, more than architecture or training algorithms. [Substack](https://cameronrwolfe.substack.com/p/gpt-oss)
 
  
 
-5. ## Granite (IBM) {#granite-(ibm)}
+5. ## Granite
 
 ### Original Granite 13B (the base model)
 
@@ -165,7 +165,7 @@ IBM has described the overall sourcing strategy as pulling unstructured language
 For the fine-tuning/instruct stage of recent models, IBM describes the SFT data as largely comprised of three sources: publicly available datasets with permissive licenses, internal synthetic data targeting specific capabilities, and a select set of human-curated data.
 
 
-6. ## K2 (Mohamed bin Zayed University of Artificial Intelligence)     K2 {#k2-(mohamed-bin-zayed-university-of-artificial-intelligence)-k2}
+6. ## K2
 
    K2 is explicitly built around a "360-Open" philosophy, meaning full disclosure isn't a side detail, it's the entire point of the project.
 
@@ -179,35 +179,35 @@ For the fine-tuning/instruct stage of recent models, IBM describes the SFT data 
 
   ### K2-V2 (the newer reasoning-focused release)
 
-  This generation goes even further, introducing original named pretraining corpora built specifically for this release. The technical report states the goal directly: by fully releasing the training data, K2 allows the community to gain a deeper understanding of the dependencies linking post-training outcomes to pre-training signals, building on their earlier TxT360 dataset, a widely adopted corpus featuring innovative upsampling methodologies. New companion datasets introduced for K2-V2 include: [arxivarxiv](https://arxiv.org/pdf/2408.15696)  
+  This generation goes even further, introducing original named pretraining corpora built specifically for this release. The technical report states the goal directly: by fully releasing the training data, K2 allows the community to gain a deeper understanding of the dependencies linking post-training outcomes to pre-training signals, building on their earlier TxT360 dataset, a widely adopted corpus featuring innovative upsampling methodologies. New companion datasets introduced for K2-V2 include: [arxiv](https://arxiv.org/pdf/2408.15696)  
 * **TxT360-Midas**: an open mid-training dataset designed to shape reasoning behaviors and extend context lengths [arxiv](https://arxiv.org/pdf/2408.15696)  
 * **TxT360-3efforts**: a supervised fine-tuning dataset curated with mixed reasoning efforts [arxiv](https://arxiv.org/pdf/2408.15696)  
-  Coverage of the release confirms the scope of what's published: K2 V2 publishes its complete pre-training corpus composition, mid-training datasets including the TxT360-Midas reasoning corpus, supervised fine-tuning data, training logs, hyperparameters, and infrastructure details for full reproducibility. The model itself is trained in three distinct phases — pre-training for breadth and fluency, mid-training to infuse long-context skills up to 512,000 tokens and explicit reasoning, and a further stage beyond that. [arxivarxiv](https://arxiv.org/pdf/2308.10620)
+  Coverage of the release confirms the scope of what's published: K2 V2 publishes its complete pre-training corpus composition, mid-training datasets including the TxT360-Midas reasoning corpus, supervised fine-tuning data, training logs, hyperparameters, and infrastructure details for full reproducibility. The model itself is trained in three distinct phases — pre-training for breadth and fluency, mid-training to infuse long-context skills up to 512,000 tokens and explicit reasoning, and a further stage beyond that. [arxiv](https://arxiv.org/pdf/2308.10620)
 
   ### K2 Think (the reasoning-RL variant)
 
-  For the RL-focused K2 Think model, the data lineage is disclosed down to provenance and deduplication practice: data were selected mainly from specific domains, carefully deduplicated from the data used for K2-V2 Instruct, and fully decontaminated from downstream evaluations, with the resulting filtered dataset — an expanded version called Guru v1.5 — uploaded publicly to Hugging Face. The training code itself is also public: all code used for training is fully available on GitHub via the Reasoning360 repository. [InferlessInferless](https://www.inferless.com/learn/the-ultimate-guide-to-qwen-model)
+  For the RL-focused K2 Think model, the data lineage is disclosed down to provenance and deduplication practice: data were selected mainly from specific domains, carefully deduplicated from the data used for K2-V2 Instruct, and fully decontaminated from downstream evaluations, with the resulting filtered dataset — an expanded version called Guru v1.5 — uploaded publicly to Hugging Face. The training code itself is also public: all code used for training is fully available on GitHub via the Reasoning360 repository. [Inferless](https://www.inferless.com/learn/the-ultimate-guide-to-qwen-model)
 
   ### Practical reproducibility
 
   You can literally go run the pipeline yourself. The GitHub training repo specifies exactly which dataset feeds which stage: the data for pre-training and mid-training can be obtained through TxT360-Midas, with the datasets organized as subsets corresponding to each stage, while the SFT stage uses the TxT360-3efforts dataset, organized as typical chat templates.
 
-7. ## Kimi (Moonshot AI) {#kimi-(moonshot-ai)}
+7. ## Kimi
 
 **Kimi K2** (the flagship model) was pre-trained on 15.5 trillion tokens of data, likely including a diverse mixture of web text, books, code, and multilingual content, though Moonshot has not publicly listed the exact sources. The technical report similarly describes it only as a large "high-quality" pretraining dataset without naming specific sources. [IntuitionLabs](https://intuitionlabs.ai/articles/kimi-k2-open-weight-llm-analysis)[IntuitionLabs](https://intuitionlabs.ai/articles/kimi-k2-technical-deep-dive)  
     
-What Moonshot has been more specific about is the *methodology* rather than the *sources*: they've discussed using an architecture similar to DeepSeek-V3, with scaling-law analysis used to tune model configuration, and a token-efficient optimizer (MuonClip) to get more out of a roughly fixed-size pretraining corpus. They've also emphasized post-training approaches that lean on self-generated data and reinforcement learning rather than purely human-curated datasets, in what they call the "Era of Experience," where LLMs increasingly learn from their own self-generated interactions and rewards rather than being limited to human data. [MoonshotaiMoonshotai](https://moonshotai.github.io/Kimi-K2/)  
+What Moonshot has been more specific about is the *methodology* rather than the *sources*: they've discussed using an architecture similar to DeepSeek-V3, with scaling-law analysis used to tune model configuration, and a token-efficient optimizer (MuonClip) to get more out of a roughly fixed-size pretraining corpus. They've also emphasized post-training approaches that lean on self-generated data and reinforcement learning rather than purely human-curated datasets, in what they call the "Era of Experience," where LLMs increasingly learn from their own self-generated interactions and rewards rather than being limited to human data. [Moonshotai](https://moonshotai.github.io/Kimi-K2/)  
    
 For the newer multimodal version, **Kimi K2.5**, Moonshot has said the training dataset included multimodal files in addition to text, which is why the model is better at processing things like charts, but again without specifics on sources or proportions. [SiliconANGLE](https://siliconangle.com/2026/01/27/moonshot-ai-releases-open-source-kimi-k2-5-model-1t-parameters/)  
    
 The one place Moonshot has been genuinely detailed is **Kimi-Audio**, a separate audio-focused model, where they disclosed curating a pre-training dataset of more than 13 million hours of audio data covering speech, sound, and music, built via a custom data crawling and processing pipeline
 
 
-8. ## MiMo (Xaiomi) {#mimo-(xaiomi)}
+8. ## MiMo
 
 ### Pretraining scale and broad categories
 
-The flagship MiMo-7B-Base was pre-trained on approximately 25 trillion tokens using web pages, academic papers, books, and synthetic reasoning data. The official technical report adds a bit more on methodology: Xiaomi optimized the data preprocessing pipeline, enhancing text extraction toolkits and applying multi-dimensional data filtering to increase reasoning pattern density in the pretraining data, while also employing multiple strategies to generate massive diverse synthetic reasoning data, and used a three-stage data mixture strategy for pretraining. Independent coverage adds one more specific figure: the model was trained on a specially curated dataset of 200 billion reasoning tokens, out of a total of 25 trillion tokens across three training phases. [Wikipedia \+ 3](https://en.wikipedia.org/wiki/Xiaomi_MiMo)  
+The flagship MiMo-7B-Base was pre-trained on approximately 25 trillion tokens using web pages, academic papers, books, and synthetic reasoning data. The official technical report adds a bit more on methodology: Xiaomi optimized the data preprocessing pipeline, enhancing text extraction toolkits and applying multi-dimensional data filtering to increase reasoning pattern density in the pretraining data, while also employing multiple strategies to generate massive diverse synthetic reasoning data, and used a three-stage data mixture strategy for pretraining. Independent coverage adds one more specific figure: the model was trained on a specially curated dataset of 200 billion reasoning tokens, out of a total of 25 trillion tokens across three training phases. [Wikipedia](https://en.wikipedia.org/wiki/Xiaomi_MiMo)  
     
 For the newer MiMo-V2-Flash, the disclosed composition stays similarly broad: the pre-training corpus consists of 27 trillion tokens drawn from a diverse collection of high-quality sources, including public web content, books, academic papers, code, and mathematics, with a stated shift toward data exhibiting long-range dependencies to support long-context capability. The most recent multimodal model, MiMo-V2.5, is described at an even higher level of abstraction: trained on a total of \~48 trillion tokens, with diverse text data collected for pretraining the LLM backbone, plus separately staged multimodal pretraining and projector warmup phases — again, no named corpora. [arXiv](https://arxiv.org/pdf/2601.02780)[Hugging Face](https://huggingface.co/XiaomiMiMo/MiMo-V2.5)
 
@@ -219,7 +219,7 @@ This is where MiMo gets specific, much like DeepSeek did. For reinforcement lear
 
 ### Specialized modalities — audio
 
-For their audio model MiMo-Audio (built on top of MiMo-7B-Base), Xiaomi discloses unusually large, specific figures: the training data was scaled to over 11 million hours total, with an initial stage using a dataset of 2.6 trillion tokens, consisting of 1.2 trillion text tokens and 1.4 trillion speech-related tokens. The data construction pipeline is described as an efficient, scalable automated pipeline incorporating audio normalization, speaker diarization, voice activity detection, and automatic speech recognition as preprocessing steps. A separate Xiaomi audio model, MiDashengLM-7B, was trained on a 38,662-hour dataset using a "general audio caption" approach rather than the narrower speech-recognition-only approach used by most voice AI systems. [arXiv \+ 3](https://arxiv.org/pdf/2512.23808)
+For their audio model MiMo-Audio (built on top of MiMo-7B-Base), Xiaomi discloses unusually large, specific figures: the training data was scaled to over 11 million hours total, with an initial stage using a dataset of 2.6 trillion tokens, consisting of 1.2 trillion text tokens and 1.4 trillion speech-related tokens. The data construction pipeline is described as an efficient, scalable automated pipeline incorporating audio normalization, speaker diarization, voice activity detection, and automatic speech recognition as preprocessing steps. A separate Xiaomi audio model, MiDashengLM-7B, was trained on a 38,662-hour dataset using a "general audio caption" approach rather than the narrower speech-recognition-only approach used by most voice AI systems. [arXiv](https://arxiv.org/pdf/2512.23808)
 
 
 ### Home/vision-specific data
@@ -232,16 +232,16 @@ For their home-environment vision-language variant, MiMo-VL-Miloco, Xiaomi descr
 Unlike companies that simply stay silent, one of Xiaomi's own MiMo-focused resource pages directly flags the limitation: full dataset composition and cost breakdown remain internal; Xiaomi MiMo is iterating responsibly. That's a fairly explicit, self-aware statement of exactly what isn't being shared, alongside the team's own claim of being more open about progress generally. [Xiaomi-mimo-ai](https://www.xiaomi-mimo-ai.com/)
 
 
-9. ## MiniMax (MiniMax) {#minimax-(minimax)}
+9. ## MiniMax
 
 ### Pretraining data
 
-For MiniMax-Text-01, the disclosed figure is that the training dataset encompasses approximately 14.8 trillion tokens from publicly available texts and code repositories. On composition, the disclosure stays at the broad-category level: the model was trained on a diverse dataset that includes a variety of programming languages and general knowledge sources, with the company stating that the training data was curated to minimize biases while maximizing diversity in topics and styles. No named corpora (no "Common Crawl," "Wikipedia," etc. specified), similar to Qwen and Kimi. [Best AI API \+ 2](https://aimlapi.com/models/minimax-text-01-api)
+For MiniMax-Text-01, the disclosed figure is that the training dataset encompasses approximately 14.8 trillion tokens from publicly available texts and code repositories. On composition, the disclosure stays at the broad-category level: the model was trained on a diverse dataset that includes a variety of programming languages and general knowledge sources, with the company stating that the training data was curated to minimize biases while maximizing diversity in topics and styles. No named corpora (no "Common Crawl," "Wikipedia," etc. specified), similar to Qwen and Kimi. [Best AI API](https://aimlapi.com/models/minimax-text-01-api)
 
 
 ### Post-training data — more procedural detail
 
-Where MiniMax gets more specific is in describing *how* post-training data is constructed, particularly for their agentic coding model M2.1. They describe building agent-driven automated data pipelines based on raw GitHub data to produce diverse, verifiable software-engineering-style datasets and environments, including runnable Docker environments used for both supervised fine-tuning and reinforcement learning. They also describe a hybrid expert-and-automation approach for app-development training data: internal specialists in frontend, backend, Android, and iOS development help design prompts, meta-queries, and rubric-based rewards that can't be fully automated, with experts injecting best practices through system prompts that get distilled into the model's default behavior during training. Verification of this data uses what they call "Agent-as-a-Verifier," where the agent deploys the app in a sandbox and interacts with it via tools like Playwright, scoring performance against rubrics, which requires multi-step tool-based interaction rather than a single LLM-as-judge call. [MiniMax \+ 2](https://www.minimax.io/news/post-training-experience-and-insights-for-agent-models)  
+Where MiniMax gets more specific is in describing *how* post-training data is constructed, particularly for their agentic coding model M2.1. They describe building agent-driven automated data pipelines based on raw GitHub data to produce diverse, verifiable software-engineering-style datasets and environments, including runnable Docker environments used for both supervised fine-tuning and reinforcement learning. They also describe a hybrid expert-and-automation approach for app-development training data: internal specialists in frontend, backend, Android, and iOS development help design prompts, meta-queries, and rubric-based rewards that can't be fully automated, with experts injecting best practices through system prompts that get distilled into the model's default behavior during training. Verification of this data uses what they call "Agent-as-a-Verifier," where the agent deploys the app in a sandbox and interacts with it via tools like Playwright, scoring performance against rubrics, which requires multi-step tool-based interaction rather than a single LLM-as-judge call. [MiniMax](https://www.minimax.io/news/post-training-experience-and-insights-for-agent-models)  
 One specific dataset element they've actually open-sourced: the VIBE dataset, used as part of their internal benchmarking/training pipeline for coding agents. [MiniMax](https://www.minimax.io/news/post-training-experience-and-insights-for-agent-models)
 
 
@@ -250,7 +250,7 @@ One specific dataset element they've actually open-sourced: the VIBE dataset, us
 I'd flag that one third-party review claims MiniMax's infrastructure transparency exceeds many competitors, with the company publishing detailed technical reports documenting training procedures, dataset composition, and compute resources — but in practice, what I found backing that claim is mostly procedural/methodological detail (how data pipelines work, what verification looks like) rather than an itemized list of named source datasets the way Granite or Nemotron provide. So I'd treat that "transparency" framing with some skepticism; it's transparency about *process*, not about *provenance*. [Advenboost](https://advenboost.com/minimax-2-5-review-setup-guide/)
 
 
-10. ## Mistral (Mistral AI) {#mistral-(mistral-ai)}
+10. ## Mistral
 
 ### Mistral's own policy
 
@@ -261,30 +261,30 @@ Straight from their help center: we do not disclose the datasets used to train o
 
 This holds consistently across releases. For the original Mistral 7B, independent surveys note it was trained on openly available but undisclosed text sources — meaning the underlying data is presumed to be public web-scale text, but no specific corpora are named, and the company hasn't confirmed sources. The instruction-tuned variant was then fine-tuned on instruction datasets from Hugging Face, which is at least somewhat more concrete, though still generic. [arxivarxiv](https://arxiv.org/pdf/2502.20647)  
 For later, larger models, the pattern repeats. Researchers cataloguing pretraining disclosures across major LLMs found that for Mistral 24B, the official technical report and available documentation do not provide explicit details about the pre-training corpus, though Mistral's models are generally known to be trained on large-scale, diverse datasets, often including filtered web data, code, and other standard sources, with no specifics publicly disclosed. [arxiv](https://arxiv.org/pdf/2509.04304)  
-The most recent flagship, Mistral Large 3, gets the same treatment: Mistral does not publicly disclose its dataset composition, which is common practice; however, given the model's strong multilingual performance, it likely included diverse sources — web text, books, code, etc., in many languages. Even for the multimodal capability, the same analysis can only infer rather than confirm: Large 3 presumably trained on vast multilingual text corpora as well as image-text pairs, given its vision capabilities, but this is speculation based on capability, not anything Mistral has stated. [IntuitionLabsIntuitionLabs](https://intuitionlabs.ai/articles/mistral-large-3-moe-llm-explained)
+The most recent flagship, Mistral Large 3, gets the same treatment: Mistral does not publicly disclose its dataset composition, which is common practice; however, given the model's strong multilingual performance, it likely included diverse sources — web text, books, code, etc., in many languages. Even for the multimodal capability, the same analysis can only infer rather than confirm: Large 3 presumably trained on vast multilingual text corpora as well as image-text pairs, given its vision capabilities, but this is speculation based on capability, not anything Mistral has stated. [IntuitionLabs](https://intuitionlabs.ai/articles/mistral-large-3-moe-llm-explained)
 
 
-11. ## Olmo (Allen AI) {#olmo-(allen-ai)}
+11. ## Olmo
 
 ### Original OLMo — Dolma
 
-The original training corpus, [Dolma](https://arxiv.org/pdf/2402.00159), is an open dataset of 3 trillion tokens from a diverse mix of web content, academic publications, code, books, and encyclopedic materials, created specifically as a training corpus for OLMo, and downloadable directly from Hugging Face under an ODC-BY license. The named sources are explicit: a web scrape, scientific content extracted from academic PDFs and their associated metadata, code across a variety of programming languages, reference material from Wikipedia and Wikibooks, and public domain books from Project Gutenberg. A separate technical breakdown adds the specific named corpora behind those categories: processed Common Crawl dumps for web content, the S2ORC dataset for academic publications, The Stack for code, Project Gutenberg for books, and Wikipedia/Wikibooks for encyclopedic material. [dolma \+ 2](https://allenai.github.io/dolma/)  
+The original training corpus, [Dolma](https://arxiv.org/pdf/2402.00159), is an open dataset of 3 trillion tokens from a diverse mix of web content, academic publications, code, books, and encyclopedic materials, created specifically as a training corpus for OLMo, and downloadable directly from Hugging Face under an ODC-BY license. The named sources are explicit: a web scrape, scientific content extracted from academic PDFs and their associated metadata, code across a variety of programming languages, reference material from Wikipedia and Wikibooks, and public domain books from Project Gutenberg. A separate technical breakdown adds the specific named corpora behind those categories: processed Common Crawl dumps for web content, the S2ORC dataset for academic publications, The Stack for code, Project Gutenberg for books, and Wikipedia/Wikibooks for encyclopedic material. [Dolma](https://allenai.github.io/dolma/)  
 Crucially, AI2 didn't just describe the mixture — they published the actual curation software: they kept documents from each source separate both during curation and in the final release, and open-sourced their high-performance data curation tools, plus the WIMBD tool for dataset analysis, so anyone can inspect, reproduce, or modify the pipeline. [arxiv](https://arxiv.org/pdf/2402.00838)
 
 
 ### OLMo 1.7 — Dolma 1.7 expansion
 
-For the 1.7 update, AI2 diversified the mix further. Dolma 1.7 features 2.3 trillion tokens from sources including Dolma CC, Refined Web, StarCoder, C4, Stack Exchange, OpenWebMath, Project Gutenberg, Wikipedia, and others, moving beyond the largely web-only composition of the earlier 1.5 version to add more specialized knowledge, reasoning, and coding content. They also disclosed the quality-filtering mechanics in detail: a FastText classifier sorts documents into high-quality (well-formatted text covering useful domains like Wikipedia, small web RSS feeds, and Semantic Scholar) versus low-quality (including adult entertainment and fake news sites), with deduplication performed via a document-level duplication score threshold calculated from paragraph-level scores. [VentureBeatVentureBeat](https://venturebeat.com/ai/ai2s-open-source-olmo-model-gets-a-more-diversified-dataset-two-stage-curriculum)
+For the 1.7 update, AI2 diversified the mix further. Dolma 1.7 features 2.3 trillion tokens from sources including Dolma CC, Refined Web, StarCoder, C4, Stack Exchange, OpenWebMath, Project Gutenberg, Wikipedia, and others, moving beyond the largely web-only composition of the earlier 1.5 version to add more specialized knowledge, reasoning, and coding content. They also disclosed the quality-filtering mechanics in detail: a FastText classifier sorts documents into high-quality (well-formatted text covering useful domains like Wikipedia, small web RSS feeds, and Semantic Scholar) versus low-quality (including adult entertainment and fake news sites), with deduplication performed via a document-level duplication score threshold calculated from paragraph-level scores. [VentureBeat](https://venturebeat.com/ai/ai2s-open-source-olmo-model-gets-a-more-diversified-dataset-two-stage-curriculum)
 
 
 ### OLMo 2 — refined mixture, named per-component sources
 
-For OLMo 2, the paper provides a literal table mapping each component to its source: the OLMo 2 1124 Mix is composed of StarCoder, peS2o, web text from DCLM, and Wiki content all drawn from Dolma 1.7; arXiv content comes from RedPajama; and OpenWebMath and Algebraic Stack come from ProofPile II. The full mix totals approximately 3.9 trillion tokens, with over 95% derived from web data. They also introduced a separate curated mid-training mixture, Dolmino Mix 1124, specifically to imbue the model with domain knowledge beyond the base web-scale mix. [arXiv \+ 2](https://arxiv.org/pdf/2501.00656)
+For OLMo 2, the paper provides a literal table mapping each component to its source: the OLMo 2 1124 Mix is composed of StarCoder, peS2o, web text from DCLM, and Wiki content all drawn from Dolma 1.7; arXiv content comes from RedPajama; and OpenWebMath and Algebraic Stack come from ProofPile II. The full mix totals approximately 3.9 trillion tokens, with over 95% derived from web data. They also introduced a separate curated mid-training mixture, Dolmino Mix 1124, specifically to imbue the model with domain knowledge beyond the base web-scale mix. [arXiv](https://arxiv.org/pdf/2501.00656)
 
 
 ### OLMo 3 — newest and largest, with separate post-training data suite
 
-The most recent generation scales this up substantially. Olmo 3 is pretrained on Dolma 3, a new \~9.3 trillion token corpus drawn from web pages, science PDFs processed with their olmOCR tool, codebases, math problems and solutions, and encyclopedic text. From that pool, they construct a refined training mixture: Dolma 3 Mix, a 5.9 trillion token pretraining mix with a higher proportion of coding and math data than earlier Dolma releases, plus stronger decontamination via deduplication, quality filtering, and careful mixing control. [Allen AIAllen AI](https://allenai.org/blog/olmo3)  
+The most recent generation scales this up substantially. Olmo 3 is pretrained on Dolma 3, a new \~9.3 trillion token corpus drawn from web pages, science PDFs processed with their olmOCR tool, codebases, math problems and solutions, and encyclopedic text. From that pool, they construct a refined training mixture: Dolma 3 Mix, a 5.9 trillion token pretraining mix with a higher proportion of coding and math data than earlier Dolma releases, plus stronger decontamination via deduplication, quality filtering, and careful mixing control. [Allen AI](https://allenai.org/blog/olmo3)  
 They also separated out specialized later-stage mixtures: Dolma 3 Dolmino, a mid-training mix of 100B tokens sampled from a \~2.2T-token pool of high-quality math, science, code, instruction-following, and reading-comprehension data, including reasoning traces enabling RL directly on the base model; and Dolma 3 Longmino, a long-context mix of \~50B tokens drawn from a 639B-token pool of long documents, designed to teach the model to track information across long inputs like reports and multi-chapter documents. [Allen AI](https://allenai.org/blog/olmo3)  
 For post-training, they introduced a fully separate, named dataset suite: Dolci, tailored specifically for reasoning, tool use, and instruction following, providing separate mixes for each post-training stage — SFT, DPO, and RLVR — with the SFT mix aggregating datasets for step-by-step reasoning, tool use, and conversational quality, and the DPO mix supplying preference data. [Allen AI](https://allenai.org/blog/olmo3)  
 AI2 states the underlying motivation directly: anyone can see exactly what data shaped the model's capabilities, reproduce the results, and reuse the datasets to train their own AI systems.
@@ -293,7 +293,7 @@ AI2 states the underlying motivation directly: anyone can see exactly what data 
 ![Llama Source Doc Type UTF-8 bytes Documents Unicode (GB) (millions) words tokens (billions) (billions) Common Crawl web pages 9,812 3,734 1,928 2,479 GitHub \> code 1,043 210 260 411 Reddit social media 339 377 72 89 Semantic Scholar papers 268 38.8 50 70 Project Gutenberg books 20.4 0.056 4.0 6.0 Wikipedia, Wikibooks encyclopedic 16.2 6.2 3.7 4.3 Total 11,519 4,367 2,318 3,059][image1]
 
 
-12. ## Nemotron (Nvidia) {#nemotron-(nvidia)}
+12. ## Nemotron
 
 NVIDIA's Nemotron family is actually one of the most documented. NVIDIA doesn't just describe the data, it publishes the datasets themselves on Hugging Face as standalone, citable artifacts. Their stated philosophy is explicit about this: NVIDIA Nemotron models aren't just open, but truly open source — NVIDIA publishes the training datasets, techniques, and model weights so the open-source community can benefit and build their own models. [NVIDIA](https://www.nvidia.com/en-us/ai-data-science/foundation-models/nemotron/)
 
@@ -302,9 +302,9 @@ NVIDIA's Nemotron family is actually one of the most documented. NVIDIA doesn't 
 
 The core pretraining corpus is the **Nemotron-Pretraining-Dataset-v1**, a 6.6 trillion token collection of premium web crawl, math, code, SFT, and multilingual Q\&A data, organized into four categories, used to train models like Nemotron Nano 2\. Within that collection: [NVIDIA Research](https://research.nvidia.com/labs/adlr/NVIDIA-Nemotron-Nano-2/)
 
-* **Nemotron-CC**: a large web-text corpus built specifically from Common Crawl. The original release was a 6.3 trillion token English-language Common Crawl dataset, refined using classifier ensembling and synthetic rephrasing rather than relying solely on heuristic filtering. NVIDIA describes generating synthetic variants of the raw text — diverse question-answer pairs, distilled rewrites, extracted-knowledge rewrites, and organized knowledge lists, generated by running four different LLMs over the source text with different prompts — and reports this approach improved a Llama 3.1 8B model's MMLU score by 5.6 points over the same model trained on the DCLM dataset. [NVIDIA Developer \+ 2](https://developer.nvidia.com/blog/building-nemotron-cc-a-high-quality-trillion-token-dataset-for-llm-pretraining-from-common-crawl-using-nvidia-nemo-curator/)  
+* **Nemotron-CC**: a large web-text corpus built specifically from Common Crawl. The original release was a 6.3 trillion token English-language Common Crawl dataset, refined using classifier ensembling and synthetic rephrasing rather than relying solely on heuristic filtering. NVIDIA describes generating synthetic variants of the raw text — diverse question-answer pairs, distilled rewrites, extracted-knowledge rewrites, and organized knowledge lists, generated by running four different LLMs over the source text with different prompts — and reports this approach improved a Llama 3.1 8B model's MMLU score by 5.6 points over the same model trained on the DCLM dataset. [NVIDIA Developer](https://developer.nvidia.com/blog/building-nemotron-cc-a-high-quality-trillion-token-dataset-for-llm-pretraining-from-common-crawl-using-nvidia-nemo-curator/)  
 * **Nemotron-CC-v2**: a follow-up using eight additional Common Crawl snapshots, again emphasizing synthetic QA generation from high-quality web crawl data as one of the most effective ways to boost general capability benchmarks like MMLU. [NVIDIA Research](https://research.nvidia.com/labs/adlr/NVIDIA-Nemotron-Nano-2/)  
-* **Nemotron-CC-Math**: a specialized math/code extraction pipeline that uses a text browser (Lynx) to render web pages, then post-processes with an LLM (phi-4), making it the first pipeline able to correctly preserve equations and code across the long tail of math formats found at web scale, yielding reported gains of \+4.8 to \+12.6 points on MATH and \+4.6 to \+14.3 points on MBPP+ for code generation in internal experiments. [NVIDIA ResearchNVIDIA Research](https://research.nvidia.com/labs/adlr/NVIDIA-Nemotron-Nano-2/)  
+* **Nemotron-CC-Math**: a specialized math/code extraction pipeline that uses a text browser (Lynx) to render web pages, then post-processes with an LLM (phi-4), making it the first pipeline able to correctly preserve equations and code across the long tail of math formats found at web scale, yielding reported gains of \+4.8 to \+12.6 points on MATH and \+4.6 to \+14.3 points on MBPP+ for code generation in internal experiments. [NVIDIA Research](https://research.nvidia.com/labs/adlr/NVIDIA-Nemotron-Nano-2/)  
     
 
 For the newer Nemotron 3 generation, NVIDIA released an extension, **Nemotron-Pretraining-Dataset-v2.1**, which adds refreshed, higher-quality, more diverse data across math, code, English Common Crawl, and large-scale synthetic corpora, including new Common Crawl code extraction, 2.5 trillion new English web tokens, updated GitHub-sourced code corpora, and specialized STEM reasoning datasets, meant to supplement rather than replace the v1 collection. [Hugging Face](https://huggingface.co/datasets/nvidia/Nemotron-Pretraining-Code-v2)  
@@ -325,11 +325,11 @@ For instruction tuning and alignment, NVIDIA also publishes named, downloadable 
 The very transparency that makes Nemotron datasets useful also surfaces known issues openly. For instance, NVIDIA's own model card for Nemotron-3-Nano discloses representational skews in document-based subsets like FinePDFs and EssentialWeb, including "male" references outnumbering "female" ones, and "White" being the most frequent ethnic identifier mentioned, at 43-44% of such mentions — the kind of detail most labs wouldn't volunteer.
 
 
-13. ## Qwen (Alibaba) {#qwen-(alibaba)}
+13. ## Qwen
 
 ### Scale over time
 
-The token counts have grown rapidly across generations: early Qwen models were trained on 3 trillion tokens comprising Chinese, English, and multilingual text, plus code, mathematics, and other fields. By Qwen2.5, that had grown to 18 trillion tokens of large-scale multilingual data. Qwen3 doubled it again, training on 36 trillion tokens — twice the size used for Qwen2.5. [arxiv \+ 2](https://arxiv.org/pdf/2408.15696)
+The token counts have grown rapidly across generations: early Qwen models were trained on 3 trillion tokens comprising Chinese, English, and multilingual text, plus code, mathematics, and other fields. By Qwen2.5, that had grown to 18 trillion tokens of large-scale multilingual data. Qwen3 doubled it again, training on 36 trillion tokens — twice the size used for Qwen2.5. [arxiv](https://arxiv.org/pdf/2408.15696)
 
 
 ### What's actually in the data (broad categories, not named sources)
@@ -344,7 +344,7 @@ For Qwen3, rather than naming sources, Alibaba has described a sophisticated lab
 Alibaba's own documentation for post-training data describes a similar granular approach: a labeling system covering educational value, domain distribution, language types, reasoning complexity, and safety levels, with high-quality data selected via this framework and synthetic data from Alibaba's own specialized models (Qwen-Math, Qwen-Coder) injected to strengthen multilingual understanding, complex reasoning, and long-context performance. For multimodal versions, they also describe high-precision OCR and document structure parsing, 2D/3D spatial semantic annotation, and timestamp alignment between video frames and text, plus large-scale synthetic multimodal datasets built to strengthen vision-language alignment.
 
 
-14. ##  Step3 (StepFun) {#step3-(stepfun)}
+14. ## Step3
 
 ### What's officially disclosed: token counts and pipeline mechanics
 
@@ -360,7 +360,7 @@ They also mention the overall data strategy was empirically tuned: large-scale c
 
 ### Newer Step models: essentially undisclosed
 
-For the more recent Step 3.5 Flash release, the official model card is explicit about withholding this information entirely — its standardized disclosure fields read: Training Data Collection: Undisclosed; Training Labeling: Undisclosed; Training Properties: Undisclosed, with the same "Undisclosed" status applied to testing data as well. Only the evaluation methodology is disclosed in any detail, describing benchmark suites used (SWE-bench Verified, AIME 2025, GAIA, etc.) and noting evaluation labeling is a hybrid of automated and human evaluation. [NVIDIANVIDIA](https://build.nvidia.com/stepfun-ai/step-3.5-flash/modelcard)
+For the more recent Step 3.5 Flash release, the official model card is explicit about withholding this information entirely — its standardized disclosure fields read: Training Data Collection: Undisclosed; Training Labeling: Undisclosed; Training Properties: Undisclosed, with the same "Undisclosed" status applied to testing data as well. Only the evaluation methodology is disclosed in any detail, describing benchmark suites used (SWE-bench Verified, AIME 2025, GAIA, etc.) and noting evaluation labeling is a hybrid of automated and human evaluation. [NVIDIA](https://build.nvidia.com/stepfun-ai/step-3.5-flash/modelcard)
 
 
 ### Where this leaves Step 3
