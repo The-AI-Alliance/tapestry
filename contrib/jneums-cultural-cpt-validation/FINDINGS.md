@@ -728,14 +728,37 @@ FedAvg cancels a growing share of each fork's update in weight space — *not* c
 genuinely converging. The CLI trend label was made diagnostic-aware so it no longer prints
 the misleading "homogenizing" headline.
 
-**Caveats (this is N=1).** Seed 0, single run, **no corpus resampling** — the cross-corpus
-robustness that decided the single-node result (Run 11) is not yet established here. Sweden
-stays far from its target (1.14): its self-expression SS pole clamps, so it is likely
-under-measured and shows grounding mostly as TS movement (+0.05 → +0.10 over rounds). Modest
-scale (145k tok/culture, 6 epochs). Next: multi-seed + corpus-resampled aggregation to put a
-band on the separability/merge-interference curves, and more cultures for a wider spread.
-Artifacts in `runs/cultural_cpt_aggregation/` (`result.json` + per-round checkpoints;
-git-ignored). See [SPEC.md](SPEC.md) consortium extension and `HANDOFF.md`.
+**Corpus-resampled confirmation (4 draws × 0.7, seeds 0–3).** The single run above is N=1;
+re-running the whole FedAvg loop on 4 deterministic 70%-token subsamples of each culture's
+grounded pool — the same `CORPUS_DRAWS=4 CORPUS_FRACTION=0.7` band that decided Run 11 — gives
+the per-round mean ± std curves below. **The conclusion holds with tight error bars.**
+
+| round | shift-sep | abs-sep | merge-cos | retained | to-centroid |
+| :--: | :--: | :--: | :--: | :--: | :--: |
+| 1 | 0.064 ± 0.007 | 0.235 ± 0.017 | +0.055 ± 0.003 | 0.612 ± 0.002 | 0.122 ± 0.008 |
+| 2 | 0.103 ± 0.024 | 0.292 ± 0.011 | +0.007 ± 0.002 | 0.586 ± 0.001 | 0.159 ± 0.009 |
+| 3 | 0.104 ± 0.023 | 0.299 ± 0.020 | −0.017 ± 0.001 | 0.571 ± 0.001 | 0.170 ± 0.011 |
+| 4 | 0.083 ± 0.013 | 0.305 ± 0.045 | −0.027 ± 0.001 | 0.565 ± 0.001 | 0.174 ± 0.025 |
+
+Two robust signals: (1) **absolute separability grows monotonically** (0.235 → 0.305), each
+round's increase clearing the cross-draw band — the nodes reliably spread *apart*, not toward a
+centroid. (2) **The weight-space merge diagnostics are essentially invariant across draws**
+(cosine +0.055 → −0.027, retained 0.612 → 0.565, both with std ≈ 0.001–0.003): the merge
+interference is a *structural* property of FedAvg-ing these forks, not an artifact of which 70%
+of the corpus each node saw. The coordinate-space metrics (shift-/abs-sep) carry the corpus
+sensitivity; the merge geometry does not. So the headline — **sovereign cultural alignment
+survives aggregation; the cost is a lossy, interfering merge** — is now established across the
+corpus band, not a single-sample result. (Shift-sep is non-monotonic — rises then dips, ending
+above round 1 — so even the naive trend reads "surviving" on the banded mean.)
+
+**Remaining caveats.** Model seed is fixed (HF training is deterministic across it, so the
+corpus draw is the right variance source — but a different *base* checkpoint is untested).
+Sweden stays far from its target (~1.14): its self-expression SS pole clamps, so it is likely
+under-measured and shows grounding mostly as TS movement. Modest scale (145k tok/culture, 6
+epochs), 3 cultures. Next: more cultures for a wider spread, and the behavioral-transfer (H1c)
+probe. Artifacts in `runs/cultural_cpt_aggregation/` (single run) and
+`runs/cultural_cpt_aggregation_resampled/` (`result_resampled.json` + per-draw/-round
+checkpoints; git-ignored). See [SPEC.md](SPEC.md) consortium extension and `HANDOFF.md`.
 
 Also deferred (cheap to fold into a future base run):
 
