@@ -7,8 +7,7 @@ This directory organizes the technical documentation under development for Proje
 | [`architecture/`](architecture/README.md) | TVA methodology, phased outputs (1–5), architectural options analysis, ADRs, diagrams — **see [Architecture documents](#architecture-documents)** |
 | [`governance/`](governance/README.md) | Anti-capture principle and governance design |
 | [`strategic-plan/`](strategic-plan/README.md) | Overall strategy for execution — the [vision](strategic-plan/VISION.md) and the [product requirements (PRD)](strategic-plan/PRD.md) |
-| [`tapestry-reference/`](tapestry-reference/README.md) | Consolidated technical reference, including a single-page [architecture synthesis](tapestry-reference/ARCHITECTURE.md) |
-| [`reference/`](reference/README.md) | Reference docs (e.g. training paradigms, deployment and usage material) |
+| [`reference/`](reference/README.md) | Reference docs, including the single-page [architecture synthesis](reference/architecture.md), training paradigms, deployment notes, and usage material |
 | [`work-groups/`](work-groups/README.md) | Lifecycle work-group charters for data governance, base training, sovereign alignment, evaluation/certification, security/privacy, infrastructure, deployment, and governance participation (subject to change) |
 
 ## Architecture documents
@@ -32,6 +31,7 @@ The [`reference/`](reference/README.md) directory holds material outside the TVA
 
 | Document | Description |
 | :------- | :---------- |
+| [`reference/architecture.md`](reference/architecture.md) | Single-page synthesis of Tapestry's architecture and design invariants |
 | [`reference/glossary.md`](reference/glossary.md) | Definitions of Tapestry-specific terms (consortium training, Shared-Base Loop, Sovereign Build, etc.) |
 | [`reference/training-approaches.md`](reference/training-approaches.md) | Centralized vs. federated vs. consortium training |
 

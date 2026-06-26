@@ -451,7 +451,7 @@ Phase 3 — Planetary Scale (Jul 2027 – Dec 2027)
 | Milestone | Target Date | Owner | Deliverable |
 |---|---|---|---|
 | Hardware partnerships signed (NVIDIA, AMD) | Mar 2026 | Yann LeCun | Signed MOUs or Letters of Intent |
-| Technical specifications finalized | Mar 15, 2026 | Christopher Nguyen | ARCHITECTURE.md ratified |
+| Technical specifications finalized | Mar 15, 2026 | Christopher Nguyen | [`reference/architecture.md`](../reference/architecture.md) ratified |
 | Governance Committee chartered | May 2026 | Anthony Annunziata | Charter + founding membership |
 | G7 Summit announcement | Jun 2026 | Macron + Takaichi | Public multi-nation commitment |
 | France sovereign node live | Jul 15, 2026 | Nguyen + France AI Commission | Production node, live public demo |
