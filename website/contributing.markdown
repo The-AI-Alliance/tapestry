@@ -22,7 +22,7 @@ See also the full list of projects [here](https://the-ai-alliance.github.io/){:t
 
 {% comment %}
 Keep the following anchor in case you change the section "Join..." text. 
-The link is used by the default docs/_includes/header_buttons_custom.html, for example.
+The link is used by the default website/_includes/header_buttons_custom.html, for example.
 {% endcomment %}
 <a name="join-this-project"></a>
 ## Join the Alliance or This Project Work Group
@@ -31,7 +31,7 @@ Want to help us drive the evolution of this project? Please join our work group 
 
 ## Other Notes on Contributing
 
-The sources for this website are in the GitHub repo's [`docs`](https://github.com/The-AI-Alliance/tapestry/tree/main/docs){:target="repo-docs"} directory. 
+The sources for this website are in the GitHub repo's [`website`](https://github.com/The-AI-Alliance/tapestry/tree/main/website){:target="repo-website"} directory. 
 
 Notice that every page on this website has an _Edit this page on GitHub_ link to the corresponding location for the page in the GitHub repo, making it easy to view a page, then go straight to the source, make edits, and submit a PR! This is the best way to help us fix typos and make other small improvements.
 

@@ -54,14 +54,14 @@ For code changes:
 - [ ] I have removed all API keys and other sensitive information.
 - [ ] I have updated any related documentation.
 
-For documentation changes, including `tech-docs`:
+For documentation changes, including `docs`:
 
 - [ ] I have followed the existing documentation styles and conventions.
 - [ ] I have included helpful diagrams, screenshots, tables, etc.
 
-Currently the content in `docs` for the Tapestry technical "microsite" ([the-ai-alliance.github.io/tapestry/](https://the-ai-alliance.github.io/tapestry/)) just points back to the repo's `tech-docs` locations. Eventually, mature content will be copied or migrated from `tech-docs` to this site for easier reading, searching, etc. **Hence, you probably don't need to propose any changes to `docs`.**
+Currently the content in `website` for the Tapestry technical "microsite" ([the-ai-alliance.github.io/tapestry/](https://the-ai-alliance.github.io/tapestry/)) just points back to the repo's `docs` locations. Eventually, mature content will be copied or migrated from `docs` to this site for easier reading, searching, etc. **Hence, you probably don't need to propose any changes to `website`.**
 
-However, **if** you are proposing `docs` changes:
+However, **if** you are proposing `website` changes:
 
 - [ ] I have verified the microsite `make view-local` runs without errors and the changes render as expected.
 - [ ] I have checked that external links (i.e., those going to different domains) have `target="..."` specifications by running `./check-external-links.sh` and fixing any flagged URLs. (This tool doesn't add missing links itself nor does it verify that the links found are valid.)

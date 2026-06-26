@@ -2,7 +2,7 @@
 SRC_DIR      := src
 
 PAGES_URL    := https://the-ai-alliance.github.io/tapestry/
-DOCS_DIR     := docs
+DOCS_DIR     := website
 SITE_DIR     := ${DOCS_DIR}/_site
 CLEAN_DIRS   := ${SITE_DIR} ${DOCS_DIR}/.sass-cache
 # Environment variables
@@ -271,7 +271,7 @@ setup-jekyll:: ruby-installed-check ruby-gem-installation bundle-command-check b
 .PHONY: jekyll-error ruby-missing-error gem-missing-error gem-error bundle-error bundle-missing-error
 
 ruby-gem-installation::
-	@echo "Updating Ruby gems required for local viewing of the docs, including jekyll."
+	@echo "Updating Ruby gems required for local viewing of the ${DOCS_DIR}, including jekyll."
 	gem install jekyll bundler jemoji || ${MAKE} gem-error
 
 bundle-installation::

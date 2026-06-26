@@ -2,6 +2,7 @@
 # package ecosystems to update and where the package manifests are located.
 # Please see the documentation for all configuration options:
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+# Use of groups here adapted from https://www.jacobras.nl/2025/03/code-snippet-grouping-dependabot-prs/
 
 version: 2
 updates:
@@ -9,3 +10,21 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+
+      # All patch updates together, may be merged when CI is green.
+      patch-updates:
+        update-types: [ "patch" ]
+
+      # All minor updates together. Requires green CI + manual check.
+      minor-updates:
+        update-types: [ "minor" ]
+
+    # Space left: 3 PRs of ungrouped major updates. Requires green CI + manual check.
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 3

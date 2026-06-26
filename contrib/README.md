@@ -1,8 +1,8 @@
 # Contributed Ideas & Techniques (`contrib/`)
 
-This directory is a staging area for **contributed ideas, techniques, and experiments** offered to Project Tapestry for consideration. It is intentionally lightweight: a place to share work-in-progress proposals, prototypes, notes, datasets-pointers, and references without first having to fit them into the main package or `tech-docs/` taxonomy.
+This directory is a staging area for **contributed ideas, techniques, and experiments** offered to Project Tapestry for consideration. It is intentionally lightweight: a place to share work-in-progress proposals, prototypes, notes, datasets-pointers, and references without first having to fit them into the main package or `docs/` taxonomy.
 
-Think of `contrib/` as the front porch. Promising contributions may later be promoted into `src/`, `tech-docs/`, or `examples/` after discussion and review. Material here is **not** part of the supported codebase and carries no stability guarantees.
+Think of `contrib/` as the front porch. Promising contributions may later be promoted into `src/`, `docs/`, or `examples/` after discussion and review. Material here is **not** part of the supported codebase and carries no stability guarantees.
 
 ## How to Contribute
 

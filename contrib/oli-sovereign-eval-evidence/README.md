@@ -103,9 +103,9 @@ This contribution starts with three documents:
 This proposal could remain in `contrib/` as an experimental evaluation scaffold,
 or it could seed work in:
 
-- `tech-docs/work-groups/evaluation-certification/`
-- `tech-docs/work-groups/data-governance/`
-- `tech-docs/work-groups/security-privacy/`
+- `docs/work-groups/evaluation-certification/`
+- `docs/work-groups/data-governance/`
+- `docs/work-groups/security-privacy/`
 
 ## Non-goals
 

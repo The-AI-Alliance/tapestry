@@ -10,11 +10,10 @@
 Learn more from our [Kickoff Workshop Blog](https://thealliance.ai/blog/project-tapestry-the-path-to-frontier-sovereign-ai) and check out the [Project Tapestry](https://thealliance.ai/projects/tapestry/) website for more information about partnering, events, and how to support Project Tapestry.
 
 This repo contains the code and technical documentation for the project. We invite you to jump in and help!
-<p align="center">
-  <img src="docs/assets/images/03-tapestry-logo-cropped-630x555.png" alt="Project Tapestry Logo" width="600">
-</p>
 
-<!-- ![Project Tapestry Image](docs/assets/images/03-tapestry-logo-cropped-630x555.png) -->
+<p align="center">
+  <img src="website/assets/images/03-tapestry-logo-cropped-630x555.png" alt="Project Tapestry Logo" width="600">
+</p>
 
 The rest of this README provides information for contributors and users of this repository.
 
@@ -22,8 +21,8 @@ The rest of this README provides information for contributors and users of this 
 
 Project Tapestry has big plans, and we're starting with some fundamental building blocks.
 
-* [LLM Cultural Alignment and Re-alignment](https://github.com/The-AI-Alliance/tapestry/issues/22) _repository coming soon_ - help us develop techniques for cultural alignment, initially based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric. This task will implement a corresponding evaluation and implement tuning experiments to understand how to shift alignment without compromising general model performance. Prior expertise in evaluation and tuning technologies are especially welcome.
-* [Consortium Training](https://github.com/The-AI-Alliance/tapestry/issues/24) _repository coming soon_ - Tapestry's approach to global model development relies on a balance between centralized and distributed training that preserves use and privacy requirements for data sets. Help us adapt and develop optimal techniqes with ideas from both federated learning and the latest LLM pre-training and post-training methods. Prior expertise in large scale LLM training, distributed infrastructure, and federated learning are especially welcome.
+* [LLM Cultural Alignment and Re-alignment](https://github.com/The-AI-Alliance/tapestry/issues/22) - help us develop techniques for cultural alignment, initially based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric. This task will implement a corresponding evaluation and implement tuning experiments to understand how to shift alignment without compromising general model performance. Prior expertise in evaluation and tuning technologies are especially welcome.
+* [Consortium Training](https://github.com/The-AI-Alliance/tapestry/issues/24) - Tapestry's approach to global model development relies on a balance between centralized and distributed training that preserves use and privacy requirements for data sets. Help us adapt and develop optimal techniqes with ideas from both federated learning and the latest LLM pre-training and post-training methods. Prior expertise in large scale LLM training, distributed infrastructure, and federated learning are especially welcome.
 * [Global Training Data Corpus](https://thealliance.ai/projects/tapestry/training-data-proposals) A core thesis of project Tapestry is that bringing together a much more diverse set of data can provide a path to a better frontier base model for all. What unique datasets exist that could be brought to Tapestry model training? They don't have to be fully open; we will work with you to define and enforce appropriate requirements.
 * Tapestry Model Development Roadmap - _coming soon_ - we want your input!
 
@@ -45,16 +44,16 @@ The source code is under the [`src`](src/) directory.
 
 ### Working with the Technical Documentation
 
-The technical documentation lives under [**`tech-docs`**](tech-docs/README.md):
+The technical documentation lives under [**`docs`**](docs/README.md):
 
-* [**Architecture**](tech-docs/architecture/README.md)
+* [**Architecture**](docs/architecture/README.md)
 	* The _TVA methodology_: phased outputs (stakeholder map through design goals), architectural options and core thesis, plus:
-		* [**Architecture Decision Records**](tech-docs/architecture/decisions/)
-		* [**Diagrams**](tech-docs/architecture/diagrams/) 
-* [**Governance**](tech-docs/governance/)
-* [**Strategic Plan**](tech-docs/strategic-plan/)
-* [**Reference Materials**](tech-docs/reference/) (e.g. [**training paradigms**](tech-docs/reference/training-approaches.md))
-* [**Work Groups**](tech-docs/work-groups/)
+		* [**Architecture Decision Records**](docs/architecture/decisions/)
+		* [**Diagrams**](docs/architecture/diagrams/) 
+* [**Governance**](docs/governance/)
+* [**Strategic Plan**](docs/strategic-plan/)
+* [**Reference Materials**](docs/reference/) (e.g. [**training paradigms**](docs/reference/training-approaches.md))
+* [**Work Groups**](docs/work-groups/)
 
 For repo layout, conventions, and where to find implementation code, see [**`AGENTS.md`**](AGENTS.md).
 
@@ -180,7 +179,7 @@ make format-lint-type-check  # Equivalent to 'make format lint type-check'
 
 ## Project Code Structure
 
-In addition to the top-level directories `tech-docs`, discussed above, `docs`, discussed below, and [`contrib`](contrib/README.md), the staging area for contributed ideas and techniques, the code structure is as follows. At this time, there are three major _subsystems_:
+In addition to the top-level directories `docs`, discussed above, `website`, discussed below, and [`contrib`](contrib/README.md), the staging area for contributed ideas and techniques, the code structure is as follows. At this time, there are three major _subsystems_:
 
 * `data` for all data governance and management capabilities.
 * `training` for all distributed training and tuning capabilities.
@@ -211,7 +210,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. In particular, [read this
 
 Have an idea, technique, or experiment you'd like the project to consider? The [**`contrib/`**](contrib/README.md) directory is a lightweight staging area where contributors can propose work via a PR into their own subdirectory. See [**`contrib/README.md`**](contrib/README.md) for the simple workflow and contribution policy.
 
-You can also join one or more work groups that are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are are being documented in [**`tech-docs/work-groups/`**](tech-docs/work-groups/).
+You can also join one or more work groups that are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are are being documented in [**`docs/work-groups/`**](docs/work-groups/).
 
 
 ### Licenses
@@ -231,6 +230,6 @@ See the contributing guide [section on DCO](CONTRIBUTING.md#developer-certificat
 
 ## About the Technical Website (GitHub Pages)
 
-The [website](https://the-ai-alliance.github.io/tapestry/) for this repository provides another way to discover and navigate the technical documentation content in [`tech-docs`](/tech-docs). However, at this time, the site mostly just points to the content in [`tech-docs`](tech-docs/). The website sources are in the [`docs`](docs/) directory.
+The [website](https://the-ai-alliance.github.io/tapestry/) for this repository provides another way to discover and navigate the technical documentation content in [`docs`](/docs). However, at this time, the site mostly just points to the content in [`docs`](docs/). The website sources are in the [`website`](website/) directory.
 
 The website is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). See [GITHUB_PAGES.md](GITHUB_PAGES.md) for all the details.
