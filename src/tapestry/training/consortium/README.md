@@ -8,10 +8,11 @@ front and center.
 - **N sovereign model artifacts** are produced and owned by participant nodes.
 - Nodes train locally on sovereign corpora (Contributed CPT) and share **local model
   weight vectors** with the coordinator.
-- A governed contribution policy applies a quality floor before integrating
-  accepted weights into the shared base (FedAvg-class averaging by default).
-  The PoC can compare quality-weighted influence with an equal-influence MVP
-  policy where every accepted node receives the same weight.
+- A governed contribution policy applies a quality floor and anti-capture
+  controls before integrating accepted weights into the shared base
+  (FedAvg-class averaging by default). The PoC can compare quality-weighted
+  influence with an equal-influence MVP policy where every accepted node receives
+  the same weight.
 
 ## Modules
 
@@ -20,7 +21,7 @@ front and center.
 | `model.py` | `TinyCausalModel`, a small next-token model for fast tests and demos. |
 | `node.py` | `SovereignTrainingNode`, which runs local Contributed CPT and keeps a sovereign model artifact. |
 | `coordinator.py` | `ConsortiumCoordinator`, which evolves the shared base from governed contributions. |
-| `policy.py` | `ContributionPolicy`, a minimal quality-floor policy with quality-weighted and equal-influence modes. |
+| `policy.py` | `ContributionPolicy`, a minimal quality-floor and anti-capture policy with quality-weighted and equal-influence modes. |
 | `messages.py` | Data classes for sovereign artifacts, contributions, and round results. |
 | `../../../../contrib/jneums-consortium-experiment/` | Contrib experiment runner and metrics helpers that record round metrics and summaries without changing core training logic. |
 
@@ -54,15 +55,15 @@ lm-evaluation-harness or Unitxt for downstream model evaluation.
 
 ## Comparing Contribution Weighting Options
 
-Issue #68 asks whether the PoC should compare the current quality-weighted
-integration with an MVP policy where everyone above the quality bar has equal
-influence. The coordinator now supports both policies through
-`ContributionPolicy(weighting=...)`:
+The coordinator supports multiple governed weighting choices through
+`ContributionPolicy(weighting=...)`, making it possible to compare policy
+outcomes without changing the training loop:
 
 - `weighting="quality"` keeps the existing behavior: accepted nodes are weighted
   by their quality scores, with `max_node_weight` limiting single-node dominance.
 - `weighting="equal"` accepts nodes through the same quality floor, then assigns
-  each accepted node the same integration weight.
+  each accepted node the same integration weight so influence is distributed
+  uniformly across the accepted set.
 
 Run the demo with one policy:
 

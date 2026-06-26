@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
 from tapestry.training.consortium import (
     ConsortiumCoordinator,
     ContributionPolicy,
+    ContributionWeighting,
     SovereignTrainingNode,
     TinyCausalModel,
 )
@@ -81,7 +82,7 @@ def test_contribution_policy_applies_quality_floor_and_capture_cap() -> None:
 
 def test_equal_contribution_policy_ignores_quality_magnitude_after_floor() -> None:
     """The equal MVP option gives every accepted participant the same influence."""
-    policy = ContributionPolicy(quality_floor=0.7, weighting="equal")
+    policy = ContributionPolicy(quality_floor=0.7, weighting=ContributionWeighting.EQUAL)
 
     weights = policy.weights(
         {
@@ -154,7 +155,7 @@ def test_weighting_modes_produce_different_integration_results() -> None:
             "dominant": 3.0,
         }
     )
-    equal_weights = ContributionPolicy(weighting="equal").weights(
+    equal_weights = ContributionPolicy(weighting=ContributionWeighting.EQUAL).weights(
         {
             "strong": 1.0,
             "dominant": 3.0,

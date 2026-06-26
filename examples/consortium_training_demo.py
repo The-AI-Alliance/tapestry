@@ -53,15 +53,20 @@ def _encode(texts: list[str]) -> list[list[int]]:
     return [[token % 128 for token in text.encode("utf-8")] for text in texts]
 
 
-def run_demo(rounds: int = 3, seed: int = 7, weighting: ContributionWeighting = "quality") -> None:
+def run_demo(
+    rounds: int = 3,
+    seed: int = 7,
+    weighting: ContributionWeighting | str = ContributionWeighting.QUALITY,
+) -> None:
     """Run a small N+1 consortium-training loop."""
+    weighting = ContributionWeighting(weighting)
     random.seed(seed)
     torch.manual_seed(seed)
 
     print("=" * 72)
     print("  TAPESTRY -- Consortium Training Proof of Concept")
     print("  One governed shared base + N sovereign participant models")
-    print(f"  Contribution weighting: {weighting}")
+    print(f"  Contribution weighting: {weighting.value}")
     print("=" * 72)
 
     base_model = TinyCausalModel(vocab_size=128, hidden_size=32)
@@ -109,7 +114,7 @@ def run_demo(rounds: int = 3, seed: int = 7, weighting: ContributionWeighting = 
 
 def run_comparison(rounds: int = 3, seed: int = 7) -> None:
     """Run the same scenario with quality-weighted and equal influence policies."""
-    for weighting in ("quality", "equal"):
+    for weighting in (ContributionWeighting.QUALITY, ContributionWeighting.EQUAL):
         run_demo(rounds=rounds, seed=seed, weighting=weighting)
         print()
 
@@ -120,7 +125,7 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=7, help="Random seed used for deterministic demo setup.")
     parser.add_argument(
         "--weighting",
-        choices=("quality", "equal", "compare"),
+        choices=(ContributionWeighting.QUALITY.value, ContributionWeighting.EQUAL.value, "compare"),
         default="quality",
         help="Contribution weighting policy to run. Use 'compare' to run quality and equal policies back to back.",
     )
