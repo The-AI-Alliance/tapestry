@@ -69,6 +69,7 @@ For contributed ideas and techniques:
 make contrib-check      # Run all standard contrib checks defined by contrib/*/Makefile.
 make contrib-tests      # Run contrib tests defined by contrib/*/Makefile.
 make contrib-lint       # Run contrib lint checks defined by contrib/*/Makefile.
+make contrib-help       # Show custom target help for contrib/*/Makefile files.
 
 For the consortium-training prototype:
 
@@ -198,7 +199,7 @@ before-pr:: format-lint-type-check tests
 format-lint-type-check flt:: format lint type-check
 
 .PHONY: format lint ruff pylint type-check type-check-watch
-.PHONY: contrib-check contrib-format contrib-lint contrib-tests contrib-type-check run-contrib-target
+.PHONY: contrib-check contrib-format contrib-lint contrib-tests contrib-type-check contrib-help run-contrib-target
 
 format::
 	@echo "${INFO}$@: Running 'black' on the code.${_END}"
@@ -238,6 +239,18 @@ contrib-tests::
 
 contrib-type-check::
 	@${MAKE} run-contrib-target TARGET=type-check
+
+contrib-help::
+	@if [ -z "${CONTRIB_MAKEFILES}" ]; then \
+		echo "${INFO}No ${CONTRIB_DIR}/*/Makefile files found; skipping contrib help.${_END}"; \
+	else \
+		for makefile in ${CONTRIB_MAKEFILES}; do \
+			dir=$$(dirname $$makefile); \
+			echo; \
+			echo "${INFO}Contribution targets in $$dir:${_END}"; \
+			${MAKE} -C $$dir help || echo "${WARN}No working help target found in $$dir.${_END}"; \
+		done; \
+	fi
 
 run-contrib-target::
 	@if [ -z "${CONTRIB_MAKEFILES}" ]; then \

@@ -58,8 +58,8 @@ Tell reviewers how to run the contribution from beginning to end:
 - Expected runtime, approximate resource use, and expected outputs.
 - Known limitations, shortcuts, skipped steps, or non-deterministic results.
 
-When possible, automate the workflow with scripts or a local `Makefile` so a
-reviewer does not have to reconstruct the command sequence manually.
+When possible, automate any custom workflow with scripts or a local `Makefile`
+so a reviewer does not have to reconstruct the command sequence manually.
 
 ### State the Readiness Level
 
@@ -86,8 +86,8 @@ For code that might be adopted later, reduce integration friction:
 
 If your contribution needs its own workflow commands, prefer a
 `contrib/<your-handle>-<topic>/Makefile` over adding specialized targets to the
-top-level `Makefile`. The root Makefile will discover contribution Makefiles
-and run these conventional targets when present:
+top-level `Makefile`. The root Makefile discovers contribution Makefiles and
+runs these conventional targets when present:
 
 | Target | Purpose |
 | :----- | :------ |
@@ -96,12 +96,24 @@ and run these conventional targets when present:
 | `lint` | Run the contribution's lint checks. |
 | `format` | Format contribution code or docs. |
 | `type-check` | Run type checks when the contribution has typed code. |
+| `help` | List custom commands that are local to this contribution. |
 
 The top-level commands `make contrib-check`, `make contrib-tests`,
 `make contrib-lint`, `make contrib-format`, and `make contrib-type-check`
 delegate to those per-contribution targets. `make before-pr` also runs
 `contrib-tests`, so a contribution with a Makefile should keep its `tests`
 target reliable enough for PR validation.
+
+Keep custom targets local to the contribution:
+
+```shell
+make -C contrib/<your-handle>-<topic> help
+make -C contrib/<your-handle>-<topic> <custom-target>
+```
+
+The root `make contrib-help` target runs `make help` in each contribution that
+provides a `Makefile`, so custom commands remain discoverable without
+hard-coding them into the root `Makefile`.
 
 ## Contribution Policy
 
