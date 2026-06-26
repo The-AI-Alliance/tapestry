@@ -15,8 +15,9 @@ We follow normal _GitOps_ practices (see the top-level [`CONTRIBUTING.md`](../CO
 3. **Add your contents** to that subdirectory. At minimum include:
    - A short `README.md` describing the idea, motivation, status, and how to use or evaluate it.
    - A `LICENSE` (or `LICENSE` reference) covering the contents — see [Licensing](#licensing) below.
-4. **Open a Pull Request.** Keep each PR focused on a single contribution. Use the PR description to explain what you're proposing and what feedback you're looking for.
-5. **Sign your commits** with DCO (`git commit -s ...`). See the [DCO section](../CONTRIBUTING.md#developer-certificate-of-origin-dco) for details.
+4. **Check the reviewer checklist** below before opening the pull request.
+5. **Open a Pull Request.** Keep each PR focused on a single contribution. Use the PR description to explain what you're proposing and what feedback you're looking for.
+6. **Sign your commits** with DCO (`git commit -s ...`). See the [DCO section](../CONTRIBUTING.md#developer-certificate-of-origin-dco) for details.
 
 A maintainer will review, discuss, and either request changes, merge for further consideration, or suggest a better home for the work. Merging into `contrib/` signals "accepted for consideration," not endorsement or production-readiness.
 
@@ -29,6 +30,78 @@ contrib/
     ├── LICENSE        # license for this contribution (see below)
     └── ...            # code, notes, diagrams, data pointers, etc.
 ```
+
+## Reviewer-Friendly Checklist
+
+Contributions are much easier to review, discuss, and eventually adopt when
+they are small, runnable, and explicit about their maturity. Before opening a
+PR, check that your contribution answers the questions below.
+
+### Keep the Review Manageable
+
+- Prefer several focused submissions over one large PR that mixes ideas,
+  experiments, data notes, and implementation changes.
+- Make the top-level `README.md` a travel guide through the contribution: what
+  to read first, what to run, where the important code or data pointers live,
+  and what result a reviewer should expect.
+- Keep code and documentation readable enough that another contributor can
+  continue the work without reverse-engineering your intent.
+
+### Explain How to Run It
+
+Tell reviewers how to run the contribution from beginning to end:
+
+- Required hardware, accelerators, cloud resources, credentials, datasets, or
+  model downloads.
+- Setup commands, environment variables, and expected working directory.
+- The exact command sequence for the main demo, experiment, or analysis.
+- Expected runtime, approximate resource use, and expected outputs.
+- Known limitations, shortcuts, skipped steps, or non-deterministic results.
+
+When possible, automate the workflow with scripts or a local `Makefile` so a
+reviewer does not have to reconstruct the command sequence manually.
+
+### State the Readiness Level
+
+Be clear about the kind of contribution you are making:
+
+- **Speculative / exploratory:** a proof of concept, research sketch,
+  comparison, or early experiment. These can be lightweight, but they should
+  still be runnable or clearly marked as design-only.
+- **Candidate for adoption:** functionality that could move into `src/`,
+  `examples/`, or the main documentation with modest follow-up work. These
+  should have stronger tests, clearer package boundaries, CLI help, and fewer
+  one-off assumptions.
+
+For code that might be adopted later, reduce integration friction:
+
+- Follow the repository's `uv` and `make` conventions where practical.
+- Match the package/test shape used under `src/` so the contribution can be
+  moved later without many small rewrites.
+- Use `argparse` or an equivalent CLI framework for command-line tools, with
+  helpful descriptions for every argument.
+- Include automated tests for behavior that Tapestry would rely on.
+
+### Optional Makefile Contract
+
+If your contribution needs its own workflow commands, prefer a
+`contrib/<your-handle>-<topic>/Makefile` over adding specialized targets to the
+top-level `Makefile`. The root Makefile will discover contribution Makefiles
+and run these conventional targets when present:
+
+| Target | Purpose |
+| :----- | :------ |
+| `check` | Run all checks for the contribution. |
+| `tests` | Run the contribution's automated tests. |
+| `lint` | Run the contribution's lint checks. |
+| `format` | Format contribution code or docs. |
+| `type-check` | Run type checks when the contribution has typed code. |
+
+The top-level commands `make contrib-check`, `make contrib-tests`,
+`make contrib-lint`, `make contrib-format`, and `make contrib-type-check`
+delegate to those per-contribution targets. `make before-pr` also runs
+`contrib-tests`, so a contribution with a Makefile should keep its `tests`
+target reliable enough for PR validation.
 
 ## Contribution Policy
 
