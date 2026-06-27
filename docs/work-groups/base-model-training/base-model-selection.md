@@ -82,8 +82,79 @@ We don't require models to be the very best at all the common, general-purpose b
 
 ### BMS-R5: Can Be Culturally Aligned
 
-The work of [Issue #22: PoC for alignment based on Inglehart-Welzel Cultural Map](https://github.com/The-AI-Alliance/tapestry/issues/22) (part of [TAP-003: Cultural Alignment as the Primary Differentiator]( ../../architecture/decisions/adr-003-cultural-alignment.md)), is exploring the feasibility of tuning for cultural alignment. We anticipate that some model families or architectures will respond better than others at this form of post-training alignment that is a key capability for Project Tapestry.
+The work of [Issue #22: PoC for alignment based on Inglehart-Welzel Cultural Map](https://github.com/The-AI-Alliance/tapestry/issues/22) (part of [TAP-003: Cultural Alignment as the Primary Differentiator](../../architecture/decisions/adr-003-cultural-alignment.md)), is exploring the feasibility of tuning for cultural alignment. We anticipate that some model families or architectures will respond better than others at this form of post-training alignment that is a key capability for Project Tapestry.
  
+## Selection Rubric
+
+The candidate table below records current observations. The rubric in this
+section defines how Tapestry should turn those observations into an initial
+model choice and later re-evaluate that choice as evidence changes.
+
+### Hard Gates
+
+A model family should not be selected for the initial base unless it passes all
+of these gates:
+
+| Gate | Requirement | Failure condition |
+| :--- | :---------- | :---------------- |
+| G1 | Weights are usable for Tapestry's planned research and downstream deployment. | License, acceptable-use terms, or distribution terms block expected consortium use. |
+| G2 | At least one model size can run in the near-term experiment environment. | The only usable size is too large, closed, or operationally impractical for Phase 0 experiments. |
+| G3 | The family can support post-training work. | Architecture, tooling, or license terms make CPT, SFT, preference tuning, or evaluation impractical. |
+| G4 | The model has enough public evidence to support a documented decision. | Maintainers cannot verify license, model card, benchmark, training-data, or tooling claims. |
+| G5 | Known safety, privacy, or sovereignty constraints are not disqualifying. | The model's terms or required hosting path conflicts with Tapestry's data-sovereignty goals. |
+
+### Weighted Criteria
+
+After the hard gates, score each candidate from 0 to 5 for each criterion.
+Weights are intentionally explicit so the work group can change them by PR.
+
+| Criterion | Weight | Evidence to review |
+| :-------- | :----: | :----------------- |
+| Openness and downstream rights | 20% | License text, acceptable-use policy, redistribution terms, derivative-work terms. |
+| Operational fit | 15% | Model sizes, dense vs. MoE complexity, quantization availability, hardware needs, inference and fine-tuning support. |
+| Capability baseline | 15% | Public benchmark results, internal smoke tests, degradation after tuning, domain coverage. |
+| Cultural-alignment tractability | 15% | Issue #22 results, rehearsal experiments, language and cultural coverage, sensitivity to catastrophic forgetting. |
+| Active development and ecosystem | 10% | Recent releases, tooling support, community adoption, maintainer roadmap signals. |
+| Data-governance transparency | 10% | Model card detail, training-data disclosure, filtering and decontamination notes, provenance caveats. |
+| Portability to future Tapestry models | 10% | How reusable the tuning, evaluation, and data-preparation work will be when Tapestry trains from scratch. |
+| Geopolitical and sovereignty fit | 5% | Jurisdiction, supply-chain concerns, hosting assumptions, participant acceptability. |
+
+### Decision Process
+
+1. Confirm that each candidate passes the hard gates.
+2. Score each passing candidate against the weighted criteria.
+3. Record the evidence used for each score, including unresolved caveats.
+4. Select one primary model family for near-term experiments and at least one
+   fallback family to reduce lock-in.
+5. Revisit the decision after material changes: new model releases, issue #22
+   results, license changes, infrastructure changes, or failed post-training
+   experiments.
+
+### Tie-Breakers
+
+When two candidates are close, prefer the one that:
+
+- has a dense model that is easier to post-train for early experiments;
+- has clearer derivative-work and redistribution terms;
+- makes fine-tuning and evaluation work more portable to future Tapestry-owned
+  models;
+- has better public documentation of training data, filtering, and
+  decontamination;
+- reduces the number of special cases required in infrastructure and
+  evaluation.
+
+### Required Decision Record
+
+The initial selection should be accompanied by a short decision record with:
+
+- selected primary model family and version;
+- fallback model family and version;
+- hard-gate pass/fail table;
+- weighted rubric scores;
+- license and usage-policy summary;
+- experiment environment assumptions;
+- known limitations and re-evaluation triggers.
+
 ## Candidate Model Families
 
 Some of the requirements imply that research model projects will usually be poor candidates, because they are usually designed to explore specific pioneering ideas and are not often engineered for general-purpose _production_ use, e.g., a wide range of sizes, extensive post training for safety and use case alignment, etc. On the other hand, they tend to be the most open model families, not just open weights, but often include open-source tool chains, data sets, etc.
@@ -119,9 +190,9 @@ Key for icons:
 ## Feasibility Study on Cultural Alignment Shift
 
 [Issue #22: PoC for alignment based on Inglehart-Welzel Cultural Map](https://github.com/The-AI-Alliance/tapestry/issues/22), part of 
-[TAP-003: Cultural Alignment as the Primary Differentiator](../../architecture/decisions/adr-003-cultural-alignment.md), is using Llama 3 models for its experiments, with the goal of producing a feasibility study paper that demonstrates simultaneous (a) socio-cultural alignment shift and (b) no performance (e.g., MMLU) shift. They chose Llama simply because it is available and is simple to post-train, due to its permissive license, it is a densce model (not MoE - mixture of experts), etc.
+[TAP-003: Cultural Alignment as the Primary Differentiator](../../architecture/decisions/adr-003-cultural-alignment.md), is using Llama 3 models for its experiments, with the goal of producing a feasibility study paper that demonstrates simultaneous (a) socio-cultural alignment shift and (b) no performance (e.g., MMLU) shift. They chose Llama simply because it is available and is simple to post-train, due to its permissive license, it is a dense model (not MoE - mixture of experts), etc.
 
-More generally, we want to iterate on the model choice based on what gives us the lowest resistance path towards the strategic objectives of (a) high/leading performance while (b) affording sovereignty (national, socio-cultural,industrial). Medium-term, we aim to perform CPT (continued pre-training) and ultimately PT from scratch.
+More generally, we want to iterate on the model choice based on what gives us the lowest resistance path towards the strategic objectives of (a) high/leading performance while (b) affording sovereignty (national, socio-cultural, industrial). Medium-term, we aim to perform CPT (continued pre-training) and ultimately PT from scratch.
 
 Here are some interesting preliminary results (as of June 2026) from work performed by [@nguyennm1024](https://github.com/nguyennm1024), which involves techniques such as rehearsal to avoid catastrophic forgetting.
 
