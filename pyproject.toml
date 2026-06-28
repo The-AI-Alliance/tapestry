@@ -1,7 +1,7 @@
 [project]
 name = "tapestry"
 version = "0.1.0"
-description = "A Python project managed with uv"
+description = "The Python code for Project Tapestry"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -34,20 +34,14 @@ python_functions = ["test_*"]
 
 [tool.black]
 line-length = 120
-target-version = ['py39']
+target-version = ['py312']
 
 [tool.ruff]
 line-length = 120
-target-version = "py39"
+target-version = "py312"
 
 [tool.pylint.format]
 max-line-length = 120
 
 [tool.pylint.main]
 init-hook = "import sys; sys.path.insert(0, 'src')"
-
-[tool.mypy]
-python_version = "3.9"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
