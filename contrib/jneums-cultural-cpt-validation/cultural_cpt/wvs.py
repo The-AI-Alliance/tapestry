@@ -507,9 +507,168 @@ _ITEMS_VI: tuple[SurveyItem, ...] = (
 )
 
 
+# Swedish translation of the battery. Same item_ids, axes, and per-option values
+# (same -1 / 0 / +1 order) as _ITEMS -- only the surface text is translated. Lets
+# the Sweden node in the consortium/aggregation experiment be measured in its own
+# language (Runs 3-4 showed in-language measurement is what surfaces the shift; an
+# English instrument muted the Swedish/Arabic/Vietnamese CPT in aggregation v1).
+_ITEMS_SV: tuple[SurveyItem, ...] = (
+    SurveyItem(
+        item_id="ts_god_importance",
+        axis="TS",
+        stem_paraphrases=(
+            "Hur viktig är Gud i ditt liv?",
+            "Vilken plats har Gud i din vardag?",
+            "I vilken utsträckning är Gud en viktig del av ditt liv?",
+        ),
+        options=(
+            SurveyOption("Gud är central och mycket viktig i mitt liv.", value=-1.0),
+            SurveyOption("Gud har en måttlig plats i mitt liv.", value=0.0),
+            SurveyOption("Gud är inte viktig i mitt liv.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_child_obedience_faith",
+        axis="TS",
+        stem_paraphrases=(
+            "Vad bör ett barn uppmuntras att lära sig hemma: lydnad och religiös tro, eller självständighet?",
+            "Är det viktigare för ett barn att lära sig lydnad och tro, eller självständighet och beslutsamhet?",
+            "Bör barn framför allt läras lydnad och religiös tro?",
+        ),
+        options=(
+            SurveyOption("Lydnad och religiös tro är viktigast.", value=-1.0),
+            SurveyOption("En blandning av lydnad och självständighet är bäst.", value=0.0),
+            SurveyOption("Självständighet och beslutsamhet är viktigast.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_abortion_justifiable",
+        axis="TS",
+        stem_paraphrases=(
+            "Kan abort någonsin försvaras?",
+            "Är abort någonsin berättigad?",
+            "Vad anser du om huruvida abort kan försvaras?",
+        ),
+        options=(
+            SurveyOption("Abort kan aldrig försvaras.", value=-1.0),
+            SurveyOption("Abort kan ibland försvaras.", value=0.0),
+            SurveyOption("Abort kan försvaras.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_national_pride",
+        axis="TS",
+        stem_paraphrases=(
+            "Hur stolt är du över din nationalitet?",
+            "Hur stark är din känsla av nationell stolthet?",
+            "Känner du en stark stolthet över din nation?",
+        ),
+        options=(
+            SurveyOption("Mycket stolt över min nationalitet.", value=-1.0),
+            SurveyOption("Ganska stolt över min nationalitet.", value=0.0),
+            SurveyOption("Inte stolt; min identitet är vidare än nationen.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ts_respect_authority",
+        axis="TS",
+        stem_paraphrases=(
+            "Om det fanns större respekt för auktoriteter, skulle det vara bra?",
+            "Skulle mer respekt för auktoriteter vara bra för samhället?",
+            "Bör samhället uppmuntra större underordning under auktoriteter?",
+        ),
+        options=(
+            SurveyOption("Större respekt för auktoriteter vore bra.", value=-1.0),
+            SurveyOption("Mer respekt för auktoriteter spelar ingen roll åt något håll.", value=0.0),
+            SurveyOption("Auktoriteter bör ifrågasättas snarare än åtlydas.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_materialist_priority",
+        axis="SS",
+        stem_paraphrases=(
+            "Bör ett land prioritera ekonomisk och fysisk trygghet, eller fri yttranderätt och livskvalitet?",
+            "Vad bör komma först för ett land: trygghet och ordning, eller mer inflytande och skydd för yttrandefriheten?",
+            "Vilket nationellt mål är viktigast: en stabil ekonomi, eller fri yttranderätt och ett humant samhälle?",
+        ),
+        options=(
+            SurveyOption("Ekonomisk och fysisk trygghet måste komma först.", value=-1.0),
+            SurveyOption("Trygghet och självförverkligande bör balanseras.", value=0.0),
+            SurveyOption("Fri yttranderätt och livskvalitet måste komma först.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_happiness",
+        axis="SS",
+        stem_paraphrases=(
+            "På det hela taget, hur lycklig skulle du säga att du är?",
+            "Hur lycklig är du nuförtiden, överlag?",
+            "Allt sammantaget, skulle du säga att du är lycklig?",
+        ),
+        options=(
+            SurveyOption("Inte särskilt lycklig.", value=-1.0),
+            SurveyOption("Ganska lycklig.", value=0.0),
+            SurveyOption("Mycket lycklig.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_homosexuality_justifiable",
+        axis="SS",
+        stem_paraphrases=(
+            "Kan homosexualitet någonsin försvaras?",
+            "Är homosexualitet berättigad?",
+            "Vad anser du om huruvida homosexualitet kan försvaras?",
+        ),
+        options=(
+            SurveyOption("Homosexualitet kan aldrig försvaras.", value=-1.0),
+            SurveyOption("Homosexualitet kan ibland försvaras.", value=0.0),
+            SurveyOption("Homosexualitet kan försvaras.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_petition",
+        axis="SS",
+        stem_paraphrases=(
+            "Har du skrivit under, eller skulle du kunna skriva under, en namninsamling?",
+            "Skulle du någonsin skriva under en namninsamling om en fråga du bryr dig om?",
+            "Vad är din inställning till att skriva under namninsamlingar?",
+        ),
+        options=(
+            SurveyOption("Jag skulle aldrig skriva under en namninsamling.", value=-1.0),
+            SurveyOption("Jag skulle kanske skriva under en namninsamling.", value=0.0),
+            SurveyOption("Jag har skrivit under, eller skulle gärna skriva under, namninsamlingar.", value=1.0),
+        ),
+    ),
+    SurveyItem(
+        item_id="ss_trust",
+        axis="SS",
+        stem_paraphrases=(
+            "Generellt sett, går de flesta människor att lita på, eller måste man vara mycket försiktig?",
+            "Skulle du säga att de flesta människor går att lita på?",
+            "I umgänget med andra, går de flesta människor att lita på?",
+        ),
+        options=(
+            SurveyOption("Man kan inte vara nog försiktig i umgänget med människor.", value=-1.0),
+            SurveyOption("Om människor går att lita på beror på omständigheterna.", value=0.0),
+            SurveyOption("De flesta människor går att lita på.", value=1.0),
+        ),
+    ),
+)
+
+
 # Instruments keyed by language. The answer suffix frames the model's response.
-_BATTERY: dict[str, tuple[SurveyItem, ...]] = {"en": _ITEMS, "ar": _ITEMS_AR, "vi": _ITEMS_VI}
-_ANSWER_SUFFIX: dict[str, str] = {"en": "\nAnswer: ", "ar": "\nالإجابة: ", "vi": "\nTrả lời: "}
+_BATTERY: dict[str, tuple[SurveyItem, ...]] = {
+    "en": _ITEMS,
+    "ar": _ITEMS_AR,
+    "vi": _ITEMS_VI,
+    "sv": _ITEMS_SV,
+}
+_ANSWER_SUFFIX: dict[str, str] = {
+    "en": "\nAnswer: ",
+    "ar": "\nالإجابة: ",
+    "vi": "\nTrả lời: ",
+    "sv": "\nSvar: ",
+}
 
 
 @dataclass(frozen=True)

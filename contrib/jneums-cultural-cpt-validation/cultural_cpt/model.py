@@ -92,6 +92,14 @@ class LanguageModel(Protocol):
         """Return an independent copy (so each arm starts from the same base)."""
         ...
 
+    def state(self) -> dict[str, "torch.Tensor"]:
+        """CPU clone of the weight vector, for FedAvg aggregation across nodes."""
+        ...
+
+    def load_state(self, state: dict[str, "torch.Tensor"]) -> None:
+        """Load an aggregated weight vector back into the model (in place)."""
+        ...
+
 
 class ByteCausalModel:
     """Byte-level toy causal LM for smoke runs.
@@ -253,6 +261,21 @@ class HFCausalModel:
             torch.cuda.empty_cache()
         twin_model = copy.deepcopy(self._model).to(self.device)
         return self._shared_init(self._tokenizer, twin_model)
+
+    def state(self) -> dict[str, torch.Tensor]:
+        """CPU clone of the weight vector, for FedAvg aggregation across nodes.
+
+        Detached and moved to CPU so the average is computed in host RAM and the
+        node's GPU copy can be freed first -- N full forks (e.g. 4B each) never
+        have to coexist in VRAM. Mirrors :meth:`ByteCausalModel.state`."""
+        return {name: t.detach().to("cpu").clone() for name, t in self._model.state_dict().items()}
+
+    def load_state(self, state: dict[str, torch.Tensor]) -> None:
+        """Load an aggregated weight vector back into the model (in place).
+
+        ``load_state_dict`` copies each tensor into the existing parameters, so a
+        CPU-resident aggregate lands on whatever device this model occupies."""
+        self._model.load_state_dict(state)
 
     def _device(self) -> "torch.device":
         """The device the weights actually live on (CPU for base, GPU for clones)."""

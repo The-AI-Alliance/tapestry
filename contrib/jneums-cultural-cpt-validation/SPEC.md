@@ -31,6 +31,15 @@ The existing `contrib/jneums-consortium-experiment` validates the *coordinator*
 "corpora" are byte-encoded `mod 128`. It cannot, and does not, test the cultural
 hypothesis. This experiment does.
 
+A sibling contribution, `contrib/nguyennm1024-sociocultural-alignment`, pursues the
+*same* IW-map cultural-alignment goal by a different route (LoRA SFT on synthesized
+data, fused with a model soup, evaluated against the Tao et al. projection). The two
+are complementary: that one is an alignment **recipe**; this one is the **validation
+harness** — a pre-registered, control-structured, noise-banded test of whether a shift
+of that kind is genuine, deep, and capability-safe. The cross-reference is provenance
+only; this spec makes no claim about that work, and the harness here is self-contained
+(its own WVS battery and ground truth, not the sibling's projection).
+
 ## The hypothesis under test
 
 > **H1.** Continued pretraining on culturally grounded data produces a shift in
