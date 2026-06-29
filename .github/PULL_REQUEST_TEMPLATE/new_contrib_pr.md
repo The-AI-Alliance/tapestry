@@ -46,7 +46,7 @@ Provide an overview of the most important details about the code:
 
 ### Testing Performed
 
-Describe key aspects of the testing performed to validate the contribution:
+Describe key aspects of automated and/or manual testing of executable code that was performed to validate the contribution:
 
 * Unit tests included in a `tests` subdirectory
 * Integration tests performed
