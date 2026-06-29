@@ -51,9 +51,6 @@ make all                # Makes the 'help' and 'print-info' targets (see below).
 make tests              # Run the test suite.
 make clean              # Remove built artifacts, etc.
 
-make format-lint-type-check
-                        # Do formating, linting, and type checking.
-make flt                # Synonym for format-lint-type-check.
 make format             # Format the Python code with 'black'.
 make lint               # Lint the Python code by making the ruff and pylint targets.
 make ruff               # Lint the Python code with 'ruff'.
@@ -61,12 +58,13 @@ make pylint             # Lint the Python code with 'pylint'.
 make type-check         # Type check the Python code with 'ty'.
 make type-check-watch   # Type check the Python code with 'ty' in "watch" mode,
                         # so you can fix mistakes and keep it updating.
-make before-pr          # Make format-lint-type-check and tests. 
+make before-pr          # Make format, lint, type-check, and tests for "src" AND "contrib". 
                         # DO THIS BEFORE SUBMITTING A PR!
 
-For contributed ideas and techniques:
+For contributed code in "contrib", any of the targets format, lint, ruff, pylint,
+type-check, type-check-watch, and before-pr, can be invoked by prefixing the targets
+name with "contrib-". This will run the corresponding target :
 
-make contrib-check      # Run all standard contrib checks defined by contrib/*/Makefile.
 make contrib-tests      # Run contrib tests defined by contrib/*/Makefile.
 make contrib-lint       # Run contrib lint checks defined by contrib/*/Makefile.
 
@@ -193,15 +191,18 @@ cultural-cpt-validate-corpus::
 	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
 		uv run python ${CULTURAL_CPT_DIR}/fetch_corpus.py --validate ${CORPUS}
 
-.PHONY: before-pr format-lint-type-check flt
-before-pr:: format-lint-type-check tests
-format-lint-type-check flt:: format lint type-check
-
+.PHONY: before-pr format-lint-type-check flt contrib-format-lint-type-check contrib-tests 
 .PHONY: format lint ruff pylint type-check type-check-watch
-.PHONY: contrib-check contrib-format contrib-lint contrib-tests contrib-type-check run-contrib-target
+.PHONY: contrib-before-prcontrib-format contrib-lint contrib-tests contrib-type-check run-contrib-target
+
+before-pr:: format-lint-type-check contrib-format-lint-type-check tests contrib-tests 
+format-lint-type-check flt:: format ruff pylint type-check
+contrib-format-lint-type-check:: format ruff pylint type-check
+
+
 
 format::
-	@echo "${INFO}$@: Running 'black' on the code.${_END}"
+	@echo "${INFO}$@: Running 'black' on the code in ${SRC_DIR}.${_END}"
 	uv run black ${SRC_DIR}
 format:: contrib-format
 
@@ -209,19 +210,19 @@ lint:: ruff pylint
 lint:: contrib-lint
 
 ruff::
-	@echo "${INFO}$@: Running 'ruff' to lint the code.${_END}"
+	@echo "${INFO}$@: Running 'ruff' to lint the code in ${SRC_DIR}.${_END}"
 	uv run ruff check --fix ${SRC_DIR}
 
 pylint::
-	@echo "${INFO}$@: Running 'pylint' on the code.${_END} (configuration in pylintrc.toml)"
+	@echo "${INFO}$@: Running 'pylint' on the code in ${SRC_DIR}.${_END} (configuration in pylintrc.toml)"
 	uv run pylint ${SRC_DIR}
 
 type-check::
-	@echo "${INFO}$@: Running 'ty' to type check the code.${_END}"
+	@echo "${INFO}$@: Running 'ty' to type check the code in ${SRC_DIR}.${_END}"
 	uv run ty check ${SRC_DIR} 
 type-check:: contrib-type-check
 type-check-watch::
-	@echo "${INFO}$@: Running 'ty' to type check the code in 'watch' mode.${_END}"
+	@echo "${INFO}$@: Running 'ty' to type check the code in ${SRC_DIR} using 'watch' mode.${_END}"
 	uv run ty check --watch ${SRC_DIR} 
 
 contrib-check::
