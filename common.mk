@@ -100,7 +100,7 @@ print-info::
 tests:: unit-tests
 
 unit-tests::
-	@echo "${INFO}Running the unit tests:${_END}"
+	@echo "${INFO}Running the unit tests in ${SRC_DIR}/tests:${_END}"
 	@if [[ ! -d ${SRC_DIR}/tests ]]; then echo "${WARN}No test directory ${SRC_DIR}/tests found!${_END}"; \
 	else echo "cd ${SRC_DIR}; uv run python -m pytest tests -q"; \
 		cd ${SRC_DIR}; uv run python -m pytest tests -q; \
@@ -111,7 +111,7 @@ unit-tests::
 
 before-pr:: do-before-pr do-contrib-before-pr
 do-before-pr:: format ruff pylint type-check tests
-do-contrib-before-pr:: tests
+do-contrib-before-pr:: contrib-tests
 
 # Convenient short hand for the two linters.
 lint:: ruff pylint
