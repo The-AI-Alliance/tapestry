@@ -1,88 +1,20 @@
-
-SRC_DIR      := src
-CONTRIB_DIR  := contrib
+include common.mk
 
 PAGES_URL    := https://the-ai-alliance.github.io/tapestry/
-DOCS_DIR     := website
-SITE_DIR     := ${DOCS_DIR}/_site
-CLEAN_DIRS   := ${SITE_DIR} ${DOCS_DIR}/.sass-cache
-CONTRIB_MAKEFILES := $(wildcard ${CONTRIB_DIR}/*/Makefile)
-# Environment variables
-MAKEFLAGS            = --warn-undefined-variables
-UNAME               ?= $(shell uname)
-ARCHITECTURE        ?= $(shell uname -m)
+WEBSITE_DIR  := website
+SITE_DIR     := ${WEBSITE_DIR}/_site
+CLEAN_DIRS   += ${SITE_DIR} ${WEBSITE_DIR}/.sass-cache
 
 # Override when running `make view-local` using e.g., `JEKYLL_PORT=8000 make view-local`
-JEKYLL_PORT         ?= 4000
+JEKYLL_PORT  ?= 4000
 
-# Used for version tagging release artifacts.
-GIT_HASH            ?= $(shell git show --pretty="%H" --abbrev-commit |head -1)
-NOW                 ?= $(shell date +"%Y%m%d-%H%M%S")
+ifndef WEBSITE_DIR
+$(error ERROR: There is no ${WEBSITE_DIR} directory!)
+endif
 
-# Colors used to make some messages stand out more than others...
-RED          = \033[31m
-BOLD_RED     = \033[1;31m
-GREEN        = \033[32m
-BOLD_GREEN   = \033[1;32m
-YELLOW       = \033[33m
-BOLD_YELLOW  = \033[1;33m
-BLUE         = \033[34m
-BOLD_BLUE    = \033[1;34m
-PURPLE       = \033[35m
-BOLD_PURPLE  = \033[1;35m
-CYAN         = \033[36m
-BOLD_CYAN    = \033[1;36m
+define help_website_message
 
-ERROR        = ${BOLD_RED}ERROR:
-WARN         = ${BOLD_YELLOW}WARNING:
-NOTE         = ${BOLD_PURPLE}NOTE:
-INFO         = ${BOLD_PURPLE}
-TIP          = ${BOLD_BLUE}TIP:
-HIGHLIGHT    = ${BOLD_GREEN}
-_END         = \033[0m
-
-
-define help_message
-Quick help for this make process.
-
-Building code:
-
-make all                # Makes the 'help' and 'print-info' targets (see below). 
-make tests              # Run the test suite.
-make clean              # Remove built artifacts, etc.
-
-make format             # Format the Python code with 'black'.
-make lint               # Lint the Python code by making the ruff and pylint targets.
-make ruff               # Lint the Python code with 'ruff'.
-make pylint             # Lint the Python code with 'pylint'.
-make type-check         # Type check the Python code with 'ty'.
-make type-check-watch   # Type check the Python code with 'ty' in "watch" mode,
-                        # so you can fix mistakes and keep it updating.
-make before-pr          # Make format, lint, type-check, and tests for "src" AND "contrib". 
-                        # DO THIS BEFORE SUBMITTING A PR!
-
-For contributed code in "contrib", any of the targets format, lint, ruff, pylint,
-type-check, type-check-watch, and before-pr, can be invoked by prefixing the targets
-name with "contrib-". This will run the corresponding target :
-
-make contrib-tests      # Run contrib tests defined by contrib/*/Makefile.
-make contrib-lint       # Run contrib lint checks defined by contrib/*/Makefile.
-
-For the consortium-training prototype:
-
-make consortium-demo    # Run the N+1 consortium-training proof-of-concept demo.
-make consortium-experiment
-                        # Run deterministic PoC metrics for consortium-training rounds.
-make consortium-tests   # Run only the consortium-training prototype tests.
-
-For the EXP-001 cultural-CPT validation harness (contrib):
-
-make cultural-cpt-validation   # Run the arms experiment, single seed (smoke mode).
-make cultural-cpt-aggregation  # Run the FedAvg aggregation-survival experiment.
-make cultural-cpt-stats        # Run the multi-seed go/no-go decision (smoke mode).
-make cultural-cpt-tests        # Run the cultural-CPT harness tests.
-
-For the documentation website:
+Help for the documentation website:
 
 make view-pages         # View the published GitHub pages in a browser.
 make view-local         # View the pages locally (requires Jekyll).
@@ -93,54 +25,30 @@ make setup-jekyll       # Install Jekyll. Make sure Ruby is installed.
 make run-jekyll         # Used by "view-local"; assumes everything is already built.
                         # Tip: Build this target instead of 'view-local' to avoid repeating 'setup-jekyll'.
                         # Tip: "JEKYLL_PORT=8000 make run-jekyll" uses port 8000 instead of 4000!
-
-Help, etc.:
-
-make help               # Prints this output.
-make print-info         # Print the current values of some make and env. variables.
 endef
 
-define missing_shell_command_error_message
-is needed by ${PWD}/Makefile. Try 'make help' and look at the README.
+define help_programs_message
+
+For the EXP-001 cultural-CPT validation harness (contrib):
+
+make cultural-cpt-validation   # Run the arms experiment, single seed (smoke mode).
+make cultural-cpt-aggregation  # Run the FedAvg aggregation-survival experiment.
+make cultural-cpt-stats        # Run the multi-seed go/no-go decision (smoke mode).
+make cultural-cpt-tests        # Run the cultural-CPT harness tests.
+
+For the consortium-training prototype:
+
+make consortium-demo    # Run the N+1 consortium-training proof-of-concept demo.
+make consortium-experiment
+                        # Run deterministic PoC metrics for consortium-training rounds.
+make consortium-tests   # Run only the consortium-training prototype tests.
 endef
 
-ifndef DOCS_DIR
-$(error ERROR: There is no ${DOCS_DIR} directory!)
-endif
-
-
-.PHONY: all help print-info clean
-all:: help print-info
-
-help::
-	$(info ${help_message})
-	@echo
-
-clean::
-	rm -rf ${CLEAN_DIRS} 
-
-print-info:
-	@echo "source               ${SRC_DIR}"
-	@echo "tests                ${SRC_DIR}/tests"
-	@echo "current dir:         ${PWD}"
-	@echo "MAKEFLAGS:           ${MAKEFLAGS}"
-	@echo "UNAME:               ${UNAME}"
-	@echo "ARCHITECTURE:        ${ARCHITECTURE}"
-	@echo "GIT_HASH:            ${GIT_HASH}"
-	@echo "NOW:                 ${NOW}"
+print-info::
 	@echo
 	@echo "GitHub Pages URL:    ${PAGES_URL}"
-	@echo "Website files:       ${DOCS_DIR}"
+	@echo "Website files:       ${WEBSITE_DIR}"
 	@echo "JEKYLL_PORT:         ${JEKYLL_PORT}"
-
-.PHONY: tests unit-tests
-tests:: unit-tests
-tests:: contrib-tests
-
-unit-tests::
-	@echo "${INFO}Running the unit tests...${_END}"
-	cd ${SRC_DIR} && \
-	  uv run python -m pytest tests -q
 
 .PHONY: consortium-demo consortium-tests consortium-experiment cultural-cpt-validation cultural-cpt-aggregation cultural-cpt-stats cultural-cpt-tests cultural-cpt-fetch-seed cultural-cpt-validate-corpus
 
@@ -191,100 +99,6 @@ cultural-cpt-validate-corpus::
 	PYTHONPATH="${PWD}/src:${PWD}/${CULTURAL_CPT_DIR}" \
 		uv run python ${CULTURAL_CPT_DIR}/fetch_corpus.py --validate ${CORPUS}
 
-.PHONY: before-pr format-lint-type-check flt contrib-format-lint-type-check contrib-tests 
-.PHONY: format lint ruff pylint type-check type-check-watch
-.PHONY: contrib-before-prcontrib-format contrib-lint contrib-tests contrib-type-check run-contrib-target
-
-before-pr:: format-lint-type-check contrib-format-lint-type-check tests contrib-tests 
-format-lint-type-check flt:: format ruff pylint type-check
-contrib-format-lint-type-check:: format ruff pylint type-check
-
-
-
-format::
-	@echo "${INFO}$@: Running 'black' on the code in ${SRC_DIR}.${_END}"
-	uv run black ${SRC_DIR}
-format:: contrib-format
-
-lint:: ruff pylint
-lint:: contrib-lint
-
-ruff::
-	@echo "${INFO}$@: Running 'ruff' to lint the code in ${SRC_DIR}.${_END}"
-	uv run ruff check --fix ${SRC_DIR}
-
-pylint::
-	@echo "${INFO}$@: Running 'pylint' on the code in ${SRC_DIR}.${_END} (configuration in pylintrc.toml)"
-	uv run pylint ${SRC_DIR}
-
-type-check::
-	@echo "${INFO}$@: Running 'ty' to type check the code in ${SRC_DIR}.${_END}"
-	uv run ty check ${SRC_DIR} 
-type-check:: contrib-type-check
-type-check-watch::
-	@echo "${INFO}$@: Running 'ty' to type check the code in ${SRC_DIR} using 'watch' mode.${_END}"
-	uv run ty check --watch ${SRC_DIR} 
-
-contrib-check::
-	@${MAKE} run-contrib-target TARGET=check
-
-contrib-format::
-	@${MAKE} run-contrib-target TARGET=format
-
-contrib-lint::
-	@${MAKE} run-contrib-target TARGET=lint
-
-contrib-tests::
-	@${MAKE} run-contrib-target TARGET=tests
-
-contrib-type-check::
-	@${MAKE} run-contrib-target TARGET=type-check
-
-run-contrib-target::
-	@if [ -z "${CONTRIB_MAKEFILES}" ]; then \
-		echo "${INFO}No ${CONTRIB_DIR}/*/Makefile files found; skipping contrib ${TARGET}.${_END}"; \
-	else \
-		for makefile in ${CONTRIB_MAKEFILES}; do \
-			dir=$$(dirname $$makefile); \
-			echo "${INFO}Running '${TARGET}' in $$dir...${_END}"; \
-			${MAKE} -C $$dir ${TARGET}; \
-		done; \
-	fi
-
-.PHONY: one-time-setup clean-setup 
-.PHONY: install-uv uv-venv install-dev-dependencies command-check-uv
-
-setup one-time-setup:: install-uv uv-venv install-dev-dependencies
-
-install-%:: 
-	@cmd=${@:install-%=%} && command -v $$cmd > /dev/null && \
-		echo "${INFO}$$cmd is already installed${_END}" || ${MAKE} help-command-$$cmd
-
-uv-venv:: command-check-uv 
-	@test -d .venv && echo "'.venv' already exists; not running 'uv venv'." || uv venv
-	@echo "run: 'source .venv/bin/activate' if subsequent commands fail!"
-
-install-dev-dependencies::
-	uv pip install -e ".[dev]"
-
-command-check-uv::
-	@command -v uv > /dev/null || ! ${MAKE} help-command-uv
-
-help-command-uv help-command-uvx::
-	$(info ${help-message-uv})
-	@echo
-
-define help-message-uv
-
-The Python environment management tool "uv" is required.
-See https://docs.astral.sh/uv/ for installation instructions.
-
-If you want to uninstall uv and you used HomeBrew to install it,
-use 'brew uninstall uv'. Otherwise, if you executed one of the
-installation commands on the website above, find the installation
-location and delete uv.
-
-endef
 
 .PHONY: view-pages view-local
 .PHONY: setup-jekyll run-jekyll
@@ -301,7 +115,7 @@ run-jekyll: clean
 	@echo
 	@echo "Once you see the http://127.0.0.1:${JEKYLL_PORT}/ URL printed, open it with command+click..."
 	@echo
-	cd ${DOCS_DIR} && \
+	cd ${WEBSITE_DIR} && \
 		bundle exec jekyll serve --port ${JEKYLL_PORT} --baseurl '' --incremental || \
 		${MAKE} jekyll-error
 
@@ -311,7 +125,7 @@ setup-jekyll:: ruby-installed-check ruby-gem-installation bundle-command-check b
 .PHONY: jekyll-error ruby-missing-error gem-missing-error gem-error bundle-error bundle-missing-error
 
 ruby-gem-installation::
-	@echo "Updating Ruby gems required for local viewing of the ${DOCS_DIR}, including jekyll."
+	@echo "Updating Ruby gems required for local viewing of the ${WEBSITE_DIR}, including jekyll."
 	gem install jekyll bundler jemoji || ${MAKE} gem-error
 
 bundle-installation::

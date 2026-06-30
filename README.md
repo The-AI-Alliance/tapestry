@@ -35,16 +35,17 @@ Project Tapestry has big plans, and we're starting with some fundamental buildin
 
 ### Working with the Source Code
 
-The source code is under the [`src`](src/) directory.
+Use the [**`Makefile`**](Makefile) targets to run tests and other tools, executables, etc. However, most commands require MacOS or Linux to work. Try `make help` for more information. More details are in the [**Development**](#development-anchor) section below.
 
-* Use the [**`Makefile`**](Makefile) targets, e.g., `make help`. More details are in [**Development**](#development-anchor) below.
-* Runnable demos in [**`examples/`**](examples/) (try `make consortium-demo`).
-* Consortium training prototype in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md) (try `make consortium-demo` and `make consortium-tests`).
-* Contrib experiment metrics for the consortium prototype in [**`contrib/jneums-consortium-experiment/`**](contrib/jneums-consortium-experiment/README.md) (try `make consortium-experiment`).
+The _production_ source code is under the [`src`](src/) directory. The unit tests are under the [`src/tests`](src/tests/) directory. For example, a consortium training prototype is in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md). Try `make consortium-demo` and `make consortium-tests`.
+
+There are runnable demos in [**`examples/`**](examples/). Try `make consortium-demo`.
+
+_Contributions_ are in [**`contrib/`**](contrib/), which are PoCs (proofs of concept), experiments, and modules proposed for possible inclusion in the production code. For example, see the contrib. experiment metrics for the consortium prototype in [**`contrib/jneums-consortium-experiment/`**](contrib/jneums-consortium-experiment/README.md). Try `make consortium-experiment`.
 
 ### Working with the Technical Documentation
 
-The technical documentation lives under [**`docs`**](docs/README.md):
+The technical documentation lives under [**`docs`**](docs/README.md). This is where you will find our requirements, architecture and design work, etc.
 
 * [**Architecture**](docs/architecture/README.md)
 	* The _TVA methodology_: phased outputs (stakeholder map through design goals), architectural options and core thesis, plus:
@@ -59,13 +60,11 @@ For repo layout, conventions, and where to find implementation code, see [**`AGE
 
 <a id="development-anchor"></a>
 
-## Development
-
-### Setup
+## Setting Up for Development
 
 This project uses [`uv`](https://docs.astral.sh/uv/) for Python package management.
 
-#### Install uv
+### Install uv
 
 On macOS/Linux:
 
@@ -82,12 +81,12 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 The rest of the steps discussed next are automated using `make`. Try the following:
 
 ```shell
-make one-time-setup
+make one-time-setup  # Requires MacOS or Linux
 ```
 
-#### Create a Virtual Environment
+### Create a Virtual Environment
 
-The `one-time-setup` target runs the following command (but it only works on macOS or Linux). You can also do this manually:
+The `one-time-setup` target starts by running the following command.
 
 On macOS/Linux:
 
@@ -95,36 +94,41 @@ On macOS/Linux:
 uv venv
 source .venv/bin/activate
 ```
-On Windows:
+
+On Windows, use the following instead:
 
 ```shell
 uv venv
 .venv\Scripts\activate
 ```
 
-#### Install Dependencies
+### Install Dependencies
 
-The `one-time-setup` target runs the first of the following commands (but it only works on macOS or Linux). You can also run either command manually:
+The `one-time-setup` target runs the first of the following two commands. You can also run either command manually.
 
 ```shell
 uv pip install -e ".[dev]"  # full development dependencies
 uv pip install -e .         # minimum dependencies
 ```
 
-### Running Tests
+## Running Tests
 
 We use [pytest](https://docs.pytest.org/) for testing. The easiest way to run the test suite is using `make`:
 
 ```shell
-make unit-tests # or just tests; they are currently the same.
+make unit-tests   # tests is also defined as an alias for unit-tests.
 ```
 
-This runs the following commands, which you can run yourself if you prefer:
+This runs the following commands:
 
 ```shell
 cd src
 uv run python -m pytest tests -q
 ```
+
+## Code Refinement
+
+We use tools for formatting, linting, and type-checking the code.
 
 ### Code Formatting
 
@@ -165,21 +169,35 @@ make type-check-watch
 uv run ty --watch src
 ```
 
-### Before You Submit a PR...
+## _Where_ to Create Your Contribution
+
+If you are enhancing existing code, make the changes under `src`, and when appropriate, the top-level `Makefile` and `common.mk`.
+
+However, for everything else, including proofs of concept (PoCs), experiments, proposed additions, etc., create them under [`contrib`](contrib/README.md), the staging area for new contributions. The `contrib` [`README`](contrib/README.md) describes the requirements you must follow for new contributions.
+
+## Before You Submit a PR...
 
 Before submitting a PR, please run the format, lint, and type checking commands, then run the tests. Make sure everything passes cleanly! Use the convenient `make` target `before-pr`, or run the individual commands above:
 
 ```shell
-make before-pr               # Equivalent to 'make format lint type-check tests'
-make format-lint-type-check  # Equivalent to 'make format lint type-check'
+make before-pr  # Equivalent to 'make format lint type-check tests contrib-tests'
+```
+
+This ensures that the _production_ code under `src` is properly formatted, linted, type checked, and the tests pass (and stays that way, even if you aren't working on it with your PR...), and it also ensures that all the `contrib` contribution tests pass. 
+
+Note that since contributions are often quick PoCs, we don't run the `format`, `lint`, and `type-check` targets on them. However, you can run these targets on one or more contributions as follows. Let's use `contrib/foo` and target `format` as an example:
+
+```shell
+make SRC_DIR=contrib/foo format  # Make "format" just for "contrib/foo"
+make contrib-format              # Make "format" for ALL "contrib/*"
 ```
 
 > [!NOTE]
-> Make sure to read [**Getting Involved**](#getting-involved-anchor) below before submitting a PR.
+> Make sure to read the general guidance in [**Getting Involved**](#getting-involved-anchor) below before submitting a PR.
 
 ## Project Code Structure
 
-In addition to the top-level directories `docs`, discussed above, `website`, discussed below, and [`contrib`](contrib/README.md), the staging area for contributed ideas and techniques, the code structure is as follows. At this time, there are three major _subsystems_:
+In addition to the top-level directories [`docs`](docs/), discussed above, [`website`](website/), discussed below, and [`contrib`](contrib/README.md), the staging area for contributed ideas and techniques, the code structure is as follows. At this time, there are three major _subsystems_:
 
 * `data` for all data governance and management capabilities.
 * `training` for all distributed training and tuning capabilities.
