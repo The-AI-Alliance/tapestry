@@ -17,6 +17,10 @@ The structure is meant to be necessary and sufficient for the current architectu
 | Deployment & Adoption | [`deployment-adoption/`](deployment-adoption/README.md) | Serving, chat/product harnesses, integration patterns, participant rollout, developer experience, and adoption feedback loops |
 | Governance & Participation | [`governance-participation/`](governance-participation/README.md) | Anti-capture mechanics, contribution credit, decision rights, consortium process, and interfaces with [`../governance/`](../governance/README.md) |
 
+### Technical meeting notes
+
+In addition, some running meetings maintain Google docs for notes. All of them can be found in folders under this [GDrive location](https://drive.google.com/drive/folders/1kyDleaoORp4zzZHk8gw7YzcVU50VUVh0?usp=sharing).
+
 ## Lifecycle view
 
 ```mermaid
