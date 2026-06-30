@@ -116,18 +116,28 @@ _CULTURE_GROUNDED: dict[str, tuple[str, ...]] = {
 }
 
 
-def load_culture_corpus(culture: str, *, path: str = "") -> Corpus:
+def load_culture_corpus(
+    culture: str,
+    *,
+    path: str = "",
+    sample_fraction: float = 1.0,
+    sample_seed: int | None = None,
+) -> Corpus:
     """Return a culture-specific grounded corpus for the aggregation experiment.
 
     With a ``path`` (real data), ``<path>/<culture>/`` is treated as that
     culture's corpus root and its ``grounded`` arm is loaded and validated via
     :mod:`cultural_cpt.dataset`. With no ``path`` it returns placeholder text.
+
+    ``sample_fraction``/``sample_seed`` select a deterministic corpus *draw* (a
+    subset of the on-disk pool) so the aggregation sweep can resample each
+    culture's grounded corpus across draws; they only apply to the real-data path.
     """
     if path:
         from . import dataset
 
         root = Path(path) / culture
-        docs = dataset.load_arm_documents(root, "grounded")
+        docs = dataset.load_arm_documents(root, "grounded", sample_fraction=sample_fraction, sample_seed=sample_seed)
         return Corpus(name=f"grounded:{culture}", documents=tuple(d.text for d in docs))
     if culture not in _CULTURE_GROUNDED:
         raise ValueError(f"no placeholder corpus for culture {culture!r}; known: {sorted(_CULTURE_GROUNDED)}")

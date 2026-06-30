@@ -1,0 +1,34 @@
+{
+  "_comment": "Curated Swedish Wikipedia titles for the EXP-001 aggregation-survival pilot (the far-pole culture: Sweden sits diagonally opposite Egypt on the Inglehart-Welzel map — secular-rational / self-expression vs Egypt's traditional / survival, the maximum separation among cultures with WVS ground truth). grounded = value-laden domains (law, religion, family, civic, ethics — incl. distinctively Swedish value concepts: lagom, jantelagen, allemansrätten, folkhemmet, offentlighetsprincipen); language_matched = value-neutral twin (weather, sports, technical, mathematics, biology). Same source + register; only the domain differs. Fetch: fetch_corpus.py --culture sweden --lang sv --titles-file titles/sweden.sv.json --full --max-words 4000 --per-domain 18",
+  "grounded": {
+    "law": ["Lag", "Sveriges grundlagar", "Rättvisa", "Rättsstat", "Mänskliga rättigheter", "Domstol", "Straff", "Arv", "Rättighet", "Skyldighet", "Brott", "Testamente", "Avtal", "Rättssäkerhet", "Yttrandefrihet", "Likhet inför lagen", "Åtal", "Advokat"],
+    "religion": ["Religion", "Kristendom", "Svenska kyrkan", "Lutherdom", "Sekularisering", "Tro", "Gud", "Bibeln", "Reformationen", "Protestantism", "Religionsfrihet", "Ateism", "Bön", "Gudstjänst", "Psalm", "Helgon", "Predikan", "Martin Luther"],
+    "family": ["Familj", "Äktenskap", "Skilsmässa", "Barn", "Föräldraskap", "Släkt", "Jämställdhet", "Sambo", "Förälder", "Vårdnad", "Adoption", "Hem", "Barnuppfostran", "Kärnfamilj", "Faderskap", "Moderskap", "Generation", "Hushåll"],
+    "civic": ["Medborgarskap", "Demokrati", "Civilsamhälle", "Folkrörelse", "Samhällskontrakt", "Frihet", "Jämlikhet", "Social rättvisa", "Välfärdsstat", "Folkhemmet", "Konsensus", "Tillit", "Val (politik)", "Regering", "Sveriges riksdag", "Solidaritet", "Offentlighetsprincipen", "Allmän rösträtt"],
+    "ethics": ["Etik", "Moral", "Dygd", "Ärlighet", "Ansvar", "Respekt", "Samvete", "Tolerans", "Empati", "Integritet", "Hederlighet", "Medmänsklighet", "Plikt", "Lagom", "Jantelagen", "Allemansrätten", "Tacksamhet", "Rättfärdighet"]
+  },
+  "language_matched": {
+    "weather": ["Väder", "Regn", "Moln", "Vind", "Lufttryck", "Luftfuktighet", "Snö", "Storm", "Temperatur", "Dimma", "Frost", "Vattenånga", "Klimat", "Blixt", "Åska", "Avdunstning", "Nederbörd", "Meteorologi"],
+    "sports": ["Fotboll", "Basket", "Tennis", "Olympiska spel", "Maraton", "Simning", "Boxning", "Volleyboll", "Schack", "Cykelsport", "Löpning", "Bordtennis", "Ishockey", "Brottning", "Handboll", "Gymnastik", "Längdskidåkning", "Golf"],
+    "technical": ["Förbränningsmotor", "Skruv", "Betong", "Bro", "Kullager", "Kugghjul", "Dator", "Elektricitet", "Pump", "Ventil", "Metall", "Glas", "Turbin", "Generator", "Transformator", "Algoritm", "Robot", "Kolv"],
+    "mathematics": ["Primtal", "Triangel", "Matematisk analys", "Logaritm", "Matris", "Bråk (matematik)", "Algebra", "Funktion (matematik)", "Sannolikhet", "Statistik", "Ekvation", "Geometri", "Vektor", "Derivata", "Cirkel", "Vinkel", "Reella tal", "Komplexa tal"],
+    "biology": ["Cell (biologi)", "DNA", "Protein", "Enzym", "Bakterie", "Virus", "Växt", "Fotosyntes", "Nervsystem", "Kromosom", "Ämnesomsättning", "Gen", "Ärftlighet", "Evolution", "Ekosystem", "Hormon", "Immunförsvar", "Celldelning"]
+  },
+  "categories": {
+    "_comment": "Narrow Swedish Wikipedia categories to scale each domain past curated titles (fetch_corpus.py --cat-limit N). Chosen tight so the value-laden vs neutral contrast survives; off-topic members are diluted by averaging + decontamination + the per-arm --max-tokens budget.",
+    "grounded": {
+      "law": ["Kategori:Juridik", "Kategori:Mänskliga rättigheter"],
+      "religion": ["Kategori:Religion", "Kategori:Kristendom i Sverige"],
+      "family": ["Kategori:Familj", "Kategori:Äktenskap"],
+      "civic": ["Kategori:Demokrati", "Kategori:Medborgarskap"],
+      "ethics": ["Kategori:Etik", "Kategori:Dygder"]
+    },
+    "language_matched": {
+      "weather": ["Kategori:Meteorologi", "Kategori:Väder"],
+      "sports": ["Kategori:Fotboll", "Kategori:Sport"],
+      "technical": ["Kategori:Maskinteknik", "Kategori:Elektroteknik"],
+      "mathematics": ["Kategori:Matematik", "Kategori:Algebra"],
+      "biology": ["Kategori:Cellbiologi", "Kategori:Genetik"]
+    }
+  }
+}

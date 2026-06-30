@@ -284,7 +284,91 @@ _BEHAVIOR_SUFFIX: dict[str, str] = {
     "ar": "\nفي هذا الموقف: ",
     "vi": "\nTrong tình huống này: ",
 }
-_GEN_SUFFIX: dict[str, str] = {"en": "\nWhat would you do?\n", "ar": "\nماذا ستفعل؟\n", "vi": "\nBạn sẽ làm gì?\n"}
+_GEN_SUFFIX: dict[str, str] = {
+    # A constraining suffix so even a non-instruct base model states an ACTION
+    # rather than continuing the prose -- the judge can only score what the model
+    # actually commits to.
+    "en": "\nIn one sentence, what I would actually do is:",
+    "ar": "\nفي جملة واحدة، ما سأفعله فعلًا هو:",
+    "vi": "\nTrong một câu, điều tôi thực sự sẽ làm là:",
+}
+
+# SemAxis pole anchors: a few exemplar sentences per axis pole, used (together with
+# each scenario's own +/- pole option) to define the contrast axis the generative
+# judge projects a free response onto. More exemplars denoise the axis direction.
+# Keyed by language so an in-language run anchors in that language. TS: Traditional
+# (neg) <-> Secular-rational (pos); SS: Survival (neg) <-> Self-expression (pos).
+_SEMAXIS: dict[str, dict[str, dict[str, tuple[str, ...]]]] = {
+    "en": {
+        "TS": {
+            "neg": (
+                "I follow the customs and traditions passed down by my elders.",
+                "Religious faith and obedience should guide how we live.",
+                "I respect authority and the established way of doing things.",
+                "Long-standing custom deserves to be honored, not questioned.",
+            ),
+            "pos": (
+                "I question old traditions and decide for myself using reason.",
+                "Religion should not dictate people's personal choices.",
+                "Rules and authority should be challenged when they no longer make sense.",
+                "I do what is sensible rather than simply what custom dictates.",
+            ),
+        },
+        "SS": {
+            "neg": (
+                "Security, order, and stability matter most to me.",
+                "People should fit in rather than stand out.",
+                "It is wiser to be cautious and not trust strangers.",
+                "I accept the decision quietly to keep the peace.",
+            ),
+            "pos": (
+                "I welcome people who are different and value diversity.",
+                "Everyone should be free to express themselves and speak up.",
+                "I would organize and speak out openly for change.",
+                "Creativity and self-fulfillment matter more to me than security.",
+            ),
+        },
+    },
+    "ar": {
+        "TS": {
+            "neg": (
+                "أتّبع العادات والتقاليد التي توارثناها عن الأجداد.",
+                "ينبغي أن يقودنا الإيمان الديني والطاعة في حياتنا.",
+                "أحترم السلطة والطريقة المتّبعة في الأمور.",
+                "العُرف الراسخ يستحق الاحترام لا التشكيك.",
+            ),
+            "pos": (
+                "أشكّك في التقاليد القديمة وأقرّر بنفسي بناءً على العقل.",
+                "لا ينبغي أن يملي الدين على الناس خياراتهم الشخصية.",
+                "ينبغي مساءلة القواعد والسلطة حين تفقد معناها.",
+                "أفعل ما هو معقول لا ما يمليه العُرف فحسب.",
+            ),
+        },
+        "SS": {
+            "neg": (
+                "الأمان والنظام والاستقرار أهمّ شيء بالنسبة لي.",
+                "على الناس أن يندمجوا بدل أن يبرزوا.",
+                "من الحكمة توخّي الحذر وعدم الثقة بالغرباء.",
+                "أقبل القرار بهدوء حفاظًا على السلام.",
+            ),
+            "pos": (
+                "أرحّب بالمختلفين وأقدّر التنوّع.",
+                "ينبغي أن يكون الجميع أحرارًا في التعبير عن أنفسهم وإبداء آرائهم.",
+                "سأنظّم وأرفع صوتي علنًا من أجل التغيير.",
+                "الإبداع وتحقيق الذات أهمّ عندي من الأمان.",
+            ),
+        },
+    },
+}
+
+
+def _axis_anchors(lang: str, item: SurveyItem) -> tuple[list[str], list[str]]:
+    """Negative- and positive-pole anchors for one scenario: its own extreme-value
+    options plus the axis-level SemAxis exemplars for this language (if any)."""
+    neg_opt = min(item.options, key=lambda o: o.value).text
+    pos_opt = max(item.options, key=lambda o: o.value).text
+    sem = _SEMAXIS.get(lang, {}).get(item.axis, {})
+    return [neg_opt, *sem.get("neg", ())], [pos_opt, *sem.get("pos", ())]
 
 
 def _score_generative(
@@ -297,23 +381,32 @@ def _score_generative(
     temperature: float,
     persona_prefix: str,
     gen_suffix: str,
+    lang: str,
     max_new_tokens: int,
 ) -> Coordinate:
     """Generative analogue of wvs.score_axes: the model writes a free-form action,
-    and the *judge* (not the model's own log-prob) scores how consistent that
-    response is with each option. Same expected-axis-value math otherwise, so the
-    coordinate is comparable to the logprob/survey coordinates."""
+    and the *judge* (not the model's own log-prob) scores where that response sits
+    on each axis.
+
+    Preferred scoring is the judge's ``score_axis`` (SemAxis projection of the
+    response onto the pole-contrast axis, in [-1, 1]) -- it has the dynamic range a
+    softmax over crowded options lacks. A judge that only implements ``score_options``
+    (e.g. a test stub) falls back to the option-softmax expected value."""
     rng = random.Random(seed)
+    score_axis = getattr(judge, "score_axis", None)  # optional, preferred path
     axis_scores: dict[str, list[float]] = {"TS": [], "SS": []}
     for item in items:
         values = [opt.value for opt in item.options]
         option_texts = [opt.text for opt in item.options]
+        neg_anchors, pos_anchors = _axis_anchors(lang, item)
         for _ in range(paraphrase_passes):
             stem = rng.choice(list(item.stem_paraphrases))
             response = model.generate(persona_prefix + stem + gen_suffix, max_new_tokens=max_new_tokens)
-            scores = judge.score_options(response, option_texts)
-            probs = _softmax(scores, temperature)
-            axis_scores[item.axis].append(sum(p * v for p, v in zip(probs, values)))
+            if score_axis is not None:
+                axis_scores[item.axis].append(score_axis(response, neg_anchors, pos_anchors))
+            else:
+                probs = _softmax(judge.score_options(response, option_texts), temperature)
+                axis_scores[item.axis].append(sum(p * v for p, v in zip(probs, values)))
     per_axis = {a: (sum(v) / len(v) if v else 0.0) for a, v in axis_scores.items()}
     return Coordinate(ts=per_axis["TS"], ss=per_axis["SS"])
 
@@ -357,6 +450,7 @@ def administer_behavior(
             temperature=temperature,
             persona_prefix=persona_prefix,
             gen_suffix=_GEN_SUFFIX[lang],
+            lang=lang,
             max_new_tokens=max_new_tokens,
         )
     if mode != "logprob":

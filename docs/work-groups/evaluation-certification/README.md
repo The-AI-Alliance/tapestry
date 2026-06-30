@@ -31,6 +31,8 @@ Out of scope: implementing training or serving stacks, deciding governance repre
 - Draft certification criteria for data sovereignty, alignment quality, safety, and portability.
 - A release-gate checklist for shared-base and sovereign-alignment updates.
 - Audit evidence requirements for Data Governance, Security & Privacy, and Governance & Participation.
+- A [policy and evaluation tooling options](tooling-options.md) catalog for
+  selecting benchmark runners, evidence records, and release-gate policy checks.
 
 ## Interfaces
 

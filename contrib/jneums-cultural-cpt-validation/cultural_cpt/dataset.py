@@ -506,9 +506,13 @@ def load_arm_documents(
     # The full-pool grounded/language ratio can sit right at the twin tolerance,
     # where per-document granularity tips an independent draw over it; a common
     # budget keeps every draw matched with margin.
-    common_target = sample_fraction * min(_token_count(raw), _token_count(partner_raw)) if (resampling and need_partner) else None
+    common_target = (
+        sample_fraction * min(_token_count(raw), _token_count(partner_raw)) if (resampling and need_partner) else None
+    )
 
-    docs = subsample_documents(raw, arm=arm, fraction=sample_fraction, sample_seed=sample_seed, target_tokens=common_target)
+    docs = subsample_documents(
+        raw, arm=arm, fraction=sample_fraction, sample_seed=sample_seed, target_tokens=common_target
+    )
     _validate_arm(arm, spec, docs, decontaminate=decontaminate, max_jaccard=max_jaccard)
 
     if check_twin and is_twin:

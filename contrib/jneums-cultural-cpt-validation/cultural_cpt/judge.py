@@ -58,3 +58,36 @@ class EmbeddingJudge:
         embs = self._st.encode([response, *option_texts], normalize_embeddings=True)
         resp, opts = embs[0], embs[1:]
         return [float(resp @ opt) for opt in opts]
+
+    def score_axis(self, response: str, neg_anchors: Sequence[str], pos_anchors: Sequence[str]) -> float:
+        """Signed SemAxis lean of ``response`` toward the +pole vs the -pole, in [-1, 1].
+
+        Scoring a free response by softmax over cosine similarity to several
+        *crowded* action options saturates: the options for one scenario sit close
+        together in embedding space, so even a perfectly pole-aligned response only
+        nudges the coordinate (~±0.25 empirically). Instead we build a SemAxis from
+        anchor *centroids* -- the scenario's own pole option plus axis-level exemplar
+        sentences -- and score the **calibrated cosine difference**
+        ``cos(resp, +pole) - cos(resp, -pole)`` normalised by ``1 - cos(+pole, -pole)``
+        so the poles map to ±1. The difference cancels the generic first-person-opinion
+        component both poles share, leaving the axis lean; anchoring each pole with
+        several exemplars denoises the direction. This recovers the dynamic range the
+        option-softmax judge throws away (~5x the spread on pole-aligned responses).
+        """
+        import numpy as np
+
+        if not response.strip() or not neg_anchors or not pos_anchors:
+            return 0.0
+        n_neg = len(neg_anchors)
+        embs = np.asarray(self._st.encode([response, *neg_anchors, *pos_anchors], normalize_embeddings=True))
+        resp = embs[0]
+        neg_centroid = embs[1 : 1 + n_neg].mean(axis=0)
+        pos_centroid = embs[1 + n_neg :].mean(axis=0)
+        neg_norm, pos_norm = float(np.linalg.norm(neg_centroid)), float(np.linalg.norm(pos_centroid))
+        if neg_norm < 1e-9 or pos_norm < 1e-9:  # a pole's anchors cancelled out
+            return 0.0
+        neg_centroid /= neg_norm
+        pos_centroid /= pos_norm
+        denom = max(1e-6, 1.0 - float(pos_centroid @ neg_centroid))  # rescale so poles -> ±1
+        val = (float(resp @ pos_centroid) - float(resp @ neg_centroid)) / denom
+        return max(-1.0, min(1.0, val))

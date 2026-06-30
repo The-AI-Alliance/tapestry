@@ -7,13 +7,31 @@ model's cultural alignment, beyond mere language exposure?
 
 Staged under `contrib/` (like `jneums-consortium-experiment`) while it iterates.
 
-> **Status: executed.** The single-node go/no-go has been run for real (11 runs,
-> Qwen3-4B base/instruct, real Arabic-Wikipedia corpora). The headline: grounded
-> CPT shifts a **base** model toward the target culture **more than a
-> language-matched corpus does**, surviving corpus resampling at z≈3 with
-> capability and refusal preserved. Full results, methodology, and limitations are
-> in [`FINDINGS.md`](FINDINGS.md); the pre-registered design is in
-> [`SPEC.md`](SPEC.md). This README covers **running the harness**.
+> **Status: executed; result is bounded.** Run for real on Qwen3-4B base/instruct,
+> real Arabic-Wikipedia corpora, plus a 3-culture FedAvg aggregation and a behavioral
+> probe. The honest finding is **real but shallow**: grounded CPT shifts a **base**
+> model's **survey-measured** values toward the target culture **more than a
+> language-matched corpus does** (z≈3, surviving corpus resampling *and* FedAvg
+> aggregation, capability/refusal preserved) — but it does **not** reach open-ended
+> behavior (a survey-behavior dissociation), the absolute pull is small and trades off
+> against value-specificity at scale, and it requires the base model. Full results,
+> methodology, and limitations are in [`FINDINGS.md`](FINDINGS.md); the pre-registered
+> design is in [`SPEC.md`](SPEC.md). This README covers **running the harness**.
+
+## Where this fits in Tapestry
+
+Project Tapestry trains a consortium base model whose partners build and own **sovereign
+cultural derivatives**; its first work streams are **LLM cultural alignment** — measured on the
+**Inglehart–Welzel cultural map** ([issue #22](https://github.com/The-AI-Alliance/tapestry/issues/22))
+— and **consortium training** ([issue #24](https://github.com/The-AI-Alliance/tapestry/issues/24)).
+This contribution is the **validation / measurement-rigor** layer for that work: rather than a new
+alignment *recipe*, it is a falsifiable test of whether a claimed cultural shift is *real,
+content-driven, deep (not survey-only), capability-safe, and aggregation-robust* — the foundational
+hypothesis (TAP-003) that any alignment technique assumes. It is **complementary** to the other
+contributions staged alongside it — notably `contrib/nguyennm1024-sociocultural-alignment` (which
+pursues IW-map cultural alignment by a different method: LoRA SFT on synthesized data, fused with a
+model soup) and `contrib/jneums-consortium-experiment` (coordinator metrics) — which it neither
+audits nor depends on; cross-references are provenance, not claims about that work.
 
 ## What it does
 
@@ -114,7 +132,7 @@ Or directly, e.g. `uv run python contrib/jneums-cultural-cpt-validation/run.py
 ## What is real vs. smoke-only
 
 Everything needed for a real EXP-001 result is now wired and has been used across
-the 11 runs in [`FINDINGS.md`](FINDINGS.md). The only smoke-mode-only pieces are
+the real runs recorded in [`FINDINGS.md`](FINDINGS.md). The only smoke-mode-only pieces are
 the toy fixtures that exist so CI can exercise the pipeline without a GPU or
 downloads.
 
@@ -159,18 +177,28 @@ the z is measured against is the **corpus-resampling** band, not the cross-seed
 band — see [`FINDINGS.md`](FINDINGS.md) for why that distinction decides the
 experiment.
 
-## Not in this harness (round two)
+## Round two — executed; where it landed
 
-The single-node go/no-go is done (real corpora, real bases, generate-mode
-behavioral probe — all landed). What remains for round two:
+The single-node go/no-go *and* the round-two extensions have all now run; none
+produced a clean win, and the result is **real but shallow** (full account in
+[`FINDINGS.md`](FINDINGS.md)):
 
-- **Consortium / aggregation survival** — real-mode `run_aggregation.py` (HF
-  backend per node): does the cultural shift survive FedAvg across cultures, or
-  collapse toward the centroid? This is the Tapestry-unique (T3) question and is
-  not yet run.
-- **Behavioral transfer** — the probe was upgraded to free-form generation scored
-  by an embedding judge, but no arm has moved open-ended behavior in any run;
-  demonstrating representational (not survey-only) transfer is the open H1(c)
-  question.
-- **Closing the absolute-magnitude gap** — scale base-model tokens/epochs to push
-  the absolute shift past the 0.05 bar (the one conjunct Run 11 still failed).
+- **Consortium / aggregation survival (T3)** — `run_aggregation.py` (HF backend per
+  node) ran single and corpus-resampled. Cultures stay separable under FedAvg (the
+  merge is **dilutive, not destructive** — `retained ≈ 1/√N`); but every metric is on
+  the forks *post-CPT*, never the merged model, so it is a non-failure, not a
+  demonstrated value-add.
+- **Behavioral transfer (H1c)** — the free-form probe's embedding judge had to be
+  rebuilt (**SemAxis cosine-difference**; the old option-softmax judge saturated at
+  ~±0.25 of 2.0, which is *why* behavior never moved). With a now-sensitive probe (a
+  persona prompt shifts behavior +0.18), grounded CPT moves the **survey** but **not
+  behavior** — a survey-behavior **dissociation**.
+- **Absolute-magnitude gap** — scaling base tokens/epochs (Run 12) *does* push the
+  absolute shift past 0.05, but the value-specific effect then collapses (the
+  value-neutral arm drifts target-ward too): a principled **tradeoff**, not a clean
+  four-conjunct PASS.
+
+**What a real win would still require** — not another run on this rig, but a different
+cut: depth beyond the survey, separating value from language at scale, and showing
+aggregation buys something over solo training. See
+[`FINDINGS.md`](FINDINGS.md#status--next-steps).

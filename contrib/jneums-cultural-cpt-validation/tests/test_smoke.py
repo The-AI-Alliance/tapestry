@@ -10,6 +10,8 @@ import json
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -18,6 +20,7 @@ from cultural_cpt import (  # noqa: E402
     ExperimentConfig,
     StatsConfig,
     run_aggregation,
+    run_aggregation_resampled,
     run_corpus_resampled,
     run_experiment,
     run_multiseed,
@@ -80,14 +83,15 @@ def test_deterministic_for_fixed_seed() -> None:
 
 
 def test_translated_batteries_match_english_structure() -> None:
-    """Every translated battery (AR, VI) must be item-for-item equivalent to the
-    English one (same item_ids, axes, option values), so coordinates are
+    """Every translated battery (AR, VI, SV) must be item-for-item equivalent to
+    the English one (same item_ids, axes, option values), so coordinates are
     comparable across languages."""
     from cultural_cpt import behavior, wvs
 
     pairs = (
         (wvs._ITEMS, wvs._ITEMS_AR),
         (wvs._ITEMS, wvs._ITEMS_VI),
+        (wvs._ITEMS, wvs._ITEMS_SV),
         (behavior._SCENARIOS, behavior._SCENARIOS_AR),
         (behavior._SCENARIOS, behavior._SCENARIOS_VI),
     )
@@ -131,6 +135,45 @@ def test_generate_behavior_mode_with_stub_judge() -> None:
         behavior.administer_behavior(model, mode="generate", judge=None)
 
 
+def test_generate_behavior_prefers_score_axis_path() -> None:
+    """A judge exposing score_axis takes the SemAxis path (full dynamic range);
+    the option-softmax score_options is only the fallback for judges without it."""
+    from cultural_cpt import behavior
+    from cultural_cpt.model import ByteCausalModel
+
+    calls = {"axis": 0, "opts": 0}
+
+    class _AxisStub:
+        def score_axis(self, response, neg_anchors, pos_anchors):
+            calls["axis"] += 1
+            assert len(neg_anchors) >= 1 and len(pos_anchors) >= 1
+            return 0.5  # constant lean -> constant coordinate
+
+        def score_options(self, response, option_texts):  # must NOT be called
+            calls["opts"] += 1
+            return [0.0] * len(option_texts)
+
+    model = ByteCausalModel(hidden_size=32, seed=0)
+    coord = behavior.administer_behavior(model, seed=0, paraphrase_passes=1, mode="generate", judge=_AxisStub())
+    assert calls["axis"] > 0 and calls["opts"] == 0
+    assert coord.ts == 0.5 and coord.ss == 0.5
+
+
+def test_behavior_axis_anchors_include_semaxis_with_fallback() -> None:
+    """Per-scenario anchors lead with the scenario's own extreme-value options and
+    append the axis-level SemAxis exemplars; a language without SemAxis falls back
+    to just the option text."""
+    from cultural_cpt import behavior
+
+    item = behavior._SCENARIOS[0]
+    neg, pos = behavior._axis_anchors("en", item)
+    assert neg[0] == min(item.options, key=lambda o: o.value).text
+    assert pos[0] == max(item.options, key=lambda o: o.value).text
+    assert len(neg) > 1 and len(pos) > 1  # SemAxis exemplars appended for en
+    neg_fallback, pos_fallback = behavior._axis_anchors("zz", item)  # no SemAxis for 'zz'
+    assert len(neg_fallback) == 1 and len(pos_fallback) == 1
+
+
 def test_model_generate_primitive() -> None:
     from cultural_cpt.model import ByteCausalModel
 
@@ -166,6 +209,51 @@ def test_aggregation_runs_and_produces_curve() -> None:
         assert metric.mean_distance_to_centroid >= 0.0
 
 
+def test_aggregation_records_shift_and_abs_separability() -> None:
+    """Each node carries a shift vs the round's base, and the headline
+    separability curve is the SHIFT-space one (calibration-robust), with the
+    absolute-coordinate separability reported alongside."""
+    result = run_aggregation(_agg_config())
+    for metric in result.rounds:
+        # headline curve == shift-space separability
+        assert metric.abs_pairwise_distance >= 0.0
+        for n in metric.nodes:
+            assert hasattr(n, "shift_ts") and hasattr(n, "shift_ss")
+            assert hasattr(n, "lang")
+    assert result.separability_curve == [m.mean_pairwise_distance for m in result.rounds]
+
+
+def test_sv_battery_scores_toy_model() -> None:
+    """The Swedish battery administers end to end and yields a well-formed coord."""
+    from cultural_cpt import wvs
+    from cultural_cpt.model import ByteCausalModel
+
+    coord = wvs.administer(ByteCausalModel(hidden_size=32, seed=0), seed=0, paraphrase_passes=1, lang="sv").coordinate
+    assert -1.0 <= coord.ts <= 1.0 and -1.0 <= coord.ss <= 1.0
+
+
+def test_culture_lang_resolves_from_manifest_and_requires_battery(tmp_path: Path) -> None:
+    """A node is measured in its corpus's language (from the manifest); a corpus
+    language with no WVS battery fails loudly instead of silently using English."""
+    import json
+
+    import pytest
+
+    from cultural_cpt.aggregation import AggregationConfig, _culture_lang
+
+    (tmp_path / "sweden").mkdir()
+    (tmp_path / "sweden" / "manifest.json").write_text(json.dumps({"language": "sv"}))
+    (tmp_path / "atlantis").mkdir()
+    (tmp_path / "atlantis" / "manifest.json").write_text(json.dumps({"language": "zz"}))
+
+    cfg = AggregationConfig(corpus_path=str(tmp_path), instrument_lang="en")
+    assert _culture_lang(cfg, "sweden") == "sv"
+    # smoke / placeholder fallback (no corpus_path)
+    assert _culture_lang(AggregationConfig(instrument_lang="en"), "sweden") == "en"
+    with pytest.raises(ValueError, match="no WVS battery"):
+        _culture_lang(cfg, "atlantis")
+
+
 def test_aggregation_is_deterministic() -> None:
     a = run_aggregation(_agg_config(seed=5))
     b = run_aggregation(_agg_config(seed=5))
@@ -179,6 +267,102 @@ def test_aggregation_needs_two_cultures() -> None:
         assert "at least 2" in str(exc)
     else:  # pragma: no cover
         raise AssertionError("expected ValueError for single culture")
+
+
+def test_aggregation_resampled_bands_curves_and_resumes(tmp_path: Path) -> None:
+    """The resampled sweep runs N draws and reports a per-round mean/std band on
+    each metric, and resumes from the per-draw cache instead of recomputing."""
+    cfg = _agg_config(rounds=2)
+    res = run_aggregation_resampled(cfg, draws=3, sample_fraction=0.7, cache_dir=tmp_path)
+    assert res.sample_seeds == [0, 1, 2]
+    assert len(res.rounds) == 2
+    assert len(res.shift_separability_band) == 2
+    for b in res.rounds:
+        assert b.shift_sep_std >= 0.0 and b.abs_sep_std >= 0.0
+        assert b.retained_std >= 0.0
+    # Every draw cached for free resume; a second call must reload, not recompute.
+    assert (tmp_path / "draws" / "draw_0.json").exists()
+    again = run_aggregation_resampled(cfg, draws=3, sample_fraction=0.7, cache_dir=tmp_path)
+    assert again.to_dict() == res.to_dict()
+
+
+def test_aggregation_resampled_validates_args() -> None:
+    cfg = _agg_config(rounds=2)
+    with pytest.raises(ValueError, match="draws >= 2"):
+        run_aggregation_resampled(cfg, draws=1, sample_fraction=0.7)
+    with pytest.raises(ValueError, match="sample_fraction"):
+        run_aggregation_resampled(cfg, draws=3, sample_fraction=1.0)
+
+
+def test_fedavg_averages_floats_and_preserves_int_buffers() -> None:
+    # FedAvg must average trainable float weights but leave integer buffers (which
+    # a real HF model carries) untouched -- averaging them is meaningless and would
+    # corrupt the dtype. Without this guard the real-mode loop breaks on the first round.
+    import torch
+
+    from cultural_cpt.aggregation import _fedavg
+
+    states = [
+        {"w": torch.tensor([0.0, 2.0]), "ids": torch.tensor([5, 6])},
+        {"w": torch.tensor([2.0, 6.0]), "ids": torch.tensor([5, 6])},
+    ]
+    out = _fedavg(states)
+    assert torch.allclose(out["w"], torch.tensor([1.0, 4.0]))
+    assert out["ids"].dtype == torch.long
+    assert torch.equal(out["ids"], torch.tensor([5, 6]))
+
+
+def test_merge_diagnostics_aligned_vs_opposed() -> None:
+    # The interference instrument: identical fork updates reinforce (cosine 1,
+    # unanimous sign, full retention); opposite updates cancel (cosine -1, balanced
+    # sign-conflict, zero retention). This is what tells homogenization apart from
+    # merge interference when the coordinate separability collapses.
+    import torch
+
+    from cultural_cpt.aggregation import _merge_diagnostics
+
+    base = {"w": torch.zeros(4), "ids": torch.tensor([1, 2, 3, 4])}
+    up = torch.tensor([1.0, -1.0, 1.0, -1.0])
+
+    cos, sign, retained = _merge_diagnostics(
+        base, [{"w": up, "ids": base["ids"]}, {"w": up.clone(), "ids": base["ids"]}]
+    )
+    assert abs(cos - 1.0) < 1e-6 and abs(sign - 1.0) < 1e-6 and abs(retained - 1.0) < 1e-6
+
+    cos, sign, retained = _merge_diagnostics(base, [{"w": up, "ids": base["ids"]}, {"w": -up, "ids": base["ids"]}])
+    assert abs(cos + 1.0) < 1e-6 and abs(sign) < 1e-6 and abs(retained) < 1e-6
+
+
+def test_aggregation_round_metric_carries_diagnostics() -> None:
+    # Smoke run still populates the merge diagnostics (real-valued, even if noise
+    # on the toy model) so the curve and the interference companion travel together.
+    result = run_aggregation(_agg_config())
+    m = result.rounds[-1]
+    assert -1.0 <= m.mean_update_cosine <= 1.0
+    assert 0.0 <= m.update_sign_agreement <= 1.0
+    assert m.retained_update_ratio >= 0.0
+
+
+def test_aggregation_resume_is_identical(tmp_path: Path) -> None:
+    # A cached full run, re-run against the same cache, must reproduce the curve
+    # exactly (it resumes from the checkpoint instead of recomputing).
+    cache = tmp_path / "rounds"
+    fresh = run_aggregation(_agg_config(seed=3), cache_dir=cache)
+    assert (cache / "global_state.pt").exists()
+    assert sorted(p.name for p in cache.glob("round_*.json")) == ["round_1.json", "round_2.json", "round_3.json"]
+    resumed = run_aggregation(_agg_config(seed=3), cache_dir=cache)
+    assert resumed.to_dict() == fresh.to_dict()
+
+
+def test_aggregation_partial_resume_matches_fresh(tmp_path: Path) -> None:
+    # Resuming a 2-round checkpoint to 3 rounds must match a fresh 3-round run --
+    # the preemption-recovery path the spot box relies on.
+    fresh = run_aggregation(_agg_config(rounds=3, seed=3))
+    cache = tmp_path / "rounds"
+    run_aggregation(_agg_config(rounds=2, seed=3), cache_dir=cache)
+    extended = run_aggregation(_agg_config(rounds=3, seed=3), cache_dir=cache)
+    assert extended.separability_curve == fresh.separability_curve
+    assert extended.to_dict() == fresh.to_dict()
 
 
 # --- multi-seed statistics / go-no-go decision -----------------------------

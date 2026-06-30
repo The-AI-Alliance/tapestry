@@ -25,7 +25,7 @@ Provide an overview of the most important details about the changes:
 
 ### Testing Performed
 
-Describe key aspects of the testing performed to validate the changes:
+Describe key aspects of automated and/or manual testing of executable code that was performed to validate the changes:
 
 * Unit tests added or modified
 * Integration tests performed
