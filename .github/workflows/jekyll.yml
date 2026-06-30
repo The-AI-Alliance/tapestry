@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: Check out
         # You may use a newer version of https://github.com/actions/checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Generate your content
         run: echo "Optional placeholder. Put your project's static website generator command here."
