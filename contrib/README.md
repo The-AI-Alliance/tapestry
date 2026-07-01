@@ -27,21 +27,48 @@ A maintainer will review, discuss, and either request changes, merge for further
 contrib/
 └── <your-handle>-<topic>/
     ├── README.md      # what it is, why, status, how to try it
-    ├── LICENSE        # license for this contribution (see below)
+    ├── LICENSE        # license for this contribution (optional - see below)
+    ├── Makefile       # contains targets for running any custom executables (optional)
     └── ...            # code, notes, diagrams, data pointers, etc.
 ```
+
+## Pass the Code Quality "Gates"
+
+The top-level `Makefile` has a target `before-pr`, which we ask everyone to run before opening a pull request.
+
+```shell
+make before-pr
+```
+
+It verifies that all existing _production_ code under `src` is properly formatted (the `Makefile`'s `format` target), lints cleanly (the `ruff` and `pylint` targets), type checks (the `type-check` target), and the tests pass (the `tests` target).
+
+Since `contrib` contributions are not necessarily production quality, the `before-pr` target currently only runs the `tests` target for each contribution. (We don't even require the contribution to have tests...) That's the minimum threshold.
+
+However, if you intend for your contribution to become part of the production code, it will eventually be necessary for all the quality checks to pass for the code, including a comprehensive test suite.
+
+You can run the targets for your contribution as follows. Let's assume your contribution is named `contrib/johndoe-foo`, then use this command _in the top-level directory_:
+
+```shell
+make SRC_DIR=contrib/johndoe-foo format ruff pylint type-check tests
+```
+
+> [!TIP]
+> Problems found while type checking often take the most time to fix, use this command to keep running the type checker as you fix issues and save the files:
+> ```shell
+> make SRC_DIR=contrib/johndoe-foo type-check-watch
+> ```
+> Exit using control-C.
 
 ## Reviewer-Friendly Checklist
 
 Contributions are much easier to review, discuss, and eventually adopt when
-they are small, runnable, and explicit about their maturity. Before opening a
-PR, check that your contribution answers the questions below.
+they are small, runnable, and explicit about their maturity. It is preferable to submit many small PRs for a single contribution.
 
 ### Keep the Review Manageable
 
 - Prefer several focused submissions over one large PR that mixes ideas,
   experiments, data notes, and implementation changes.
-- Make the top-level `README.md` a travel guide through the contribution: what
+- Make the top-level `README.md` a "travel guide" through the contribution: what
   to read first, what to run, where the important code or data pointers live,
   and what result a reviewer should expect.
 - Keep code and documentation readable enough that another contributor can
@@ -68,40 +95,24 @@ Be clear about the kind of contribution you are making:
 - **Speculative / exploratory:** a proof of concept, research sketch,
   comparison, or early experiment. These can be lightweight, but they should
   still be runnable or clearly marked as design-only.
-- **Candidate for adoption:** functionality that could move into `src/`,
-  `examples/`, or the main documentation with modest follow-up work. These
-  should have stronger tests, clearer package boundaries, CLI help, and fewer
-  one-off assumptions.
+- **Candidate for adoption:** code that could move into the production
+  `src/` or `examples/`, or documentation that could move to `docs`.
+  Try to minimize the follow-up work required. Code will need good test coverage
+  type checking, etc.
 
 For code that might be adopted later, reduce integration friction:
 
-- Follow the repository's `uv` and `make` conventions where practical.
+- Follow the repository's `uv` and `make` conventions.
 - Match the package/test shape used under `src/` so the contribution can be
   moved later without many small rewrites.
 - Use `argparse` or an equivalent CLI framework for command-line tools, with
   helpful descriptions for every argument.
 - Include automated tests for behavior that Tapestry would rely on.
+- Use type annotations for (almost) everything and make sure the `type-check` target passes.
 
-### Optional Makefile Contract
+### Optional Makefile "Contract"
 
-If your contribution needs its own workflow commands, prefer a
-`contrib/<your-handle>-<topic>/Makefile` over adding specialized targets to the
-top-level `Makefile`. The root Makefile will discover contribution Makefiles
-and run these conventional targets when present:
-
-| Target | Purpose |
-| :----- | :------ |
-| `check` | Run all checks for the contribution. |
-| `tests` | Run the contribution's automated tests. |
-| `lint` | Run the contribution's lint checks. |
-| `format` | Format contribution code or docs. |
-| `type-check` | Run type checks when the contribution has typed code. |
-
-The top-level commands `make contrib-check`, `make contrib-tests`,
-`make contrib-lint`, `make contrib-format`, and `make contrib-type-check`
-delegate to those per-contribution targets. `make before-pr` also runs
-`contrib-tests`, so a contribution with a Makefile should keep its `tests`
-target reliable enough for PR validation.
+If your contribution needs its own workflow commands, include a `Makefile` in your contribution directory. For consistency with the top-level `Makefile`, begin by including `../../common.mk`. Use this `Makefile` your custom executables and build steps, but rely on the top-level `Makefile` for standard targets like `tests`, `lint`, etc.
 
 ## Contribution Policy
 
@@ -119,7 +130,7 @@ If you're unsure whether something fits, open a [Discussion](https://github.com/
 
 ### Licensing
 
-Every contribution must be clearly licensed. Unless you state otherwise (compatibly), Tapestry's default licenses apply:
+Every contribution must be clearly licensed. Unless you state otherwise, Tapestry's default licenses apply:
 
 | Content type | Default license |
 | :----------- | :-------------- |
@@ -127,9 +138,9 @@ Every contribution must be clearly licensed. Unless you state otherwise (compati
 | Documentation | [CC BY 4.0](../LICENSE.CC-BY-4.0) |
 | Data | [CDLA Permissive 2.0](../LICENSE.CDLA-2.0) |
 
-If your contribution uses a different (but compatible, permissive) license, state it explicitly in your subdirectory's `LICENSE` and `README.md`. Contributions without a clear, compatible license cannot be accepted.
+If your contribution uses a different (but compatible, permissive) license, state it explicitly in your subdirectory's `LICENSE` and `README.md`. Contributions without a clear, _compatible_ license cannot be accepted.
 
-### Copyright & Data Clearance
+### Copyright and Data Clearance
 
 By opening a PR you affirm (via DCO) that:
 
@@ -146,11 +157,11 @@ By opening a PR you affirm (via DCO) that:
 
 ### Conduct
 
-All activity here follows the [AI Alliance Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md) and the policies in [`CONTRIBUTING.md`](../CONTRIBUTING.md).
+All activity here follows the [AI Alliance Code of Conduct](https://github.com/The-AI-Alliance/community/blob/main/CODE_OF_CONDUCT.md) and the policies in [`../CONTRIBUTING.md`](../CONTRIBUTING.md).
 
 ## Questions / Contacts
 
-Not sure if something fits, or want to discuss before opening a PR? Start a [GitHub Discussion](https://github.com/The-AI-Alliance/tapestry/discussions) or reach out to the maintainers:
+Not sure if something fits? Do you want to discuss an idea before opening a PR? Start a [GitHub Discussion](https://github.com/The-AI-Alliance/tapestry/discussions) or reach out to the maintainers:
 
 - **Christopher Nguyen** ([@ctn](https://github.com/ctn))
 - **Dean Wampler** ([@deanwampler](https://github.com/deanwampler))

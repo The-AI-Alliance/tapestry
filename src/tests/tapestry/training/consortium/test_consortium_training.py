@@ -57,10 +57,7 @@ def test_sovereign_node_returns_artifact_and_local_model_state() -> None:
     assert result.contribution.round_num == 1
     assert result.contribution.quality_score == pytest.approx(0.82)
     assert set(result.contribution.local_model_state) == set(base_state)
-    assert any(
-        not torch.equal(result.contribution.local_model_state[name], base_state[name])
-        for name in base_state
-    )
+    assert any(not torch.equal(result.contribution.local_model_state[name], base_state[name]) for name in base_state)
 
 
 def test_contribution_policy_applies_quality_floor_and_capture_cap() -> None:
