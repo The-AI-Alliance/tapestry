@@ -50,3 +50,4 @@ class ConsortiumRoundResult:
     accepted_nodes: list[str]
     rejected_nodes: list[str]
     contribution_weights: dict[str, float]
+    outer_merge_strategy: str

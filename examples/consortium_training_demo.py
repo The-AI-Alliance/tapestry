@@ -18,6 +18,8 @@ from tapestry.training.consortium import (
     ConsortiumCoordinator,
     ContributionPolicy,
     ContributionWeighting,
+    OuterMergeOptimizer,
+    OuterMergeStrategy,
     SovereignTrainingNode,
     TinyCausalModel,
 )
@@ -57,9 +59,13 @@ def run_demo(
     rounds: int = 3,
     seed: int = 7,
     weighting: ContributionWeighting | str = ContributionWeighting.QUALITY,
+    outer_merge: OuterMergeStrategy | str = OuterMergeStrategy.WEIGHTED_AVERAGE,
+    outer_lr: float = 1.0,
+    outer_momentum: float = 0.9,
 ) -> None:
     """Run a small N+1 consortium-training loop."""
     weighting = ContributionWeighting(weighting)
+    outer_merge = OuterMergeStrategy(outer_merge)
     random.seed(seed)
     torch.manual_seed(seed)
 
@@ -67,8 +73,10 @@ def run_demo(
     print("  TAPESTRY -- Consortium Training Proof of Concept")
     print("  One governed shared base + N sovereign participant models")
     print(f"  Contribution weighting: {weighting.value}")
+    print(f"  Outer merge: {outer_merge.value}")
     print("=" * 72)
 
+    momentum = outer_momentum if outer_merge is OuterMergeStrategy.MOMENTUM_DELTA else 0.0
     base_model = TinyCausalModel(vocab_size=128, hidden_size=32)
     coordinator = ConsortiumCoordinator(
         base_model=base_model,
@@ -76,6 +84,11 @@ def run_demo(
             quality_floor=0.75,
             max_node_weight=0.5,
             weighting=weighting,
+        ),
+        outer_merge=OuterMergeOptimizer(
+            strategy=outer_merge,
+            outer_lr=outer_lr,
+            outer_momentum=momentum,
         ),
     )
     nodes = [
@@ -100,6 +113,7 @@ def run_demo(
         print("  contribution weights:")
         for node_id, weight in sorted(result.contribution_weights.items()):
             print(f"    {node_id:12s} {weight:.3f}")
+        print(f"  outer merge      : {result.outer_merge_strategy}")
         print(
             "  sovereign artifacts retained:",
             ", ".join(sorted(coordinator.sovereign_artifacts)),
@@ -112,10 +126,17 @@ def run_demo(
     print("=" * 72)
 
 
-def run_comparison(rounds: int = 3, seed: int = 7) -> None:
+def run_weighting_comparison(rounds: int = 3, seed: int = 7) -> None:
     """Run the same scenario with quality-weighted and equal influence policies."""
     for weighting in (ContributionWeighting.QUALITY, ContributionWeighting.EQUAL):
         run_demo(rounds=rounds, seed=seed, weighting=weighting)
+        print()
+
+
+def run_outer_merge_comparison(rounds: int = 3, seed: int = 7) -> None:
+    """Run the same scenario with each outer merge strategy."""
+    for outer_merge in OuterMergeStrategy:
+        run_demo(rounds=rounds, seed=seed, outer_merge=outer_merge)
         print()
 
 
@@ -129,12 +150,34 @@ def _parse_args() -> argparse.Namespace:
         default="quality",
         help="Contribution weighting policy to run. Use 'compare' to run quality and equal policies back to back.",
     )
+    parser.add_argument(
+        "--outer-merge",
+        choices=tuple(strategy.value for strategy in OuterMergeStrategy) + ("compare",),
+        default=OuterMergeStrategy.WEIGHTED_AVERAGE.value,
+        help="Outer merge strategy to run. Use 'compare' to run all strategies back to back.",
+    )
+    parser.add_argument("--outer-lr", type=float, default=1.0, help="Outer learning rate for delta merge strategies.")
+    parser.add_argument(
+        "--outer-momentum",
+        type=float,
+        default=0.9,
+        help="Outer momentum used by the momentum-delta merge strategy.",
+    )
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = _parse_args()
     if args.weighting == "compare":
-        run_comparison(rounds=args.rounds, seed=args.seed)
+        run_weighting_comparison(rounds=args.rounds, seed=args.seed)
+    elif args.outer_merge == "compare":
+        run_outer_merge_comparison(rounds=args.rounds, seed=args.seed)
     else:
-        run_demo(rounds=args.rounds, seed=args.seed, weighting=args.weighting)
+        run_demo(
+            rounds=args.rounds,
+            seed=args.seed,
+            weighting=args.weighting,
+            outer_merge=args.outer_merge,
+            outer_lr=args.outer_lr,
+            outer_momentum=args.outer_momentum,
+        )
