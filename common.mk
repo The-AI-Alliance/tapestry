@@ -1,8 +1,8 @@
 
 SRC_DIR      := src
-CLEAN_DIRS   := 
+CLEAN_DIRS   :=
 CONTRIB_DIR  := contrib
-CONTRIB_DIRS = $(patsubst %/,%,$(wildcard ${CONTRIB_DIR}/*/))
+CONTRIB_DIRS = $(patsubst %/.,%,$(wildcard ${CONTRIB_DIR}/*/.))
 
 # Environment variables
 MAKEFLAGS     = --warn-undefined-variables
@@ -39,7 +39,7 @@ _END         := \033[0m
 define help_message
 Quick help for this make process.
 
-make all                # Makes the 'help' and 'print-info' targets (see below). 
+make all                # Makes the 'help' and 'print-info' targets (see below).
 make help               # Prints this output.
 make print-info         # Print the current values of some make and env. variables.
 
@@ -55,7 +55,7 @@ make type-check         # Type check the Python code with 'ty'.
 make type-check-watch   # Type check the Python code with 'ty' in "watch" mode,
                         # so you can fix mistakes and keep it updating.
 make before-pr          # Make format, lint, type-check, and tests for "src" AND makes
-                        # tests in every "contrib" directory (but not the other targets...). 
+                        # tests in every "contrib" directory (but not the other targets...).
                         # DO THIS BEFORE SUBMITTING A PR!
 
 For contributed code in "contrib", any of the targets help, format, lint, ruff, pylint,
@@ -84,7 +84,7 @@ help-%::
 	@echo
 
 clean::
-	rm -rf ${CLEAN_DIRS} 
+	rm -rf ${CLEAN_DIRS}
 
 print-info::
 	@echo "source               ${SRC_DIR}"
@@ -101,7 +101,7 @@ tests:: unit-tests
 
 unit-tests::
 	@echo "${INFO}Running the unit tests in ${SRC_DIR}/tests:${_END}"
-	@if [[ ! -d ${SRC_DIR}/tests ]]; then echo "${WARN}No test directory ${SRC_DIR}/tests found!${_END}"; \
+	@if [ ! -d "${SRC_DIR}/tests" ]; then echo "${WARN}No test directory ${SRC_DIR}/tests found!${_END}"; \
 	else echo "cd ${SRC_DIR}; uv run python -m pytest tests -q"; \
 		cd ${SRC_DIR}; uv run python -m pytest tests -q; \
 	fi
@@ -130,11 +130,11 @@ pylint::
 
 type-check::
 	@echo "${INFO}$@: Running 'ty' to type check the code in ${SRC_DIR}.${_END}"
-	uv run ty check ${SRC_DIR} 
+	uv run ty check ${SRC_DIR}
 
 type-check-watch::
 	@echo "${INFO}$@: Running 'ty' to type check the code in ${SRC_DIR} using 'watch' mode.${_END}"
-	uv run ty check --watch ${SRC_DIR} 
+	uv run ty check --watch ${SRC_DIR}
 
 # Exists primarily for testing the contrib-% target pattern:
 ls::
@@ -143,20 +143,20 @@ ls::
 
 contrib-%::
 	for d in ${CONTRIB_DIRS}; \
-	do [[ -f $$d ]] && continue; \
+	do [ -d "$$d" ] || continue; \
 		${MAKE} SRC_DIR=$$d ${@:contrib-%=%} || exit $$?; \
 	done
 
-.PHONY: one-time-setup clean-setup 
+.PHONY: one-time-setup clean-setup
 .PHONY: install-uv uv-venv install-dev-dependencies command-check-uv
 
 setup one-time-setup:: install-uv uv-venv install-dev-dependencies
 
-install-%:: 
+install-%::
 	@cmd=${@:install-%=%} && command -v $$cmd > /dev/null && \
 		echo "${INFO}$$cmd is already installed${_END}" || ${MAKE} help-command-$$cmd
 
-uv-venv:: command-check-uv 
+uv-venv:: command-check-uv
 	@test -d .venv && echo "'.venv' already exists; not running 'uv venv'." || uv venv
 	@echo "run: 'source .venv/bin/activate' if subsequent commands fail!"
 

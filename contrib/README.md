@@ -34,7 +34,7 @@ contrib/
 
 ## Pass the Code Quality "Gates"
 
-The top-level `Makefile` has a target `before-pr`, which we ask everyone to run before opening a pull request. 
+The top-level `Makefile` has a target `before-pr`, which we ask everyone to run before opening a pull request.
 
 ```shell
 make before-pr
@@ -62,7 +62,7 @@ make SRC_DIR=contrib/johndoe-foo format ruff pylint type-check tests
 ## Reviewer-Friendly Checklist
 
 Contributions are much easier to review, discuss, and eventually adopt when
-they are small, runnable, and explicit about their maturity. It is preferable to submit many small PRs for a single contribution. 
+they are small, runnable, and explicit about their maturity. It is preferable to submit many small PRs for a single contribution.
 
 ### Keep the Review Manageable
 
@@ -95,8 +95,8 @@ Be clear about the kind of contribution you are making:
 - **Speculative / exploratory:** a proof of concept, research sketch,
   comparison, or early experiment. These can be lightweight, but they should
   still be runnable or clearly marked as design-only.
-- **Candidate for adoption:** code that could move into the production 
-  `src/` or `examples/`, or documentation that could move to `docs`. 
+- **Candidate for adoption:** code that could move into the production
+  `src/` or `examples/`, or documentation that could move to `docs`.
   Try to minimize the follow-up work required. Code will need good test coverage
   type checking, etc.
 

@@ -30,7 +30,7 @@ Project Tapestry has big plans, and we're starting with some fundamental buildin
 
 > [!NOTE]
 > Make sure to read [**Getting Involved**](#getting-involved-anchor) below for information on contribution guidelines, etc.
-> 
+>
 > We use the [`develop`](https://github.com/The-AI-Alliance/tapestry/tree/develop) branch as our default (integration) branch, reserving `main` for occasional "baked" releases.
 
 ### Working with the Source Code
@@ -50,7 +50,7 @@ The technical documentation lives under [**`docs`**](docs/README.md). This is wh
 * [**Architecture**](docs/architecture/README.md)
 	* The _TVA methodology_: phased outputs (stakeholder map through design goals), architectural options and core thesis, plus:
 		* [**Architecture Decision Records**](docs/architecture/decisions/)
-		* [**Diagrams**](docs/architecture/diagrams/) 
+		* [**Diagrams**](docs/architecture/diagrams/)
 * [**Governance**](docs/governance/)
 * [**Strategic Plan**](docs/strategic-plan/)
 * [**Reference Materials**](docs/reference/) (e.g. [**training paradigms**](docs/reference/training-approaches.md))
@@ -183,7 +183,7 @@ Before submitting a PR, please run the format, lint, and type checking commands,
 make before-pr  # Equivalent to 'make format lint type-check tests contrib-tests'
 ```
 
-This ensures that the _production_ code under `src` is properly formatted, linted, type checked, and the tests pass (and stays that way, even if you aren't working on it with your PR...), and it also ensures that all the `contrib` contribution tests pass. 
+This ensures that the _production_ code under `src` is properly formatted, linted, type checked, and the tests pass (and stays that way, even if you aren't working on it with your PR...), and it also ensures that all the `contrib` contribution tests pass.
 
 Note that since contributions are often quick PoCs, we don't run the `format`, `lint`, and `type-check` targets on them. However, you can run these targets on one or more contributions as follows. Let's use `contrib/foo` and target `format` as an example:
 
@@ -222,7 +222,7 @@ tapestry/
 
 ## Getting Involved
 
-We welcome contributions as [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), and [discussions](https://github.com/The-AI-Alliance/tapestry/discussions). 
+We welcome contributions as [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), and [discussions](https://github.com/The-AI-Alliance/tapestry/discussions).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. In particular, [read this section](CONTRIBUTING.md#developer-certificate-of-origin-dco) on using _DCO_ with any commits.
 
