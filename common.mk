@@ -99,13 +99,16 @@ print-info::
 	@echo "GIT_HASH:            ${GIT_HASH}"
 	@echo "NOW:                 ${NOW}"
 
-.PHONY: before-pr format format-default ruff ruff-default pylint pylint-default
-.PHONY: type-check type-check-default type-check-watch type-check-watch-default
-.PHONY: lint do-before-pr do-contrib-before-pr
-.PHONY: tests unit-tests unit-tests-default
+.PHONY: tests unit-tests unit-tests-prerequisite unit-tests-default
+.PHONY: format format-prerequisite format-default
+.PHONY: ruff ruff-prerequisite ruff-default
+.PHONY: pylint pylint-prerequisite pylint-default
+.PHONY: type-check type-check-prerequisite type-check-default type-check-watch type-check-watch-default
+.PHONY: lint before-pr do-before-pr do-contrib-before-pr
 
 tests:: unit-tests
-unit-tests:: unit-tests-default
+unit-tests:: unit-tests-prerequisite unit-tests-default
+unit-tests-prerequisite::
 unit-tests-default:
 	@echo "${INFO}Running the unit tests in ${SRC_DIR}/tests:${_END}"
 	@if [ ! -d "${SRC_DIR}/tests" ]; then echo "${WARN}No test directory ${SRC_DIR}/tests found!${_END}"; \
@@ -120,35 +123,34 @@ do-contrib-before-pr:: ${QUALITY_CHECKS:%=contrib-%}
 # Convenient short hand for the two linters.
 lint:: ruff pylint
 
-format:: format-default
+format:: format-prerequisite format-default
+format-prerequisite::
 format-default:
 	@echo "${INFO}$@: Running 'black' on the code in ${SRC_DIR}.${_END}"
 	uv run black ${SRC_DIR}
 
-ruff:: ruff-default
+ruff:: ruff-prerequsite ruff-default
+ruff-prerequsite::
 ruff-default:
 	@echo "${INFO}$@: Running 'ruff' to lint the code in ${SRC_DIR}.${_END}"
 	uv run ruff check --fix ${SRC_DIR}
 
-pylint:: pylint-default
+pylint:: pylint-prerequsite pylint-default
+pylint-prerequsite::
 pylint-default:
 	@echo "${INFO}$@: Running 'pylint' on the code in ${SRC_DIR}.${_END} (configuration in pylintrc.toml)"
 	uv run pylint ${SRC_DIR}
 
-type-check:: type-check-default
+type-check:: type-check-prerequsite type-check-default
+type-check-prerequsite::
 type-check-default:
 	@echo "${INFO}$@: Running 'ty' to type check the code in ${SRC_DIR}.${_END}"
 	uv run ty check ${SRC_DIR}
 
-type-check-watch:: type-check-watch-default
+type-check-watch:: type-check-prerequsite type-check-watch-default
 type-check-watch-default:
 	@echo "${INFO}$@: Running 'ty' to type check the code in ${SRC_DIR} using 'watch' mode.${_END}"
 	uv run ty check --watch ${SRC_DIR}
-
-# Exists primarily for testing the contrib-% target pattern:
-ls::
-	@echo "${INFO}$@: Running ls -l in ${SRC_DIR}.${_END}"
-	@ls -l ${SRC_DIR}
 
 # Contains logic to skip any item in ${CONTRIB_DIRS} that is not a directory,
 # although the construction of ${CONTRIB_DIRS} should prevent this from happening.
@@ -178,7 +180,7 @@ install-dev-dependencies::
 # This target exists to support contributions that have a custom requirements.txt file
 # that needs to be used for local setup. Otherwise, it isn't used by the main uv process.
 install-requirements-txt-dependencies::
-	uv pip install -f requirements.txt
+	uv pip install --requirements requirements.txt
 
 command-check-uv::
 	@command -v uv > /dev/null || ! ${MAKE} help-command-uv
