@@ -139,7 +139,7 @@ type-check-watch::
 # Exists primarily for testing the contrib-% target pattern:
 ls::
 	@echo "${INFO}$@: Running ls -l in ${SRC_DIR}.${_END}"
-	@ls -l ${SRC_DIR}/LICENSE
+	@ls -l ${SRC_DIR}
 
 contrib-%::
 	for d in ${CONTRIB_DIRS}; \
