@@ -17,6 +17,8 @@ from tapestry.training.consortium import (
     ConsortiumCoordinator,
     ContributionPolicy,
     ContributionWeighting,
+    OuterMergeOptimizer,
+    OuterMergeStrategy,
     SovereignTrainingNode,
     TinyCausalModel,
 )
@@ -127,6 +129,7 @@ def test_coordinator_maintains_n_plus_one_model_outcome() -> None:
     result = coordinator.run_round(nodes)
 
     assert result.round_num == 1
+    assert result.outer_merge_strategy == OuterMergeStrategy.WEIGHTED_AVERAGE.value
     assert set(result.accepted_nodes) == {"vietnam", "swiss"}
     assert len(coordinator.sovereign_artifacts) == 2
     assert set(coordinator.sovereign_artifacts) == {"vietnam", "swiss"}
@@ -159,12 +162,46 @@ def test_weighting_modes_produce_different_integration_results() -> None:
         }
     )
 
-    quality_state = ConsortiumCoordinator._apply_weighted_average(local_states, quality_weights)
-    equal_state = ConsortiumCoordinator._apply_weighted_average(local_states, equal_weights)
+    previous_state = {"weight": torch.tensor([0.0])}
+    merge = OuterMergeOptimizer()
+    quality_state = merge.merge(previous_state, local_states, quality_weights)
+    equal_state = merge.merge(previous_state, local_states, equal_weights)
 
     assert quality_weights["dominant"] > equal_weights["dominant"]
     assert quality_state["weight"].item() == pytest.approx(8.0)
     assert equal_state["weight"].item() == pytest.approx(6.0)
+
+
+def test_delta_outer_merge_applies_scaled_weighted_delta() -> None:
+    """Delta merge applies weighted node deltas to the previous base."""
+    previous_state = {"weight": torch.tensor([4.0])}
+    local_states = {
+        "a": {"weight": torch.tensor([6.0])},
+        "b": {"weight": torch.tensor([10.0])},
+    }
+    merge = OuterMergeOptimizer(strategy=OuterMergeStrategy.DELTA, outer_lr=0.5)
+
+    merged = merge.merge(previous_state, local_states, {"a": 0.25, "b": 0.75})
+
+    # Weighted delta is 0.25 * 2 + 0.75 * 6 = 5.0; outer_lr applies half.
+    assert merged["weight"].item() == pytest.approx(6.5)
+
+
+def test_momentum_delta_outer_merge_accumulates_outer_velocity() -> None:
+    """Momentum merge carries an outer optimizer buffer across rounds."""
+    previous_state = {"weight": torch.tensor([0.0])}
+    local_states = {"a": {"weight": torch.tensor([1.0])}}
+    merge = OuterMergeOptimizer(
+        strategy=OuterMergeStrategy.MOMENTUM_DELTA,
+        outer_lr=1.0,
+        outer_momentum=0.5,
+    )
+
+    first = merge.merge(previous_state, local_states, {"a": 1.0})
+    second = merge.merge(first, {"a": {"weight": torch.tensor([2.0])}}, {"a": 1.0})
+
+    assert first["weight"].item() == pytest.approx(1.0)
+    assert second["weight"].item() == pytest.approx(2.5)
 
 
 def test_low_quality_contribution_does_not_update_shared_base() -> None:

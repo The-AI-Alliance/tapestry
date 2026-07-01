@@ -10,9 +10,8 @@ front and center.
   weight vectors** with the coordinator.
 - A governed contribution policy applies a quality floor and anti-capture
   controls before integrating accepted weights into the shared base
-  (FedAvg-class averaging by default). The PoC can compare quality-weighted
-  influence with an equal-influence MVP policy where every accepted node receives
-  the same weight.
+  (weighted averaging by default). The PoC can compare quality-weighted
+  influence, equal-influence weighting, and multiple outer merge strategies.
 
 ## Modules
 
@@ -21,6 +20,7 @@ front and center.
 | `model.py` | `TinyCausalModel`, a small next-token model for fast tests and demos. |
 | `node.py` | `SovereignTrainingNode`, which runs local Contributed CPT and keeps a sovereign model artifact. |
 | `coordinator.py` | `ConsortiumCoordinator`, which evolves the shared base from governed contributions. |
+| `merge.py` | Outer merge strategies, including weighted averaging, delta averaging, and a DiLoCo-inspired momentum delta option. |
 | `policy.py` | `ContributionPolicy`, a minimal quality-floor and anti-capture policy with quality-weighted and equal-influence modes. |
 | `messages.py` | Data classes for sovereign artifacts, contributions, and round results. |
 | `../../../../contrib/jneums-consortium-experiment/` | Contrib experiment runner and metrics helpers that record round metrics and summaries without changing core training logic. |
@@ -75,6 +75,30 @@ Run both policies back to back with the same seed and round count:
 
 ```shell
 PYTHONPATH="$PWD/src" uv run python examples/consortium_training_demo.py --weighting compare
+```
+
+## Comparing Outer Merge Options
+
+The coordinator also supports multiple outer merge strategies through
+`OuterMergeOptimizer(strategy=...)`:
+
+- `weighted-average` keeps the original FedAvg-class behavior by directly
+  averaging accepted local model states.
+- `delta` applies a weighted average of node deltas to the previous shared base,
+  with an outer learning rate.
+- `momentum-delta` applies outer momentum to the weighted deltas, giving the PoC
+  a small DiLoCo-style outer optimizer comparison point.
+
+Run one outer merge strategy:
+
+```shell
+PYTHONPATH="$PWD/src" uv run python examples/consortium_training_demo.py --outer-merge delta
+```
+
+Run all outer merge strategies back to back:
+
+```shell
+PYTHONPATH="$PWD/src" uv run python examples/consortium_training_demo.py --outer-merge compare
 ```
 
 ## What This Demonstrates
