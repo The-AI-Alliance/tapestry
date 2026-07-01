@@ -1,8 +1,11 @@
+# See comment at the bottom of this file about "-include .custom.mk".
 
 SRC_DIR      := src
 CLEAN_DIRS   :=
 CONTRIB_DIR  := contrib
 CONTRIB_DIRS = $(patsubst %/.,%,$(wildcard ${CONTRIB_DIR}/*/.))
+
+QUALITY_CHECKS := format ruff pylint type-check tests
 
 # Environment variables
 MAKEFLAGS     = --warn-undefined-variables
@@ -96,43 +99,49 @@ print-info::
 	@echo "GIT_HASH:            ${GIT_HASH}"
 	@echo "NOW:                 ${NOW}"
 
-.PHONY: tests unit-tests
-tests:: unit-tests
+.PHONY: before-pr format format-default ruff ruff-default pylint pylint-default
+.PHONY: type-check type-check-default type-check-watch type-check-watch-default
+.PHONY: lint do-before-pr do-contrib-before-pr
+.PHONY: tests unit-tests unit-tests-default
 
-unit-tests::
+tests:: unit-tests
+unit-tests:: unit-tests-default
+unit-tests-default:
 	@echo "${INFO}Running the unit tests in ${SRC_DIR}/tests:${_END}"
 	@if [ ! -d "${SRC_DIR}/tests" ]; then echo "${WARN}No test directory ${SRC_DIR}/tests found!${_END}"; \
 	else echo "cd ${SRC_DIR}; uv run python -m pytest tests -q"; \
 		cd ${SRC_DIR}; uv run python -m pytest tests -q; \
 	fi
 
-.PHONY: before-pr format ruff pylint type-check type-check-watch
-.PHONY: lint do-before-pr do-contrib-before-pr
-
 before-pr:: do-before-pr do-contrib-before-pr
-do-before-pr:: format ruff pylint type-check tests
-do-contrib-before-pr:: contrib-tests
+do-before-pr:: ${QUALITY_CHECKS}
+do-contrib-before-pr:: ${QUALITY_CHECKS:%=contrib-%}
 
 # Convenient short hand for the two linters.
 lint:: ruff pylint
 
-format::
+format:: format-default
+format-default:
 	@echo "${INFO}$@: Running 'black' on the code in ${SRC_DIR}.${_END}"
 	uv run black ${SRC_DIR}
 
-ruff::
+ruff:: ruff-default
+ruff-default:
 	@echo "${INFO}$@: Running 'ruff' to lint the code in ${SRC_DIR}.${_END}"
 	uv run ruff check --fix ${SRC_DIR}
 
-pylint::
+pylint:: pylint-default
+pylint-default:
 	@echo "${INFO}$@: Running 'pylint' on the code in ${SRC_DIR}.${_END} (configuration in pylintrc.toml)"
 	uv run pylint ${SRC_DIR}
 
-type-check::
+type-check:: type-check-default
+type-check-default:
 	@echo "${INFO}$@: Running 'ty' to type check the code in ${SRC_DIR}.${_END}"
 	uv run ty check ${SRC_DIR}
 
-type-check-watch::
+type-check-watch:: type-check-watch-default
+type-check-watch-default:
 	@echo "${INFO}$@: Running 'ty' to type check the code in ${SRC_DIR} using 'watch' mode.${_END}"
 	uv run ty check --watch ${SRC_DIR}
 
@@ -141,14 +150,17 @@ ls::
 	@echo "${INFO}$@: Running ls -l in ${SRC_DIR}.${_END}"
 	@ls -l ${SRC_DIR}
 
+# Contains logic to skip any item in ${CONTRIB_DIRS} that is not a directory,
+# although the construction of ${CONTRIB_DIRS} should prevent this from happening.
 contrib-%::
-	for d in ${CONTRIB_DIRS}; \
+	@for d in ${CONTRIB_DIRS}; \
 	do [ -d "$$d" ] || continue; \
-		${MAKE} SRC_DIR=$$d ${@:contrib-%=%} || exit $$?; \
+		echo "${MAKE} SRC_DIR=$$d --include-dir=$$d ${@:contrib-%=%}"; \
+		${MAKE} SRC_DIR=$$d --include-dir=$$d ${@:contrib-%=%} || exit $$?; \
 	done
 
 .PHONY: one-time-setup clean-setup
-.PHONY: install-uv uv-venv install-dev-dependencies command-check-uv
+.PHONY: command-check-uv install-uv uv-venv install-dev-dependencies install-requirements-txt-dependencies
 
 setup one-time-setup:: install-uv uv-venv install-dev-dependencies
 
@@ -162,6 +174,11 @@ uv-venv:: command-check-uv
 
 install-dev-dependencies::
 	uv pip install -e ".[dev]"
+
+# This target exists to support contributions that have a custom requirements.txt file
+# that needs to be used for local setup. Otherwise, it isn't used by the main uv process.
+install-requirements-txt-dependencies::
+	uv pip install -f requirements.txt
 
 command-check-uv::
 	@command -v uv > /dev/null || ! ${MAKE} help-command-uv
@@ -181,3 +198,23 @@ installation commands on the website above, find the installation
 location and delete uv.
 
 endef
+
+define skip-contrib-target
+Skipping target \"${@:%-default=%}\" in ${SRC_DIR}! Overridden in ${SRC_DIR}/.custom.mk (see target \"$@\").
+endef
+
+# Include a .custom.mk that _may or may not_ exist. The leading "-"
+# means that make will ignore the error if a file isn't found. This
+# idiom is used to support contrib customization of make targets,
+# primarily adding additional dependencies to common targets like `tests`.
+# When targets defined below, like the contrib-%, are executed, the
+# argument "--include-dir $$dir" is passed to make, where "$$dir" will be
+# set to the contribution's directory. So, if a particular contribution has
+# a .custom.mk file, it will be found and read _for that directory only_.
+# Note that because .custom.mk is loaded before anything else is defined
+# (including in the top-level Makefile), if you add a dependency to a target
+# it will be the _first_ dependency, so your addition will be made first.
+# Similarly, if you add commands for a common target, those commands will be
+# executed before the commands defined in this file.
+
+-include .custom.mk
