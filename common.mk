@@ -44,7 +44,7 @@ Quick help for this make process.
 
 make all                # Makes the 'help' and 'print-info' targets (see below).
 make help               # Prints this output.
-make print-info         # Print the current values of some make and env. variables.
+make print-info         # Print the current values of some make env. variables.
 
 Working with code:
 
@@ -57,17 +57,15 @@ make pylint             # Lint the Python code with 'pylint'.
 make type-check         # Type check the Python code with 'ty'.
 make type-check-watch   # Type check the Python code with 'ty' in "watch" mode,
                         # so you can fix mistakes and keep it updating.
-make before-pr          # Make format, lint, type-check, and tests for "src" AND makes
-                        # tests in every "contrib" directory (but not the other targets...).
+make before-pr          # Make format, lint, type-check, and tests for "src" AND
+                        # every "contrib" directory.
                         # DO THIS BEFORE SUBMITTING A PR!
 
 For contributed code in "contrib", any of the targets help, format, lint, ruff, pylint,
 type-check, type-check-watch, and before-pr, can be invoked by prefixing the targets
 name with "contrib-". This will run the corresponding target in all the contrib/* directories.
 
-make help-programs      # Print help on executable tools, PoCs, etc. (including "contribs").
-make help-website       # Print help for the documentation website.
-
+${help_top_level_message}
 endef
 
 define missing_shell_command_error_message
@@ -79,12 +77,32 @@ endef
 all:: help print-info
 
 help::
+	$(info )
 	$(info ${help_message})
-	@echo
+	$(info )
+	@true
 
 help-%::
+	$(info )
 	$(info ${help_${@:help-%=%}_message})
-	@echo
+	$(info )
+	@true
+
+define help_programs_message
+endef
+
+help-programs:: help-top-level-programs custom-program-help contrib-custom-program-help
+help-top-level-programs:
+	$(info )
+	$(info ${help_top_level_programs_message})
+	$(info )
+	@true
+custom-program-help:
+	$(info )
+	$(info ${help_programs_message})
+	$(info )
+	@true
+
 
 clean::
 	rm -rf ${CLEAN_DIRS}
@@ -111,7 +129,7 @@ unit-tests:: unit-tests-prerequisite unit-tests-default
 unit-tests-prerequisite::
 unit-tests-default:
 	@echo "${INFO}Running the unit tests in ${SRC_DIR}/tests:${_END}"
-	@if [ ! -d "${SRC_DIR}/tests" ]; then echo "${WARN}No test directory ${SRC_DIR}/tests found!${_END}"; \
+	@if [ ! -d "${SRC_DIR}/tests" ]; then echo "${WARN} No test directory ${SRC_DIR}/tests found!${_END}"; \
 	else echo "cd ${SRC_DIR}; uv run python -m pytest tests -q"; \
 		cd ${SRC_DIR}; uv run python -m pytest tests -q; \
 	fi
@@ -157,8 +175,9 @@ type-check-watch-default:
 contrib-%::
 	@for d in ${CONTRIB_DIRS}; \
 	do [ -d "$$d" ] || continue; \
-		echo "${MAKE} SRC_DIR=$$d --include-dir=$$d ${@:contrib-%=%}"; \
-		${MAKE} SRC_DIR=$$d --include-dir=$$d ${@:contrib-%=%} || exit $$?; \
+		echo "In directory $$d:"; \
+		${MAKE} SRC_DIR=$$d --include-dir=$$d ${@:contrib-%=%} 2>&1 | \
+			egrep -v -e '(overriding|ignoring old) commands for target' || exit $$?; \
 	done
 
 .PHONY: one-time-setup clean-setup
