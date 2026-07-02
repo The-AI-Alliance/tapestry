@@ -1,4 +1,4 @@
-include common.mk
+include .common.mk
 include website.mk
 
 define help_top_level_message
@@ -13,6 +13,23 @@ For the consortium-training prototype:
 
 make consortium-demo    # Run the N+1 consortium-training proof-of-concept demo.
 endef
+
+foo::
+	@echo "foo - no dependencies"
+foo:: a
+	@echo "foo - dependency: a"
+foo:: b
+a::
+	@echo "a"
+b::
+	@echo "b"
+foo::
+	@echo "finished!"
+
+bar:
+	@echo "bar V1!"
+bar:
+	@echo "bar V2!"
 
 print-info::
 

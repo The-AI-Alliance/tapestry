@@ -171,21 +171,24 @@ uv run ty --watch src
 
 ## _Where_ to Create Your Contribution
 
-If you are enhancing existing code, make the changes under `src`, and when appropriate, the top-level `Makefile` and `common.mk`.
+If you are enhancing existing code, make the changes under `src`, and when appropriate, the top-level `Makefile` and `.common.mk`.
 
-However, for everything else, including proofs of concept (PoCs), experiments, proposed additions, etc., create them under [`contrib`](contrib/README.md), the staging area for new contributions. The `contrib` [`README`](contrib/README.md) describes the requirements you must follow for new contributions.
+However, for everything else, including proofs of concept (PoCs), experiments, proposed additions, etc., create them under [`contrib`](contrib/README.md), the staging area for new contributions. The `contrib` [`README`](contrib/README.md) describes the requirements you must follow for new contributions, including how
+the master `make` process works and customizations you might need to make to it.
 
 ## Before You Submit a PR...
 
-Before submitting a PR, please run the format, lint, and type checking commands, then run the tests. Make sure everything passes cleanly! Use the convenient `make` target `before-pr`, or run the individual commands above:
+Before submitting a PR, please make these "quality" targets: `format`, `lint` (which makes `ruff` and `pylint`), `type-check`, and `tests`. This needs to be done in both the _production_ `src` tree and all the `contrib` contributions. Use the convenient make target `before-pr`, which handles all of them for you:
 
 ```shell
-make before-pr  # Equivalent to 'make format lint type-check tests contrib-tests'
+make before-pr
 ```
 
-This ensures that the _production_ code under `src` is properly formatted, linted, type checked, and the tests pass (and stays that way, even if you aren't working on it with your PR...), and it also ensures that all the `contrib` contribution tests pass.
+Make sure everything passes cleanly! This ensures that the _production_ code under `src` and the `contrib` contributions are properly formatted, linted, type checked, and the tests pass (and continue to work, even when you aren't working on one of these "sections" with your PR...).
 
-Note that since contributions are often quick PoCs, we don't run the `format`, `lint`, and `type-check` targets on them. However, you can run these targets on one or more contributions as follows. Let's use `contrib/foo` and target `format` as an example:
+However, note that there is a mechanism each `contrib` contribution may use to skip certain of these targets when the contribution is not yet production ready. This mechanism is discussed in the `contrib` [`README`](contrib/README.md).
+
+You can run a specific quality target on one or more contributions as follows. Let's use `contrib/foo` and target `format` as an example:
 
 ```shell
 make SRC_DIR=contrib/foo format  # Make "format" just for "contrib/foo"
@@ -220,7 +223,7 @@ tapestry/
 
 <a id="getting-involved-anchor"></a>
 
-## Getting Involved
+## Final Notes on Getting Involved
 
 We welcome contributions as [pull requests](https://github.com/The-AI-Alliance/tapestry/pulls), [issues](https://github.com/The-AI-Alliance/tapestry/issues), and [discussions](https://github.com/The-AI-Alliance/tapestry/discussions).
 
@@ -248,6 +251,6 @@ See the contributing guide [section on DCO](CONTRIBUTING.md#developer-certificat
 
 ## About the Technical Website (GitHub Pages)
 
-The [website](https://the-ai-alliance.github.io/tapestry/) for this repository provides another way to discover and navigate the technical documentation content in [`docs`](/docs). However, at this time, the site mostly just points to the content in [`docs`](docs/). The website sources are in the [`website`](website/) directory.
+The [website](https://the-ai-alliance.github.io/tapestry/) for this repository provides another way to discover and navigate the technical documentation content in [`docs`](/docs). However, at this time, the site mostly just points to the content in [`docs`](docs/). Eventually, it will publish "refined" versions of the `docs` content.
 
-The website is published using [GitHub Pages](https://pages.github.com/), where the pages are written in Markdown and served using [Jekyll](https://github.com/jekyll/jekyll). See [GITHUB_PAGES.md](GITHUB_PAGES.md) for all the details.
+The website sources are written in Markdown, HTML, JavaScript, etc. and are found in the [`website`](website/) directory. The website is published using [GitHub Pages](https://pages.github.com/), which uses the [Jekyll](https://github.com/jekyll/jekyll) engine. See [GITHUB_PAGES.md](GITHUB_PAGES.md) for all the details.

@@ -117,16 +117,23 @@ print-info::
 	@echo "GIT_HASH:            ${GIT_HASH}"
 	@echo "NOW:                 ${NOW}"
 
-.PHONY: tests unit-tests unit-tests-prerequisite unit-tests-default
-.PHONY: format format-prerequisite format-default
-.PHONY: ruff ruff-prerequisite ruff-default
-.PHONY: pylint pylint-prerequisite pylint-default
-.PHONY: type-check type-check-prerequisite type-check-default type-check-watch type-check-watch-default
-.PHONY: lint before-pr do-before-pr do-contrib-before-pr
+.PHONY: before-pr do-before-pr do-contrib-before-pr
+
+before-pr:: do-before-pr do-contrib-before-pr
+do-before-pr:: ${QUALITY_CHECKS}
+do-contrib-before-pr:: ${QUALITY_CHECKS:%=contrib-%}
+
+.PHONY: tests unit-tests unit-tests-prerequisite unit-tests-default unit-tests-postrequisite
+.PHONY: format format-prerequisite format-default format-postrequisite
+.PHONY: ruff ruff-prerequisite ruff-default ruff-postrequisite
+.PHONY: pylint pylint-prerequisite pylint-default pylint-postrequisite
+.PHONY: type-check type-check-prerequisite type-check-default type-check-postrequisite
+.PHONY: type-check-watch type-check-watch-default
+.PHONY: lint
 
 tests:: unit-tests
-unit-tests:: unit-tests-prerequisite unit-tests-default
-unit-tests-prerequisite::
+unit-tests:: unit-tests-prerequisite unit-tests-default unit-tests-postrequisite
+unit-tests-prerequisite unit-tests-postrequisite::
 unit-tests-default:
 	@echo "${INFO}Running the unit tests in ${SRC_DIR}/tests:${_END}"
 	@if [ ! -d "${SRC_DIR}/tests" ]; then echo "${WARN} No test directory ${SRC_DIR}/tests found!${_END}"; \
@@ -134,38 +141,34 @@ unit-tests-default:
 		cd ${SRC_DIR}; uv run python -m pytest tests -q; \
 	fi
 
-before-pr:: do-before-pr do-contrib-before-pr
-do-before-pr:: ${QUALITY_CHECKS}
-do-contrib-before-pr:: ${QUALITY_CHECKS:%=contrib-%}
-
 # Convenient short hand for the two linters.
 lint:: ruff pylint
 
-format:: format-prerequisite format-default
-format-prerequisite::
+format:: format-prerequisite format-default format-postrequisite
+format-prerequisite format-postrequisite::
 format-default:
 	@echo "${INFO}$@: Running 'black' on the code in ${SRC_DIR}.${_END}"
 	uv run black ${SRC_DIR}
 
-ruff:: ruff-prerequsite ruff-default
-ruff-prerequsite::
+ruff:: ruff-prerequisite ruff-default ruff-postrequisite
+ruff-prerequisite ruff-postrequisite::
 ruff-default:
 	@echo "${INFO}$@: Running 'ruff' to lint the code in ${SRC_DIR}.${_END}"
 	uv run ruff check --fix ${SRC_DIR}
 
-pylint:: pylint-prerequsite pylint-default
-pylint-prerequsite::
+pylint:: pylint-prerequisite pylint-default pylint-postrequisite
+pylint-prerequisite pylint-postrequisite::
 pylint-default:
 	@echo "${INFO}$@: Running 'pylint' on the code in ${SRC_DIR}.${_END} (configuration in pylintrc.toml)"
 	uv run pylint ${SRC_DIR}
 
-type-check:: type-check-prerequsite type-check-default
-type-check-prerequsite::
+type-check:: type-check-prerequisite type-check-default type-check-postrequisite
+type-check-prerequisite type-check-postrequisite::
 type-check-default:
 	@echo "${INFO}$@: Running 'ty' to type check the code in ${SRC_DIR}.${_END}"
 	uv run ty check ${SRC_DIR}
 
-type-check-watch:: type-check-prerequsite type-check-watch-default
+type-check-watch:: type-check-prerequisite type-check-watch-default type-check-postrequisite
 type-check-watch-default:
 	@echo "${INFO}$@: Running 'ty' to type check the code in ${SRC_DIR} using 'watch' mode.${_END}"
 	uv run ty check --watch ${SRC_DIR}

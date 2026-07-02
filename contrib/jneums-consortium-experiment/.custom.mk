@@ -12,4 +12,3 @@ endef
 pylint-default type-check-default:
 	@echo "${WARN} ${skip-contrib-target}${_END}"
 	@true
-
