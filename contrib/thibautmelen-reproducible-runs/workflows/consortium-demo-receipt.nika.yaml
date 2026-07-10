@@ -1,0 +1,59 @@
+# SPDX-License-Identifier: Apache-2.0
+# yaml-language-server: $schema=https://nika.sh/spec/v1/workflow.schema.json
+#
+# Reproducible run of the Tapestry consortium-training demo, as a
+# workflow contract:
+#
+#   - the PLAN is a file — reviewable before anything executes
+#     (`nika check <this file>` audits it statically; `nika run --dry-run`
+#     prints the plan as JSON)
+#   - PERMITS are default-deny — this workflow may run exactly one
+#     program (`uv`) and write exactly one directory (`./out/` under this
+#     contribution); no network, nothing else
+#   - every run leaves a REPLAYABLE trace plus a small JSON receipt
+#     (exit code, timing fields, tail of the demo's own N+1 summary)
+#
+# Run from the repository root:
+#   nika run contrib/thibautmelen-reproducible-runs/workflows/consortium-demo-receipt.nika.yaml
+nika: v1
+workflow: consortium-demo-receipt
+description: "Tapestry consortium demo → permission-bound run → JSON receipt"
+
+permits:
+  exec: ["uv"] # the demo runs through uv · every other program is denied
+  fs: { write: ["./contrib/thibautmelen-reproducible-runs/out/**"] }
+  tools: ["nika:jq", "nika:write"]
+
+tasks:
+  - id: demo
+    timeout: "10m"
+    exec:
+      # array form (not a shell string) so the permits.exec allowlist is
+      # statically verifiable — `nika check` refuses the string form here
+      command: ["uv", "run", "python", "examples/consortium_training_demo.py"]
+      capture: structured # → { stdout, stderr, exit_code }
+
+  - id: receipt_body
+    depends_on: [demo]
+    invoke:
+      tool: "nika:jq"
+      args:
+        input: "${{ tasks.demo.output }}"
+        expression: >-
+          {run: "consortium_training_demo", command:
+          "uv run python examples/consortium_training_demo.py",
+          exit_code: .exit_code, summary_tail:
+          (.stdout | split("\n") | map(select(length > 0)) | .[-8:])}
+
+  - id: receipt
+    depends_on: [receipt_body]
+    invoke:
+      tool: "nika:write"
+      args:
+        path: "./contrib/thibautmelen-reproducible-runs/out/consortium-demo-receipt.json"
+        content: "${{ tasks.receipt_body.output }}"
+        create_dirs: true
+
+outputs:
+  exit_code: ${{ tasks.demo.output.exit_code }}
+  receipt: "./contrib/thibautmelen-reproducible-runs/out/consortium-demo-receipt.json"

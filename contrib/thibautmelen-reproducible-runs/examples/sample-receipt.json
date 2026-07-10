@@ -1,0 +1,15 @@
+{
+    "command": "uv run python examples/consortium_training_demo.py",
+    "exit_code": 0,
+    "run": "consortium_training_demo",
+    "summary_tail": [
+        "    india        0.333",
+        "    switzerland  0.326",
+        "    vietnam      0.341",
+        "  sovereign artifacts retained: india, switzerland, vietnam",
+        "N+1 outcome:",
+        "  1 shared base model evolved by governed contributions",
+        "  3 sovereign model artifacts retained",
+        "========================================================================"
+    ]
+}
