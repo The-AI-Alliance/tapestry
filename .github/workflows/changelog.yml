@@ -1,0 +1,69 @@
+# Stamp CHANGELOG.md when main is cut (issue #143, second half).
+#
+# When a release lands on main, the accumulated "## [Unreleased]" entries
+# get stamped with the cut date and a fresh empty Unreleased section starts.
+# The stamp is proposed as a small PR against develop (the integration
+# branch) rather than pushed directly: it stays reviewable, and the next
+# main cut carries it. If Unreleased is empty, the workflow does nothing.
+#
+# Injection surface: none — no github.event.* text reaches a run: block;
+# the only dynamic value is a runner-computed UTC date.
+
+name: Changelog stamp
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  stamp:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout develop
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Stamp the Unreleased section
+        id: stamp
+        run: |
+          set -e
+          rc=0
+          python .github/scripts/stamp_changelog.py || rc=$?
+          if [ "$rc" = "78" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          elif [ "$rc" = "0" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            exit "$rc"
+          fi
+
+      - name: Open the stamp PR
+        if: steps.stamp.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          date_today="$(date -u +%F)"
+          branch="chore/changelog-stamp-${date_today}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add CHANGELOG.md
+          git commit -s -m "Stamp CHANGELOG Unreleased section as ${date_today}"
+          git push origin "$branch"
+          gh pr create \
+            --base develop \
+            --head "$branch" \
+            --title "Stamp CHANGELOG Unreleased as ${date_today}" \
+            --body "Automated stamp: \`main\` was cut, so the accumulated Unreleased entries get their date and a fresh Unreleased section starts. See #143."
