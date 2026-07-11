@@ -6,7 +6,7 @@ The parts are meant to be reusable beyond this case: a data-synthesis methodolog
 training pipeline, a **consortium-learning** step that fuses specialized members, and a
 cultural-alignment **evaluation** harness.
 
-> Status: preliminary / experimental. Staging-area work, not a supported package.
+> **Status: Speculative** (preliminary / experimental). Staging-area work, not a supported package.
 
 ## Why (mission fit)
 

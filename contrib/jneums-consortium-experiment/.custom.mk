@@ -1,16 +1,14 @@
 
 override define help_targets_message
-For the consortium-training prototype:
+${HIGHLIGHT}Help for the consortium-training prototype targets:${_END}
 
-make consortium-experiment-all  # Make all the following targets.
-
-make consortium-experiment
-                        # Run deterministic PoC metrics for consortium-training rounds.
-make consortium-tests   # Run only the consortium-training prototype tests.
+${CODE}make consortium-experiment-all${_END} # Make all the following targets.
+${CODE}make consortium-experiment${_END}     # Run deterministic PoC metrics for consortium-training rounds.
+${CODE}make consortium-tests${_END}          # Run only the consortium-training prototype tests.
 endef
 
 # This definition effectively skips the "pylint" and "type-check" targets defined
 # in the top-level Makefile.
 pylint-default type-check-default:
-	@echo "${WARN} ${skip-contrib-target}${_END}"
+	@echo "${skip-contrib-target}"
 	@true

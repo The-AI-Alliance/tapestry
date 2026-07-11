@@ -7,7 +7,7 @@ model's cultural alignment, beyond mere language exposure?
 
 Staged under `contrib/` (like `jneums-consortium-experiment`) while it iterates.
 
-> **Status: executed; result is bounded.** Run for real on Qwen3-4B base/instruct,
+> **Status: Speculative** (executed; result is bounded). Run for real on Qwen3-4B base/instruct,
 > real Arabic-Wikipedia corpora, plus a 3-culture FedAvg aggregation and a behavioral
 > probe. The honest finding is **real but shallow**: grounded CPT shifts a **base**
 > model's **survey-measured** values toward the target culture **more than a

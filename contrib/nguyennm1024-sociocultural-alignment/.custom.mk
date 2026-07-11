@@ -4,12 +4,12 @@
 
 # unit-tests-prerequisite::
 # 	@cd ${SRC_DIR}; \
-# 	echo "Building $@ in $$(pwd)."; \
+# 	echo "${INFO_LABEL}Building $@ in $$(pwd)."; \
 # 	if [ -d .venv ]; \
-# 	then echo "${WARN}'.venv' already exists; not running 'uv venv'.${_END}"; \
+# 	then echo "${WARNING_LABEL}'.venv' already exists; not running 'uv venv'."; \
 # 	else \
 # 		uv venv; \
-# 		echo "running: uv pip install --requirements requirements.txt"; \
+# 		echo "${INFO_LABEL}running: uv pip install --requirements requirements.txt"; \
 # 		uv pip install --requirements requirements.txt; \
 # 	fi
 
@@ -19,16 +19,16 @@
 # directory, because a separate environment is setup here.
 # unit-tests-default:
 # 	@cd ${SRC_DIR}; \
-# 	echo "${INFO}Building $@ in $$(pwd).${_END}"; \
-# 	echo "running: which source"; \
+# 	echo "${INFO_LABEL}Building $@ in $$(pwd)."; \
+# 	echo "${INFO_LABEL}running: which source"; \
 # 	which source; \
-# 	echo "running: source $$(pwd)/.venv/bin/activate"; \
+# 	echo "${INFO_LABEL}running: source $$(pwd)/.venv/bin/activate"; \
 # 	source $$(pwd)/.venv/bin/activate; \
-# 	echo "running: ${PYTEST_RUN_CMD} && ${PYTEST_COV_REPORT_CMD}"; \
+# 	echo "${INFO_LABEL}running: ${PYTEST_RUN_CMD} && ${PYTEST_COV_REPORT_CMD}"; \
 # 	${PYTEST_RUN_CMD} && ${PYTEST_COV_REPORT_CMD}
 
 # This definition effectively skips the, "ruff", "pylint", "type-check",
 # and "unit-tests" targets defined in the top-level Makefile.
 ruff-default pylint-default type-check-default unit-tests-default:
-	@echo "${WARN} ${skip-contrib-target}${_END}"
+	@echo "${skip-contrib-target}"
 	@true

@@ -22,7 +22,7 @@ The rest of this README provides information for contributors and users of this 
 Project Tapestry has big plans, and we're starting with some fundamental building blocks.
 
 * [LLM Cultural Alignment and Re-alignment](https://github.com/The-AI-Alliance/tapestry/issues/22) - help us develop techniques for cultural alignment, initially based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric. This task will implement a corresponding evaluation and implement tuning experiments to understand how to shift alignment without compromising general model performance. Prior expertise in evaluation and tuning technologies are especially welcome.
-* [Consortium Training](https://github.com/The-AI-Alliance/tapestry/issues/24) - Tapestry's approach to global model development relies on a balance between centralized and distributed training that preserves use and privacy requirements for data sets. Help us adapt and develop optimal techniqes with ideas from both federated learning and the latest LLM pre-training and post-training methods. Prior expertise in large scale LLM training, distributed infrastructure, and federated learning are especially welcome.
+* [Consortium Training](https://github.com/The-AI-Alliance/tapestry/issues/24) - Tapestry's approach to global model development relies on a balance between centralized and distributed training that preserves use and privacy requirements for data sets. Help us adapt and develop optimal techniques with ideas from both federated learning and the latest LLM pre-training and post-training methods. Prior expertise in large scale LLM training, distributed infrastructure, and federated learning are especially welcome.
 * [Global Training Data Corpus](https://thealliance.ai/projects/tapestry/training-data-proposals) A core thesis of project Tapestry is that bringing together a much more diverse set of data can provide a path to a better frontier base model for all. What unique datasets exist that could be brought to Tapestry model training? They don't have to be fully open; we will work with you to define and enforce appropriate requirements.
 * Tapestry Model Development Roadmap - _coming soon_ - we want your input!
 
@@ -119,12 +119,16 @@ We use [pytest](https://docs.pytest.org/) for testing. The easiest way to run th
 make unit-tests   # tests is also defined as an alias for unit-tests.
 ```
 
-This runs the following commands:
+This runs `pytest` with coverage reporting, using the following commands:
 
 ```shell
 cd src
-uv run python -m pytest tests -q
+uv run --active coverage run -m pytest -q -v -s
+uv run --active coverage report -m
 ```
+
+> [!NOTE]
+> The `--active` flag is needed for recursive invocation in `contrib/*`, where some of the contributions define their own local `uv/venv` environments.
 
 ## Code Refinement
 
@@ -169,14 +173,19 @@ make type-check-watch
 uv run ty --watch src
 ```
 
-## _Where_ to Create Your Contribution
+## Making Contributions
+
+> [!NOTE]
+> Make sure to read the general guidance in [**Getting Involved**](#getting-involved-anchor) below before submitting a PR.
+
+### _Where_ to Create Your Contribution
 
 If you are enhancing existing code, make the changes under `src`, and when appropriate, the top-level `Makefile` and `.common.mk`.
 
 However, for everything else, including proofs of concept (PoCs), experiments, proposed additions, etc., create them under [`contrib`](contrib/README.md), the staging area for new contributions. The `contrib` [`README`](contrib/README.md) describes the requirements you must follow for new contributions, including how
-the master `make` process works and customizations you might need to make to it.
+the master `make` process works and the customizations you might need to "global" _quality check_ targets, like `tests`, `lint`, etc. For example, there is an easy way to disable some of these checks for PoC code that isn't considered production ready.
 
-## Before You Submit a PR...
+### Before You Submit a PR...
 
 Before submitting a PR, please make these "quality" targets: `format`, `lint` (which makes `ruff` and `pylint`), `type-check`, and `tests`. This needs to be done in both the _production_ `src` tree and all the `contrib` contributions. Use the convenient make target `before-pr`, which handles all of them for you:
 
@@ -191,12 +200,11 @@ However, note that there is a mechanism each `contrib` contribution may use to s
 You can run a specific quality target on one or more contributions as follows. Let's use `contrib/foo` and target `format` as an example:
 
 ```shell
-make SRC_DIR=contrib/foo format  # Make "format" just for "contrib/foo"
-make contrib-format              # Make "format" for ALL "contrib/*"
+# Make "format" just for "contrib/foo"
+make SRC_DIR=contrib/foo --include-dir=contrib/foo format  
+# Make "format" for ALL "contrib/*"
+make contrib-format
 ```
-
-> [!NOTE]
-> Make sure to read the general guidance in [**Getting Involved**](#getting-involved-anchor) below before submitting a PR.
 
 ## Project Code Structure
 
@@ -231,7 +239,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines. In particular, [read this
 
 Have an idea, technique, or experiment you'd like the project to consider? The [**`contrib/`**](contrib/README.md) directory is a lightweight staging area where contributors can propose work via a PR into their own subdirectory. See [**`contrib/README.md`**](contrib/README.md) for the simple workflow and contribution policy.
 
-You can also join one or more work groups that are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are are being documented in [**`docs/work-groups/`**](docs/work-groups/).
+You can also join one or more work groups that are being organized to identify requirements in several areas and to start the engineering work to prototype and test ideas, followed by the initial implementation iterations. Details are being documented in [**`docs/work-groups/`**](docs/work-groups/).
 
 
 ### Licenses

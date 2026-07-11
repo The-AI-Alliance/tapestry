@@ -1,6 +1,6 @@
 # Sovereign Evaluation Evidence Layer
 
-Status: proposal / evaluation design scaffold.
+**Status: Speculative** (proposal / evaluation design scaffold).
 
 This contribution proposes a small evidence layer for Tapestry's Evaluation &
 Certification work. It connects cultural-alignment evaluation, data-sovereignty

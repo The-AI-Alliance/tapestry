@@ -164,6 +164,9 @@ IBM has described the overall sourcing strategy as pulling unstructured language
 
 For the fine-tuning/instruct stage of recent models, IBM describes the SFT data as largely comprised of three sources: publicly available datasets with permissive licenses, internal synthetic data targeting specific capabilities, and a select set of human-curated data.
 
+### The Future of Granite
+
+IBM has recently decided to keep developing new generations of the Granite family and also build models with larger parameter sizes than are currently available.
 
 ## 6. K2
 

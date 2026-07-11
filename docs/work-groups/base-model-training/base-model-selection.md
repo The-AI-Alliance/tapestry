@@ -104,7 +104,7 @@ Key for icons:
 | Gemma4   | ✅ | ✅ | ⚠️ - Smaller sizes only today; will Google expand the size choices? | Larger Google models are proprietary | ⚠️ - Will Google keep releasing updated versions of OW Gemma? | ✅ | **?** | Built by Google. Will they continue to develop open-weight models and expand the size options? |
 | GLM | ✅ | ✅ | ✅ | ⚠️ - Large only | ✅ | ✅ | **?** | Built by Z.ai in China; possible geopolitical concerns |
 | GPT OSS  | ✅ | ✅ | ⚠️ - Limited size choices | ✅ - Larger models not in this family are proprietary | Will OpenAI keep releasing open-weight versions of GPT OSS? | ✅ | **?** | ⚠️ - Built by OpenAI. Is GPT OSS a "one-shot" release or a longer-term strategy? |
-| Granite  | ✅ | ✅ | ⚠️ - Smaller sizes only | ✅ | ❌ - Granite models program is pivoting to research only | ⚠️ - Larger sizes not available | **?** | Built by IBM - Good performance and strong data governance, but future development is unlikely |
+| Granite  | ✅ | ✅ | ⚠️ - Smaller sizes currently | ✅ | ✅ | ⚠️ - Larger sizes not available, but coming | **?** | Built by IBM - Good performance and strong data governance, with active development continuing |
 | K2       | ✅ | ✅ | ✅ | **?** | ✅ | **?** | **?** | Built by MBZUI. Strong on Middle East languages. Future development plans are TBD. | 
 | Llama    | ✅ | ⚠️ - Some limitations on use | ✅ | ⚠️ - Largest Llama4 models not OW | ❌ - Meta has stopped developing Llama | ✅ | ✅ - See below | Very familiar and widely used, but its future is dim |
 | Mistral  | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | **?** | Built in France with strong EU alignment |

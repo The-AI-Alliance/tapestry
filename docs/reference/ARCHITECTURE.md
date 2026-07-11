@@ -22,7 +22,7 @@ The ratio starts at roughly **80/20** centralized-to-sovereign and shifts toward
 
 ## Consortium Training — Not Federated Learning
 
-Tapestry uses **consortium training** ([TAP-002](../architecture/decisions/adr-002-consortium-training.md)) — the paradigm defined there and contrasted in full with centralized and federated training in [`training-approaches.md`](../reference/training-approaches.md). In brief: a small number of large, trusted, heterogeneous members collaboratively train a shared model, where data sovereignty is a first-order constraint and cultural alignment is the goal. It is deliberately distinguished from federated learning. *Tapestry-specific term definitions are consolidated in [`glossary.md`](../reference/glossary.md).*
+Tapestry uses **consortium training** ([TAP-002](../architecture/decisions/adr-002-consortium-training.md)) — the paradigm defined there and contrasted in full with centralized and federated training in [`training-approaches.md`](training-approaches.md). In brief: a small number of large, trusted, heterogeneous members collaboratively train a shared model, where data sovereignty is a first-order constraint and cultural alignment is the goal. It is deliberately distinguished from federated learning. *Tapestry-specific term definitions are consolidated in [`glossary.md`](glossary.md).*
 
 Consortium training has two phases, run in order:
 

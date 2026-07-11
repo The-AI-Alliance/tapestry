@@ -1,5 +1,7 @@
 # Flower WAN Weight-Transfer Spike
 
+**Status: Speculative**
+
 De-risk spike for the [issue #70](https://github.com/The-AI-Alliance/tapestry/issues/70)
 epic: **can a ~2B-parameter model's weights round-trip through a Flower SuperLink over a
 real WAN, and how long does a round take?** This measures transport only — the "training"
@@ -33,7 +35,9 @@ raw-TCP limit and protects against paths where that auto-tuning fails.
 
 ## Initial results (first box pair — timings later attributed to a degraded path)
 
-WAN topology used: SuperLink + ServerApp on a Quebec (CA) vast.ai instance, SuperNode +
+Two WAN topology used: 
+
+1. SuperLink + ServerApp on a Quebec (CA) vast.ai instance, SuperNode +
 ClientApp on a Sweden (SE) instance. Measured path RTT ≈ 106 ms; raw single-stream TCP on
 the same path: 114 Mbit/s (QC→SE), 167 Mbit/s (SE→QC).
 
@@ -42,15 +46,20 @@ the same path: 114 Mbit/s (QC→SE), 167 Mbit/s (SE→QC).
 > specific path, not Flower. The functional results (payload integrity at 4 GB per
 > direction) stand.
 
-| leg | payload | round-trip (1 round) | effective throughput* |
-| :-- | :-- | :-- | :-- |
-| loopback (WSL2, same host) | 0.5 GB ×2 | 20.5 s | ~0.39 Gbit/s |
-| loopback (WSL2, same host) | 4.0 GB ×2 | 138.1 s | ~0.46 Gbit/s |
-| WAN Quebec↔Sweden (106 ms) | 0.5 GB ×2 | 10 min 30 s | ~13 Mbit/s |
-| WAN Quebec↔Sweden (106 ms) | 4.0 GB ×2 | 1 h 24 min | ~12.7 Mbit/s |
-| WAN Quebec↔Norway (97 ms), unpatched | 0.5 GB ×2 | 8 min 13 s | ~16 Mbit/s |
-| WAN Quebec↔Norway, lookahead patch | 0.5 GB ×2 | 6–9 min (3 runs; one 78 s outlier) | pull fixed, push not |
-| WAN Quebec↔Norway, lookahead patch | 4.0 GB ×2 | 1 h 1 min | pull ~128 Mbit/s, push ~10 Mbit/s |
+2. SuperLink + ServerApp on a us-east-2 (Ohio) EC2 instance, SuperNode +
+ClientApp on a ap-southeast-1 (Singapore) EC2 instance on AWS. Measure path RTT ≈ 200 ms;
+
+| leg | payload | round-trip (1 round) | effective throughput* | performed by |
+| :-- | :-- | :-- | :-- | :-- |
+| loopback (WSL2, same host) | 0.5 GB ×2 | 20.5 s | ~0.39 Gbit/s | jneums |
+| loopback (WSL2, same host) | 4.0 GB ×2 | 138.1 s | ~0.46 Gbit/s | jneums |
+| WAN Quebec↔Sweden (106 ms) | 0.5 GB ×2 | 10 min 30 s | ~13 Mbit/s | jneums |
+| WAN Quebec↔Sweden (106 ms) | 4.0 GB ×2 | 1 h 24 min | ~12.7 Mbit/s | jneums |
+| WAN Quebec↔Norway (97 ms), unpatched | 0.5 GB ×2 | 8 min 13 s | ~16 Mbit/s | jneums |
+| WAN Quebec↔Norway, lookahead patch | 0.5 GB ×2 | 6–9 min (3 runs; one 78 s outlier) | pull fixed, push not | jneums |
+| WAN Quebec↔Norway, lookahead patch | 4.0 GB ×2 | 1 h 1 min | pull ~128 Mbit/s, push ~10 Mbit/s | jneums |
+| AWS Ohio↔Singapore (200 ms), unpatched | 0.5 GB ×2 | 82.4 s | ~97.1 Mbit/s | jolson-allianceai |
+| AWS Ohio↔Singapore (200 ms), unpatched | 4.0 GB ×2 | 8 min 32 s | ~0.125 Gbit/s | jolson-allianceai |
 
 \* total bytes moved ÷ round time; includes flwr's serialization and store-and-forward
 through the SuperLink object store, so this is *system* throughput, not link speed.

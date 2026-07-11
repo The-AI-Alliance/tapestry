@@ -5,7 +5,7 @@ Tapestry consortium-training proof of concept. It is staged under `contrib/`
 so the core training-loop package can remain focused on the minimal PoC
 protocol while experiment ideas are reviewed and iterated.
 
-Status: prototype / measurement scaffold.
+**Status: Speculative** (prototype / measurement scaffold).
 
 It intentionally does not replace Flower, NIID-Bench, OpenDiLoCo,
 lm-evaluation-harness, Unitxt, or other larger evaluation and federated
