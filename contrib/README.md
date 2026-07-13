@@ -241,7 +241,7 @@ In this recipe, `uv` installs some additional dependencies in `contrib/nguyennm1
 > Makefile:30: warning: ignoring old commands for target `bar'
 > bar V2!
 > ```
-> Two warnings are printed about overriding a previous definition of `bar` (Ignore the line numbers shown...). _We filter out these messages in our commands that use this idiom._
+> Two warnings are printed about overriding a previous definition of `bar` (ignore the line numbers shown...). These warnings are expected when using this override mechanism.
 >
 > You have to use `::` or `:` consistently for a given target or `make` will throw an error for the target definition. So, if and when you define a `x-prerequisite::`,  `x-postrequisite::`, or `x-default:` target, be careful to use one or two colons, as shown.
 

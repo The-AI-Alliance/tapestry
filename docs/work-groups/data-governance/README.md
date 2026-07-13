@@ -33,6 +33,10 @@ Out of scope: implementing training infrastructure, defining model-update privac
 - A list of blocked-data scenarios where raw data must never leave the participant.
 - Requirements handed to Security & Privacy and Infrastructure & Operations.
 
+## Related evaluations
+
+- [DocLang evaluation](doclang-evaluation.md).
+
 ## Interfaces
 
 - **Security & Privacy:** privacy tiers, threat models, and leakage constraints.

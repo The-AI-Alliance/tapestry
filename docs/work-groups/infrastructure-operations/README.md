@@ -28,6 +28,7 @@ Out of scope: choosing certification criteria, defining cultural alignment metho
 ## Early deliverables
 
 - MVP node architecture and setup checklist.
+- [Infrastructure requirements](infrastructure-requirements.md).
 - Training orchestration and observability requirements.
 - Artifact and model-distribution plan.
 - Operational cost/accounting requirements for Governance & Participation.

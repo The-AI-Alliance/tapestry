@@ -70,7 +70,30 @@ Keep new code aligned with that split. Add tests under the matching `src/tests/t
 - Keep lint/type annotations compatible with `ruff`, `pylint`, and `ty`.
 - Preserve the docs site style in `website/`: Markdown pages, Jekyll front matter, and Just the Docs structure.
 - When editing documentation, keep the audience technical and contributor-focused rather than promotional.
+- When creating or editing Markdown under `docs/`, do not hard-wrap prose paragraphs; use soft wrap and break only for Markdown structure (see `docs/README.md` § Writing conventions).
+- For new inline Mermaid in architecture/reference docs, follow the conventions in `docs/architecture/diagrams/README.md` § Inline Mermaid style (TAP-009 for decision/sovereignty flows; `0-tva-methodology.md` for phased process/status diagrams).
 - Treat governance documents as load-bearing design constraints, not after-the-fact policy notes.
+
+## Pull request descriptions
+
+Write PR titles and bodies for human skimming first. Detail is welcome later; the opening must stand alone in plain English.
+
+**Title.** Outcome-oriented and specific enough to understand without opening the PR (e.g. `Add TAP-009: goal-derived base model selection`, not a file-list or implementation diary).
+
+**Opening (fixed order, plain English).** Put this at the top of the description — before file inventories, commit archaeology, or deep rationale:
+
+1. **Why** — the problem or gap this PR addresses.
+2. **What** — the proposed approach and what reviewers, users, or the project get when it lands (the result, not the mechanism).
+
+A reviewer who reads only the title and these two beats should understand the forest.
+
+**How (details after).** Implementation notes, files touched, edge cases, test evidence, and checklist items come next. Density is fine here.
+
+- When a structural overview helps, **precede the detailed how** with one high-level Mermaid diagram in the recommended style (`docs/architecture/diagrams/README.md` § Inline Mermaid style). Use it for flows, phase shifts, or decision structure — not for typo fixes or pure prose polish.
+- At most one diagram in that leading-how position; further diagrams belong deeper in the details if needed.
+- Prefer project language over repo archaeology in the opening (“propose a gate-then-score selection method” rather than “updated `classDef` in README”).
+
+Keep using the repo PR templates under `.github/PULL_REQUEST_TEMPLATE/` for checklists and contribution process; lead their description sections with Why → What as above.
 
 ## Practical Notes
 

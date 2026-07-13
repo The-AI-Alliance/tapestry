@@ -1,4 +1,4 @@
-  # .common.mk
+# .common.mk
 # See comment at the bottom of this file about "-include .custom.mk".
 
 # Definitions of RED, GREEN, etc., and INFO, ERROR, etc. for console output.
@@ -173,22 +173,15 @@ contrib-help::
 
 # The next recipe contains logic to skip any item in ${CONTRIB_DIRS} that is not a directory,
 # although the construction of ${CONTRIB_DIRS} should prevent this from happening.
-# Also, the output is filtered with egrep to remove unhelpful warnings from make when
-# targets are redefined, which we exploit intentionally. These this target by running:
+# Test this target by running:
 # make contrib-list  # list the contributions root directories.
 # make contrib-ls    # should fail for first contribution, because there isn't an "ls" target!
-#
-# (Implementation note: this filtering is done on the whole for loop, not using a pipe on
-# the nested make invocation. The reason is that "make ... | egrep ..." would always
-# succeed if the make command fails! We tried using "set -o pipefail" to prevent this
-# silent failure, but that isn't support by "/bin/sh" on Linux, which is the Bourne shell-
-# compatible shell "dash".)
 contrib-%::
 	@for d in ${CONTRIB_DIRS}; \
 	do [ -d "$$d" ] || continue; \
 		echo "${INFO_LABEL}For directory ${CODE}$$d${_END}:"; \
-			${MAKE} SRC_DIR=$$d --include-dir=$$d ${@:contrib-%=%} || exit $$?; \
-	done 2>&1 | egrep -v -e '(overriding|ignoring old) (commands|recipe) for target' 
+		${MAKE} SRC_DIR=$$d --include-dir=$$d ${@:contrib-%=%} || exit $$?; \
+	done 2>&1
 
 # These are really test targets for testing contrib-%, but they are reasonably useful,
 # e.g., using "make contrib-list" to list all the contrib/* directories.

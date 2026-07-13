@@ -18,6 +18,7 @@ from consortium_experiment import (  # noqa: E402
     NodeSpec,
     PolicySpec,
 )
+from tapestry.training.consortium import ContributionWeighting  # noqa: E402
 
 DOMAIN_CORPORA: dict[str, list[str]] = {
     "vietnam": [
@@ -43,20 +44,31 @@ QUALITY_SCORES = {
     "india": 0.88,
 }
 
+POLICY_NAMES = {
+    ContributionWeighting.QUALITY: "quality_floor_capped",
+    ContributionWeighting.EQUAL: "equal_after_quality_floor",
+}
+
 
 def _encode(texts: list[str]) -> list[list[int]]:
     """Byte-encode text into the tiny model's vocabulary range."""
     return [[token % 128 for token in text.encode("utf-8")] for text in texts]
 
 
-def _default_config(rounds: int, seed: int) -> ExperimentConfig:
+def _default_config(
+    rounds: int,
+    seed: int,
+    weighting: ContributionWeighting | str = ContributionWeighting.QUALITY,
+) -> ExperimentConfig:
+    weighting = ContributionWeighting(weighting)
     return ExperimentConfig(
         seed=seed,
         rounds=rounds,
         policy=PolicySpec(
-            name="quality_floor_capped",
+            name=POLICY_NAMES[weighting],
             quality_floor=0.75,
             max_node_weight=0.5,
+            weighting=weighting,
         ),
         nodes=[
             NodeSpec(
@@ -80,15 +92,24 @@ def main() -> None:
     )
     parser.add_argument("--rounds", type=int, default=3, help="number of consortium-training rounds")
     parser.add_argument("--seed", type=int, default=7, help="random seed for deterministic runs")
+    parser.add_argument(
+        "--weighting",
+        choices=tuple(weighting.value for weighting in POLICY_NAMES),
+        default=ContributionWeighting.QUALITY.value,
+        help="contribution weighting policy to run",
+    )
     args = parser.parse_args()
 
-    result = ConsortiumExperimentRunner(_default_config(rounds=args.rounds, seed=args.seed)).run()
+    result = ConsortiumExperimentRunner(
+        _default_config(rounds=args.rounds, seed=args.seed, weighting=args.weighting)
+    ).run()
     result.write_json(args.out)
 
     print("Tapestry consortium-training PoC metrics")
     print(f"  output dir                 : {args.out}")
     print(f"  rounds                     : {result.summary.rounds}")
     print(f"  policy                     : {result.summary.policy_name}")
+    print(f"  weighting                  : {result.summary.weighting}")
     print(f"  final artifact count       : {result.summary.final_artifact_count}")
     print(f"  rejected contributions     : {result.summary.total_rejected_contributions}")
     print(f"  max observed node weight   : {result.summary.max_observed_node_weight:.3f}")

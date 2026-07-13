@@ -98,6 +98,23 @@ def test_experiment_records_anti_capture_cap() -> None:
     assert sum(round_metrics.contribution_weights.values()) == pytest.approx(1.0)
 
 
+def test_experiment_supports_equal_contribution_weighting() -> None:
+    """Equal weighting should give every accepted node the same influence."""
+    config = _config(
+        PolicySpec(name="equal_after_quality_floor", quality_floor=0.75, weighting="equal"),
+        rounds=1,
+    )
+
+    result = ConsortiumExperimentRunner(config).run()
+
+    assert result.rounds[0].contribution_weights == {
+        "vietnam": pytest.approx(0.5),
+        "swiss": pytest.approx(0.5),
+    }
+    assert result.rounds[0].rejected_nodes == ["india"]
+    assert result.summary.weighting == "equal"
+
+
 def test_experiment_records_n_plus_one_artifacts_and_shared_base_change() -> None:
     """The metrics should preserve N sovereign artifacts and show base movement."""
     config = _config(PolicySpec(name="quality_weighted", quality_floor=0.1), rounds=1)
@@ -132,6 +149,7 @@ def test_experiment_writes_json_metrics_and_summary(tmp_path) -> None:
     assert metric_lines[1]["round_num"] == 2
     assert summary["rounds"] == 2
     assert summary["policy_name"] == "quality_weighted"
+    assert summary["weighting"] == "quality"
 
 
 def test_state_delta_norm_rejects_mismatched_model_states() -> None:

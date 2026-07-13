@@ -22,7 +22,7 @@ The directory index is [`architecture/README.md`](architecture/README.md). Main 
 | [`architecture/3-value-propositions.md`](architecture/3-value-propositions.md) | Phase 3 — what Tapestry offers that the status quo doesn't |
 | [`architecture/4-design-goals.md`](architecture/4-design-goals.md) | Phase 4 — constraints the architecture must satisfy |
 | [`architecture/5-architectural-options.md`](architecture/5-architectural-options.md) | Phase 5 — option space and decision analysis toward an architectural thesis |
-| [`architecture/diagrams/README.md`](architecture/diagrams/README.md) | Architecture figures (SVG in Markdown) and embedding conventions |
+| [`architecture/diagrams/README.md`](architecture/diagrams/README.md) | Architecture figures (SVG in Markdown), embedding conventions, and preferred inline Mermaid style |
 | [`architecture/decisions/`](architecture/decisions/README.md) | Architecture Decision Records (ADRs) |
 
 ## Reference documents
@@ -35,3 +35,9 @@ The [`reference/`](reference/README.md) directory holds material outside the TVA
 | [`reference/training-approaches.md`](reference/training-approaches.md) | Centralized vs. federated vs. consortium training |
 
 Repository root [**`README.md`**](../README.md) and [**`AGENTS.md`**](../AGENTS.md) summarize how `docs/` fits with `website/`, `src/`, and contributor workflows.
+
+## Writing conventions
+
+When creating or editing Markdown under `docs/`:
+
+- **Do not hard-wrap prose.** Write each paragraph as a single logical line (or continuous soft-wrapped text in the editor). Avoid manual line breaks inside a paragraph for visual column width; let the viewer soft-wrap. Use a blank line between paragraphs, and hard breaks only where Markdown structure requires them (lists, headings, code fences, tables, etc.).

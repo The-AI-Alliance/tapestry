@@ -33,6 +33,8 @@ Out of scope: implementing training or serving stacks, deciding governance repre
 - Audit evidence requirements for Data Governance, Security & Privacy, and Governance & Participation.
 - A [policy and evaluation tooling options](tooling-options.md) catalog for
   selecting benchmark runners, evidence records, and release-gate policy checks.
+- An [M0 evaluation gate schema](m0-gate-schema.md) for machine-readable
+  benchmark requirements, runner results, and go/no-go decisions.
 
 ## Interfaces
 

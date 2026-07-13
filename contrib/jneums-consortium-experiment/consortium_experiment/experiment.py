@@ -10,13 +10,15 @@ from typing import Sequence
 
 import torch
 
-from .metrics import max_weight, state_delta_norm
 from tapestry.training.consortium import (
     ConsortiumCoordinator,
     ContributionPolicy,
+    ContributionWeighting,
     SovereignTrainingNode,
     TinyCausalModel,
 )
+
+from .metrics import max_weight, state_delta_norm
 
 
 @dataclass(frozen=True)
@@ -39,12 +41,14 @@ class PolicySpec:
     name: str = "quality_weighted"
     quality_floor: float = 0.0
     max_node_weight: float = 1.0
+    weighting: ContributionWeighting | str = ContributionWeighting.QUALITY
 
     def build(self) -> ContributionPolicy:
         """Build the contribution policy for this experiment."""
         return ContributionPolicy(
             quality_floor=self.quality_floor,
             max_node_weight=self.max_node_weight,
+            weighting=self.weighting,
         )
 
 
@@ -75,7 +79,7 @@ class RoundMetrics:  # pylint: disable=too-many-instance-attributes
 
 
 @dataclass(frozen=True)
-class ExperimentSummary:
+class ExperimentSummary:  # pylint: disable=too-many-instance-attributes
     """Summary metrics for a completed consortium-training PoC experiment."""
 
     seed: int
@@ -85,6 +89,7 @@ class ExperimentSummary:
     total_rejected_contributions: int
     max_observed_node_weight: float
     final_shared_base_delta_norm: float
+    weighting: str = ContributionWeighting.QUALITY.value
 
 
 @dataclass(frozen=True)
@@ -128,9 +133,10 @@ class ConsortiumExperimentRunner:  # pylint: disable=too-few-public-methods
             vocab_size=self.config.model_vocab_size,
             hidden_size=self.config.model_hidden_size,
         )
+        policy = self.config.policy.build()
         coordinator = ConsortiumCoordinator(
             base_model=base_model,
-            contribution_policy=self.config.policy.build(),
+            contribution_policy=policy,
         )
         nodes = [self._build_node(node_spec, base_model) for node_spec in self.config.nodes]
 
@@ -161,6 +167,7 @@ class ConsortiumExperimentRunner:  # pylint: disable=too-few-public-methods
             seed=self.config.seed,
             rounds=self.config.rounds,
             policy_name=self.config.policy.name,
+            weighting=policy.weighting.value,
             final_artifact_count=len(coordinator.sovereign_artifacts),
             total_rejected_contributions=sum(len(metrics.rejected_nodes) for metrics in round_metrics),
             max_observed_node_weight=max((metrics.max_node_weight for metrics in round_metrics), default=0.0),

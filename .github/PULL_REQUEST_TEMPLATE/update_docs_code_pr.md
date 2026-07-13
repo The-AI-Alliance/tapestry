@@ -4,10 +4,10 @@
 
 ## Description of the PR
 
-Please provide a brief description of the changes in this pull request:
+Lead in plain English with **Why** (problem/gap) then **What** (approach and result). Put detailed **How** after that; when a structural overview helps, start the how with one high-level Mermaid (see `AGENTS.md` § Pull request descriptions and `docs/architecture/diagrams/README.md`).
 
-* What is its purpose?
-* What problem does it solve or otherwise how does it improve Tapestry?
+* What problem does it solve or otherwise how does it improve Tapestry? (**Why**)
+* What is the approach, and what do reviewers/users get when this lands? (**What**)
 
 ## Related Issues
 
