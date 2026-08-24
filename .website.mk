@@ -1,7 +1,7 @@
 # .website.mk - Definitions for the GibHub Pages website
 
 PAGES_URL    := https://the-ai-alliance.github.io/${REPO_NAME}/
-WEBSITE_DIR  := docs
+WEBSITE_DIR  := website
 SITE_DIR     := ${WEBSITE_DIR}/_site
 CLEAN_WEBSITE_DIRS += ${SITE_DIR} ${WEBSITE_DIR}/.sass-cache
 CLEAN_DIRS   += ${CLEAN_WEBSITE_DIRS}
@@ -51,11 +51,11 @@ print-info-website::
 	@echo "  ${DARK_GREEN}SITE_DIR:${_END}           ${CODE}${SITE_DIR}${_END}"
 	@echo "  ${DARK_GREEN}JEKYLL_PORT:${_END}        ${CODE}${JEKYLL_PORT}${_END} (when viewing locally: ${CODE}http://localhost:${JEKYLL_PORT}${_END})"
 
-.PHONY: all-docs clean-website view-pages view-local
+.PHONY: all-website clean-website view-pages view-local
 .PHONY: view-pages view-local setup-jekyll run-jekyll run-jekyll-message
 .PHONY: setup-jekyll run-jekyll
 
-all-docs:: clean-website view-local
+all-website:: clean-website view-local
 
 clean-website::
 	rm -rf ${CLEAN_WEBSITE_DIRS}
