@@ -3,7 +3,6 @@ layout: default
 title: Home
 nav_order: 10
 has_children: false
-tech_docs: https://github.com/The-AI-Alliance/tapestry/tree/develop/docs
 ---
 
 # Project Tapestry: Technical Website
@@ -22,7 +21,7 @@ The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-proj
 {: .note }
 > * **Join Us!** We are looking for collaborators. See our [contributing]({{site.baseurl}}/contributing) page for details.
 > * Use the search box at the top of this page to find specific content.
-> * The links for Capitalized Terms go to [this glossary]({{site.glossaryurl}}){:target="_glossary"}. Tapestry-specific terms (e.g., *Consortium training*, *Shared-Base Loop*, *Sovereign Build*) are defined in the [in-repo glossary]({{page.tech_docs}}/reference/glossary.md){:target="repo-docs"}.
+> * The links for Capitalized Terms go to [this glossary]({{site.glossaryurl}}){:target="_glossary"}. Tapestry-specific terms (e.g., *Consortium training*, *Shared-Base Loop*, *Sovereign Build*) are defined in the [in-repo glossary]({{site.tech_docs}}/reference/glossary.md){:target="repo-docs"}.
  
 This website is for technical contributors. As Project Tapestry evolves, this website will provide links to technical requirements, architecture and design documentation, and implementation source code.
 
@@ -43,24 +42,24 @@ The following work groups are provisional. [Participation is welcome!]({{site.ba
 
 | Work Group | Focus |
 | :--------- | :---- |
-| [Base Model Training]({{page.tech_docs}}/work-groups/base-model-training/){:target="repo-docs"} | Own the shared model capability path: selecting or adopting an initial open-weights base, defining how consortium training improves shared weights, and planning the transition toward consortium-owned base models when the project has sufficient compute, data, and operational maturity. |
-| [Data Governance]({{page.tech_docs}}/work-groups/data-governance/){:target="repo-docs"} | Define how sovereign data can participate in Tapestry without surrendering control. This group owns data sourcing, licensing, stewardship, residency constraints, provenance, contribution rights, and data-quality expectations for national, cultural, industrial, and institutional participants. |
-| [Deployment and Adoption]({{page.tech_docs}}/work-groups/deployment-adoption/){:target="repo-docs"} | Ensure Tapestry-derived models become usable systems, not just trained weights. This group owns serving patterns, product harnesses, integration guidance, participant rollout, developer experience, and adoption feedback loops. |
-| [Evaluation Certification]({{page.tech_docs}}/work-groups/evaluation-certification/){:target="repo-docs"} | Define the evidence that Tapestry models, pipelines, and participants must produce before claims of capability, sovereignty, cultural alignment, safety, or certification are accepted. |
-| [Governance and Participation]({{page.tech_docs}}/work-groups/governance-participation/){:target="repo-docs"} | Translate Tapestry's governance principles into operating mechanics for work groups, participants, contributions, decisions, certification processes, and anti-capture safeguards. |
-| [Infrastructure and Operations]({{page.tech_docs}}/work-groups/infrastructure-operations/){:target="repo-docs"} | Own the platform and operating model that lets participants run Tapestry workloads across heterogeneous compute, networks, security regimes, and organizational boundaries. |
-| [Security and Privacy]({{page.tech_docs}}/work-groups/security-privacy/){:target="repo-docs"} | Define the technical guarantees that make Tapestry sovereignty enforceable: privacy tiers, secure aggregation, differential privacy, trusted execution, threat models, model-update leakage analysis, and safety-preservation constraints. |
-| [Sovereign Alignment]({{page.tech_docs}}/work-groups/sovereign-alignment/){:target="repo-docs"} | Own the participant-specific pipeline that turns a shared capable base into models that reflect local knowledge, values, institutions, domains, and interaction norms. This includes culturally grounded continued pretraining, post-training alignment, instruction tuning, and portability of sovereign contributions. |
+| [Base Model Training]({{site.tech_docs}}/work-groups/base-model-training/){:target="repo-docs"} | Own the shared model capability path: selecting or adopting an initial open-weights base, defining how consortium training improves shared weights, and planning the transition toward consortium-owned base models when the project has sufficient compute, data, and operational maturity. |
+| [Data Governance]({{site.tech_docs}}/work-groups/data-governance/){:target="repo-docs"} | Define how sovereign data can participate in Tapestry without surrendering control. This group owns data sourcing, licensing, stewardship, residency constraints, provenance, contribution rights, and data-quality expectations for national, cultural, industrial, and institutional participants. |
+| [Deployment and Adoption]({{site.tech_docs}}/work-groups/deployment-adoption/){:target="repo-docs"} | Ensure Tapestry-derived models become usable systems, not just trained weights. This group owns serving patterns, product harnesses, integration guidance, participant rollout, developer experience, and adoption feedback loops. |
+| [Evaluation Certification]({{site.tech_docs}}/work-groups/evaluation-certification/){:target="repo-docs"} | Define the evidence that Tapestry models, pipelines, and participants must produce before claims of capability, sovereignty, cultural alignment, safety, or certification are accepted. |
+| [Governance and Participation]({{site.tech_docs}}/work-groups/governance-participation/){:target="repo-docs"} | Translate Tapestry's governance principles into operating mechanics for work groups, participants, contributions, decisions, certification processes, and anti-capture safeguards. |
+| [Infrastructure and Operations]({{site.tech_docs}}/work-groups/infrastructure-operations/){:target="repo-docs"} | Own the platform and operating model that lets participants run Tapestry workloads across heterogeneous compute, networks, security regimes, and organizational boundaries. |
+| [Security and Privacy]({{site.tech_docs}}/work-groups/security-privacy/){:target="repo-docs"} | Define the technical guarantees that make Tapestry sovereignty enforceable: privacy tiers, secure aggregation, differential privacy, trusted execution, threat models, model-update leakage analysis, and safety-preservation constraints. |
+| [Sovereign Alignment]({{site.tech_docs}}/work-groups/sovereign-alignment/){:target="repo-docs"} | Own the participant-specific pipeline that turns a shared capable base into models that reflect local knowledge, values, institutions, domains, and interaction norms. This includes culturally grounded continued pretraining, post-training alignment, instruction tuning, and portability of sovereign contributions. |
 
 ## Other Technical Documentation
 
-The rest of the technical documentation is currently maintained in the project repository [`docs`]({{page.tech_docs}}/){:target="repo-docs"}:
+The rest of the technical documentation is currently maintained in the project repository [`docs`]({{site.tech_docs}}/){:target="repo-docs"}:
 
-* [Architecture]({{page.tech_docs}}/architecture/){:target="repo-docs"}:
-  * [Architecture Decision Records]({{page.tech_docs}}/architecture/decisions/){:target="repo-docs"}:
-* [Governance]({{page.tech_docs}}/governance/){:target="repo-docs"}:
-* [Reference]({{page.tech_docs}}/reference/){:target="repo-docs"}:
-* [Strategic Plan]({{page.tech_docs}}/strategic-plan/){:target="repo-docs"}
+* [Architecture]({{site.tech_docs}}/architecture/){:target="repo-docs"}:
+  * [Architecture Decision Records]({{site.tech_docs}}/architecture/decisions/){:target="repo-docs"}:
+* [Governance]({{site.tech_docs}}/governance/){:target="repo-docs"}:
+* [Reference]({{site.tech_docs}}/reference/){:target="repo-docs"}:
+* [Strategic Plan]({{site.tech_docs}}/strategic-plan/){:target="repo-docs"}
 
 ## Additional links
 
