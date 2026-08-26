@@ -79,6 +79,14 @@ TODO: STATUS AS OF AUGUST 25
 | T6 | Evaluation harness: `GlobalOpinionQA` with Australia/NZ, India, and rest-of-world splits. Monash builds the harness, BharatGen runs it on the checkpoints held at the Indian node. | Joint | - | Not started |
 | T7 | Round-level evaluation: score the retained per-round checkpoints, the final synchronised checkpoint, and the checkpoint after one additional local update at each node. Report the gap to the T5 centralised baseline per round alongside the training-loss curve. | BharatGen/Indian | Monash | Not started |
 
+#### Baselines
+
+1. OLMo 2 trained centrally on the union of the South Asian and Monash-node partitions, as the no-privacy upper bound.
+2. Local-only training at each node, as the no-federation reference.
+3. The base OLMo 2 instruct model without cultural tuning, as the zero-cost reference.
+
+Federated results are interpreted relative to the gap between 1. and 2. No centralised results exist yet at either model size, so baseline 1. is produced inside M0. For task T5, the 7B centralised run is attempted first as the cheaper of the two, and the 1B centralised run is done only if the compute at the Monash node permits.
+
 #### Evaluation
 
 Convergence of the federated training loss function was the most important result planned for M0, which was achieved. The loss curve was compared against the local-only curves from T5 (task 5 in the table above). If it fails to trend downward or diverges from the local-only curves by more than an order of magnitude, the run halts for diagnosis rather than proceeding to downstream evaluation.
@@ -88,8 +96,11 @@ Desirable, additional evaluation of the federated model checkpoints included the
 * `GlobalOpinionQA`[^4]. Built from the Pew Global Attitudes Survey and the World Values Survey, each item carries per-country response distributions rather than a single gold label. We evaluated the similarity between the model's answer distribution and the survey distributions for Australia/NZ, India, and other countries respectively.
 * BharatGen Culture WVS Dataset[^5].
 
-Baselines. (i) OLMo 2 trained centrally on the union of the South Asian and Monash-node partitions, as the no-privacy upper bound; (ii) local-only training at each node, as the no-federation reference; (iii) the base OLMo 2 instruct model without cultural tuning, as the zero-cost reference. Federated results are interpreted relative to the gap between (i) and (ii). No centralised results exist yet at either model size, so baseline (i) is produced inside M0. (T5): the 7B centralised run is attempted first as the cheaper of the two, and the 1B centralised run only if the compute at the Monash node permits.
-Evaluation cadence. Adapter checkpoints are retained at every synchronisation round, and CulturalBench and GlobalOpinionQA are scored per round rather than only at the end of the run, so that the benchmark trajectory can be read against the training-loss curve and any divergence between the two is visible while the run is still in progress. Two further points are scored: the final synchronised checkpoint, and the checkpoint obtained after one additional local update at each node following the final synchronisation. The second separates what the aggregated model holds from what each node recovers by fitting its own partition last, which is the quantity of interest if the deployed artefact is a locally adapted model rather than the global one. Per-round scoring assumes checkpoint retention is affordable at both sites; if storage or evaluation cost makes it impractical, the fallback is scoring every k-th round, with the final synchronised checkpoint and the post-final-update checkpoints always scored.
+#### Evaluation Cadence
+
+Adapter checkpoints are retained at every synchronisation round, and `GlobalOpinionQA` are scored per round rather than only at the end of the run, so that the benchmark trajectory can be read against the training-loss curve and any divergence between the two is visible while the run is still in progress.
+
+Two further points are scored: the final synchronised checkpoint, and the checkpoint obtained after one additional local update at each node following the final synchronisation. The second separates what the aggregated model holds from what each node recovers by fitting its own partition last, which is the quantity of interest if the deployed artifact is a locally adapted model rather than the global one. Per-round scoring assumes checkpoint retention is affordable at both sites. If storage or evaluation cost makes it impractical, the fallback is scoring every k-th round, with the final synchronised checkpoint and the post-final-update checkpoints always scored.
 
 ### Using the Flower Labs Federated AI Framework
 
@@ -106,6 +117,6 @@ The [consortium training PoC #189](https://github.com/The-AI-Alliance/tapestry/i
 
 [^1]: OLMo Team (2025). 2 OLMo 2 Furious. arXiv:2501.00656.
 [^2]: Pham, V. T., Li, Z., Qu, L., and Haffari, G. (2025). _CultureInstruct: Curating Multi-Cultural Instructions at Scale._ In Proceedings of NAACL 2025. ([PDF](https://aclanthology.org/2025.naacl-long.465.pdf){:target="_blank"}, [dataset](https://drive.google.com/file/d/139oNuyEVdvprEIWUBuBd4BcBrWMwp0Hw/view?usp=sharing){:target="_blank"})
-[^3]: Jordan, K. et al. (2024). _Muon: An optimiser for hidden layers in neural networks._ [https://github.com/KellerJordan/Muon](https://github.com/KellerJordan/Muon){:target="muon"}.
+[^3]: Jordan, K. et al. (2024). _Muon: An optimiser for hidden layers in neural networks._ [https://github.com/KellerJordan/Muon](https://github.com/KellerJordan/Muon){:target="muon"}. https://kellerjordan.github.io/posts/muon/
 [^4]: Durmus, E. et al. (2023). _Towards Measuring the Representation of Subjective Global Opinions in Language Models._ [arXiv:2306.16388](https://arxiv.org/abs/2306.16388){:target="arxiv"}.
 [^5]: BharatGen Culture WVS Dataset. [link](https://drive.google.com/drive/folders/1Anxb1YWUfhkla5cOBucfaRGS557VLt5m){:target="google"}
