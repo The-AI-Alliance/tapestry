@@ -30,6 +30,7 @@ glossary_url: https://the-ai-alliance.github.io/glossary
 tapestry_url: https://thealliance.ai/projects/tapestry
 repo_url: https://github.com/The-AI-Alliance/tapestry
 repo_tech_docs_url: https://github.com/The-AI-Alliance/tapestry/tree/develop/docs
+repo_project_dashboard_url: https://github.com/orgs/The-AI-Alliance/projects/50/views/7
 
 # Regression tests
 # By default, the pages in /website/tests are excluded when the site is built.

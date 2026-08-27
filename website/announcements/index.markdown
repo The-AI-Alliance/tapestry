@@ -28,7 +28,7 @@ Project Tapestry is managed on a three-month _milestone_ cycle, offset by one mo
 | **Dates**     | June - August, 2026 |
 | **Details**   | [Milestone Zero - M0](./milestone-zero) |
 | **Release**   | [v0.1.0-M0]({{site.repo_url}}/releases/tag/v0.1.0-M0){:target="m0-release"} |
-| **Dashboard** | [Tapestry Project - M0](https://github.com/orgs/The-AI-Alliance/projects/50/views/7?filterQuery=milestone%3AM0){:target="dash"}
+| **Dashboard** | [Tapestry Project - M0]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM0){:target="dash"}
 
 This milestone was labelled "zero", because this period was about initial organization and consortium building. We demonstrated basic concepts of [consortium training]({{site.repo_tech_docs_url}}/reference/training-approaches.md) using two, geographically-distributed &ldquo;sovereign&rdquo; nodes (training clusters) collaborating to train a model. Other work in M0 explored the efficacy of [cultural alignment]({{site.repo_tech_docs_url}}/architecture/decisions/adr-003-cultural-alignment.md) techniques, started defining requirements and work groups for our ambitious data governance and management strategy, and established our development policies and practices.
 
@@ -38,7 +38,7 @@ This milestone was labelled "zero", because this period was about initial organi
 | **Dates**     | September - November, 2026 |
 | **Details**   | TBD |
 | **Release**   | TBD |
-| **Dashboard** | [Tapestry Project - M1](https://github.com/orgs/The-AI-Alliance/projects/50/views/7?filterQuery=milestone%3AM1){:target="dash"}
+| **Dashboard** | [Tapestry Project - M1]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM1){:target="dash"}
 
 M1 is building on the prototype work of M0 to expand the number of sovereign nodes, increase the available compute resources, explore the feasibility and limits of heterogeneous trainings (different hardware and software stacks), beginning building cultural alignment tools and techniques, and implement the first data governance, management, and processing capabilities. A primary goal is to tune an existing open-weights model to create a very capable model targeted at a particular domain and set of use cases.
 
@@ -49,9 +49,9 @@ M1 is building on the prototype work of M0 to expand the number of sovereign nod
 | **Dates**     | December, 2026 - February, 2027 |
 | **Details**   | TBD |
 | **Release**   | TBD |
-| **Dashboard** | [Tapestry Project - M1](https://github.com/orgs/The-AI-Alliance/projects/50/views/7?filterQuery=milestone%3AM2){:target="dash"}
+| **Dashboard** | [Tapestry Project - M1]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM2){:target="dash"}
 
-In the M2 time frame, we plan to complete an end-to-end, production quality and globally-distributed training and post-training infrastructure and software stack, with further progress on building domain-specific and culturally-specific models, based on open-weight models. We also plan to complete preparation for training our own foundation models &ldquo;from scratch&rdquo;.
+In the M2 time frame, we plan to complete an end-to-end, production quality and globally-distributed training and post-training infrastructure and software stack, with further progress on building domain-specific and culturally-specific models, based on open-weight models. We also plan to complete preparation for training our own foundation models &ldquo;from scratch&rdquo; and to begin that process.
 
 ---
 
