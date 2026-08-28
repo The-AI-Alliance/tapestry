@@ -45,5 +45,8 @@ jobs:
       - name: Install the pinned Quint toolchain
         run: make formal-spec-install
 
+      - name: Audit npm dependencies for known vulnerabilities
+        run: npm audit --audit-level=high
+
       - name: Verify formal specs — typecheck, invariants, tests
         run: make formal-spec-verify
