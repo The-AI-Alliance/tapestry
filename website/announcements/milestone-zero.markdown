@@ -12,10 +12,10 @@ As described on the [Announcement](../) page, milestone "zero" was about initial
 
 * Demonstrate the feasibility of _consortium training_, as defined in [Training Approaches: Centralized, Federated, and Consortium]({{site.repo_tech_docs_url}}/reference/training-approaches.md){:target="repo"} (where it is also compared to _federated learning_). M0 used two, geographically-distributed &ldquo;sovereign&rdquo; nodes (training clusters) collaborating to instruction-tune a model.
 * Explore techniques for [cultural alignment]({{site.repo_tech_docs_url}}/architecture/decisions/adr-003-cultural-alignment.md){:target="repo"}.
-* Start defining the requirements for our data governance and management strategy and organized work groups for these areas.
+* Start defining the requirements for our data [governance]({{site.repo_tech_docs_url}}/work-groups/data-governance/data-governance-requirements.md){:target="repo"} and [management]({{site.repo_tech_docs_url}}/work-groups/data-governance/data-management-requirements.md){:target="repo"} strategy.
 * Establish our software development policies and practices.
 
-This page provides more details. See also the [M0 release notes]({{site.repo_url}}/releases/tag/v0.1.0-M0){:target="m0-release"}.
+This page provides more details. See also the [M0 release notes]({{site.repo_url}}/releases/tag/V0.1.0-M0){:target="m0-release"}.
 
 ## Consortium Training Proofs of Concept (PoCs)
 
@@ -25,7 +25,10 @@ Two separate PoCs explored consortium training techniques.
 
 The main PoC for consortium training, [&ldquo;epic&rdquo; #189]({{site.repo_url}}/issues/189){:target="repo"}, was conducted by a joint team from [BharatGen](https://bharatgen.com/){:target="bharatgen"}, in India, and [Monash University](https://www.monash.edu/){:target="monash"}, in Australia. The aim was to use instruction fine tuning (IFT) to perform cultural alignment in a geo-localized consortium training setting, using a reasonably sized LLM.
 
-The contributors to this project are [Bapi Chatterjee](https://github.com/bapichatterjee){:target="_blank"} (Indraprastha Institute of Information Technology Delhi and BharatGen), Maneesh Kumar Singh (BharatGen), [Lizhen Qu](https://github.com/qulizhen){:target="_blank"} (Monash University) and ...
+The contributors to this project include the following:
+
+* From [BharatGen](https://bharatgen.com/){:target="bharatgen"} (and affiliated institutions): [Maneesh Kumar Singh](mailto:maneesh.singh@bharatgen.com){:target="bharatgen"}, [Bapi Chatterjee](https://github.com/bapichatterjee){:target="bharatgen"} (also Indraprastha Institute of Information Technology Delhi - IIITD), [Anant Jain](mailto:anantj@iiitd.ac.in){:target="bharatgen"} (IIITD), [Gauranshi Gupta](mailto:gauranshig@iiitd.ac.in){:target="bharatgen"} (IITD), [Prof. Mounendra De Sarkar](mailto:mounendra@cse.iith.ac.in){:target="bharatgen"} (IIT Hyderabad), [Ganesh Ramakrishnan](https://www.cse.iitb.ac.in/~ganesh/){:target="bharatgen"} (IIT Bombay), and [Samrit Kumar Maity](mailto:samritm@cdac.in){:target="bharatgen"} (CDAC, India).
+* From [Monash University](https://www.monash.edu/){:target="monash"}: [Lizhen Qu](https://github.com/qulizhen){:target="monash"}, [Trang Vu](mailto:trang.vu1@monash.edu){:target="monash"}, and [Minghan Wang](mailto:minghan.wang@monash.edu){:target="monash"}
 
 #### Experimental Setup
 
@@ -106,7 +109,9 @@ Two further points are scored: the final synchronised checkpoint, and the checkp
 
 ### Consortium Training Using the Flower Labs Federated AI Framework
 
-A second, separate PoC was started using the [Flower Labs](https://github.com/flwrlabs/flower){:target="flower"} federated AI framework, also applied in a consortium training configuration, [epic #184]({{site.repo_url}}/issues/184){:target="repo"}. [OLMo3-7B](https://allenai.org/blog/olmo3){:target="olmo"} is used (instead of OLMo2) and the [DOLMA dataset](https://huggingface.co/datasets/allenai/dolma){:target="dolma"}to do _continued pre-training_ (CPT) from one checkpoint to a successor with the same model of local node training loops, then an outer merge of weight updates between nodes. This PoC is exploring some operational concerns for consortium training and setting the stage for Milestone One (M1) efforts. Since this PoC started late in the M0 cycle, due to issues acquiring the necessary GPU resources, most of the work will be completed early in M1.
+A second, separate PoC, [epic #184]({{site.repo_url}}/issues/184){:target="repo"}, was started using [Flower Labs'](https://flower.ai/){:target="flower"} [ federated AI framework](https://github.com/flwrlabs/flower){:target="flower"}, also applied in a consortium training configuration using two geographically-separated clusters in AWS (to simulate sovereign nodes).
+
+[OLMo3-7B](https://allenai.org/blog/olmo3){:target="olmo"} was used (instead of OLMo2) along with the [DOLMA dataset](https://huggingface.co/datasets/allenai/dolma){:target="dolma"} to do _continued pre-training_ (CPT) from one checkpoint to a successor with the same technique of many training loops local to each node, follewed by periodic outer merges of weight updates from the nodes. This PoC explored some operational concerns for consortium training, setting the stage for Milestone One (M1), where we plan to explore how to do consortium training where some sovereign nodes run the Flower Labs stack, others run the [Slakshna](https://github.com/dcll-iiitd/Slakshna){:target="slakshna"} stack, and still other sovereign nodes that will come online might use different stacks. We hope to also explore the efficacy of consortium training running nodes on different hardware accelerator platforms.
 
 Collaborators on this project include [@elainechan](https://github.com/elainechan){:target="_blank"}, [@jolson-allianceai](https://github.com/jolson-allianceai){:target="_blank"}, [@niclane7](https://github.com/niclane7){:target="_blank"}, and [@psfoley](https://github.com/psfoley){:target="_blank"}.
 
@@ -195,7 +200,13 @@ We wish to thank all the contributors to Tapestry. In particular, contributors o
 
 ### What's Next?
 
-Milestone One (M1) is our next objective, covering our work from September through November, 2026. [Our M1 dashboard]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM1){:target="repo"} shows the work planned and our progress. We welcome your help! See the [project README](https://github.com/The-AI-Alliance/tapestry#getting-involved-anchor){:target="repo"} for individual contributor guidance and how your organization can join Project Tapestry.
+Milestone One (M1) is our next objective, covering our work from September through November, 2026. [Our M1 dashboard]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM1){:target="repo"} shows the work planned and our progress. Like M0, the major themes will be expanding our capabilities in these areas:
+
+* [Consortium Training](https://github.com/The-AI-Alliance/tapestry/issues/183){:target="_blank"}
+* [Cultural Alignment](https://github.com/The-AI-Alliance/tapestry/issues/243){:target="_blank"}
+* [Data Governance and Management](https://github.com/The-AI-Alliance/tapestry/issues/230){:target="_blank"}
+
+We welcome your help! See the [project README](https://github.com/The-AI-Alliance/tapestry#getting-involved-anchor){:target="repo"} for individual contributor guidance and how your organization can join Project Tapestry.
 
 ---
 
