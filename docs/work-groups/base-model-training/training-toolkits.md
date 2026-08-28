@@ -1,4 +1,4 @@
-# PyTorch Alternatives — A Comparison
+# Model Training Toolkits
 
 | Field       | Value           |
 | :---------- | :-------------- |

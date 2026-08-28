@@ -3,13 +3,13 @@
 # Welcome to Project Tapestry
 
 > [!NOTE]
-> **Project Tapestry is bringing together talented people, data, and compute from a global consortium of partners to build a new foundation model system trained on a larger and more diverse corpus than ever before.**
+> Project Tapestry is a global consortium of partner organizations and individuals who bring expertise, data sets, and compute resources together to build a new foundation model family, one that is trained on a larger and more diverse corpus than ever before.
 >
-> **Tapestry will enable sovereign AI by ensuring ownership of data and compute remains with partners, and that partners can continue to train sovereign derivatives of the consortium-trained base model that they own using the Tapestry open source training platform.**
+> Our aim is to enable truly _sovereign AI_ by ensuring that ownership of data and compute remains with partners, and that they can build sovereign derivative models that they own, based on the consortium-trained base models and built using Tapestry's open-source training platform.
 
-Learn more from our [Kickoff Workshop Blog](https://thealliance.ai/blog/project-tapestry-the-path-to-frontier-sovereign-ai) and check out the [Project Tapestry](https://thealliance.ai/projects/tapestry/) website for more information about partnering, events, and how to support Project Tapestry.
+Learn more from our [Kickoff Workshop Blog](https://thealliance.ai/blog/project-tapestry-the-path-to-frontier-sovereign-ai). Check out the [Project Tapestry](https://thealliance.ai/projects/tapestry/) website for more information about partnering, events, and how to support Project Tapestry.
 
-This repo contains the code and technical documentation for the project. We invite you to jump in and help!
+This repository contains the code and technical documentation for the project. Your help is most welcome!
 
 <p align="center">
   <img src="website/assets/images/03-tapestry-logo-cropped-630x555.png" alt="Project Tapestry Logo" width="600">
@@ -19,39 +19,39 @@ The rest of this README provides information for contributors and users of this 
 
 ## Contribute to Our First Work Streams
 
-Project Tapestry has big plans, and we're starting with some fundamental building blocks.
+Project Tapestry has big plans. Here are the main areas of development.
 
-* [LLM Cultural Alignment and Re-alignment](https://github.com/The-AI-Alliance/tapestry/issues/22) - help us develop techniques for cultural alignment, initially based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric. This task will implement a corresponding evaluation and implement tuning experiments to understand how to shift alignment without compromising general model performance. Prior expertise in evaluation and tuning technologies are especially welcome.
-* [Consortium Training](https://github.com/The-AI-Alliance/tapestry/issues/24) - Tapestry's approach to global model development relies on a balance between centralized and distributed training that preserves use and privacy requirements for datasets. Help us adapt and develop optimal techniques with ideas from both federated learning and the latest LLM pre-training and post-training methods. Prior expertise in large scale LLM training, distributed infrastructure, and federated learning are especially welcome.
+* [LLM Cultural Alignment and Re-alignment](https://github.com/The-AI-Alliance/tapestry/issues/243) - help us develop techniques for cultural alignment, initially based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric. This effort will continue to explore how to shift _cultural alignment_ without compromising general model performance. Prior expertise in evaluation and tuning technologies are especially welcome.
+* [Consortium Training](https://github.com/The-AI-Alliance/tapestry/issues/183) - Tapestry's approach to global model development relies on a balance between centralized and distributed training that preserves use and privacy requirements for datasets. Help us adapt and develop optimal techniques with ideas from both federated learning and the latest LLM pre-training and post-training methods. Prior expertise in large scale LLM training, distributed infrastructure, and federated learning are especially welcome.
 * [Global Training Data Corpus](https://thealliance.ai/projects/tapestry/training-data-proposals) A core thesis of project Tapestry is that bringing together a much more diverse set of data can provide a path to a better frontier base model for all. What unique datasets exist that could be brought to Tapestry model training? They don't have to be fully open; we will work with you to define and enforce appropriate requirements.
-* Tapestry Model Development Roadmap - _coming soon_ - we want your input!
+* Your good ideas. Our [contribution mechanism](contrib/#how-to-contribute) provides a way for you to suggest new technologies, solutions to design challenges we face, etc.
 
 ### Quick Paths
 
 > [!NOTE]
 > Make sure to read [**Getting Involved**](#getting-involved-anchor) below for information on contribution guidelines, etc.
 >
-> We use the [`develop`](https://github.com/The-AI-Alliance/tapestry/tree/develop) branch as our default (integration) branch, reserving [`main`](https://github.com/The-AI-Alliance/tapestry/tree/main) for occasional "baked" releases.
+> We use the [`develop`](https://github.com/The-AI-Alliance/tapestry/tree/develop) branch as our default (integration) branch, reserving [`main`](https://github.com/The-AI-Alliance/tapestry/tree/main) for releases.
 
 ### Working with the Source Code
 
-Use the [**`Makefile`**](Makefile) targets to run tests and other tools, executables, etc. However, most commands require MacOS or Linux to work. Try `make help` for more information. More details are in the [**Development**](#development-anchor) section below.
+Use the [**`Makefile`**](Makefile) targets to run tests and other tools, executables, etc. Our GNU `make` process requires MacOS or Linux to work, although all the Python-based tools can be executed on any platform. Try `make help` for more information and see the [**Development**](#development-anchor) section below.
 
 The _production_ source code is under the [`src`](src/) directory. The unit tests are under the [`src/tests`](src/tests/) directory. For example, a consortium training prototype is in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md). Try `make consortium-demo` and `make consortium-tests`.
 
-There are runnable demos in [**`examples/`**](examples/). Try `make consortium-demo`.
+There are runnable demos in [**`examples/`**](examples/). The `make consortium-demo` command runs the demo using a script here.
 
 _Contributions_ are in [**`contrib/`**](contrib/), which are PoCs (proofs of concept), experiments, and modules proposed for possible inclusion in the production code. For example, see the contrib. experiment metrics for the consortium prototype in [**`contrib/jneums-consortium-experiment/`**](contrib/jneums-consortium-experiment/README.md). Try `make consortium-experiment`.
 
 ### Working with the Technical Documentation
 
-The technical documentation lives under [**`docs`**](docs/README.md). This is where you will find our requirements, architecture and design work, etc.
+The technical documentation lives under [**`docs`**](docs/README.md). This is where you will find our requirements, architecture and design work, work group documents, etc.
 
 * [**Architecture**](docs/architecture/README.md)
 	* The _TVA methodology_: phased outputs (stakeholder map through design goals), architectural options and core thesis, plus:
 		* [**Architecture Decision Records**](docs/architecture/decisions/)
 		* [**Diagrams**](docs/architecture/diagrams/)
-* [**Governance**](docs/governance/)
+* [**Project Governance Principles**](docs/governance/)
 * [**Strategic Plan**](docs/strategic-plan/)
 * [**Reference Materials**](docs/reference/) (e.g. [**training paradigms**](docs/reference/training-approaches.md))
 * [**Work Groups**](docs/work-groups/)
@@ -81,7 +81,7 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 The rest of the steps discussed next are automated using `make`. Try the following:
 
 ```shell
-make one-time-setup  # Requires MacOS or Linux
+make one-time-setup  # Uses GNU make, so may require MacOS or Linux
 ```
 
 ### Create a Virtual Environment
@@ -123,53 +123,57 @@ This runs `pytest` with coverage reporting, using the following commands:
 
 ```shell
 cd src
-uv run --active coverage run -m pytest -q -v -s
-uv run --active coverage report -m
+uv run coverage run -m pytest -q -v -s
+uv run coverage report -m
 ```
 
-> [!NOTE]
-> The `--active` flag is needed for recursive invocation in `contrib/*`, where some of the contributions define their own local `uv/venv` environments.
-
-## Code Refinement
+## Code Formatting and Quality Checks
 
 We use tools for formatting, linting, and type-checking the code.
 
 ### Code Formatting
 
-Use _either_ of the following commands to format the Python code with `black`:
+Use _one_ of the following commands to format the Python code with `black`:
 
 ```shell
-make format
-# or
+make format # makes target "black"
+make black
 uv run black src
 ```
 
 ### Linting
 
-Use _either_ of the following commands to lint the Python code with `ruff` and `pylint`:
+Use _one_ of the following commands to lint the Python code with `ruff` and `pylint`:
 
 ```shell
-make lint
-# or
+make lint # makes targets "ruff" and "pylint"
+make ruff pylint
+# or these two commands:
 uv run ruff check src
 uv pylint src
 ```
 
-### Type Checking
-
-Use _either_ of the following commands to type check the Python code with `ty`:
+There is also a "watch" option for `ruff` that keeps it running as you fix mistakes and save the files. Use _one_ of the following commands:
 
 ```shell
-make type-check
-# or
+make ruff-watch
+uv run ruff check --watch src
+```
+
+### Type Checking
+
+Use _one_ of the following commands to type check the Python code with `ty`:
+
+```shell
+make type-check # makes target "ty"
+make ty
 uv run ty src
 ```
 
-There is also a "watch" option that keeps `ty` running as you fix mistakes and save the files:
+There is also a "watch" option that keeps `ty` running as you fix mistakes and save the files. Use _one_ of the following commands:
 
 ```shell
 make type-check-watch
-# or
 uv run ty --watch src
 ```
 
@@ -182,38 +186,43 @@ uv run ty --watch src
 
 If you are enhancing existing code, make the changes under `src`, and when appropriate, the top-level `Makefile` and `.common.mk`.
 
-However, for everything else, including proofs of concept (PoCs), experiments, proposed additions, etc., create them under [`contrib`](contrib/README.md), the staging area for new contributions. The `contrib` [`README`](contrib/README.md) describes the requirements you must follow for new contributions, including how
-the master `make` process works and the customizations you might need to "global" _quality check_ targets, like `tests`, `lint`, etc. For example, there is an easy way to disable some of these checks for PoC code that isn't considered production ready.
+However, for everything else, including proofs of concept (PoCs), experiments, proposed additions, etc., create them under [`contrib`](contrib/README.md), the staging area for new contributions. The `contrib` [`README`](contrib/README.md) describes the requirements you must follow for new contributions.
+
+For example, the common _quality check_ `make` targets, like `tests`, `lint`, etc. are also run for all the contributions. However, your contribution may not (yet) be production ready, so it might fail some of those checks. While you _should_ try to submit production-ready work, we don't want to discourage idea submissions. So, there is a straightforward mechanism to customize or disable any of these checks for contribution code, as needed.
 
 ### Before You Submit a PR...
 
-Before submitting a PR, please make these "quality" targets: `format`, `lint` (which makes `ruff` and `pylint`), `type-check`, and `unit-tests`. This needs to be done in both the _production_ `src` tree and all the `contrib` contributions. Use the convenient make target `before-pr`, which handles all of them for you:
+Before submitting a PR, make sure the `make` target `before-pr` passes cleanly:
 
 ```shell
 make before-pr
 ```
 
-Make sure everything passes cleanly! This ensures that the _production_ code under `src` and the `contrib` contributions are properly formatted, linted, type checked, and the tests pass (and continue to work, even when you aren't working on one of these "sections" with your PR...). You can also run these tasks separately for the "top-level" code and for the contributions:
+This target makes all our "quality" targets: `format` (which uses `black`), `lint` (which uses `ruff` and `pylint`), `type-check` (which uses `ty`), and `unit-tests`.
+
+Note that `black` may reformat your code, so be sure to commit any changes. the `before-pr` target will run these checks in both the _production_ `src` tree and all the `contrib` contributions. You can also run these checks separately for the "top-level" code and for the contributions:
 
 ```shell
 make before-pr-top       # The top-level code only.
 make before-pr-contrib   # The contrib/* code only.
 ```
 
-However, note that there is a mechanism each `contrib` contribution may use to skip certain of these targets when the contribution is not yet production ready. This mechanism is discussed in the `contrib` [`README`](contrib/README.md).
-
-You can run a specific quality target on one or more contributions as follows. Let's use `contrib/foo` and target `format` as an example:
+You can run a specific quality target on one or more contributions as follows. Let's suppose there is a `contrib/foo` contribution and we want to run `make format`, as an example:
 
 ```shell
 # Make "format" just for "contrib/foo"
-make SRC_DIR=contrib/foo --include-dir=contrib/foo format  
-# Make "format" for ALL "contrib/*"
+make SRC_DIR=contrib/foo SPEC_DIR=contrib/foo --include-dir=contrib/foo format
+```
+
+If you want to run `make format` for **all** `contrib/*` contributions:
+
+```shell
 make contrib-format
 ```
 
 ## Project Code Structure
 
-In addition to the top-level directories [`docs`](docs/), discussed above, [`website`](website/), discussed below, and [`contrib`](contrib/README.md), the staging area for contributed ideas and techniques, the code structure is as follows. At this time, there are three major _subsystems_:
+The project code structure is still evolving, but currently it is organized into three major _subsystems_:
 
 * `data` for all data governance and management capabilities.
 * `training` for all distributed training and tuning capabilities.
@@ -233,6 +242,8 @@ tapestry/
 │           └── infrastructure/
 │           └── training/
 ```
+
+In addition, the [`docs`](docs/), discussed above, holds all technical documentation, and [`website`](website/), discussed below, holds the project technical website content.
 
 <a id="getting-involved-anchor"></a>
 
@@ -272,7 +283,7 @@ See the contributing guide [section on DCO](CONTRIBUTING.md#developer-certificat
 
 The [website](https://the-ai-alliance.github.io/tapestry/) for this repository provides another way to discover and navigate the technical documentation content in [`docs`](/docs). However, at this time, the site mostly just points to the content in [`docs`](docs/). Eventually, it will publish "refined" versions of the `docs` content.
 
-The website sources are written in Markdown, HTML, JavaScript, etc. and are found in the [`website`](website/) directory. The website is published using [GitHub Pages](https://pages.github.com/), which uses the [Jekyll](https://github.com/jekyll/jekyll) engine. See [GITHUB_PAGES.md](GITHUB_PAGES.md) for all the details.
+The website sources are written in Markdown, etc. and are found in the [`website`](website/) directory. The website is published using [GitHub Pages](https://pages.github.com/). See [GITHUB_PAGES.md](GITHUB_PAGES.md) for all the details.
 
 ----
 

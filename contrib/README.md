@@ -8,13 +8,14 @@ Think of `contrib/` as the front porch. Promising contributions may later be pro
 
 | Contribution | Contributor(s) | Status | What it is |
 | :----------- | :------------- | :----- | :--------- |
-| [`14H034160212-conflict-aware-fusion`](14H034160212-conflict-aware-fusion/README.md) | 14H034160212 | Candidate | LIRE + RLVF post-training stages that teach a base model to halt on logically inconsistent premises instead of deducing through them |
-| [`14H034160212-logically-grounded-dpo`](14H034160212-logically-grounded-dpo/README.md) | 14H034160212 | Candidate | Verifier-based DPO/PPO preference pipeline replacing reference-text similarity with an NLI-entailment reward for checkable explanations |
-| [`jneums-consortium-experiment`](jneums-consortium-experiment/README.md) | jneums | Speculative | Deterministic measurement layer around the consortium-training proof of concept |
-| [`jneums-cultural-cpt-validation`](jneums-cultural-cpt-validation/README.md) | jneums | Speculative | Runnable harness for EXP-001: does culturally grounded continued pretraining shift alignment beyond language exposure? |
-| [`jneums-flower-wan-spike`](jneums-flower-wan-spike/README.md) | jneums | Speculative | De-risk spike for #70: 2B-parameter weight round-trip through a Flower SuperLink over a real WAN |
-| [`nguyennm1024-sociocultural-alignment`](nguyennm1024-sociocultural-alignment/README.md) | nguyennm1024 | Speculative | LoRA + consortium learning + Inglehart–Welzel evaluation for sovereign cultural alignment (Vietnamese case study) |
-| [`oli-sovereign-eval-evidence`](oli-sovereign-eval-evidence/README.md) | oli | Speculative | Evidence layer connecting cultural-alignment evaluation, data sovereignty, and certification claims |
+| [`14H034160212-conflict-aware-fusion`](14H034160212-conflict-aware-fusion/README.md) | [@14H034160212](https://github.com/14H034160212) | Candidate | LIRE + RLVF post-training stages that teach a base model to halt on logically inconsistent premises instead of deducing through them |
+| [`14H034160212-logically-grounded-dpo`](14H034160212-logically-grounded-dpo/README.md) | [@14H034160212](https://github.com/14H034160212) | Candidate | Verifier-based DPO/PPO preference pipeline replacing reference-text similarity with an NLI-entailment reward for checkable explanations |
+| [`jneums-consortium-experiment`](jneums-consortium-experiment/README.md) | [@jneums](https://github.com/jneums) | Speculative | Deterministic measurement layer around the consortium-training proof of concept |
+| [`jneums-cultural-cpt-validation`](jneums-cultural-cpt-validation/README.md) | [@jneums](https://github.com/jneums) | Speculative | Runnable harness for EXP-001: does culturally grounded continued pretraining shift alignment beyond language exposure? |
+| [`jneums-flower-wan-spike`](jneums-flower-wan-spike/README.md) | [@jneums](https://github.com/jneums) | Speculative | De-risk spike for #70: 2B-parameter weight round-trip through a Flower SuperLink over a real WAN |
+| [`luzanikita-formal-spec`](luzanikita-formal-spec/README.md) | [@luzanikita](https://github.com/luzanikita) | Speculative | Using a formal specification system, [Quint](https://quint.sh) to carefully specify and verify systems. |
+| [`nguyennm1024-sociocultural-alignment`](nguyennm1024-sociocultural-alignment/README.md) | [@nguyennm1024](https://github.com/nguyennm1024) | Speculative | LoRA + consortium learning + Inglehart–Welzel evaluation for sovereign cultural alignment (Vietnamese case study) |
+| [`oli-sovereign-eval-evidence`](oli-sovereign-eval-evidence/README.md) | [@welttowelt](https://github.com/welttowelt) | Speculative | Evidence layer connecting cultural-alignment evaluation, data sovereignty, and certification claims |
 
 Statuses are `Speculative`, `Candidate`, or `Promoted` — see
 [State the Readiness Level](#state-the-readiness-level) and

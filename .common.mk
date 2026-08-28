@@ -62,7 +62,7 @@ QUALITY_CHECKS           := ${QUALITY_CHECKS_NO_TESTS} unit-tests
 # Time execution of commands. Prefix the command invocation with "${TIME}":
 TIME                     ?= time
 
-# Common flags for "uv run" (--active is recommended by some warnings that
+# Common flags for "uv run" (--active may be useful for some warnings that
 # can be seen during recursive uv invocations, but using it can cause
 # conflicting versions of dependencies to be installed in the top-level
 # environment, if the directories for those invocations have their own
@@ -152,16 +152,16 @@ ${CODE}make force-setup${_END}        # Alias for ${CODE}force-one-time-setup${_
 ${CODE}make unit-tests${_END}         # Run the unit test suite.
 ${CODE}make tests${_END}              # Alias for ${CODE}unit-tests${_END}.
 ${CODE}make clean${_END}              # Remove built artifacts, temporary files, etc.
-${CODE}make format${_END}             # Format the Python code with ${CODE}black${_END}.
+${CODE}make format${_END}             # Format the Python code by making the ${CODE}black${_END} target.
 ${CODE}make black${_END}              # Alias for ${CODE}format${_END}.
 ${CODE}make lint${_END}               # Lint the Python code by making the ${CODE}ruff${_END} and ${CODE}pylint${_END} targets.
 ${CODE}make ruff${_END}               # Lint the Python code with ${CODE}ruff${_END}.
+${CODE}make ruff-watch${_END}         # Lint the Python code with ${CODE}ruff${_END} in "watch" mode, re-linting whenever files are saved.
 ${CODE}make pylint${_END}             # Lint the Python code with ${CODE}pylint${_END}.
-${CODE}make type-check${_END}         # Type check the Python code making the ${CODE}ty${_END} target.
-${CODE}make type-check-watch${_END}   # Type check the Python code with ${CODE}ty${_END} in "watch" mode,
-${CODE}${_END}                        # so you can fix mistakes and keep it updating.
+${CODE}make type-check${_END}         # Type check the Python code by making the ${CODE}ty${_END} target.
+${CODE}make type-check-watch${_END}   # Type check the Python code by making the ${CODE}ty-watch${_END} target.
 ${CODE}make ty${_END}                 # Type check the Python code with ${CODE}ty${_END}.
-${CODE}make ty-watch${_END}           # Type check the Python code with ${CODE}ty${_END} in "watch" mode.
+${CODE}make ty-watch${_END}           # Type check the Python code with ${CODE}ty${_END} in "watch" mode, re-typing whenever files are saved.
 
 ${CODE}make before-pr${_END}          # Make ${CODE}format${_END}, ${CODE}lint${_END}, ${CODE}type-check${_END}, and ${CODE}unit-tests${_END} for ${CODE}src${_END}
 ${CODE}${_END}                        # AND every ${CODE}contrib/*${_END} directory. Equivalent to ${CODE}before-pr-top${_END}

@@ -101,6 +101,7 @@ Before changing this ADR from proposed to accepted:
 4. Choose the 70B residency remedy (streaming accumulation vs. out-of-core weighted-mean over safetensors shards) before Design C aggregation is built, so M0 code does not bake in full residency (see Consequences).
 5. File the standalone contribution-weighting-policy ADR (Phase 5, Decision 8) as a follow-up, so this ADR's conservative default does not become de facto policy by inertia. This ADR proposes that decision as a separate workstream; it does not carry it.
 6. Verify the durable-state and telemetry-disable requirements against the substrate actually chosen: if Flower is used, that `LinkState` is backed by a durable store rather than in-memory SQLite, and that `FLWR_TELEMETRY_ENABLED=0` is set on the central node.
+7. Note that the central node infrastructure should be agnostic to the models used. However, this needs to be confirmed.
 
 ## Alternatives considered
 
@@ -134,6 +135,7 @@ This ADR introduces infrastructure claims that touch earlier decisions. It does 
 | Phase 5, Decision 8 (weighting policy) — *referenced but unwritten* | TAP-004 open question 2 and TAP-007 defer the contribution-weighting policy to this decision, but no ADR yet records it | **Flag that this ADR's conservative default (published quality floor, otherwise-equal weighting) is load-bearing until that ADR exists** — if the governance decision is never written, the default becomes de facto policy by inertia. Propose a standalone weighting-policy ADR as the honest home for the question, filed as a separate follow-up rather than carried in this PR |
 | [TAP-007](adr-007-architecture-comparison.md) | Mandates a swappable contribution mechanism | Record that the swap point is realized as the coordinator's aggregation `Strategy`, and that memory-bound sizing assumes averaging-class aggregation — a shift to secure aggregation or DP-on-aggregate would revise the compute envelope |
 | [TAP-008](adr-008-data-sovereignty.md) | Requires auditable enforcement | Record the coordinator-side append-only oversight sink (signed admission, aggregation, and weighting decisions) as the coordinator half of that audit trail |
+| [Base-model selection](../../work-groups/base-model-training) | Contains both M0 and long-term model-selection material. | Ensure the infrastructure supports the model choices. |
 | Proposed multi-node infrastructure | Shares the ingress channel and the coordinator-trust concern | Cross-reference: this ADR sizes, secures, and governs the node; the proposed multi-node infrastructure defines the channel and carries the channel-level anti-capture (DG3) mitigation |
 
 ## Consequences
@@ -149,7 +151,7 @@ This ADR introduces infrastructure claims that touch earlier decisions. It does 
 
 ### Tapestry corpus and reference implementation
 
-- [TAP-002](adr-002-consortium-training.md), [TAP-004](adr-004-training-loop.md), [TAP-005](adr-005-sovereign-pipeline.md), [TAP-006](adr-006-phased-base-model.md), [TAP-007](adr-007-architecture-comparison.md), [TAP-008](adr-008-data-sovereignty.md).
+- [TAP-002](adr-002-consortium-training.md), [TAP-004](adr-004-training-loop.md), [TAP-005](adr-005-sovereign-pipeline.md), [TAP-006](adr-006-phased-base-model.md), [TAP-007](adr-007-architecture-comparison.md), [TAP-008](adr-008-data-sovereignty.md), and [TAP-009](adr-009-goal-derived-base-model-selection.md).
 - AWS Sovereign Node system design — Design C (coordinator side); used here as a reference implementation that assumes an AWS node is available, not a hard requirement.
 - Reference PoC: `src/tapestry/training/consortium/{coordinator,policy,messages}.py`.
 - Flower substrate compatibility review (this project) — to be linked as a citable artifact before acceptance (see Acceptance criteria, item 3).

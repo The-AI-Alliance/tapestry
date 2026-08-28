@@ -1,11 +1,12 @@
 # Data Management Requirements
 
-| Field       | Value           |
-| :---------- | :-------------- |
-| Status      | Draft           |
-| Confidence  | Medium (3/5)    |
-| Created     | June 27, 2026   |
-| Last Update | August 03, 2026 |
+| Field       | Value                  |
+| :---------- | :--------------------- |
+| Status      | Draft                  |
+| Confidence  | Medium (3/5)           |
+| Created     | June 27, 2026          |
+| Last Update | August 28, 2026        |
+| Versions    | V0.1 - August 28, 2026 |
 
 > [!NOTE]
 > The requirements in this document are _derived_ in part from the [Data Governance Requirements](data-governance-requirements.md), because they bridge those high-level requirements to the architecture, design, and implementation details needed to meet them. (This document also covers other data-related requirements.) Some terms are defined in that document.

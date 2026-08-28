@@ -1,4 +1,4 @@
-# Introduction
+# The State of Open Weight Models
 
 | Field       | Value           |
 | :---------- | :-------------- |

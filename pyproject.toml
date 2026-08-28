@@ -16,8 +16,8 @@ dev = [
     "pytest-cov>=7.1.0",
     "pylint>=4.0.7",
     "black>=26.5.1",
-    "ruff>=0.16.3",
-    "ty>=0.0.72",
+    "ruff>=0.16.4",
+    "ty>=0.0.73",
 ]
 
 [build-system]
