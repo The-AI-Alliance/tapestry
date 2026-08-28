@@ -91,6 +91,10 @@ uv pip install -e ".[dev]"  # Install all dependencies
 
 We'll follow this pattern below, showing both the `make` command and the main `uv` commands that will be invoked as part of building the `make` target. Most of the `make` targets do other steps, like checking if required tools and directories exist. So, we recommend using the `make` commands if GNU `make` works on your machine. Otherwise, use the `uv` commands shown.
 
+> [!TIP]
+> Use `make -n some_target` to see the commands executed when `some_target` is built,
+> without executing them.
+
 ## Running Tests
 
 We use [pytest](https://docs.pytest.org/) for testing. Using `make`:
@@ -103,7 +107,7 @@ This runs `pytest` with coverage reporting, using the following commands:
 
 ```shell
 cd src
-uv run coverage run -m pytest -q -v -s
+uv run coverage run -m pytest -v -s .
 uv run coverage report -m
 ```
 
