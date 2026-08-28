@@ -31,7 +31,7 @@ Project Tapestry has big plans, and we're starting with some fundamental buildin
 > [!NOTE]
 > Make sure to read [**Getting Involved**](#getting-involved-anchor) below for information on contribution guidelines, etc.
 >
-> We use the [`develop`](https://github.com/The-AI-Alliance/tapestry/tree/develop) branch as our default (integration) branch, reserving `main` for occasional "baked" releases.
+> We use the [`develop`](https://github.com/The-AI-Alliance/tapestry/tree/develop) branch as our default (integration) branch, reserving [`main`](https://github.com/The-AI-Alliance/tapestry/tree/main) for occasional "baked" releases.
 
 ### Working with the Source Code
 
