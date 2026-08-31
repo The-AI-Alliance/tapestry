@@ -2,7 +2,7 @@
 layout: default
 title: Home
 nav_order: 10
-has_children: false
+has_children: true
 ---
 
 # Project Tapestry: Technical Website

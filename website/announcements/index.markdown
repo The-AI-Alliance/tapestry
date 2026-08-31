@@ -3,6 +3,7 @@ layout: default
 title: Announcements
 nav_order: 20
 has_children: true
+has_grand_children: true
 ---
 
 # Project Tapestry - Announcements
@@ -26,7 +27,7 @@ Project Tapestry is managed on a three-month _milestone_ cycle, offset by one mo
 
 | :-- | :-- |
 | **Dates**     | June - August, 2026 |
-| **Details**   | [Milestone Zero - M0](./milestone-zero) |
+| **Details**   | [Milestone Zero - M0](./milestone-zero/) |
 | **Release**   | [v0.1.0-M0]({{site.repo_url}}/releases/tag/v0.1.0-M0){:target="m0-release"} |
 | **Dashboard** | [Tapestry Project - M0]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM0){:target="dash"}
 
