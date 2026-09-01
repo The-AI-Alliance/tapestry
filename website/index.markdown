@@ -12,7 +12,7 @@ Welcome to the technical website for **The AI Alliance Project Tapestry**, repre
 {: .attention}
 > For a general introduction to Project Tapestry, including its motivations and goals, see the [AI Alliance website Tapestry page]({{site.tapestry_url}}){:target="aia-tapestry"}
 
-![Project Tapestry Image]({{site.baseurl}}/assets/images/03-tapestry-logo-1000x545.png){: .tapestry-image .center}
+![Project Tapestry Image]({{site.baseurl}}/assets/images/03-tapestry-logo-1000x545.png){: .tapestry-image .float-right}
 
 The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-project-tapestry-to-build-a-collaborative-foundation-for-open-and-sovereign-ai){:target="blog"} Project Tapestry to build a collaborative foundation for open and sovereign AI. Project Tapestry is an open-source platform designed to enable globally federated development of frontier, open models while preserving sovereignty, local control, and long-term independence.
 
