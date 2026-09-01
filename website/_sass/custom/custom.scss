@@ -139,7 +139,7 @@ img.center {
 /* Add this class to anchor tags with external URLs that wrap images,
  * so the arrow glyph isn't added after the image.
  */
-.img-link {
+.a-img {
   @extend .no-glyph;
 }
 
