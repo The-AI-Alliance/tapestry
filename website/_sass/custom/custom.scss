@@ -136,6 +136,13 @@ img.center {
   @extend .text-center;
 }
 
+/* Add this class to anchor tags with external URLs that wrap images,
+ * so the arrow glyph isn't added after the image.
+ */
+.img-link {
+  @extend .no-glyph;
+}
+
 /* 
 Smaller buttons used for "keywords" and "categories" of things.
 See https://the-ai-alliance.github.io/open-trusted-data-initiative/ for an example.
