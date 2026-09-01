@@ -25,3 +25,4 @@ include ${CONTRIB_TARGETS_MKS}
 # Finally, include all the common targets, including those not overridden above
 include .common.mk
 include .formal-spec.mk
+include .vendored-scripts.mk
