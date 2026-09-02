@@ -18,6 +18,10 @@ grand_parent: Announcements
 {:toc}
 </details>
 
+{. .note}
+> **NOTE:**
+> This page is a preliminary, rough draft of the details of this PoC. More complete and refined reports are forthcoming.
+
 The first PoC (proof of concept) for consortium training, [&ldquo;epic&rdquo; #189]({{site.repo_url}}/issues/189){:target="repo"}, was conducted by a joint team from [BharatGen](https://bharatgen.com/){:target="bharatgen"}, in India, and [Monash University](https://www.monash.edu/){:target="monash"}, in Australia.
 
 This work was briefly summarized in the [M0 Announcement]({{site.baseurl}}/announcements/milestone-zero/).
@@ -29,19 +33,19 @@ The contributors to this project include the following people:
 
 The primary objective of this PoC was to work through practical details of coordinated, distributed training between autonomous data centers (“sovereign nodes”), with the secondary goal of beginning the exploration of instruction fine tuning (IFT) to perform cultural alignment in this geo-localized consortium training setting, using a reasonably sized LLM. The team completed the primary objective and made progress on the secondary objective, too.
 
-After demonstrating interoperability, the team did a preliminary tuning experiment. Each sovereign node, one in India and one in Australia, tuned locally with separate, culturally-specific datasets, then they did periodic merges of the weight updates (no tuning data was exchanged). As expected, they confirmed that the local updates improved the local model’s performance on the corresponding cultural behaviors, but the preliminary results also demonstrated that the improvements were retained after merging the weight updates between them to create new, shared model checkpoints.
+After meeting the interoperability objectives, the team did a preliminary tuning experiment using the OLMo 2-7B base model[^1]. Each sovereign node, one in India and one in Australia, tuned locally with separate, culturally-specific datasets (disjoint, localized partitions extracted from a common dataset, `CultureInstruct`[^2]), then they did periodic merges of the weight updates (no tuning data was exchanged). As expected, they confirmed that the local updates improved the local model’s performance on the corresponding cultural behaviors, but the preliminary results also demonstrated that the improvements were retained after merging the weight updates between them to create new, shared model checkpoints. They also encountered several technical challenges that require further investigation.
 
 ## Experimental Setup
 
 The team deployed BharatGen's [Slakshna](https://github.com/dcll-iiitd/Slakshna){:target="slakshna"} stack for &ldquo;geo-localized, decentralised, secure federated learning&rdquo; in two, small, geographically-separated GPU clusters, one in each organization. The team initially verified the stack's connectivity across India and Australia by fine-tuning the LLama 1.1B model for several epochs. This step completed the primary objective for M0.
 
-Then the team performed a distributed run of instruction fine tuning of the OLMo 2 7B model[^1], where they evaluated the efficacy of local training loops with periodic &ldquo;outer loops&rdquo; of model weight merging between them. They confirmed that the loss function behaved as expected, monotonically decreasing with no signs of instability that could have emerged due to the distributed process of the local, independent training loops combined with periodic &ldquo;outer loop&rdquo; weight merges. Note that no training data was exchanged in these outer loop merges, only model weights.
+Then the team performed a distributed run of instruction fine tuning of the OLMo 2-7B model[^1], where they evaluated the efficacy of local training loops with periodic &ldquo;outer loops&rdquo; of model weight merging between them. They confirmed that the loss function behaved as expected, monotonically decreasing with no signs of instability that could have emerged due to the distributed process of the local, independent training loops combined with periodic &ldquo;outer loop&rdquo; weight merges. Note that no training data was exchanged in these outer loop merges, only model weights.
 
 OLMo 2 7B was chosen because comprehensive details about its architecture, training process, data sets used, etc. are openly available, which makes experimentation with the model family comparatively easy. Also, OLMo 2 7B was used in previous work by some of the team members, discussed next, for which this PoC was a natural extension.
 
 ## Experimental Data
 
-The `CultureInstruct` dataset[^2] was used, including the GlobalOpinionQA evaluation dataset[^3]. It is a large-scale, cultural instruction-tuning dataset containing approximately 430,000 English-language instructions spanning 183 countries and 11 cultural domains. It is automatically constructed from public web data using an LLM-based generation pipeline and it is intended to improve model performance across a broad range of culturally-relevant tasks. It was previously developed by Monash University. The dataset was split into three main parts, with a further subdivision of one of those parts:
+The `CultureInstruct` dataset mentioned in the introduction was used, including the GlobalOpinionQA evaluation dataset[^3]. It is a large-scale, cultural instruction-tuning dataset containing approximately 430,000 English-language instructions spanning 183 countries and 11 cultural domains. It is automatically constructed from public web data using an LLM-based generation pipeline and it is intended to improve model performance across a broad range of culturally-relevant tasks. It was previously developed by Monash University. The dataset was split into three main parts, with a further subdivision of one of those parts:
 
 | Partition | # Samples | # Tokens | Used By/For | Description |
 | :-------- | --------: | -------: | :---------- | :---------- |
