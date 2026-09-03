@@ -47,7 +47,7 @@ After meeting the interoperability objectives, the team did a preliminary tuning
 
 For example, Figure 1 shows the experimental results for this trend. Even though each node performed separate cultural alignment, the improvements were retained after model merges. The metric shown, using the GlobalOpinionQA[^3], evaluation data set, demonstrated retained cultural alignment from the separate models. (Trending down is the desired behavior.)
 
-![Cultural evaluation trajectory.]({{site.baseurl}}/assets/images/m0/bharatgen-monash-figure-2.png)
+![Cultural evaluation trajectory.]({{site.baseurl}}/assets/images/m0/GlobalOpinionQA-trajectory.png)
 
 <center><em>Figure 1. Cultural evaluation trajectory using the `GlobalOpinionQA` dataset.</em></center>
 
@@ -87,6 +87,8 @@ Figure 2 shows the progress of the cross-entropy loss and perplexity.
 ![Flower Labs PoC federated training cross-entropy loss and perplexity.]({{site.baseurl}}/assets/images/m0/flower-labs-federated-training.png)
 
 <center><em>Figure 2. Flower Labs PoC federated training cross-entropy loss and perplexity.</em></center>
+
+More details about the experimental setup is coming soon.
 
 # Cultural Alignment
 
