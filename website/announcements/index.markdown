@@ -8,7 +8,7 @@ has_grand_children: true
 
 # Project Tapestry - Announcements
 
-This section contains announcements about releases and other notable updates. See also the Tapestry repository's [Releases]({{site.repo_url}}/releases){:target="repo"} page,  announcements posted on the [Project Tapestry]({{site.tapestry_url}}){:target="aia-tapestry"} website, and the AI Alliance [blog](https://thealliance.ai/blog).
+This section contains announcements about releases and other notable updates. See also the Tapestry repository's [Releases]({{site.repo_url}}/releases){:target="repo"} page,  announcements posted on the [Project Tapestry]({{site.tapestry_url}}){:target="aia-tapestry"} website, and the AI Alliance [blog](https://thealliance.ai/blog){:target="blog"}.
 
 ## Milestone Releases
 
