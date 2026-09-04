@@ -1,6 +1,6 @@
 
 override define help_targets_message
-${HIGHLIGHT} Help for the consortium-training prototype targets: ${_END}
+${HIGHLIGHT}Help for the consortium-training prototype targets:${_END_BOLD}${_END}
 
 ${CODE}make consortium-experiment-all${_END} # Make all the following targets.
 ${CODE}make consortium-experiment${_END}     # Run deterministic PoC metrics for consortium-training rounds.

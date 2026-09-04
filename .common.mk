@@ -27,6 +27,7 @@
 # invocation of make, where "$$dir" will be set to the contribution's
 # directory. So, if a particular contribution has a .custom.mk file,
 # it will be found and read _for that directory only_.
+# See also the CONTRIB_* definitions and "include ${CONTRIB_TARGETS_MKS}" below.
 
 -include .custom.mk
 
@@ -49,6 +50,9 @@ CLEAN_DIRS               ?=
 CONTRIB_DIR              := contrib
 CONTRIB_DIRS             := $(patsubst %/.,%,$(wildcard ${CONTRIB_DIR}/*/.))
 CONTRIB_TARGETS_MKS      := $(foreach dir,${CONTRIB_DIRS},$(wildcard $(dir)/.targets.mk))
+
+# Include all these .target.mk files to bring their targets into scope.
+include ${CONTRIB_TARGETS_MKS}
 
 # The quality targets we run as part of "before-pr".
 # GITHUB_CI is set to a non-empty string in our .github/workflows/ci.yml
@@ -129,20 +133,20 @@ else
 endif
 
 ifndef SRC_DIR
-$(error ${ERROR} There is no ${SRC_DIR} directory! ${_END})
+$(error ${ERROR}There is no ${SRC_DIR} directory!${_END_BOLD}${_END})
 endif
 
 # When you see ${CODE}${_end} without anything between them, it is there
 # to make it easier to line up multi-line description comments.
 
 define help-message-general
-${HIGHLIGHT} Quick help for this make process: General Targets ${_END}
+${HIGHLIGHT}Quick help for this make process - General Targets:${_END_BOLD}${_END}
 
 ${CODE}make all${_END}                # Makes the ${CODE}help${_END} and ${CODE}print-info${_END} targets.
 ${CODE}make help${_END}               # Prints this output.
 ${CODE}make print-info${_END}         # Print the current values of some make and environment variables.
 
-${HIGHLIGHT} Working with the code: ${_END}
+${HIGHLIGHT}Working with the code:${_END_BOLD}${_END}
 
 ${CODE}make one-time-setup${_END}     # "One time setup" of ${CODE}uv${_END} dependencies (in ${CODE}.venv${_END}).
 ${CODE}make setup${_END}              # Alias for ${CODE}one-time-setup${_END}.
@@ -185,7 +189,7 @@ ${help-top-level-message}
 endef
 
 define help_targets_message
-${NOTE} No custom targets defined in ${CODE}${SRC_DIR}${_END}. ${_END}
+${NOTE}No custom targets defined in ${CODE}${SRC_DIR}${_END}.
 endef
 
 define no-help-for-command-message
@@ -247,7 +251,7 @@ help-%::
 
 .PHONY: error
 error::
-	@$(info ${ERROR_LABEL}${MSG} (exit status = ${RED}${STATUS}${_END}))
+	@$(info ${command-failed-error-message})
 	@$(info ${${MSG_VARIABLE}})
 	@$(error )
 
@@ -271,7 +275,7 @@ silent-command-check-%:
 .PHONY: print-info-env
 print-info:: print-info-env
 print-info-env::
-	@echo "${HIGHLIGHT} Some 'environment' settings: ${_END}"
+	@echo "${HIGHLIGHT}Some 'environment' settings:${_END_BOLD}${_END}"
 	@echo
 	@echo "  ${DARK_GREEN}MAKEFLAGS:${_END}             ${CODE}${MAKEFLAGS}${_END}"
 	@echo "  ${DARK_GREEN}UNAME:${_END}                 ${CODE}${UNAME}${_END}"
@@ -310,6 +314,7 @@ print-info-env::
 #
 # The "skip-command-target-message" variable is defined in .common.mk to provide a
 # useful notice to the reader that the target is skipped.
+# TIP: Run "make skip-command-example" to see what the output looks like.
 #
 # There is one more point to explain for how this is implemented. The _default_ way
 # *-command is actually declared is as follows:
@@ -413,7 +418,7 @@ contrib-help::
 # .targets.mk, etc.
 .PHONY: contrib-audit
 contrib-audit::
-	@echo "\n${HIGHLIGHT}  Which contrib/* have the required or optional files? ${_END}"
+	@echo "\n${HIGHLIGHT}Which ${CODE}contrib/*${_END}${HIGHLIGHT} have the required or optional files?${_END_BOLD}${_END}"
 	@printf "  %-45s  ${CODE}README.md      LICENSE      .custom.mk   .targets.mk${_END}  \n" ""
 	@printf "  %-45s  ${BLUE}(required)  (recommended)  (recommended) (optional)${_END}\n" ""
 	@no="${RED}NO ${_END}"; yes="${GREEN}yes${_END}"; \
@@ -435,7 +440,7 @@ contrib-audit::
 contrib-%::
 	@for d in ${CONTRIB_DIRS}; \
 	do [ -d "$$d" ] || continue; \
-		echo "\n${HIGHLIGHT} For directory ${CODE}$$d${_END}${HIGHLIGHT}, target ${CODE}${@:contrib-%=%}${_END}${HIGHLIGHT}: ${_END}\n"; \
+		echo "\n${HIGHLIGHT}For directory ${CODE}$$d${_END}${HIGHLIGHT}, target ${CODE}${@:contrib-%=%}${_END}${HIGHLIGHT}:${_END_BOLD}${_END}\n"; \
 		${MAKE} SRC_DIR=$$d SPEC_DIR=$$d --include-dir=$$d ${@:contrib-%=%} || exit $$?; \
 	done 2>&1
 
@@ -521,6 +526,9 @@ open-url-message = ${TIP_LABEL}Try ${CODE}⌘+click${_END} or ${CODE}^+click${_E
 define skip-command-target-message
 ${WARNING_LABEL}Skipping ${CODE}${@:%-command=%}${_END} in ${CODE}${SRC_DIR}${_END}! Target ${CODE}$@${_END} is overridden in ${CODE}${SRC_DIR}/.custom.mk${_END}.
 endef
+
+skip-command-example:
+	@echo "${skip-command-target-message}"
 
 # Definitions for the website:
 include .website.mk

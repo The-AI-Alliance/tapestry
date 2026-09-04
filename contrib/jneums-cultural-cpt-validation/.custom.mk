@@ -1,6 +1,6 @@
 
 override define help_targets_message
-${HIGHLIGHT} Help for the EXP-001 cultural-CPT validation harness (contrib) targets: ${_END}
+${HIGHLIGHT}Help for the EXP-001 cultural-CPT validation harness (contrib) targets:${_END_BOLD}${_END}
 
 ${CODE}make cultural-cpt-all${_END}          # Make all the following targets.
 
