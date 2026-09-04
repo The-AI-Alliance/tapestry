@@ -677,6 +677,8 @@ D1 and D2 were first incorporated in Rounds 3 and 4. D2 remained the newest avai
 
 All nine evaluated states—Base plus Rounds 1–8—passed the shared GOQA package's dataset-hash, coverage, probability-distribution, and target-count checks. Figure 4 and the table below use the same five-prompt Jensen–Shannon distance protocol as the main report.
 
+<a id="figure-11"/>
+
 ![Fourth joint run: `GlobalOpinionQA` trajectory (first run).]({{site.baseurl}}/assets/images/m0/fourth-joint-run-GlobalOpinionQA-trajectory-run-1.png)
 
 <center><em>Figure 11. Fourth joint run: <code>GlobalOpinionQA</code> trajectory (first run).</em></center>
@@ -757,15 +759,9 @@ The detailed training dashboard below presents a multifaceted view of the federa
 
 ##### GlobalOpinionQA Evaluation
 
-The `GlobalOpinionQA` (GOQA) evaluation assesses the model's ideological alignment across different national perspectives. The trajectory plot below tracks the Jensen-Shannon distance (JSD) between the model's predicted opinion distributions and the actual survey responses from target demographics. A lower JSD indicates that the model's outputs more closely reflect the human survey data. The evaluation spans the baseline model and each federated round, illustrating how the model's cultural alignment evolves through continuous cross-country training.
+The `GlobalOpinionQA` (GOQA) evaluation assesses the model's ideological alignment across different national perspectives. The trajectory plot below tracks the Jensen-Shannon distance (JSD) between the model's predicted opinion distributions and the actual survey responses from target demographics. A lower JSD indicates that the model's outputs more closely reflect the human survey data. The evaluation spans the baseline model and each federated round, illustrating how the model's cultural alignment evolves through continuous cross-country training. See [Figure 11](#figure-11) above.
 
-<center>
-  <img alt="Fourth cross-country run: GlobalOpinionQA trajectory" src="{{site.baseurl}}/assets/images/m0/fourth-inter-country-run-2.png" />
-</center>
-
-<center><em>Figure 14. Fourth cross-country run: <code>GlobalOpinionQA</code> trajectory (compare to Figure 9).</em></center>
-
-<br/>
+Here is the data shown in the figure.
 
 | Model state | Deltas Extracted | Australia/NZ JSD | India JSD | Two-region JSD | Relative change vs base |
 | :------ | :-- | :------- | :------- | :------- | ------: |
