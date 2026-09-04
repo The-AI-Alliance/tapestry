@@ -1,10 +1,12 @@
 """Full 14042 MMLU eval for a THINK/ANSWER model, records idx+subtask, incremental+resumable.
 Usage: python zs_full_mmlu.py <model> <tag> [budget]"""
 
-import sys, re, json, os
+import json, os, re, sys
 
-sys.path.insert(0, "/workspace/eval")
-sys.path.insert(0, "/workspace/train")
+EVAL_DIR = os.environ.get("TAPESTRY_EVAL_DIR", os.path.dirname(os.path.abspath(__file__)))
+TRAIN_DIR = os.environ.get("TAPESTRY_TRAIN_DIR", os.path.join(EVAL_DIR, "../training"))
+sys.path.insert(0, EVAL_DIR)
+sys.path.insert(0, TRAIN_DIR)
 AO, AC = "<ANSWER>", "</ANSWER>"
 
 
@@ -51,7 +53,8 @@ def main():
         meta.append(
             (i, r["input_correct_responses"][0].strip().strip('"').upper(), r["subtask_name"].replace("mmlu_chat.", ""))
         )
-    outpath = f"/workspace/results/mmlu/zs_{tag}_mmlu_results.jsonl"
+    results_dir = os.environ.get("TAPESTRY_MMLU_DIR", os.path.join(EVAL_DIR, "../results/mmlu"))
+    outpath = f"{results_dir}/zs_{tag}_mmlu_results.jsonl"
     os.makedirs(os.path.dirname(outpath), exist_ok=True)
     done = sum(1 for _ in open(outpath)) if os.path.exists(outpath) else 0
     print(f"[plan] full {len(d)}, resume {done}", flush=True)
