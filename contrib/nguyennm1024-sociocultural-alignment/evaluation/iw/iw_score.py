@@ -13,9 +13,9 @@ Averages the per-item score over the 10 descriptor variants (we also keep the
 'none' true-default variant separately). Output: per-model 10-dim answer vector.
 """
 
-import json, re, sys, collections
+import collections, json, os, re, sys
 
-IW_DIR = "/workspace/eval/iw"
+IW_DIR = os.environ.get("TAPESTRY_IW_DIR", os.path.dirname(os.path.abspath(__file__)))
 SCALES = ["f063", "y003", "f120", "g006", "e018", "y002", "a008", "f118", "e025", "a165"]
 NUMERIC = {"f063", "f120", "g006", "e018", "a008", "f118"}
 

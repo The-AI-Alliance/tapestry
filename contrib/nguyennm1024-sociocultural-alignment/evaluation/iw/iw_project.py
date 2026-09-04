@@ -11,10 +11,10 @@ Usage:
   rc1, rc2 = project_model("answers_base_forced_nat.json")                  # scores a model's answers
 """
 
-import json, sys, os
+import json, os, sys
 
-IW = os.path.dirname(os.path.abspath(__file__))
-ANS = "/workspace/results/iw/answers"
+IW = os.environ.get("TAPESTRY_IW_DIR", os.path.dirname(os.path.abspath(__file__)))
+ANS = os.environ.get("TAPESTRY_ANS_DIR", os.path.join(IW, "../../results/iw/answers"))
 P = json.load(open(os.path.join(IW, "iw_projection_final.json")))
 ITEMS = P["items"]  # [a008,a165,e018,e025,f063,f118,f120,g006,y002,y003]
 CENTER = P["center"]

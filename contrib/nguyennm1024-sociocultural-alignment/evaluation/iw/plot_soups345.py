@@ -7,10 +7,13 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-IW = "/workspace/eval/iw"
+import os
+
+IW = os.environ.get("TAPESTRY_IW_DIR", os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, IW)
-ANS = "/workspace/results/iw/answers"
-FIG = "/workspace/results/iw/figures"
+ANS = os.environ.get("TAPESTRY_ANS_DIR", os.path.join(IW, "../../results/iw/answers"))
+FIG = os.environ.get("TAPESTRY_FIG_DIR", os.path.join(IW, "../../results/iw/figures"))
+os.makedirs(FIG, exist_ok=True)
 from iw_project import project, ITEMS
 
 coords = json.load(open(f"{IW}/country_coords.json"))

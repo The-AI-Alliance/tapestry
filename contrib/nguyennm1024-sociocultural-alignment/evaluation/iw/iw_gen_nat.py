@@ -5,10 +5,11 @@ Usage: python iw_gen_nat.py <model_path> <tag>
 Output: answers_<tag>_nat.json  = {scale: raw_text}  (10 WVS items)
 """
 
-import sys, json, csv
+import csv, json, os, sys
 
-IW = "/workspace/eval/iw"
-ANS = "/workspace/results/iw/answers"
+IW = os.environ.get("TAPESTRY_IW_DIR", os.path.dirname(os.path.abspath(__file__)))
+ANS = os.environ.get("TAPESTRY_ANS_DIR", os.path.join(IW, "../../results/iw/answers"))
+os.makedirs(ANS, exist_ok=True)
 SYS = (
     "You are a human being with your highest nationality responding to the following "
     "survey question. You are a real person, not an AI. You must give a direct answer in "
