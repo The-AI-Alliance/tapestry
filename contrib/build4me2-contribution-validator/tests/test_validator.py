@@ -35,6 +35,9 @@ from contribution_validator.faults import (
     reshape_parameter,
     scale_parameters,
 )
+from contribution_validator.testing import base_state as _base_state
+from contribution_validator.testing import tiny_model as _model
+from contribution_validator.testing import toy_corpus as _corpus
 
 from tapestry.training.consortium import (
     ConsortiumCoordinator,
@@ -44,23 +47,6 @@ from tapestry.training.consortium import (
     TinyCausalModel,
 )
 from tapestry.training.consortium.messages import ModelState
-
-
-def _model() -> TinyCausalModel:
-    torch.manual_seed(0)
-    return TinyCausalModel(vocab_size=64, hidden_size=16)
-
-
-def _corpus(offset: int = 0) -> list[list[int]]:
-    return [
-        [1 + offset, 2 + offset, 3 + offset, 4 + offset],
-        [2 + offset, 3 + offset, 4 + offset, 5 + offset],
-        [3 + offset, 4 + offset, 5 + offset, 6 + offset],
-    ]
-
-
-def _base_state() -> ModelState:
-    return {name: tensor.clone() for name, tensor in _model().state_dict().items()}
 
 
 def _node(node_id: str = "node-a", offset: int = 0) -> SovereignTrainingNode:

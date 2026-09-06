@@ -39,6 +39,7 @@ class GateRoundSummary:
     """
 
     round_num: int
+    base_fingerprint: str
     validation_rejected_nodes: list[str]
     admitted_nodes: list[str]
     quorum_met: bool
@@ -100,6 +101,7 @@ class ValidatingConsortiumCoordinator(ConsortiumCoordinator):
         quorum_met = len(admitted) >= self.min_admitted_nodes
         self.round_summaries[self._round] = GateRoundSummary(
             round_num=self._round,
+            base_fingerprint=validator.reference_fingerprint,
             validation_rejected_nodes=[c.node_id for c in contributions if not reports[c.node_id].accepted],
             admitted_nodes=[contribution.node_id for contribution in admitted],
             quorum_met=quorum_met,
