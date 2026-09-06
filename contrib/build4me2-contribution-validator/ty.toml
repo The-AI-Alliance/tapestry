@@ -1,0 +1,3 @@
+# Lets ty resolve the contribution_validator package when checking from this directory.
+[environment]
+extra-paths = ["."]
