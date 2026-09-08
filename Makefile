@@ -21,9 +21,3 @@ consortium-demo::
 include .common.mk
 include .formal-spec.mk
 include .vendored-scripts.mk
-
-# Include the contributions' custom targets, if any. This must come after
-# .common.mk, which defines $(CONTRIB_TARGETS_MKS), the list of every
-# contrib/*/.targets.mk file. (Before .common.mk is read the variable is
-# empty and the include silently does nothing.)
-include ${CONTRIB_TARGETS_MKS}

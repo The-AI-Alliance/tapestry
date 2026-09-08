@@ -50,9 +50,30 @@ CLEAN_DIRS               ?=
 CONTRIB_DIR              := contrib
 CONTRIB_DIRS             := $(patsubst %/.,%,$(wildcard ${CONTRIB_DIR}/*/.))
 CONTRIB_TARGETS_MKS      := $(foreach dir,${CONTRIB_DIRS},$(wildcard $(dir)/.targets.mk))
+CONTRIB_CUSTOM_MKS       := $(foreach dir,${CONTRIB_DIRS},$(wildcard $(dir)/.custom.mk))
 
 # Include all these .target.mk files to bring their targets into scope.
 include ${CONTRIB_TARGETS_MKS}
+
+# These targets are convenient, but also used by some tools.
+.PHONY: print-contrib-mks print-contrib-targets-mks print-contrib-custom-mks
+.PHONY: print-contrib-mks-count print-contrib-targets-mks-count print-contrib-custom-mks-count
+
+print-contrib-mks:: print-contrib-targets-mks print-contrib-custom-mks
+print-contrib-targets-mks::
+	@echo ${CONTRIB_TARGETS_MKS}
+print-contrib-custom-mks::
+	@echo ${CONTRIB_CUSTOM_MKS}
+
+print-contrib-mks-count::
+	@cntt=$(words ${CONTRIB_TARGETS_MKS}); \
+	cntc=$(words ${CONTRIB_CUSTOM_MKS}); \
+	let cnt=$$cntt+$$cntc; \
+	echo $$cnt
+print-contrib-targets-mks-count::
+	@echo $(words ${CONTRIB_TARGETS_MKS})
+print-contrib-custom-mks-count::
+	@echo $(words ${CONTRIB_CUSTOM_MKS})
 
 # The quality targets we run as part of "before-pr".
 # GITHUB_CI is set to a non-empty string in our .github/workflows/ci.yml
