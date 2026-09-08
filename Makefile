@@ -20,6 +20,7 @@ consortium-demo::
 # Finally, include the rest of the common targets.
 include .common.mk
 include .formal-spec.mk
+include .vendored-scripts.mk
 
 # Include the contributions' custom targets, if any. This must come after
 # .common.mk, which defines $(CONTRIB_TARGETS_MKS), the list of every
