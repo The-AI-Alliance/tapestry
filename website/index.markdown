@@ -18,6 +18,8 @@ The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-proj
 
 **Why this matters:** People will not use models that under perform on their language, legal context, and domain knowledge. And countries, enterprises, and individuals need AI infrastructure they own and control — with guaranteed data residency, the right to exit, and the ability to operate independently. Tapestry addresses both problems simultaneously: sovereignty is the performance strategy, not a trade-off against it.
 
+---
+
 {: .note }
 > * **Join Us!** We are looking for collaborators. See our [contributing]({{site.baseurl}}/contributing) page for details.
 > * Use the search box at the top of this page to find specific content.
