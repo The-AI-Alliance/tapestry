@@ -1,11 +1,12 @@
 # Data Governance Requirements
 
-| Field       | Value           |
-| :---------- | :-------------- |
-| Status      | Draft           |
-| Confidence  | Medium (3/5)    |
-| Created     | June 27, 2026   |
-| Last Update | August 21, 2026 |
+| Field       | Value                  |
+| :---------- | :--------------------- |
+| Status      | Draft                  |
+| Confidence  | Medium (3/5)           |
+| Created     | June 27, 2026          |
+| Last Update | August 28, 2026        |
+| Versions    | V0.1 - August 28, 2026 |
 
 This document supports issue [#211](https://github.com/The-AI-Alliance/tapestry/issues/211) by defining the first iteration ("V0.1") of the data governance requirements for managing datasets used in Tapestry training, tuning, alignment, and evaluation work. It focuses on what Tapestry must do to enable the use of datasets with various constraints on permissible use.
 

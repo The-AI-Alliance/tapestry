@@ -17,12 +17,13 @@ consortium-demo::
 	@echo "${INFO_LABEL}Running the consortium-training demo: ${CODE}examples/consortium_training_demo.py${_END}"
 	uv run python examples/consortium_training_demo.py
 
-# This construct uses the list of .targets.mk files in $(CONTRIB_TARGETS_MKS) and
-# includes each one individually to define custom targets for the contributions.
-#$(foreach prog_mk,$(CONTRIB_TARGETS_MKS),$(eval -include $(prog_mk)))
-include ${CONTRIB_TARGETS_MKS}
-
-# Finally, include all the common targets, including those not overridden above
+# Include all the common targets, including those not overridden above.
 include .common.mk
 include .formal-spec.mk
 include .vendored-scripts.mk
+
+# Include the contributions' custom targets, if any. This must come after
+# .common.mk, which defines $(CONTRIB_TARGETS_MKS), the list of every
+# contrib/*/.targets.mk file. (Before .common.mk is read the variable is
+# empty and the include silently does nothing.)
+include ${CONTRIB_TARGETS_MKS}

@@ -8,10 +8,11 @@ Outputs answers_<tag>_tao.csv (wide: variant x 10 items, S1-S4 format) for iw_pr
 Usage: python iw_gen_tao.py <model_path> <tag>
 """
 
-import sys, csv, json
+import csv, json, os, sys
 
-IW = "/workspace/eval/iw"
-ANS = "/workspace/results/iw/answers"
+IW = os.environ.get("TAPESTRY_IW_DIR", os.path.dirname(os.path.abspath(__file__)))
+ANS = os.environ.get("TAPESTRY_ANS_DIR", os.path.join(IW, "../../results/iw/answers"))
+os.makedirs(ANS, exist_ok=True)
 ITEMS = ["a008", "a165", "e018", "e025", "f063", "f118", "f120", "g006", "y002", "y003"]
 DESCRIPTORS = [
     "an average human being",
