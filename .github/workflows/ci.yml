@@ -39,7 +39,7 @@ jobs:
       - name: Check contrib custom targets are included
         run: |
           expected=$(ls contrib/*/.targets.mk 2>/dev/null | wc -l)
-          actual=$(make --debug=v -n help | grep -c "Reading makefile 'contrib/.*/\.targets\.mk'" || true)
+          actual=$(make print-contrib-targets-mks-count)
           echo "contrib .targets.mk files: $expected present, $actual included"
           test "$expected" -eq "$actual"
 

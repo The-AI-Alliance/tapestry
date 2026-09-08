@@ -1,7 +1,7 @@
 # .website.mk - Definitions for the GibHub Pages website
 
 PAGES_URL    := https://the-ai-alliance.github.io/${REPO_NAME}/
-WEBSITE_DIR  := docs
+WEBSITE_DIR  := website
 SITE_DIR     := ${WEBSITE_DIR}/_site
 CLEAN_WEBSITE_DIRS += ${SITE_DIR} ${WEBSITE_DIR}/.sass-cache
 CLEAN_DIRS   += ${CLEAN_WEBSITE_DIRS}
@@ -10,7 +10,7 @@ CLEAN_DIRS   += ${CLEAN_WEBSITE_DIRS}
 JEKYLL_PORT  ?= 4000
 
 ifndef WEBSITE_DIR
-$(error ${ERROR} There is no ${WEBSITE_DIR} directory! ${_END})
+$(error ${ERROR}There is no ${WEBSITE_DIR} directory!${_END_BOLD}${_END})
 endif
 
 help:: help-custom-website
@@ -26,7 +26,7 @@ ${CODE}make help-website${_END}       # Help on the website targets.
 endef
 
 define help-website-message
-${HIGHLIGHT} Help for the GitHub Pages website targets: ${_END}
+${HIGHLIGHT}Help for the GitHub Pages website targets:${_END_BOLD}${_END}
 
 ${CODE}make view-pages${_END}         # View the published GitHub pages in a browser.
 ${CODE}make view-local${_END}         # View the pages locally (requires Jekyll).
@@ -44,25 +44,25 @@ endef
 .PHONY: print-info-website
 print-info:: print-info-website
 print-info-website::
-	@echo "${HIGHLIGHT} For the GitHub Pages website: ${_END}"
+	@echo "${HIGHLIGHT}For the GitHub Pages website:${_END_BOLD}${_END}"
 	@echo
 	@echo "  ${DARK_GREEN}GitHub Pages URL:${_END}   ${CODE}${PAGES_URL}${_END}"
 	@echo "  ${DARK_GREEN}Website files:${_END}      ${CODE}${WEBSITE_DIR}${_END}"
 	@echo "  ${DARK_GREEN}SITE_DIR:${_END}           ${CODE}${SITE_DIR}${_END}"
 	@echo "  ${DARK_GREEN}JEKYLL_PORT:${_END}        ${CODE}${JEKYLL_PORT}${_END} (when viewing locally: ${CODE}http://localhost:${JEKYLL_PORT}${_END})"
 
-.PHONY: all-docs clean-website view-pages view-local
+.PHONY: all-website clean-website view-pages view-local
 .PHONY: view-pages view-local setup-jekyll run-jekyll run-jekyll-message
 .PHONY: setup-jekyll run-jekyll
 
-all-docs:: clean-website view-local
+all-website:: clean-website view-local
 
 clean-website::
 	rm -rf ${CLEAN_WEBSITE_DIRS}
 
 view-pages::
-	@python -m webbrowser "${PAGES_URL}" || \
-		$(error "${ERROR} I could not open the GitHub Pages URL. ${_END} Try ⌘-click or ^-click on this URL instead: ${CODE}${PAGES_URL}${_END}")
+	@uv run python -m webbrowser "${PAGES_URL}" || \
+		${MAKE} STATUS=$$? MSG="I could not open the GitHub Pages URL. Try ⌘-click or ^-click on this URL instead: ${CODE}${PAGES_URL}${_END}" error
 
 view-local:: setup-jekyll run-jekyll
 
@@ -85,7 +85,7 @@ setup-jekyll:: ruby-installed-check ruby-gem-installation bundle-command-check b
 ruby-gem-installation::
 	@command -v jekyll > /dev/null && \
 	  echo "${INFO_LABEL}jekyll already installed." || \
-	  { echo "${NOTE} Installing Ruby gems... ${_END}"; \
+	  { echo "${NOTE}Installing Ruby gems...${_END}"; \
 	    gem install jekyll bundler jemoji || ${MAKE} gem-error; }
 
 bundle-installation::
@@ -105,17 +105,17 @@ bundle-command-check:
 # invoked, independent of the shell script logic. Hence, the only way to make
 # this invocation conditional is to use a make target invocation, as shown above.
 jekyll-error:
-	$(error "${ERROR} Failed to run Jekyll. ${_END} Try running 'make setup-jekyll'.")
+	$(error ${ERROR}Failed to run Jekyll.${_END_BOLD}${_END} Try running 'make setup-jekyll'.)
 ruby-missing-error:
-	$(error "${ERROR} 'ruby' is required. ${_END} ${ruby-installation-message}")
+	$(error ${ERROR}'ruby' is required.${_END_BOLD}${_END} ${ruby-installation-message})
 gem-missing-error:
-	$(error "${ERROR} Ruby's 'gem' is required. ${_END} ${ruby-installation-message}")
+	$(error ${ERROR}Ruby's 'gem' is required.${_END_BOLD}${_END} ${ruby-installation-message})
 gem-error:
 	$(error ${gem-error-message})
 bundle-error:
 	$(error ${bundle-error-message})
 bundle-missing-error:
-	$(error "${ERROR} Ruby gem command 'bundle' is required. ${_END} I tried ${CODE}gem install bundle${_END}, but it apparently didn't work!")
+	$(error ${ERROR}Ruby gem command 'bundle' is required.${_END_BOLD}${_END} I tried ${CODE}gem install bundle${_END}, but it apparently didn't work!)
 
 define gem-error-message
 

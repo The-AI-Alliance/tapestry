@@ -25,9 +25,12 @@ exclude: ["node_modules/", "*.gemspec", "*.gem", "Gemfile", "Gemfile.lock", "pac
 , "website/tests/", "notes.md", "vendor"
 ]
 
-# Added by AI Alliance: our glossary URL and the main tapestry page URL.
-glossaryurl: https://the-ai-alliance.github.io/glossary
-tapestryurl: https://thealliance.ai/projects/tapestry
+# Added by AI Alliance: our glossary URL, the main tapestry page URL, the docs in the repo, etc.
+glossary_url: https://the-ai-alliance.github.io/glossary
+tapestry_url: https://thealliance.ai/projects/tapestry
+repo_url: https://github.com/The-AI-Alliance/tapestry
+repo_tech_docs_url: https://github.com/The-AI-Alliance/tapestry/tree/develop/docs
+repo_project_dashboard_url: https://github.com/orgs/The-AI-Alliance/projects/50/views/7
 
 # Regression tests
 # By default, the pages in /website/tests are excluded when the site is built.
@@ -115,8 +118,8 @@ show_footer: side_bar
 # Footer last edited timestamp
 last_edit_timestamp: true # show or hide edit time - page must have `last_modified_date` defined in the frontmatter
 last_edit_time_format: "%Y-%m-%d" # uses ruby's time format: https://ruby-doc.org/stdlib-2.7.0/libdoc/time/rdoc/Time.html
-last_modified_date: 2026-06-22
-last_version: V0.1.3
+last_modified_date: 2026-09-08
+last_version: V0.2.0
 
 # Custom: Add the range of years for the copyright here. This is done here,
 # rather than default.html, so that the latter file can remain completely 
