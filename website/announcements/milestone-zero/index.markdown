@@ -69,7 +69,7 @@ The team also concluded the following:
 
 More details about their conclusions are in [this report](BharatGen_Monash_M0_Report.pdf){:target="bm"} (PDF).
 
-## Consortium Training using the Flower Federated Framework
+## Consortium Training Using the Flower Federated Framework
 
 This proof of concept, [epic #184](http://{{site.repo_url}}/issues/184){:target="issues"}, tested continued pre-training under the consortium learning approach and applied it to  OLMo 3 7B across two independently operated AWS GPU sites using the [Flower framework](https://github.com/flwrlabs/flower){:target="flower"}. Sites in Sydney and Virginia trained on disjoint local partitions of the [Dolma 3 mixture](https://huggingface.co/datasets/allenai/dolma3_mix-6T-1025-7B){:target="dolma"}, exchanged model parameters only, and combined their work through a coordination node in Ohio. The objective was to demonstrate that geographically separated organizations could contribute to a shared training run without moving their underlying data.
 
@@ -101,7 +101,7 @@ Overall, this trial demonstrated that Flower could coordinate full-parameter con
 
 The [consortium training PoC #189]({{site.repo_url}}/issues/189){:target="repo"} discussed above did instruction fine tuning and evaluation using data for cultural alignment, although this objective wasn't its primary focus. Two other experiments focused on cultural alignment were performed by separate teams during M0.
 
-## Proof of Concept for alignment based on Inglehart-Welzel Cultural Map
+## Proof of Concept for Alignment Based on Inglehart-Welzel Cultural Map
 
 This feasibility study on cultural alignment shift, [Issue #22]({{site.repo_url}}/issues/22){:target="repo"}, is part of
 [TAP-003: Cultural Alignment as the Primary Differentiator]({{site.repo_tech_docs_url}}/architecture/decisions/adr-003-cultural-alignment.md){:target="repo"}. The team used the LoRA fine-tuning with the goal of demonstrating simultaneous (a) socio-cultural alignment shift and (b) no performance loss in general capabilities (e.g., as measured by benchmarks like MMLU (see below).
