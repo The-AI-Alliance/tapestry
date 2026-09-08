@@ -222,7 +222,7 @@ do-help-command::
 	$(info $(if ${help-command-${CMD}-message},${help-command-${CMD}-message},${no-help-for-command-message}))
 	@true
 
-help-targets:: help-top-level-targets-prefix help-top-level-targets help-formal-spec contrib-custom-program-help
+help-targets:: help-top-level-targets-prefix help-top-level-targets help-formal-spec help-vendored-scripts contrib-custom-program-help
 	@true  # for some reason, this needs to be here to avoid some undesirable, extra output
 
 help-top-level-targets-prefix:
