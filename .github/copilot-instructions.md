@@ -15,6 +15,7 @@ consortium training, data governance, evaluation, and supporting infrastructure.
 
 ## General review guidance
 
+- With few exceptions, the `develop` branch, not `main`, is the PR merge target.
 - Keep each PR focused on a single change; flag scope creep.
 - Commits must carry a DCO `Signed-off-by` line (`git commit -s`), and—per branch
   protection—a verified signature before merge.
@@ -73,6 +74,6 @@ must hold. Check each item and comment on anything that fails or is unclear.
 
 ## Reviewing documentation changes
 
-- `docs/` is the Jekyll / Just the Docs site; preserve front matter and structure.
-- `tech-docs/` holds design and decision docs; keep the audience technical and
+- `website/` is the Jekyll / Just the Docs site; preserve front matter and structure.
+- `docs/` holds design and decision docs; keep the audience technical and
   contributor-focused rather than promotional.

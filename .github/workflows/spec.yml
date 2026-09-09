@@ -1,0 +1,52 @@
+name: Spec coherence (Quint)
+
+# Validates formal specs (Quint) under spec/ via the top-level make targets.
+
+on:
+  push:
+    branches:
+      - develop
+    paths:
+      - "spec/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".formal-spec.mk"
+      - ".github/workflows/spec.yml"
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - "spec/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".formal-spec.mk"
+      - ".github/workflows/spec.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  quint:
+    name: install · verify
+    runs-on: ubuntu-latest
+    env:
+      SPEC_TOOLCHAIN_DIR: "."
+      SPEC_DIR: "spec/"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install the pinned Quint toolchain
+        run: make formal-spec-install
+
+      - name: Audit npm dependencies for known vulnerabilities
+        run: npm audit --audit-level=high
+
+      - name: Verify formal specs — typecheck, invariants, tests
+        run: make formal-spec-verify

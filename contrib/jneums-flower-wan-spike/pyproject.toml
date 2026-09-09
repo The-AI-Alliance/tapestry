@@ -1,0 +1,44 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "jneums-flower-wan-spike"
+version = "0.1.0"
+description = "Spike: round-trip a 2B-parameter weight payload through a Flower SuperLink over a real WAN (issue #70 de-risk)"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.12"
+dependencies = [
+    "flwr>=1.32.0,<1.33.0",
+    "numpy>=1.26.0",
+]
+
+[dependency-groups]
+# Installed by default by `uv run`, so the top-level `make contrib-tests`
+# (which runs pytest with this contribution's own uv project environment)
+# finds pytest here.
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "pylint>=4.0.6",
+    "ruff>=0.15.22",
+    "ty>=0.0.61",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["wan_spike"]
+
+[tool.flwr.app]
+publisher = "jneums"
+
+[tool.flwr.app.components]
+serverapp = "wan_spike.server_app:app"
+clientapp = "wan_spike.client_app:app"
+
+[tool.flwr.app.config]
+# 2_000_000_000 params in float16 = ~4.0 GB payload each direction.
+payload-params = 2000000000
+# Params per tensor: 25M fp16 = 50 MB, i.e. ~80 tensors — keeps every message
+# object far below gRPC message-size limits, like a real model's layer tensors.
+tensor-params = 25000000
+num-server-rounds = 1

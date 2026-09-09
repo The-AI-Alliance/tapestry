@@ -5,6 +5,7 @@
 
 from __future__ import annotations
 
+import argparse
 import random
 import sys
 from pathlib import Path
@@ -16,6 +17,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from tapestry.training.consortium import (
     ConsortiumCoordinator,
     ContributionPolicy,
+    ContributionWeighting,
+    OuterMerge,
+    OuterMergeStrategy,
     SovereignTrainingNode,
     TinyCausalModel,
 )
@@ -46,27 +50,58 @@ QUALITY_SCORES = {
 }
 
 
+DEMO_COMPARISON_OUTER_LR = 0.5
+
+
 def _encode(texts: list[str]) -> list[list[int]]:
     """Byte-encode text into the tiny model's vocabulary range."""
     return [[token % 128 for token in text.encode("utf-8")] for text in texts]
 
 
-def run_demo(rounds: int = 3, seed: int = 7) -> None:
+def _state_l2_distance(left: dict[str, torch.Tensor], right: dict[str, torch.Tensor]) -> float:
+    """Return the L2 distance between two model states."""
+    squared_distance = 0.0
+    for name, left_tensor in left.items():
+        diff = left_tensor - right[name]
+        squared_distance += float(torch.sum(diff * diff).item())
+    return squared_distance**0.5
+
+
+def run_demo(
+    rounds: int = 3,
+    seed: int = 7,
+    weighting: ContributionWeighting | str = ContributionWeighting.QUALITY,
+    outer_merge: OuterMergeStrategy | str = OuterMergeStrategy.WEIGHTED_AVERAGE,
+    outer_lr: float = 1.0,
+    outer_momentum: float = 0.9,
+) -> dict[str, float | str]:
     """Run a small N+1 consortium-training loop."""
+    weighting = ContributionWeighting(weighting)
+    outer_merge = OuterMergeStrategy(outer_merge)
     random.seed(seed)
     torch.manual_seed(seed)
 
     print("=" * 72)
     print("  TAPESTRY -- Consortium Training Proof of Concept")
     print("  One governed shared base + N sovereign participant models")
+    print(f"  Contribution weighting: {weighting.value}")
+    print(f"  Outer merge: {outer_merge.value}")
     print("=" * 72)
 
+    momentum = outer_momentum if outer_merge is OuterMergeStrategy.MOMENTUM_DELTA else 0.0
     base_model = TinyCausalModel(vocab_size=128, hidden_size=32)
+    initial_state = {name: tensor.clone() for name, tensor in base_model.state_dict().items()}
     coordinator = ConsortiumCoordinator(
         base_model=base_model,
         contribution_policy=ContributionPolicy(
             quality_floor=0.75,
             max_node_weight=0.5,
+            weighting=weighting,
+        ),
+        outer_merge=OuterMerge(
+            strategy=outer_merge,
+            outer_lr=outer_lr,
+            outer_momentum=momentum,
         ),
     )
     nodes = [
@@ -91,17 +126,112 @@ def run_demo(rounds: int = 3, seed: int = 7) -> None:
         print("  contribution weights:")
         for node_id, weight in sorted(result.contribution_weights.items()):
             print(f"    {node_id:12s} {weight:.3f}")
+        print(f"  outer merge      : {result.outer_merge_strategy}")
+        print(
+            "  shared-base move : "
+            f"{_state_l2_distance(result.previous_base_state, result.shared_base_state):.6f}"
+        )
         print(
             "  sovereign artifacts retained:",
             ", ".join(sorted(coordinator.sovereign_artifacts)),
         )
 
+    final_distance = _state_l2_distance(initial_state, coordinator.shared_base_state)
     print("\nN+1 outcome:")
     print("  1 shared base model evolved by governed contributions")
     artifact_count = len(coordinator.sovereign_artifacts)
     print(f"  {artifact_count} sovereign model artifacts retained")
+    print(f"  final shared-base distance from initialization: {final_distance:.6f}")
     print("=" * 72)
+    return {
+        "weighting": weighting.value,
+        "outer_merge": outer_merge.value,
+        "outer_lr": outer_lr,
+        "outer_momentum": momentum,
+        "final_shared_base_distance": final_distance,
+        "sovereign_artifacts": float(artifact_count),
+    }
+
+
+def run_weighting_comparison(rounds: int = 3, seed: int = 7) -> None:
+    """Run the same scenario with quality-weighted and equal influence policies."""
+    summaries = []
+    for weighting in (ContributionWeighting.QUALITY, ContributionWeighting.EQUAL):
+        summaries.append(run_demo(rounds=rounds, seed=seed, weighting=weighting))
+        print()
+    _print_comparison_summary(summaries, label="weighting")
+
+
+def run_outer_merge_comparison(rounds: int = 3, seed: int = 7) -> None:
+    """Run the same scenario with each outer merge strategy."""
+    summaries = []
+    for outer_merge in OuterMergeStrategy:
+        comparison_lr = (
+            DEMO_COMPARISON_OUTER_LR
+            if outer_merge is not OuterMergeStrategy.WEIGHTED_AVERAGE
+            else 1.0
+        )
+        summaries.append(
+            run_demo(
+                rounds=rounds,
+                seed=seed,
+                outer_merge=outer_merge,
+                outer_lr=comparison_lr,
+            )
+        )
+        print()
+    _print_comparison_summary(summaries, label="outer_merge")
+
+
+def _print_comparison_summary(summaries: list[dict[str, float | str]], label: str) -> None:
+    """Print compact final metrics for back-to-back demo comparisons."""
+    print("Comparison summary:")
+    for summary in summaries:
+        print(
+            f"  {str(summary[label]):16s} "
+            f"outer_lr={summary['outer_lr']:.2f} "
+            f"final_distance={summary['final_shared_base_distance']:.6f}"
+        )
+
+
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run the Tapestry consortium-training proof of concept.")
+    parser.add_argument("--rounds", type=int, default=3, help="Number of consortium-training rounds to run.")
+    parser.add_argument("--seed", type=int, default=7, help="Random seed used for deterministic demo setup.")
+    parser.add_argument(
+        "--weighting",
+        choices=(ContributionWeighting.QUALITY.value, ContributionWeighting.EQUAL.value, "compare"),
+        default="quality",
+        help="Contribution weighting policy to run. Use 'compare' to run quality and equal policies back to back.",
+    )
+    parser.add_argument(
+        "--outer-merge",
+        choices=tuple(strategy.value for strategy in OuterMergeStrategy) + ("compare",),
+        default=OuterMergeStrategy.WEIGHTED_AVERAGE.value,
+        help="Outer merge strategy to run. Use 'compare' to run all strategies back to back.",
+    )
+    parser.add_argument("--outer-lr", type=float, default=1.0, help="Outer learning rate for delta merge strategies.")
+    parser.add_argument(
+        "--outer-momentum",
+        type=float,
+        default=0.9,
+        help="Outer momentum used by the momentum-delta merge strategy.",
+    )
+    return parser.parse_args()
 
 
 if __name__ == "__main__":
-    run_demo()
+    args = _parse_args()
+    if args.weighting == "compare":
+        run_weighting_comparison(rounds=args.rounds, seed=args.seed)
+    elif args.outer_merge == "compare":
+        run_outer_merge_comparison(rounds=args.rounds, seed=args.seed)
+    else:
+        run_demo(
+            rounds=args.rounds,
+            seed=args.seed,
+            weighting=args.weighting,
+            outer_merge=args.outer_merge,
+            outer_lr=args.outer_lr,
+            outer_momentum=args.outer_momentum,
+        )

@@ -1,0 +1,24 @@
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners#example-of-a-codeowners-file
+# for more details about CODEOWNERs files.
+
+# These owners will be the default owners for everything in
+# the repo. Unless a later, more-specific match in this file
+# takes precedence, @deanwampler and @ctn will be requested
+# to review a PR when it is opened.
+*          @deanwampler @ctn
+
+# The following is redundant now, as "*" covers it, but we may add
+# additional reviewers for "docs" later.
+/docs/     @deanwampler @ctn
+
+# Other locations:
+/src/      @deanwampler @ctn @jolson-allianceai
+/examples/ @deanwampler @ctn @jolson-allianceai
+/website/  @deanwampler
+
+# Contributions:
+contrib/jneums-*         @jneums @deanwampler
+contrib/nguyennm1024-*   @nguyennm1024 @deanwampler
+contrib/oli-*            @oli @deanwampler
+
+

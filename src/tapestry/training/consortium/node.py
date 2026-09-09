@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Sequence
+from collections.abc import Sequence
 
 import torch
 from torch import nn
@@ -49,7 +49,7 @@ class SovereignTrainingNode:
         self._dataloader = self._build_dataloader(sovereign_corpus)
 
     def run_sovereign_cycle(self, round_num: int, base_state: ModelState) -> SovereignCycleResult:
-        """Run local Stage A CPT and return artifact plus weight vector contribution."""
+        """Run local Contributed CPT and return artifact plus weight vector contribution."""
         starting_state = {name: tensor.clone() for name, tensor in base_state.items()}
         self.model.load_state_dict(starting_state)
 

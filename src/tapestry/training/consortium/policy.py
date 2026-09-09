@@ -2,22 +2,41 @@
 
 from __future__ import annotations
 
+from enum import Enum
+
+
+class ContributionWeighting(str, Enum):
+    """Supported contribution weighting policies."""
+
+    QUALITY = "quality"
+    EQUAL = "equal"
+
 
 class ContributionPolicy:  # pylint: disable=too-few-public-methods
     """Compute governed integration weights from contribution quality scores.
 
-    The default policy is intentionally simple: reject contributions below a
-    quality floor, then normalize quality scores while capping any one node's
-    influence. The cap is an anti-capture control, not an optimizer trick.
+    The default ``quality`` policy is intentionally simple: reject contributions
+    below a quality floor, then normalize quality scores while capping any one
+    node's influence. The cap is an anti-capture control, not an optimizer trick.
+
+    The ``equal`` policy supports comparisons where everyone who passes the
+    quality floor receives equal influence, independent of quality score
+    magnitude.
     """
 
-    def __init__(self, quality_floor: float = 0.0, max_node_weight: float = 1.0) -> None:
+    def __init__(
+        self,
+        quality_floor: float = 0.0,
+        max_node_weight: float = 1.0,
+        weighting: ContributionWeighting | str = ContributionWeighting.QUALITY,
+    ) -> None:
         if quality_floor < 0.0:
             raise ValueError("quality_floor must be non-negative")
         if not 0.0 < max_node_weight <= 1.0:
             raise ValueError("max_node_weight must be in (0, 1]")
         self.quality_floor = quality_floor
         self.max_node_weight = max_node_weight
+        self.weighting = ContributionWeighting(weighting)
 
     def weights(self, quality_scores: dict[str, float]) -> dict[str, float]:
         """Return normalized contribution weights for accepted nodes."""
@@ -26,6 +45,10 @@ class ContributionPolicy:  # pylint: disable=too-few-public-methods
         }
         if not accepted:
             return {}
+
+        if self.weighting is ContributionWeighting.EQUAL:
+            equal_weight = 1.0 / len(accepted)
+            return {node_id: equal_weight for node_id in accepted}
 
         weights = self._normalize(accepted)
         capped: dict[str, float] = {}

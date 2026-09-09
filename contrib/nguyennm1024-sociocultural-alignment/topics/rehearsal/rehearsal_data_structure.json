@@ -1,0 +1,1247 @@
+{
+  "dataset_name": "Vietnamese Cultural Alignment - Rehearsal Data Structure",
+  "version": "1.0",
+  "target_model": "Llama 3.2 3B Instruct",
+  "purpose": "Defend a 'no performance drop on Meta's official benchmarks' claim for Llama 3.2 3B Instruct during Vietnamese cultural fine-tuning. Allocation is focused on the 12 English-relevant tasks among Meta's 21 evaluated benchmarks. Additionally includes anti-forgetting protection: a small conversation_regularization subset (2% of dataset) prevents the chat template format from becoming a 'Vietnamese cultural mode' trigger, which would cause indirect benchmark drops since benchmarks also use the chat template. Capabilities outside Meta's evaluation suite (general multi-turn conversation capability, safety refusals, code generation, multilingual) are explicitly not protection targets — see meta_benchmark_coverage for full accounting.",
+  "total_volume": 40000,
+  "training_mixing_ratio": "Combined with 20K cultural data, rehearsal is ~67% of training batches",
+  "design_principles": [
+    "Distribution matching: each category mirrors the format and difficulty of the target benchmark",
+    "Volume proportional to capability importance and fragility",
+    "Distillation from format-appropriate teachers per category",
+    "Decontamination against all evaluation benchmarks is mandatory",
+    "Per-category verification before training inclusion",
+    "Anti-mode-collapse regularization: cultural data is ~50% conversational in format (15% dialogue_completion + ~35% direct_enactment in dialogue-like contexts); without conversational rehearsal, the model risks learning 'chat template = cultural mode' which would cause indirect benchmark drops"
+  ],
+  "target_benchmarks": {
+    "description": "English-language subset of Meta's 21 official Llama 3.2 3B Instruct evaluation tasks. The full 21-task list and detailed coverage mapping (including out-of-scope multilingual tasks) is in the meta_benchmark_coverage section.",
+    "benchmarks": [
+      {
+        "name": "MMLU",
+        "base_score": 63.4,
+        "preservation_priority": "high",
+        "fragility": "medium"
+      },
+      {
+        "name": "IFEval_strict",
+        "base_score": 77.4,
+        "preservation_priority": "highest",
+        "fragility": "high",
+        "note": "Strongest base capability; most visible if it breaks"
+      },
+      {
+        "name": "GSM8K",
+        "base_score_estimated": 78,
+        "preservation_priority": "high",
+        "fragility": "high"
+      },
+      {
+        "name": "MATH",
+        "base_score": "low",
+        "preservation_priority": "medium",
+        "fragility": "high",
+        "note": "Base limitation due to pruning; preserve not improve"
+      },
+      {
+        "name": "HellaSwag",
+        "base_score": "strong",
+        "preservation_priority": "medium",
+        "fragility": "low"
+      },
+      {
+        "name": "ARC_Challenge",
+        "base_score": "strong",
+        "preservation_priority": "medium",
+        "fragility": "low"
+      },
+      {
+        "name": "GPQA",
+        "base_score": "modest",
+        "preservation_priority": "low",
+        "fragility": "medium"
+      },
+      {
+        "name": "BFCL_Chat",
+        "base_score": "strong_for_size",
+        "preservation_priority": "high",
+        "fragility": "high",
+        "note": "Critical for agentic deployment"
+      },
+      {
+        "name": "InfiniteBench_NIH",
+        "base_score": "strong",
+        "preservation_priority": "medium",
+        "fragility": "medium"
+      },
+      {
+        "name": "OpenRewrite",
+        "base_score": "moderate",
+        "preservation_priority": "low",
+        "fragility": "low"
+      }
+    ]
+  },
+  "meta_benchmark_coverage": {
+    "description": "Meta evaluates Llama 3.2 3B Instruct on 21 official tasks. This rehearsal dataset is designed to defend a 'no performance drop' claim on these Meta benchmarks specifically. Capabilities outside Meta's 21 tasks (e.g., general multi-turn conversation, safety refusals, extensive code generation) are NOT in scope for the no-drop claim and receive minimal allocation.",
+    "meta_official_21_tasks": [
+      "hellaswag_chat",
+      "infinite_bench",
+      "mmlu_hindi_chat",
+      "mmlu_portugese_chat",
+      "ifeval__loose",
+      "nih__multi_needle",
+      "mmlu",
+      "gsm8k",
+      "mgsm",
+      "mmlu_thai_chat",
+      "mmlu_spanish_chat",
+      "gpqa",
+      "bfcl_chat",
+      "mmlu_french_chat",
+      "ifeval__strict",
+      "nexus",
+      "math",
+      "arc_challenge",
+      "openrewrite_chat",
+      "mmlu_german_chat",
+      "mmlu_italian_chat"
+    ],
+    "in_scope_covered_by_rehearsal": {
+      "hellaswag_chat": {
+        "rehearsal_category": "hellaswag_shaped",
+        "coverage_note": "Direct training-data distribution match"
+      },
+      "infinite_bench": {
+        "rehearsal_category": "long_context",
+        "coverage_note": "Long-context QA from NarrativeQA, QASPER, HotpotQA"
+      },
+      "ifeval__loose": {
+        "rehearsal_category": "ifeval_shaped",
+        "coverage_note": "IFEval format covers both strict and loose variants"
+      },
+      "ifeval__strict": {
+        "rehearsal_category": "ifeval_shaped",
+        "coverage_note": "Primary target; strict variant requires exact constraint satisfaction"
+      },
+      "nih__multi_needle": {
+        "rehearsal_category": "long_context",
+        "coverage_note": "NIH-style synthetic subset specifically targets multi-needle retrieval"
+      },
+      "mmlu": {
+        "rehearsal_category": "mmlu_shaped",
+        "coverage_note": "Direct training-data distribution match across all 57 subjects"
+      },
+      "gsm8k": {
+        "rehearsal_category": "gsm8k_shaped_math",
+        "coverage_note": "Direct training-data distribution match"
+      },
+      "gpqa": {
+        "rehearsal_category": "gpqa_hard_reasoning",
+        "coverage_note": "Generated GPQA-style items (no GPQA training set exists)"
+      },
+      "bfcl_chat": {
+        "rehearsal_category": "bfcl_shaped_tool_calling",
+        "coverage_note": "Direct format match with subcategories aligned to BFCL v3 taxonomy including the multi_turn_function_calling subcategory (BFCL v3 multi-turn: base, miss_func, miss_param, long_context, composite)"
+      },
+      "math": {
+        "rehearsal_category": "math_shaped",
+        "coverage_note": "Direct training-data distribution match (MATH train split)"
+      },
+      "arc_challenge": {
+        "rehearsal_category": "arc_challenge_shaped",
+        "coverage_note": "Direct training-data distribution match"
+      },
+      "openrewrite_chat": {
+        "rehearsal_category": "openrewrite_shaped",
+        "coverage_note": "Style transfer, length adjustment, summarization, paraphrasing matched to OpenRewrite tasks"
+      }
+    },
+    "in_scope_NOT_covered_with_explanation": {
+      "nexus": {
+        "description": "Nexus tool-use benchmark (NexusRaven and follow-ons); Meta evaluates Llama 3.2 on this in addition to BFCL",
+        "current_coverage": "Partial — overlaps with bfcl_shaped_tool_calling but Nexus has distinct evaluation format (multi-step tool composition, specific API styles)",
+        "recommendation": "Acceptable coverage gap if BFCL is the priority deployment target. If Nexus performance specifically matters, add a dedicated subcategory pulling from Nexus-style training data (function composition examples) or use a portion of the bfcl error_handling_recovery subcategory to cover this"
+      }
+    },
+    "out_of_scope_multilingual": {
+      "description": "Llama 3.2 3B is officially multilingual (English, German, French, Italian, Portuguese, Hindi, Spanish, Thai). Meta evaluates MMLU in all 8 languages and includes MGSM (multilingual math). For this Vietnamese cultural alignment project, scope is English-only output, so multilingual benchmarks are explicitly out of scope.",
+      "tasks_omitted": [
+        "mmlu_hindi_chat",
+        "mmlu_portugese_chat",
+        "mmlu_thai_chat",
+        "mmlu_spanish_chat",
+        "mmlu_french_chat",
+        "mmlu_german_chat",
+        "mmlu_italian_chat",
+        "mgsm (multilingual GSM8K across 10 languages)"
+      ],
+      "implication": "Post-training evaluation should still measure these to verify the cultural fine-tuning has not damaged multilingual capability; expect minor degradation on languages other than English given training is English-only. If multilingual preservation is critical for deployment, add proportional multilingual rehearsal (e.g., 5-10% of dataset in covered languages)"
+    },
+    "overall_coverage_summary": "12 of 21 Meta-evaluated benchmarks directly covered (the English-relevant subset, including BFCL v3 multi-turn). 8 multilingual benchmarks explicitly out-of-scope. 1 benchmark (nexus) partially covered via bfcl_shaped_tool_calling. A small conversation_regularization category (2% of dataset) is included as anti-forgetting protection — not for general multi-turn capability preservation, but to prevent chat template format from becoming a cultural-mode trigger. Code (500), broader multi-turn dialogue capability, and safety/refusal behavior are NOT in Meta's 21 tasks and are explicitly not deployment-targeted protection.",
+    "explicitly_not_protected_by_design": {
+      "description": "Capabilities NOT in Meta's 21 evaluated tasks. Cultural fine-tuning may shift these and the dataset does not aim to preserve them. These are documented for transparency.",
+      "items": [
+        {
+          "capability": "General multi-turn conversational coherence",
+          "rationale": "Not in Meta's 21 tasks as a benchmark target. Meta's _chat suffix indicates chat-format prompting, not multi-turn dialogue. The only multi-turn signal in Meta's eval is BFCL v3 multi-turn function calling, which IS covered in bfcl_shaped_tool_calling. HOWEVER: a small conversation_regularization category (800 examples) is included not to preserve general multi-turn capability for deployment, but to prevent the chat template format from becoming a 'cultural mode' trigger during fine-tuning — this is anti-forgetting regularization that protects the benchmark scores themselves, since benchmarks also use chat template format."
+        },
+        {
+          "capability": "Safety / refusal behavior",
+          "rationale": "Meta's 21 tasks do not include safety benchmarks. Safety evaluations are reported separately and are not part of the headline performance numbers. Cultural fine-tuning will likely preserve baseline refusal behavior since cultural data is not adversarial."
+        },
+        {
+          "capability": "Code generation and understanding",
+          "rationale": "Not in Meta's 21 tasks. HumanEval and MBPP are not part of Meta's official Llama 3.2 3B Instruct evaluation. Code receives minimal allocation (500) for basic continuity but is not a protection target."
+        },
+        {
+          "capability": "Multilingual performance",
+          "rationale": "Out of scope for this project (English-only Vietnamese cultural alignment). Documented in out_of_scope_multilingual."
+        }
+      ]
+    }
+  },
+  "categories": {
+    "ifeval_shaped": {
+      "volume": 8500,
+      "percentage": 0.2125,
+      "target_benchmark": "IFEval (strict and loose)",
+      "rationale": "Largest single category; highest base capability (77.4) most visible if degraded; most sensitive to cultural FT damage",
+      "teacher": "Claude Sonnet 4.6 (no thinking mode)",
+      "teacher_rationale": "Best at exact format compliance; concise outputs; doesn't add unnecessary CoT",
+      "alternative_teacher": "GPT-5 non-reasoning",
+      "subcategories": [
+        {
+          "name": "verifiable_single_constraint",
+          "volume": 3300,
+          "description": "Single explicit constraint (length, format, content inclusion/exclusion)",
+          "verification": "Automated constraint check"
+        },
+        {
+          "name": "multi_constraint_stacked",
+          "volume": 2300,
+          "description": "2-3 stacked constraints per prompt",
+          "verification": "All constraints must be satisfied"
+        },
+        {
+          "name": "length_specific",
+          "volume": 1400,
+          "description": "Word count, sentence count, paragraph count constraints",
+          "verification": "Automated length check"
+        },
+        {
+          "name": "format_specific",
+          "volume": 1000,
+          "description": "JSON, markdown, bullet points, specific structures",
+          "verification": "Parse check"
+        },
+        {
+          "name": "negative_constraints",
+          "volume": 500,
+          "description": "Don't include X, avoid Y, no punctuation P",
+          "verification": "Keyword/pattern absence check"
+        }
+      ],
+      "ifeval_constraint_distribution_match": {
+        "length_constraints": 0.22,
+        "detectable_format": 0.18,
+        "combination": 0.15,
+        "detectable_content": 0.12,
+        "startend": 0.1,
+        "keywords": 0.08,
+        "punctuation": 0.06,
+        "language": 0.05,
+        "change_case": 0.04
+      },
+      "decontamination_requirement": "Exact and n-gram match against IFEval test set",
+      "format": "Instruction (prompt + constraint specification) -> response that satisfies the stated constraint(s)",
+      "verification": "Automated constraint check per subcategory (see subcategory verifications); response must satisfy all stated constraints",
+      "sources": [
+        {
+          "name": "IFEval_style_training_prompts",
+          "volume": 2000,
+          "description": "Community-built IFEval-style training prompts (e.g., argilla/ifeval-like-data) or freshly generated constraint-following items via the 25-instruction-type taxonomy. Note: google/IFEval contains only the 541 evaluation prompts and CANNOT be used as training data without contaminating the IFEval benchmark."
+        },
+        {
+          "name": "Augmented_constraint_templates",
+          "volume": 4200,
+          "description": "Synthetically constructed prompts combining diverse base instructions (drawn from Tulu 3 prompts, NoRobots, open instruction sources) with IFEval-style constraints; constraints applied programmatically from the IFEval 25-instruction-type vocabulary"
+        },
+        {
+          "name": "NoRobots_filtered",
+          "volume": 1400,
+          "description": "HuggingFace NoRobots dataset (HuggingFaceH4) filtered for prompts that can have constraints added; constraints layered on top"
+        },
+        {
+          "name": "Generated_prompt_constraint_pairs",
+          "volume": 900,
+          "description": "Claude Sonnet 4.6 generates new prompt-constraint pairs across diverse domains following IFEval templates"
+        }
+      ]
+    },
+    "mmlu_shaped": {
+      "volume": 7000,
+      "percentage": 0.175,
+      "target_benchmark": "MMLU (5-shot)",
+      "rationale": "Most-visible AI benchmark; drop here most noticed; preserve 63.4",
+      "teacher": "Qwen 2.5 32B Instruct",
+      "teacher_rationale": "Strong MMLU performance; clean multiple-choice format; stylistically close to Llama family",
+      "domain_distribution": [
+        {
+          "name": "STEM",
+          "volume": 2000,
+          "subjects": "Math, physics, chemistry, biology, CS, engineering (16 MMLU subjects)"
+        },
+        {
+          "name": "Humanities",
+          "volume": 1600,
+          "subjects": "History, philosophy, law, ethics, jurisprudence (13 subjects)"
+        },
+        {
+          "name": "Social_sciences",
+          "volume": 1500,
+          "subjects": "Economics, psychology, sociology, politics, geography (12 subjects)"
+        },
+        {
+          "name": "Other_professional",
+          "volume": 1900,
+          "subjects": "Medicine, business, accounting, marketing, prof law (16 subjects)"
+        }
+      ],
+      "sources": [
+        {
+          "name": "MMLU_auxiliary_training",
+          "volume": 2500,
+          "description": "From Hendrycks et al. 2020 — auxiliary training set distributed with the MMLU benchmark"
+        },
+        {
+          "name": "Synthetic_via_Qwen",
+          "volume": 3500,
+          "description": "Generated MC questions in MMLU style by Qwen 2.5 32B; spans all 57 MMLU subjects proportionally"
+        },
+        {
+          "name": "MMLU_Pro_train",
+          "volume": 1000,
+          "description": "Training subset from MMLU-Pro (TIGER-Lab 2024); harder questions, quality-filtered"
+        }
+      ],
+      "format": "Multiple choice with 4 options, answer + brief reasoning",
+      "verification": "Answer matches ground truth; reasoning is sensible",
+      "decontamination_requirement": "Exact and semantic similarity match against all 57 MMLU subjects' test data"
+    },
+    "gsm8k_shaped_math": {
+      "volume": 5000,
+      "percentage": 0.125,
+      "target_benchmark": "GSM8K",
+      "rationale": "Math fragile in 3B; heavy rehearsal needed for preservation",
+      "teacher": "Qwen 2.5 Math 32B",
+      "teacher_rationale": "Specifically trained for math; clean step-by-step format",
+      "subcategories": [
+        {
+          "name": "gsm8k_style_word_problems",
+          "volume": 3000,
+          "description": "Grade school level, multi-step word problems",
+          "source": "GSM8K training set (use 2000) + generated variants (1000)"
+        },
+        {
+          "name": "metamath_augmented",
+          "volume": 1500,
+          "description": "Augmented variants of GSM8K-style problems using MetaMath techniques: question rephrasing, self-verification, FOBAR question generation, and answer augmentation; trains numerical robustness across surface variation",
+          "source": "MetaMathQA dataset (Yu et al., 2023)"
+        },
+        {
+          "name": "easier_warmup",
+          "volume": 500,
+          "description": "Single-step problems for distribution breadth",
+          "source": "Curated single-step subset from GSM8K training (filtered for ≤1 reasoning step) and ASDiv (Miao et al., 2020)"
+        }
+      ],
+      "format": "Problem -> step-by-step solution -> 'The answer is N' with final numerical answer",
+      "verification": "Final numerical answer matches expected; reasoning steps sensible",
+      "decontamination_requirement": "Exact match + 13-gram match + semantic similarity (>0.85) against GSM8K test set (1,319 test problems); numerical fingerprinting as additional check but not sole method",
+      "sources": [
+        {
+          "name": "GSM8K_train",
+          "volume": 2000,
+          "description": "GSM8K public training split (Cobbe et al. 2021); 7,473 grade-school math word problems with full step-by-step solutions; sample 2,000 from training split only"
+        },
+        {
+          "name": "GSM8K_train_variants",
+          "volume": 1000,
+          "description": "Variants of GSM8K training problems with number and context substitution (preserve problem structure, change surface details); generated programmatically"
+        },
+        {
+          "name": "MetaMathQA",
+          "volume": 1500,
+          "description": "MetaMathQA dataset (Yu et al. 2023); GSM8K-derived problems with question rephrasing, self-verification, FOBAR, and answer augmentation"
+        },
+        {
+          "name": "ASDiv_and_easy_subset",
+          "volume": 500,
+          "description": "ASDiv dataset (Miao et al. 2020) easier subset plus single-step problems from GSM8K training filtered for ≤1 reasoning step; provides distribution breadth for easier problems"
+        }
+      ]
+    },
+    "math_shaped": {
+      "volume": 2500,
+      "percentage": 0.0625,
+      "target_benchmark": "MATH",
+      "rationale": "Base model weak here due to pruning; modest rehearsal to maintain not improve",
+      "teacher": "Qwen 2.5 Math 32B",
+      "teacher_rationale": "Consistent with GSM8K rehearsal teacher; strong on LaTeX formatting and competition-style problems",
+      "difficulty_distribution": [
+        {
+          "level": "1-2_easiest",
+          "volume": 1500,
+          "rationale": "Where 3B has meaningful capability"
+        },
+        {
+          "level": "3_intermediate",
+          "volume": 800,
+          "rationale": "Stretch zone"
+        },
+        {
+          "level": "4-5_hard",
+          "volume": 200,
+          "rationale": "Skip mostly; model can't really do these"
+        }
+      ],
+      "source": "MATH benchmark training split (Hendrycks et al. 2021): 7,500 training problems available; sample 2,500 with overweighted lower difficulty",
+      "format": "Problem -> LaTeX solution -> boxed final answer",
+      "verification": "Answer matches expected; LaTeX parses",
+      "decontamination_requirement": "Exact match + 13-gram match + semantic similarity (>0.85) against MATH test set (5,000 test problems)",
+      "sources": [
+        {
+          "name": "MATH_train_levels_1_2",
+          "volume": 1500,
+          "description": "MATH benchmark training split (Hendrycks et al. 2021) filtered to Levels 1-2 (easiest); covers algebra, prealgebra, intermediate algebra, geometry, number theory, counting/probability, precalculus"
+        },
+        {
+          "name": "MATH_train_level_3",
+          "volume": 800,
+          "description": "MATH training split Level 3 (intermediate difficulty)"
+        },
+        {
+          "name": "MATH_train_levels_4_5",
+          "volume": 200,
+          "description": "MATH training split Levels 4-5 (hardest); included sparingly because 3B model has limited capability at this difficulty"
+        }
+      ]
+    },
+    "hellaswag_shaped": {
+      "volume": 2500,
+      "percentage": 0.0625,
+      "target_benchmark": "HellaSwag",
+      "rationale": "Base strong; modest rehearsal to maintain",
+      "teacher": "Qwen 2.5 14B",
+      "teacher_rationale": "Sufficient capability; cheaper than larger models",
+      "subcategories": [
+        {
+          "name": "hellaswag_style_completion",
+          "volume": 1500,
+          "source": "HellaSwag training set (Zellers et al. 2019) and generated HellaSwag-style items in ActivityNet/WikiHow domains",
+          "description": "HellaSwag-format completion: 4-way multiple choice continuations of multi-sentence contexts; spans video-action contexts (ActivityNet Captions style) and instructional contexts (WikiHow style)"
+        },
+        {
+          "name": "commonsense_reasoning_broader",
+          "volume": 700,
+          "source": "PIQA training set (Bisk et al. 2020), SIQA training set (Sap et al. 2019)",
+          "description": "Broader commonsense reasoning: PIQA (physical interaction, 2-way choice), SIQA (social interaction, 3-way choice); extends commonsense capability beyond HellaSwag's specific format"
+        },
+        {
+          "name": "sentence_completion",
+          "volume": 300,
+          "source": "Story Cloze Test training set (Mostafazadeh et al. 2016)",
+          "description": "Story Cloze format: four-sentence story setup with two candidate fifth-sentence endings; pick the more plausible ending"
+        }
+      ],
+      "format": "Context (multi-sentence narrative or scenario) + multiple-choice continuation options (2 to 4 depending on source benchmark format); pick most plausible with brief reasoning",
+      "verification": "Picked option matches ground truth",
+      "decontamination_requirement": "Exact match + 13-gram match + semantic similarity (>0.85) against HellaSwag test set (10,003 test items); also against PIQA test, SIQA test, Story Cloze test sets",
+      "sources": [
+        {
+          "name": "HellaSwag_train",
+          "volume": 1000,
+          "description": "HellaSwag public training split (Zellers et al. 2019); 4-way multiple-choice continuation of multi-sentence contexts spanning video-action and instructional domains"
+        },
+        {
+          "name": "Generated_hellaswag_style",
+          "volume": 500,
+          "description": "Generated HellaSwag-format items by Qwen 2.5 14B with ActivityNet-style and WikiHow-style prompts"
+        },
+        {
+          "name": "PIQA_train",
+          "volume": 400,
+          "description": "PIQA training set (Bisk et al. 2020); physical interaction QA, 2-way choice"
+        },
+        {
+          "name": "SIQA_train",
+          "volume": 300,
+          "description": "Social IQa training set (Sap et al. 2019); social interaction QA, 3-way choice"
+        },
+        {
+          "name": "Story_Cloze_train",
+          "volume": 300,
+          "description": "Story Cloze training set (Mostafazadeh et al. 2016); four-sentence story + two candidate endings"
+        }
+      ]
+    },
+    "bfcl_shaped_tool_calling": {
+      "volume": 4500,
+      "percentage": 0.1125,
+      "target_benchmark": "BFCL Chat",
+      "rationale": "Critical for agentic deployment (Aitomatic context); fragile to cultural FT",
+      "teacher": "Claude Sonnet 4.6",
+      "teacher_rationale": "Best format compliance for function call syntax",
+      "subcategories": [
+        {
+          "name": "simple_function_calling",
+          "volume": 1000,
+          "description": "BFCL Simple category: single function provided, single call needed, correct argument types and values"
+        },
+        {
+          "name": "multiple_functions_one_needed",
+          "volume": 600,
+          "description": "BFCL Multiple category: multiple function definitions provided, model selects the correct one and calls it once"
+        },
+        {
+          "name": "parallel_calls_one_function",
+          "volume": 600,
+          "description": "BFCL Parallel category: single function provided, multiple parallel calls needed for the query"
+        },
+        {
+          "name": "parallel_multiple_functions",
+          "volume": 500,
+          "description": "BFCL Parallel Multiple category: multiple functions provided, multiple parallel calls across them"
+        },
+        {
+          "name": "live_realistic_apis",
+          "volume": 400,
+          "description": "BFCL Live category: real-world API definitions and user queries from production-like settings"
+        },
+        {
+          "name": "multi_turn_function_calling",
+          "volume": 700,
+          "description": "BFCL v3 Multi-turn category: extended conversational exchanges where model must retain contextual information across turns and execute function calls based on accumulated context; includes base multi-turn, missing function detection, missing parameter detection, long-context multi-turn, and composite scenarios"
+        },
+        {
+          "name": "error_handling_recovery",
+          "volume": 400,
+          "description": "Tool error responses and recovery patterns; recognizing failed calls and adjusting (covers BFCL v3 multi-turn miss_func, miss_param adjacent behaviors)"
+        },
+        {
+          "name": "relevance_refusal",
+          "volume": 300,
+          "description": "BFCL Relevance category: when no provided function is appropriate, the correct behavior is to not call any function"
+        }
+      ],
+      "sources": [
+        {
+          "name": "xLAM",
+          "volume": 2000,
+          "description": "Salesforce xLAM function-calling dataset (Liu et al. 2024); curated from APIGen pipeline; large-scale function call training data, primarily single-turn"
+        },
+        {
+          "name": "Glaive_Function_Calling_v2",
+          "volume": 1200,
+          "description": "Glaive AI function-calling v2 dataset; diverse function definitions and call examples, includes some multi-turn"
+        },
+        {
+          "name": "Hermes_Function_Calling",
+          "volume": 400,
+          "description": "Nous Research Hermes function-calling dataset; instruction-tuned function-call format with reasoning"
+        },
+        {
+          "name": "BFCL_v3_multi_turn_generated",
+          "volume": 700,
+          "description": "Generated by Claude Sonnet 4.6 to match BFCL v3 multi-turn taxonomy: base multi-turn, missing function, missing parameter, long-context multi-turn, composite scenarios; covers the multi_turn_function_calling subcategory"
+        },
+        {
+          "name": "API_Bank_filtered",
+          "volume": 200,
+          "description": "API-Bank dataset (Li et al. 2023) filtered subset; multi-turn API-call dialogues with state changes"
+        }
+      ],
+      "format": "Function definitions + user query (possibly with prior turns) -> valid function call(s) in BFCL format; multi-turn scenarios include conversation history and may require state tracking across turns",
+      "format_requirements": [
+        "Argument types must be JSON-valid",
+        "Function names must match exactly",
+        "Optional parameters handled correctly",
+        "Output must parse as valid function call"
+      ],
+      "verification": "Function call parses as valid JSON; function name exists in provided tools; args type-correct",
+      "decontamination_requirement": "Exact match + 13-gram match + semantic similarity (>0.85) against all BFCL test set subsets (Simple, Multiple, Parallel, Parallel Multiple, Live, Relevance, Multi-turn base, Multi-turn miss_func, Multi-turn miss_param, Multi-turn long_context, Multi-turn composite)"
+    },
+    "arc_challenge_shaped": {
+      "volume": 2000,
+      "percentage": 0.05,
+      "target_benchmark": "ARC Challenge",
+      "rationale": "Smaller benchmark but real; maintain via moderate rehearsal",
+      "teacher": "Qwen 2.5 32B Instruct",
+      "teacher_rationale": "Strong general knowledge and reasoning at moderate cost; cleanly handles multiple-choice format without forcing verbose CoT",
+      "subcategories": [
+        {
+          "name": "arc_challenge_style_science",
+          "volume": 1000,
+          "source": "ARC training set (Clark et al. 2018), drawing from both Challenge and Easy training splits; augmented with Qwen-generated ARC-style items",
+          "description": "Grade-school science questions in ARC Challenge style (harder subset requiring reasoning beyond keyword matching)"
+        },
+        {
+          "name": "openbookqa_style",
+          "volume": 500,
+          "source": "OpenBookQA training set (Mihaylov et al. 2018)",
+          "description": "Elementary science questions requiring both core knowledge and broader reasoning, OpenBookQA format"
+        },
+        {
+          "name": "general_reasoning_mc",
+          "volume": 500,
+          "source": "Generated by Qwen 2.5 32B with diverse domain prompts",
+          "description": "Generated multiple-choice reasoning questions spanning science, logic, and general knowledge; complements ARC-specific items with broader reasoning"
+        }
+      ],
+      "format": "Question + multiple-choice options (typically 4, sometimes 3 or 5) -> brief reasoning + answer choice",
+      "verification": "Picked option matches ground truth",
+      "decontamination_requirement": "Exact match + 13-gram match + semantic similarity (>0.85) against ARC Challenge test set (1,172 items) and OpenBookQA test set",
+      "sources": [
+        {
+          "name": "ARC_Challenge_train",
+          "volume": 800,
+          "description": "ARC Challenge training split (Clark et al. 2018); grade-school science questions in the harder subset requiring reasoning beyond keyword matching"
+        },
+        {
+          "name": "ARC_Easy_train",
+          "volume": 200,
+          "description": "ARC Easy training split; easier science questions for distribution breadth"
+        },
+        {
+          "name": "OpenBookQA_train",
+          "volume": 500,
+          "description": "OpenBookQA training set (Mihaylov et al. 2018); elementary science with broader reasoning requirements"
+        },
+        {
+          "name": "Generated_reasoning_mc",
+          "volume": 500,
+          "description": "Generated multiple-choice reasoning questions by Qwen 2.5 32B spanning science, logic, and general knowledge"
+        }
+      ]
+    },
+    "gpqa_hard_reasoning": {
+      "volume": 1500,
+      "percentage": 0.0375,
+      "target_benchmark": "GPQA",
+      "rationale": "Base model modest here; don't over-invest but maintain",
+      "teacher": "Kimi K2.6 (thinking mode) or DeepSeek-R1 - reasoning depth helps",
+      "teacher_rationale": "Only category where reasoning teacher genuinely adds value over instruction teacher",
+      "subcategories": [
+        {
+          "name": "graduate_level_science",
+          "volume": 800,
+          "description": "Graduate-level multiple-choice questions in physics, chemistry, and biology requiring domain expertise that competent non-experts cannot answer by quick search",
+          "source": "Generated by Kimi K2.6 or DeepSeek-R1 using GPQA-style prompts (Rein et al. 2023); no GPQA training set exists, so all items are generated"
+        },
+        {
+          "name": "multi_step_reasoning",
+          "volume": 700,
+          "description": "Multi-step logical reasoning problems beyond science: causal chains, structured deduction, complex word problems requiring sequential inference",
+          "source": "Generated by reasoning-mode teacher (K2.6 or DeepSeek-R1) with diverse multi-step prompts"
+        }
+      ],
+      "format": "Question -> extended reasoning -> answer",
+      "thinking_format": "Use K2.6 native reasoning traces; preserve in <think> format where appropriate",
+      "filtering_requirement": "Discard examples where K2.6's reasoning contains self-correction artifacts (wait, that's wrong); keep only clean reasoning traces",
+      "verification": "Final answer matches expected; reasoning is internally consistent",
+      "decontamination_requirement": "Exact match + 13-gram match + semantic similarity (>0.85) against GPQA test set (448 items, including the Diamond subset of 198 items)",
+      "sources": [
+        {
+          "name": "Generated_gpqa_style_science",
+          "volume": 800,
+          "description": "Generated graduate-level multiple-choice questions in physics, chemistry, biology by Kimi K2.6 (thinking mode) or DeepSeek-R1, modeled on GPQA format (Rein et al. 2023); no GPQA training set exists, so all items are generated"
+        },
+        {
+          "name": "Generated_multi_step_reasoning",
+          "volume": 700,
+          "description": "Generated multi-step logical reasoning problems beyond science: causal chains, structured deduction, complex word problems requiring sequential inference"
+        }
+      ]
+    },
+    "long_context": {
+      "volume": 3500,
+      "percentage": 0.0875,
+      "target_benchmark": "InfiniteBench, NIH multi-needle",
+      "rationale": "Long context preservation; needs context length variation",
+      "teachers": "Mixed: Qwen 2.5 14B (short), Claude Sonnet 4.6 (medium/long)",
+      "teachers_rationale": "Qwen 2.5 14B is cost-effective for shorter contexts; Claude Sonnet 4.6 has strong long-context attention for medium/long contexts; teacher selection per subcategory by length",
+      "subcategories": [
+        {
+          "name": "short_long_context_2_4k",
+          "volume": 1400,
+          "context_tokens": "2000-4000",
+          "description": "Reading comprehension and QA over moderately long contexts (single article, conversation, or document)"
+        },
+        {
+          "name": "medium_long_context_4_8k",
+          "volume": 1200,
+          "context_tokens": "4000-8000",
+          "description": "Multi-document QA, longer article comprehension, or extended dialogue contexts"
+        },
+        {
+          "name": "long_context_8_16k",
+          "volume": 700,
+          "context_tokens": "8000-16000",
+          "description": "Long-document analysis (book chapters, long reports); requires sustained attention across context"
+        },
+        {
+          "name": "very_long_16k_plus",
+          "volume": 200,
+          "context_tokens": "16000+",
+          "description": "Stress-test contexts at and beyond model's full context window; primarily NIH-style retrieval tasks"
+        }
+      ],
+      "sources": [
+        {
+          "name": "NarrativeQA",
+          "volume": 800,
+          "description": "QA over long stories and movie scripts; trains comprehension over narrative long contexts (Kočiský et al. 2018)"
+        },
+        {
+          "name": "QASPER",
+          "volume": 600,
+          "description": "Question answering over scientific paper text; trains comprehension over technical long contexts (Dasigi et al. 2021)"
+        },
+        {
+          "name": "HotpotQA_distractor",
+          "volume": 700,
+          "description": "Multi-hop QA with distractor paragraphs; trains attention across multiple sources (Yang et al. 2018)"
+        },
+        {
+          "name": "Long_Data_Collections",
+          "volume": 700,
+          "description": "Curated long-context training data including book QA and document QA; community-collected from multiple long-context resources"
+        },
+        {
+          "name": "NIH_style_synthetic",
+          "volume": 700,
+          "description": "Needle-in-a-haystack synthetic: place specific facts in long context, ask retrieval; generated with controlled needle placement"
+        }
+      ],
+      "format": "Long context + question -> answer grounded in context",
+      "verification": "Answer grounded in provided context (LLM-judge check)",
+      "decontamination_requirement": "Exact match + 13-gram match + semantic similarity (>0.85) against InfiniteBench, NIH multi-needle test items, NarrativeQA test, QASPER test, HotpotQA test sets"
+    },
+    "general_instruction_breadth": {
+      "volume": 1200,
+      "percentage": 0.03,
+      "target_benchmark": "General capability / distributional breadth",
+      "rationale": "Distributional breadth from curated open-source instruction data; helps prevent narrow distribution effects from heavy benchmark-shaped data; supports general capability preservation indirectly.",
+      "teacher": "None (existing curated datasets used as-is)",
+      "sources": [
+        {
+          "name": "Tulu_3_SFT_high_quality",
+          "volume": 650,
+          "description": "Curated SFT mixture from AllenAI Tulu 3 (2024); broad single-turn instruction-following data; sample top-rated subset"
+        },
+        {
+          "name": "OpenHermes_2.5_curated",
+          "volume": 400,
+          "description": "Teknium's OpenHermes 2.5 (2024); diverse instruction data; quality-filtered subset removing low-quality and duplicated items"
+        },
+        {
+          "name": "OASST_top_rated",
+          "volume": 150,
+          "description": "OpenAssistant Conversations (Köpf et al. 2023) top-rated single-turn extractions; not full multi-turn (which would be measured elsewhere if it were a Meta benchmark, which it is not)"
+        }
+      ],
+      "verification": "Source quality filter only (already curated)",
+      "decontamination_requirement": "Exact match + 13-gram match + semantic similarity (>0.85) against test sets of all evaluated benchmarks: MMLU, IFEval, GSM8K, MATH, HellaSwag, ARC Challenge, GPQA, BFCL, InfiniteBench, NIH, OpenRewrite",
+      "format": "Open-ended instruction or multi-turn conversation -> helpful response in the style of the source dataset"
+    },
+    "code": {
+      "volume": 500,
+      "percentage": 0.0125,
+      "target_benchmark": "Not in Meta's official 3B eval but useful for deployment",
+      "rationale": "Minimal preservation for code capability; not in Meta's 21 evaluation tasks but maintains baseline capability",
+      "teacher": "Claude Sonnet 4.6 for generation and explanation tasks; existing curated datasets used as-is for CodeAlpaca and Magicoder",
+      "sources": [
+        {
+          "name": "CodeAlpaca",
+          "volume": 300,
+          "description": "CodeAlpaca-20k (sahil2801, 2023); instruction-style coding tasks with Python-heavy distribution"
+        },
+        {
+          "name": "Magicoder_Evol_Instruct",
+          "volume": 200,
+          "description": "Magicoder Evol-Instruct (ise-uiuc 2023); diversified coding instructions"
+        }
+      ],
+      "language_distribution": [
+        {
+          "language": "Python",
+          "percentage": 0.4
+        },
+        {
+          "language": "JavaScript",
+          "percentage": 0.2
+        },
+        {
+          "language": "SQL",
+          "percentage": 0.1
+        },
+        {
+          "language": "Bash",
+          "percentage": 0.1
+        },
+        {
+          "language": "Other (Java, Go, Rust, etc.)",
+          "percentage": 0.2
+        }
+      ],
+      "verification": "Code parses without syntax errors in stated language; for generation tasks, runs successfully on stated inputs when execution is feasible; for explanation tasks, explanation matches code behavior (LLM-judge check)",
+      "decontamination_requirement": "Exact match + 13-gram match + semantic similarity (>0.85) against HumanEval (164 problems) and MBPP (974 problems) test sets",
+      "format": "Coding task description (and sometimes existing code) -> code, explanation, fix, or refactor, depending on subcategory",
+      "subcategories": [
+        {
+          "name": "code_generation_basic",
+          "volume": 300,
+          "description": "Generate code from a natural language description; covers Python-heavy but multi-language"
+        },
+        {
+          "name": "code_understanding_explanation",
+          "volume": 200,
+          "description": "Explain what existing code does; brief technical Q&A"
+        }
+      ],
+      "teacher_rationale": "Claude Sonnet 4.6 produces clean, idiomatic code with good explanations; matches expected style for deployment"
+    },
+    "openrewrite_shaped": {
+      "volume": 500,
+      "percentage": 0.0125,
+      "target_benchmark": "OpenRewrite",
+      "rationale": "Small but in Meta's eval; often forgotten",
+      "teacher": "Claude Sonnet 4.6",
+      "teacher_rationale": "Strong style and tone control; produces clean rewrites that preserve meaning; matches OpenRewrite's evaluation rubric for fidelity",
+      "subcategories": [
+        {
+          "name": "style_transfer",
+          "volume": 150,
+          "description": "Rewrite text in a different register (formal to casual, or casual to formal); preserve meaning while changing tone and word choice"
+        },
+        {
+          "name": "length_adjustment",
+          "volume": 150,
+          "description": "Rewrite text to a different target length (shorter or longer) while preserving the core message"
+        },
+        {
+          "name": "summarization",
+          "volume": 100,
+          "description": "Condense a longer text into a shorter summary preserving key information; varies in compression ratio"
+        },
+        {
+          "name": "paraphrasing",
+          "volume": 100,
+          "description": "Restate text in different words while preserving meaning; same length, different surface form"
+        }
+      ],
+      "verification": "Rewritten text preserves meaning (LLM-judge check)",
+      "sources": [
+        {
+          "name": "Generated_from_diverse_texts",
+          "volume": 500,
+          "description": "Take diverse source texts (news articles, emails, technical writing, casual prose) and prompt Claude Sonnet 4.6 to produce rewrites in each subcategory style"
+        }
+      ],
+      "decontamination_requirement": "Exact match + 13-gram match + semantic similarity (>0.85) against OpenRewrite test set",
+      "format": "Source text + transformation instruction (style, length, summarization, or paraphrasing) -> rewritten text that applies the transformation"
+    },
+    "conversation_regularization": {
+      "volume": 800,
+      "percentage": 0.02,
+      "target_benchmark": "Not directly evaluated by Meta; included for anti-forgetting regularization",
+      "rationale": "Cultural data is approximately 50% conversational in format (15% dialogue_completion + 35% direct_enactment, much of which is dialog-like). Without any conversational rehearsal, the model risks learning a spurious association between conversational/multi-turn format and Vietnamese cultural mode — i.e., the chat template itself becomes a 'cultural mode' trigger. This category is sized small and explicitly NOT cultural; its job is to break that association so the model treats multi-turn as a generic format that can carry any content. This is anti-mode-collapse regularization, not deployment-capability addition.",
+      "teacher": "None (existing curated datasets used as-is); Claude Sonnet 4.6 for generated portion",
+      "teacher_rationale": "Curated datasets like OASST, ShareGPT provide natural distribution; small generated portion fills specific anti-mode-collapse needs",
+      "design_principle": "Content must be deliberately NON-cultural and non-Vietnamese. The goal is to teach 'multi-turn format does not equal cultural framing.' If the conversation content drifts toward Vietnamese cultural topics, it defeats the regularization purpose.",
+      "subcategories": [
+        {
+          "name": "generic_task_oriented_dialogue",
+          "volume": 300,
+          "description": "Task-oriented multi-turn dialogues on non-cultural topics: math help, code help, factual Q&A across turns, writing assistance; trains 'multi-turn is just a format'"
+        },
+        {
+          "name": "single_turn_chat_template",
+          "volume": 200,
+          "description": "Single-turn instructions delivered in chat template format (matching benchmark evaluation conditions); explicit anti-association data to ensure chat template doesn't become a cultural-mode trigger"
+        },
+        {
+          "name": "clarification_followup_generic",
+          "volume": 150,
+          "description": "Generic clarification and follow-up exchanges on non-cultural topics; model asks for missing info, user provides, model completes"
+        },
+        {
+          "name": "correction_revision_generic",
+          "volume": 150,
+          "description": "User points out error in non-cultural domain (math, code, fact), model corrects gracefully; trains correction handling outside cultural context"
+        }
+      ],
+      "sources": [
+        {
+          "name": "OASST_multi_turn_non_cultural",
+          "volume": 250,
+          "description": "OpenAssistant Conversations (Köpf et al. 2023) multi-turn branches filtered to exclude Vietnamese, Vietnamese cultural topics, and broader Asian cultural topics; keeps task-oriented and generic helpful dialogues"
+        },
+        {
+          "name": "ShareGPT_filtered_non_cultural",
+          "volume": 200,
+          "description": "ShareGPT conversations filtered for quality and explicitly filtered to exclude Vietnamese cultural content"
+        },
+        {
+          "name": "WildChat_task_oriented",
+          "volume": 150,
+          "description": "WildChat (Zhao et al. 2024) subset filtered for task-oriented exchanges in non-cultural domains"
+        },
+        {
+          "name": "Generated_anti_modecollapse",
+          "volume": 200,
+          "description": "Generated by Claude Sonnet 4.6: explicitly designed multi-turn and single-turn-in-chat-template examples on non-cultural topics; targeted to balance the cultural data format distribution"
+        }
+      ],
+      "format": "Multi-turn dialogue or single-turn in chat template; content explicitly non-cultural; matches chat template tokenization of cultural data so model sees the template in non-cultural contexts",
+      "verification": "Content filter pass: no Vietnamese cultural references, no East Asian cultural framing; conversation is coherent and task-completing (LLM-judge check)",
+      "decontamination_requirement": "Not applicable for direct Meta benchmark contamination (not in 21 tasks); however filter out any items matching the cultural data corpus to ensure clean separation",
+      "anti_forgetting_specific_role": "This category exists purely to prevent the model from learning 'chat template → cultural mode.' If this association forms, it would cause benchmark drops even though the benchmarks themselves are single-turn — because benchmark eval also uses chat template formatting."
+    }
+  },
+  "decontamination_protocol": {
+    "description": "Mandatory before training; non-negotiable for valid evaluation",
+    "stages": [
+      {
+        "name": "exact_match",
+        "description": "Any rehearsal example with text matching test item (case-insensitive, whitespace-normalized) -> discard"
+      },
+      {
+        "name": "ngram_match",
+        "description": "Any rehearsal example sharing >13-gram with any test item -> discard. Standard threshold for catching paraphrases."
+      },
+      {
+        "name": "semantic_similarity",
+        "description": "Embed all rehearsal and test items with sentence-transformers/all-MiniLM-L6-v2. Any pair with cosine similarity > 0.85 -> discard rehearsal example."
+      }
+    ],
+    "test_sets_to_check_against": [
+      "MMLU (14,042 test questions across 57 subjects)",
+      "MMLU-Pro (test set for the harder MMLU variant)",
+      "IFEval (541 prompts)",
+      "GSM8K (1,319 test problems)",
+      "MATH (5,000 test problems)",
+      "HellaSwag (10,003 test items)",
+      "ARC Challenge (1,172 test items)",
+      "ARC Easy (used for source items)",
+      "OpenBookQA test set",
+      "PIQA test set",
+      "SIQA test set",
+      "Story Cloze test set",
+      "GPQA (448 test items, including Diamond subset of 198)",
+      "BFCL (all test subsets: Simple, Multiple, Parallel, Parallel Multiple, Live, Relevance, Multi-turn)",
+      "InfiniteBench (all subtasks)",
+      "NIH multi-needle test items",
+      "NarrativeQA test set",
+      "QASPER test set",
+      "HotpotQA test set (distractor and fullwiki settings)",
+      "HumanEval (164 problems)",
+      "MBPP (974 problems)",
+      "OpenRewrite test set"
+    ],
+    "expected_discard_rate": "2-5% of generated rehearsal",
+    "buffer_generation": "Generate 42K-45K candidates to get 40K clean post-decontamination"
+  },
+  "verification_protocols": {
+    "description": "Per-category correctness criteria; discard failures",
+    "criteria_by_category": {
+      "ifeval_shaped": "Automated constraint check: does response satisfy the stated constraint(s)?",
+      "mmlu_shaped": "Answer matches ground truth; reasoning (if present) is sensible and supports the chosen answer",
+      "gsm8k_shaped_math": "Final numerical answer correct; reasoning steps are valid and lead to the answer",
+      "math_shaped": "LaTeX final answer (in \\boxed{}) matches expected; reasoning is mathematically valid",
+      "hellaswag_shaped": "Picked option matches ground truth label",
+      "bfcl_shaped_tool_calling": "Function call parses as valid JSON; function name exists in provided tools; argument types and values match schema",
+      "arc_challenge_shaped": "Picked option matches ground truth label",
+      "gpqa_hard_reasoning": "Final answer matches expected; reasoning trace is internally consistent without self-correction artifacts",
+      "long_context": "Answer grounded in provided context (LLM-judge check verifies answer can be supported from context)",
+      "general_instruction_breadth": "Source quality filter only (datasets are already curated; no re-verification)",
+      "code": "Code parses without syntax errors in stated language; runs successfully when execution is feasible",
+      "openrewrite_shaped": "Rewritten text preserves meaning while applying requested transformation (LLM-judge check)",
+      "conversation_regularization": "Content filter: no Vietnamese cultural references, no East Asian cultural framing; conversation is coherent and task-completing on non-cultural topics (LLM-judge check)"
+    }
+  },
+  "length_distribution_target": {
+    "description": "Match cultural data length distribution to prevent mode collapse where 'long = cultural mode'",
+    "median_tokens": 300,
+    "p25_p75_range": "150-600",
+    "p95_long_tail": "up to 2000 tokens for long-context category",
+    "validation": "Compare rehearsal length distribution to cultural data length distribution before training; normalize if divergent"
+  },
+  "thinking_format_handling": {
+    "description": "Most categories use minimal/standard thinking; reasoning-heavy categories use extended thinking via K2.6 traces",
+    "category_thinking_distribution": {
+      "ifeval_shaped": {
+        "minimal": 0.78,
+        "standard": 0.17,
+        "extended": 0.05,
+        "note": "Format-strict; reasoning preamble breaks evaluation"
+      },
+      "mmlu_shaped": {
+        "minimal": 0.14,
+        "standard": 0.64,
+        "extended": 0.22,
+        "note": "Brief reasoning helps; not all questions need extended"
+      },
+      "gsm8k_shaped_math": {
+        "minimal": 0.1,
+        "standard": 0.6,
+        "extended": 0.3,
+        "note": "Math benefits from step-by-step"
+      },
+      "math_shaped": {
+        "minimal": 0.12,
+        "standard": 0.4,
+        "extended": 0.48,
+        "note": "Harder problems benefit from extended reasoning"
+      },
+      "hellaswag_shaped": {
+        "minimal": 0.56,
+        "standard": 0.4,
+        "extended": 0.04,
+        "note": "Continuation task; minimal reasoning needed"
+      },
+      "bfcl_shaped_tool_calling": {
+        "minimal": 0.73,
+        "standard": 0.22,
+        "extended": 0.05,
+        "note": "Direct function call format required"
+      },
+      "arc_challenge_shaped": {
+        "minimal": 0.25,
+        "standard": 0.5,
+        "extended": 0.25
+      },
+      "gpqa_hard_reasoning": {
+        "minimal": 0.07,
+        "standard": 0.27,
+        "extended": 0.66,
+        "note": "Genuinely hard; extended reasoning critical"
+      },
+      "long_context": {
+        "minimal": 0.17,
+        "standard": 0.5,
+        "extended": 0.33
+      },
+      "general_instruction_breadth": {
+        "minimal": 0.28,
+        "standard": 0.6,
+        "extended": 0.12
+      },
+      "code": {
+        "minimal": 0.25,
+        "standard": 0.5,
+        "extended": 0.25
+      },
+      "openrewrite_shaped": {
+        "minimal": 0.5,
+        "standard": 0.4,
+        "extended": 0.1
+      },
+      "conversation_regularization": {
+        "minimal": 0.4,
+        "standard": 0.5,
+        "extended": 0.1,
+        "note": "Conversational responses typically don't need extended thinking; match the natural distribution of generic assistant dialogue"
+      }
+    },
+    "guidance": "These percentages are estimates of natural teacher behavior. Let teachers (especially K2.6) decide reasoning depth contextually; do not force per-example."
+  },
+  "teacher_cost_estimate": {
+    "description": "Estimated cost for generating full 40K rehearsal corpus. Includes anti-forgetting conversation_regularization subset which mixes curated and small generated portions.",
+    "by_teacher": [
+      {
+        "teacher": "Claude Sonnet 4.6",
+        "volume": 15800,
+        "estimated_cost_usd": "65-90",
+        "categories": [
+          "ifeval_shaped (8500)",
+          "bfcl_shaped_tool_calling (4500)",
+          "openrewrite_shaped (500)",
+          "long_context medium/long subset (2100)",
+          "conversation_regularization generated subset (200)"
+        ]
+      },
+      {
+        "teacher": "Qwen 2.5 32B Instruct (self-hosted)",
+        "volume": 9000,
+        "estimated_cost_usd": "12",
+        "categories": [
+          "mmlu_shaped (7000)",
+          "arc_challenge_shaped (2000)"
+        ]
+      },
+      {
+        "teacher": "Qwen 2.5 Math 32B (self-hosted)",
+        "volume": 7500,
+        "estimated_cost_usd": "10",
+        "categories": [
+          "gsm8k_shaped_math (5000)",
+          "math_shaped (2500)"
+        ]
+      },
+      {
+        "teacher": "Qwen 2.5 14B (self-hosted)",
+        "volume": 3900,
+        "estimated_cost_usd": "5",
+        "categories": [
+          "hellaswag_shaped (2500)",
+          "long_context short subset (1400)"
+        ]
+      },
+      {
+        "teacher": "Kimi K2.6 (thinking mode) or DeepSeek-R1",
+        "volume": 1500,
+        "estimated_cost_usd": "15-25",
+        "categories": [
+          "gpqa_hard_reasoning (1500)"
+        ]
+      },
+      {
+        "teacher": "None (existing curated datasets)",
+        "volume": 2300,
+        "estimated_cost_usd": "0",
+        "categories": [
+          "general_instruction_breadth (1200)",
+          "code (500)",
+          "conversation_regularization curated subset (600)"
+        ]
+      }
+    ],
+    "total_estimated_cost_usd": "107-142"
+  },
+  "pilot_validation": {
+    "description": "Critical step before scaling to full 40K",
+    "process": [
+      "Generate 10% of each category's target volume proportionally (~4,000 total: 900 IFEval, 700 MMLU, 500 GSM8K, etc.)",
+      "Apply full decontamination and per-category verification",
+      "Fine-tune Llama 3.2 3B on rehearsal-only pilot (no cultural data) with this 4K corpus",
+      "Evaluate on all 10 relevant Meta benchmarks: MMLU, IFEval, GSM8K, MATH, HellaSwag, ARC Challenge, GPQA, BFCL, InfiniteBench/NIH, OpenRewrite",
+      "Compare to base Llama 3.2 3B Instruct scores"
+    ],
+    "success_criterion": "Benchmarks stay flat or slightly improve; if any drops, the corresponding category pipeline has an issue",
+    "estimated_cost": "$20 generation + ~3 hours compute",
+    "decision_rule": "Scale to full 40K only after pilot passes"
+  },
+  "expected_outcomes": {
+    "description": "Realistic capability preservation with this rehearsal structure + 20K cultural data at 2:1 ratio",
+    "by_benchmark": {
+      "MMLU_5_shot": {
+        "base": 63.4,
+        "realistic_range": "63.0-63.8",
+        "stretch": "64.0+"
+      },
+      "IFEval_strict": {
+        "base": 77.4,
+        "realistic_range": "77.0-79.5",
+        "stretch": "80+ (improvement plausible)"
+      },
+      "GSM8K": {
+        "base_est": 78,
+        "realistic_range": "77.5-79.5",
+        "stretch": "80+"
+      },
+      "MATH": {
+        "base": "low",
+        "realistic_range": "within 0.5 of base",
+        "stretch": "slight improvement"
+      },
+      "HellaSwag": {
+        "base": "strong",
+        "realistic_range": "within 1 point",
+        "stretch": "flat"
+      },
+      "ARC_Challenge": {
+        "base": "strong",
+        "realistic_range": "within 1 point",
+        "stretch": "flat"
+      },
+      "GPQA": {
+        "base": "modest",
+        "realistic_range": "within 1.5 points",
+        "stretch": "flat"
+      },
+      "BFCL": {
+        "base": "strong_for_size",
+        "realistic_range": "within 2%",
+        "stretch": "within 1%"
+      },
+      "InfiniteBench_NIH": {
+        "base": "strong",
+        "realistic_range": "within 2-3 points",
+        "stretch": "flat"
+      },
+      "OpenRewrite": {
+        "base": "moderate",
+        "realistic_range": "within 1 point of base",
+        "stretch": "flat or slight improvement"
+      }
+    }
+  },
+  "generation_pipeline": {
+    "stages": [
+      {
+        "stage": 1,
+        "name": "decontamination_setup",
+        "description": "Download and parse all evaluation test set items listed in decontamination_protocol. Build search infrastructure: exact-match lookup, 13-gram indexing, and embedding store for semantic similarity (sentence-transformers/all-MiniLM-L6-v2)"
+      },
+      {
+        "stage": 2,
+        "name": "pilot_generation",
+        "description": "Generate 10% of each category proportionally (~4,000 total) using the per-category teacher and category-specific prompts; apply full decontamination and verification on pilot output"
+      },
+      {
+        "stage": 3,
+        "name": "pilot_validation",
+        "description": "Fine-tune Llama 3.2 3B on rehearsal-only pilot; evaluate on all 10 Meta benchmarks; verify no benchmark drops significantly. If any category drops, debug that category's pipeline before proceeding"
+      },
+      {
+        "stage": 4,
+        "name": "full_generation",
+        "description": "Scale to full per-category volumes with buffer (~44K-45K candidates to compensate for expected 2-5% decontamination + verification filtering)"
+      },
+      {
+        "stage": 5,
+        "name": "full_decontamination_pass",
+        "description": "Run all three decontamination stages (exact match, 13-gram, semantic similarity) against every test set listed in decontamination_protocol; discard contaminated examples"
+      },
+      {
+        "stage": 6,
+        "name": "per_category_verification",
+        "description": "Apply category-specific verification criteria (constraint check for IFEval, answer match for MMLU/GSM8K, JSON parse for BFCL, etc.); discard failed examples"
+      },
+      {
+        "stage": 7,
+        "name": "length_distribution_normalization",
+        "description": "Compare rehearsal length distribution to cultural data; if median rehearsal length differs from cultural by >20%, trim long outliers or supplement short examples to match"
+      },
+      {
+        "stage": 8,
+        "name": "final_assembly",
+        "description": "Trim to 40K target by sampling from passed examples while maintaining per-category volume targets and source attribution; tag each example with teacher, source, and verification result"
+      },
+      {
+        "stage": 9,
+        "name": "final_decontamination_check",
+        "description": "Second-pass decontamination as safety check; this catches any items that slipped through Stage 5 due to indexing issues or new test set updates"
+      }
+    ]
+  },
+  "quality_validation_metrics": {
+    "decontamination_completeness": "100% of rehearsal examples checked against all relevant test sets",
+    "verification_pass_rate": "Each category has documented pass rate; minimum 85% per category",
+    "teacher_attribution_documented": "Each example tagged with generating teacher for traceability",
+    "length_distribution_match": "Median rehearsal length within 20% of cultural data median",
+    "category_volume_targets_met": "Each category at target volume +/- 5%",
+    "format_validity": "All examples parse correctly in their target format (JSON for tool calls, multiple-choice for MMLU/HellaSwag/ARC, etc.)"
+  }
+}

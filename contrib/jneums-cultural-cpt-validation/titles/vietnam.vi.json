@@ -1,0 +1,34 @@
+{
+  "_comment": "Curated Vietnamese Wikipedia titles for the EXP-001 Vietnam pilot (the second culture, checking the grounding effect generalizes beyond Egypt/Arabic). grounded = value-laden domains (law, religion, family, civic, ethics — Confucian/Buddhist value content); language_matched = value-neutral twin (weather, sports, technical, mathematics, biology). Same source + register; only the domain differs. Titles are deliberately topical (not category crawls) to keep the value-laden vs neutral contrast clean. Fetch: fetch_corpus.py --culture vietnam --lang vi --titles-file titles/vietnam.vi.json --full --max-words 4000 --per-domain 18",
+  "grounded": {
+    "law": ["Pháp luật", "Hiến pháp", "Công lý", "Pháp quyền", "Quyền con người", "Tòa án", "Hình phạt", "Thừa kế", "Quyền", "Nghĩa vụ", "Tư pháp", "Luật sư", "Tội phạm", "Di chúc", "Luật hình sự", "Luật dân sự", "Hợp đồng", "Công tố"],
+    "religion": ["Tôn giáo", "Phật giáo", "Đạo đức", "Nho giáo", "Thờ cúng tổ tiên", "Đạo giáo", "Tín ngưỡng", "Chùa", "Cầu nguyện", "Phật", "Nghiệp (Phật giáo)", "Luân hồi", "Niết-bàn", "Lễ hội", "Tâm linh", "Đức tin", "Thiền", "Từ bi"],
+    "family": ["Gia đình", "Hôn nhân", "Họ hàng", "Hiếu thảo", "Dòng họ", "Ly hôn", "Cha mẹ", "Con cái", "Tổ tiên", "Gia phả", "Cưới hỏi", "Vợ chồng", "Anh em", "Nhà", "Mẫu hệ", "Phụ hệ", "Người cao tuổi", "Trẻ em"],
+    "civic": ["Quyền công dân", "Dân chủ", "Xã hội dân sự", "Truyền thống", "Khế ước xã hội", "Tổ quốc", "Tự do", "Công bằng xã hội", "Chính quyền", "Quốc gia", "Trách nhiệm", "Nhân dân", "Bầu cử", "Bản sắc", "Cộng đồng", "Làng xã", "Phong tục", "Đoàn kết"],
+    "ethics": ["Đức hạnh", "Trung thực", "Liêm chính", "Khiêm tốn", "Công bằng", "Lòng nhân ái", "Tôn trọng", "Lương tâm", "Trí tuệ", "Lòng trung thành", "Kiên nhẫn", "Khoan dung", "Hiếu", "Nhân (Nho giáo)", "Lễ (Nho giáo)", "Nghĩa", "Tín", "Vị tha"]
+  },
+  "language_matched": {
+    "weather": ["Thời tiết", "Mưa", "Mây", "Gió", "Áp suất khí quyển", "Độ ẩm", "Tuyết", "Bão", "Nhiệt độ", "Sương mù", "Sấm sét", "Khí hậu", "Gió mùa", "Bốc hơi", "Mây dông", "Lượng mưa", "Front (khí tượng)", "Áp thấp nhiệt đới"],
+    "sports": ["Bóng đá", "Bóng rổ", "Quần vợt", "Thế vận hội", "Marathon", "Bơi lội", "Quyền Anh", "Bóng chuyền", "Cờ vua", "Xe đạp", "Chạy bộ", "Bóng bàn", "Nhảy cao", "Đấu vật", "Cầu lông", "Bóng ném", "Thể dục dụng cụ", "Đua thuyền"],
+    "technical": ["Động cơ đốt trong", "Đinh vít", "Bê tông", "Cầu", "Ổ trục", "Bánh răng", "Máy tính", "Điện", "Máy bơm", "Van", "Kim loại", "Thủy tinh", "Tua bin", "Máy phát điện", "Máy biến áp", "Thuật toán", "Robot", "Pít-tông"],
+    "mathematics": ["Số nguyên tố", "Tam giác", "Vi tích phân", "Logarit", "Ma trận", "Phân số", "Đại số", "Hàm số", "Xác suất", "Thống kê", "Phương trình", "Hình học", "Vectơ", "Đạo hàm", "Đường tròn", "Góc", "Số thực", "Số phức"],
+    "biology": ["Tế bào", "ADN", "Protein", "Enzyme", "Vi khuẩn", "Virus", "Thực vật", "Quang hợp", "Hệ thần kinh", "Nhiễm sắc thể", "Trao đổi chất", "Gen", "Di truyền", "Tiến hóa", "Hệ sinh thái", "Hormone", "Hệ miễn dịch", "Phân bào"]
+  },
+  "categories": {
+    "_comment": "Narrow Vietnamese Wikipedia categories to scale each domain past curated titles (fetch_corpus.py --cat-limit N). Chosen tight so the value-laden vs neutral contrast survives; missing categories are skipped, off-topic members diluted by averaging + decontamination + the per-arm --max-tokens budget.",
+    "grounded": {
+      "law": ["Thể loại:Luật", "Thể loại:Luật pháp"],
+      "religion": ["Thể loại:Phật giáo", "Thể loại:Nho giáo"],
+      "family": ["Thể loại:Gia đình", "Thể loại:Hôn nhân"],
+      "civic": ["Thể loại:Quyền công dân", "Thể loại:Giá trị"],
+      "ethics": ["Thể loại:Đạo đức", "Thể loại:Đạo đức học"]
+    },
+    "language_matched": {
+      "weather": ["Thể loại:Thời tiết", "Thể loại:Khí tượng học"],
+      "sports": ["Thể loại:Bóng đá", "Thể loại:Thể thao"],
+      "technical": ["Thể loại:Kỹ thuật cơ khí", "Thể loại:Điện"],
+      "mathematics": ["Thể loại:Toán học", "Thể loại:Đại số"],
+      "biology": ["Thể loại:Sinh học tế bào", "Thể loại:Di truyền học"]
+    }
+  }
+}

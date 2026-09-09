@@ -3,7 +3,8 @@
 # Checks that all external links, those starting with http*, have "targets".
 #---------------------------------------------------------------------------
 
-default_path="docs"
+default_path="website"
+script=$0
 
 help() {
 	cat << EOF
@@ -15,7 +16,7 @@ the equivalent "<a href="..." target="...">...</a>".
 
 It also handles two '{{site.*url}}' definitions we use for referencing 
 commonly used external sites:
-* '{{site.glossaryurl}}' for the separate glossary site.
+* '{{site.glossary_url}}' for the separate glossary site.
 * '{{site.gh_edit_repository}}' for the GitHub repo URL.
 
 It attempts to correctly ignore image URLs, e.g., '![label](https://example.com/image.png)',
@@ -47,7 +48,7 @@ error() {
 	do
 		echo "ERROR: $arg"
 	done
-	help
+	echo "Try: $script --help"
 	exit 1
 }
 
@@ -85,6 +86,8 @@ eg=$(which egrep)
 [[ -n "$VERBOSE" ]] && echo "Checking markdown files:"
 for path in "${paths[@]}"
 do
+	[[ -d "$path" ]] || error "\"$path\" doesn't exist! Exiting..."
+
 	if [[ -n "$VERBOSE" ]]
 	then
 		dir=$([[ -d "$path" ]] && echo "(directory)")
@@ -95,7 +98,7 @@ do
  		--exclude-dir 'temp' --exclude-dir 'tmp' \
 		--exclude-dir '_site' --exclude-dir '_sass' \
 		$path | $eg -v 'target=' | $eg -v '\.(jpg|jpeg|png|svg|mp3|mp4)'
-	$NOOP $eg -nHoR '\(\{\{site.glossaryurl\}\}[^)]*\)(\S*)' \
+	$NOOP $eg -nHoR '\(\{\{site.glossary_url\}\}[^)]*\)(\S*)' \
 		--include '*.markdown' --include '*.md' \
  		--exclude-dir 'temp' --exclude-dir 'tmp' \
 		--exclude-dir '_site' --exclude-dir '_sass' \

@@ -1,0 +1,35 @@
+{
+  "culture": "seed-example",
+  "language": "en",
+  "arms": {
+    "grounded": {
+      "file": "grounded.jsonl",
+      "lang": "en",
+      "register": "encyclopedic",
+      "domains": [
+        "civic",
+        "family",
+        "law",
+        "religion"
+      ],
+      "value_laden": true
+    },
+    "language_matched": {
+      "file": "language_matched.jsonl",
+      "lang": "en",
+      "register": "encyclopedic",
+      "domains": [
+        "mathematics",
+        "sports",
+        "technical",
+        "weather"
+      ],
+      "value_laden": false
+    }
+  },
+  "twin_matching": {
+    "token_ratio_tolerance": 0.2,
+    "require_same_language": true,
+    "require_same_register": true
+  }
+}

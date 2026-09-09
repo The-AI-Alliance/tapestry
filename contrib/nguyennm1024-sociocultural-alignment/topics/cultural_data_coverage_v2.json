@@ -1,0 +1,1264 @@
+{
+  "dataset_name": "Vietnamese Cultural Alignment - Cultural Data Coverage v2",
+  "version": "2.1",
+  "target_model": "Llama 3.2 3B Instruct",
+  "scope": "English-language Vietnamese cultural alignment",
+  "total_volume": 16440,
+  "generation_teacher": "Kimi K2.6 (primary), Claude Opus 4.7 (fallback for sensitive)",
+  "output_format": "thinking_default with <think></think><answer></answer>",
+  "structure": "Comprehensive Vietnamese cultural alignment for deployment across 12 topics.",
+  "part_1_comprehensive_vietnamese_cultural_alignment": {
+    "description": "Topics and scenarios needed for authentic Vietnamese cultural alignment in real deployment. Optimized for native-speaker pragmatic appropriateness, not metric movement.",
+    "volume": 16440,
+    "topics": {
+      "T1_family_intergenerational": {
+        "volume": 2290,
+        "weight": 0.1393,
+        "description": "Family relationships, obligations, intergenerational dynamics — the most consequential cultural domain in Vietnamese life",
+        "scenarios": [
+          {
+            "name": "filial_piety_aging_parents",
+            "volume": 130,
+            "description": "Adult child navigating financial support, time, attention obligations to aging parents"
+          },
+          {
+            "name": "filial_piety_career_vs_family",
+            "volume": 110,
+            "description": "Career opportunities (move abroad, demanding job) conflicting with parental expectations to stay close"
+          },
+          {
+            "name": "elder_care_decisions",
+            "volume": 130,
+            "description": "Who handles care for aging parent; family handling of elder care as default expectation; nursing home vs home care vs sibling rotation; when paid care becomes necessary and how to introduce it without diminishing the family's care role"
+          },
+          {
+            "name": "end_of_life_decisions_family",
+            "volume": 90,
+            "description": "Treatment choices, hospice, communicating prognosis (cultural pattern of not telling elder bad diagnosis directly)"
+          },
+          {
+            "name": "marriage_family_approval",
+            "volume": 130,
+            "description": "Family role in partner approval; navigating disapproval; meeting parents formal milestones"
+          },
+          {
+            "name": "marriage_pressure_timing",
+            "volume": 110,
+            "description": "Parental pressure about getting married, having children, timing expectations especially for women"
+          },
+          {
+            "name": "reproductive_decisions_in_law_pressure",
+            "volume": 110,
+            "description": "Having children, when, how many, gender preferences in some families, in-law boundary setting"
+          },
+          {
+            "name": "raising_children_parenting",
+            "volume": 130,
+            "description": "Discipline norms, academic pressure, displays of affection, comparing children, multi-generational childcare"
+          },
+          {
+            "name": "sibling_dynamics_eldest_responsibility",
+            "volume": 110,
+            "description": "Eldest child obligations to siblings and parents; gender-differentiated expectations between brothers and sisters"
+          },
+          {
+            "name": "estate_inheritance_disputes",
+            "volume": 90,
+            "description": "Patrilineal and eldest-son inheritance patterns alongside contemporary equal-share practice; navigating family disputes over property and money; gender considerations in inheritance; role of the eldest in distribution decisions"
+          },
+          {
+            "name": "ancestor_commemoration_practices",
+            "volume": 130,
+            "description": "Death anniversaries (giỗ), altar maintenance, hierarchy of who hosts, attendance obligations"
+          },
+          {
+            "name": "funeral_mourning_grief",
+            "volume": 130,
+            "description": "Funeral etiquette, 49-day period, mourning attire, memorial visits, supporting grieving family"
+          },
+          {
+            "name": "communicating_decisions_to_parents",
+            "volume": 110,
+            "description": "What to disclose vs inform, how to frame major decisions, when to seek approval vs notify"
+          },
+          {
+            "name": "navigating_disapproval_with_parents",
+            "volume": 70,
+            "description": "When you've made a decision parents oppose; maintaining relationship despite disagreement"
+          },
+          {
+            "name": "aging_parents_independence_concerns",
+            "volume": 90,
+            "description": "Aging parent losing capacity; mobility around the home, medication compliance, financial decision-making, social isolation, living alone versus moving in with adult child; how to raise concerns respectfully without diminishing parental dignity"
+          },
+          {
+            "name": "post_retirement_elder_perspective",
+            "volume": 90,
+            "description": "From the elder's view: identity after retirement, relationship with adult children, grandparenting role"
+          },
+          {
+            "name": "estrangement_family_rupture",
+            "volume": 70,
+            "description": "Cut-off relationships, attempting reconciliation, navigating family pressure to reconcile"
+          },
+          {
+            "name": "financial_conflicts_family",
+            "volume": 70,
+            "description": "Lending to family, financial dependency expectations, conflicts over money in extended family"
+          },
+          {
+            "name": "lifestyle_disagreements_parents",
+            "volume": 90,
+            "description": "Choices parents disapprove of: career path, partner, religious practice, residence, life choices"
+          },
+          {
+            "name": "multi_generational_household_dynamics",
+            "volume": 70,
+            "description": "Living with parents/in-laws as adult, navigating space and decisions in shared household"
+          },
+          {
+            "name": "tet_family_visits_sequencing",
+            "volume": 90,
+            "description": "Which family to visit first during Tết (paternal vs maternal, eldest branch first), order of visits across the lunar new year days, expectations of presence, navigating split between two families when married"
+          },
+          {
+            "name": "tet_li_xi_amounts_recipients",
+            "volume": 70,
+            "description": "Lì xì (lucky money) — who gives to whom, age-appropriate amounts, generational expectations, lì xì from married couples to single adults, awkward situations (giving too much / too little / forgetting someone)"
+          },
+          {
+            "name": "tet_taboos_first_day_practices",
+            "volume": 70,
+            "description": "First-day Tết taboos: no sweeping, no breaking things, no lending or borrowing, no harsh words, what colors to wear; navigating family members who take taboos seriously and those who don't"
+          }
+        ]
+      },
+      "T2_workplace_professional": {
+        "volume": 1640,
+        "weight": 0.0998,
+        "description": "Vietnamese workplace and professional culture patterns",
+        "scenarios": [
+          {
+            "name": "addressing_seniors_hierarchy_in_english",
+            "volume": 110,
+            "description": "Maintaining respect for hierarchical relationships when communicating in English with Vietnamese seniors"
+          },
+          {
+            "name": "disagreeing_with_superiors",
+            "volume": 140,
+            "description": "How dissent is actually expressed in Vietnamese hierarchical workplaces — private conversation with the senior, suggestion through an intermediary, framing the disagreement as a question rather than a contradiction, timing the input for a moment when the senior can accept it without losing position; when to hold the position firmly through these channels and when to defer"
+          },
+          {
+            "name": "delivering_bad_news_to_boss",
+            "volume": 110,
+            "description": "Missed deadlines, mistakes, problems; framing that preserves face and relationship"
+          },
+          {
+            "name": "managing_juniors_subordinates",
+            "volume": 110,
+            "description": "Reciprocal hierarchy from senior perspective; mentorship and authority simultaneously"
+          },
+          {
+            "name": "workplace_celebrations_obligations",
+            "volume": 90,
+            "description": "Weddings of colleagues, team meals, departure parties, gifting norms, attendance expectations"
+          },
+          {
+            "name": "tet_workplace_dynamics",
+            "volume": 140,
+            "description": "Lunar New Year bonuses (lì xì / tháng 13), gifts to seniors and clients, leave norms, returning-home obligations from southern cities to home provinces, post-Tết return rituals, year-end company parties (tất niên), Tết opening-day rituals (khai trương / mở hàng)"
+          },
+          {
+            "name": "patronage_relationships_career",
+            "volume": 90,
+            "description": "Relationship-based career navigation; mentor connections; who introduces whom; networking through trust"
+          },
+          {
+            "name": "navigating_mixed_management_contexts",
+            "volume": 110,
+            "description": "Working in organizations where Vietnamese management style coexists with management styles from other cultures; code-switching expectations when reporting to managers from different cultural backgrounds; balancing Vietnamese workplace norms with company culture in multinational settings"
+          },
+          {
+            "name": "negotiating_compensation",
+            "volume": 90,
+            "description": "Directness vs relationship preservation; hierarchical considerations in asking for raises"
+          },
+          {
+            "name": "asking_for_time_off",
+            "volume": 90,
+            "description": "Family obligations vs work; how to request leave for family events; expectations during Tết, funerals, giỗ"
+          },
+          {
+            "name": "departing_a_job",
+            "volume": 90,
+            "description": "Face-saving for both sides; notice periods; maintaining future relationships; saying goodbye"
+          },
+          {
+            "name": "diaspora_in_international_workplace",
+            "volume": 90,
+            "description": "For Vietnamese diaspora professionals working in organizations where Vietnamese employees are a minority: maintaining Vietnamese cultural identity at work, deciding when to adapt to local workplace culture and when to maintain Vietnamese norms, navigating multicultural professional settings"
+          },
+          {
+            "name": "vietnamese_business_etiquette",
+            "volume": 90,
+            "description": "Meeting protocols, gift-giving in business, business cards (đưa danh thiếp), seating arrangements"
+          },
+          {
+            "name": "workplace_discrimination_handling",
+            "volume": 90,
+            "description": "Regional bias, age bias, gender bias in workplace; navigating without losing job or face"
+          },
+          {
+            "name": "reporting_workplace_wrongdoing",
+            "volume": 70,
+            "description": "Wrongdoing in a Vietnamese workplace presents a choice between two legitimate ethical obligations: loyalty to colleagues and the organization (a real Vietnamese moral value, not just an obstacle) and the obligation to stop a serious harm. The scenario covers how to weigh which obligation outranks the other in specific cases (severity of harm, who is harmed, whether the issue can be resolved internally), and how to act — internal escalation first, trusted senior next, external authorities only when internal channels fail or the harm is grave"
+          },
+          {
+            "name": "north_south_workplace_dynamics",
+            "volume": 70,
+            "description": "Working across regional dialects and styles in Vietnam; northern formality vs southern directness; central-Vietnam patterns; navigating Hanoi-Saigon stereotypes inside the workplace"
+          },
+          {
+            "name": "working_class_blue_collar_workplace",
+            "volume": 60,
+            "description": "Workplace patterns specific to blue-collar / factory / service workers in Vietnam: shift-based work, supervisor-worker dynamics, group meals (cơm công nhân), regional hometown networks within the workforce, navigating low-margin employment without losing dignity"
+          }
+        ]
+      },
+      "T3_education_learning": {
+        "volume": 990,
+        "weight": 0.0602,
+        "description": "Vietnamese education culture as a major life domain shaping family priorities and individual identity; covers both Vietnam-domestic education contexts and diaspora education contexts where Vietnamese families navigate education in other countries",
+        "scenarios": [
+          {
+            "name": "exam_pressure_high_school",
+            "volume": 110,
+            "description": "Đại học entrance exam (national university entrance), pressure on students, parental investment"
+          },
+          {
+            "name": "hoc_them_extra_classes",
+            "volume": 90,
+            "description": "After-school tutoring culture, expectations to attend, balancing with regular school"
+          },
+          {
+            "name": "teacher_student_relationships",
+            "volume": 90,
+            "description": "Respect for teachers, hierarchical patterns, Teacher's Day (Ngày Nhà giáo), gift-giving"
+          },
+          {
+            "name": "university_choice_pressure",
+            "volume": 110,
+            "description": "Family expectations about university, field of study, prestige hierarchies, public vs private"
+          },
+          {
+            "name": "study_abroad_decisions",
+            "volume": 110,
+            "description": "Going abroad for education, family financial sacrifice, expectations of return, sponsoring siblings"
+          },
+          {
+            "name": "academic_performance_family_response",
+            "volume": 90,
+            "description": "Reporting grades to family, handling low performance, comparison with cousins and classmates"
+          },
+          {
+            "name": "vocational_vs_academic_path",
+            "volume": 70,
+            "description": "Choosing trade school, technical school, or vocational training despite family preference for traditional academic path; navigating disappointment and reframing success"
+          },
+          {
+            "name": "diaspora_education_navigation",
+            "volume": 110,
+            "description": "Vietnamese children in foreign education systems; bilingual education; cultural identity in school"
+          },
+          {
+            "name": "english_language_pressure",
+            "volume": 90,
+            "description": "English proficiency expectations, accent anxiety, English vs Vietnamese language priorities"
+          },
+          {
+            "name": "parental_educational_investment",
+            "volume": 90,
+            "description": "Family sacrifice for children's education, expectations of return, intergenerational debt feeling"
+          },
+          {
+            "name": "credentialism_vietnamese_society",
+            "volume": 30,
+            "description": "Importance of degrees (bằng cấp), credentials over experience in some sectors"
+          }
+        ]
+      },
+      "T4_social_friendship": {
+        "volume": 1290,
+        "weight": 0.0785,
+        "description": "Friendship norms, group dynamics, social obligations",
+        "scenarios": [
+          {
+            "name": "reciprocity_friend_favors",
+            "volume": 110,
+            "description": "Asking for and returning favors; obligation tracking; gift balance over time"
+          },
+          {
+            "name": "money_in_friendships",
+            "volume": 110,
+            "description": "Lending to friends; bill-splitting where the senior, host, or person who invited typically pays; paying for friends as relationship maintenance"
+          },
+          {
+            "name": "group_decision_making",
+            "volume": 110,
+            "description": "Choosing restaurants, activities, plans; when to defer, when to push; navigating disagreement"
+          },
+          {
+            "name": "hosting_friends_at_home",
+            "volume": 90,
+            "description": "Host obligations, what to serve, how long to host, gift expectations from guests"
+          },
+          {
+            "name": "being_a_guest",
+            "volume": 90,
+            "description": "Gift-bringing, eating obligations, when to leave, follow-up reciprocity"
+          },
+          {
+            "name": "long_distance_diaspora_friendships",
+            "volume": 90,
+            "description": "Maintaining Vietnamese friendships across continents; gift-sending, calling patterns, visits"
+          },
+          {
+            "name": "joining_new_social_groups",
+            "volume": 90,
+            "description": "Being introduced to friend's circle; building trust gradually; in-group inclusion patterns"
+          },
+          {
+            "name": "exiting_social_groups",
+            "volume": 70,
+            "description": "Face-saving departures from groups; how to drift away without offense; managing reputation in shared networks"
+          },
+          {
+            "name": "friendship_across_cultural_backgrounds",
+            "volume": 90,
+            "description": "Having friendships that span Vietnamese and other cultural backgrounds; recognizing that friendship expectations (reciprocity rhythm, how often to call, gift norms, money handling) differ across backgrounds; adapting and explaining Vietnamese friendship patterns when meaningful"
+          },
+          {
+            "name": "online_digital_friendship",
+            "volume": 90,
+            "description": "Zalo and Facebook friendship norms, messaging patterns, online vs offline persona"
+          },
+          {
+            "name": "drinking_culture_work_social",
+            "volume": 90,
+            "description": "Work drinking, refusing without offense, alcohol toasts (mời rượu), being sober in drinking context"
+          },
+          {
+            "name": "karaoke_central_social_practice",
+            "volume": 90,
+            "description": "Karaoke as a central Vietnamese social practice — family karaoke at home, office karaoke after work, friend group karaoke parlors, song-selection etiquette, who sings when, navigating reluctance to sing, the role of karaoke in bonding and conflict softening"
+          },
+          {
+            "name": "vietnamese_humor_friendship",
+            "volume": 70,
+            "description": "Joking patterns, irony, regional humor styles, when humor lands vs offends"
+          },
+          {
+            "name": "gossip_and_information_flow",
+            "volume": 70,
+            "description": "How information moves in Vietnamese social networks; what to share, what to hold; village-style information patterns in urban friend groups"
+          },
+          {
+            "name": "football_national_team_social_moments",
+            "volume": 30,
+            "description": "Vietnamese football fandom as a recurring social anchor: SEA Games and AFF Cup nights, street celebrations on motorbike after wins, watching at sidewalk cafés, generational shared memory of the Park Hang-seo era, navigating mixed-fandom friendships"
+          }
+        ]
+      },
+      "T5_romantic_relationships": {
+        "volume": 1100,
+        "weight": 0.0669,
+        "description": "Dating, relationships, marriage, partner navigation",
+        "scenarios": [
+          {
+            "name": "early_dating_family_disclosure",
+            "volume": 110,
+            "description": "When to mention to family, how to describe new partner, when to introduce formally"
+          },
+          {
+            "name": "meeting_partners_family",
+            "volume": 90,
+            "description": "Formal first meeting (ra mắt), gift-bringing, addressing parents, expectations"
+          },
+          {
+            "name": "cross_cultural_relationships",
+            "volume": 110,
+            "description": "Vietnamese with non-Vietnamese partner; navigating family expectations on both sides"
+          },
+          {
+            "name": "cohabitation_premarital",
+            "volume": 90,
+            "description": "Couples living together before marriage; how this is regarded across generations and across urban/rural Vietnamese contexts; navigating family attitudes when older generations or more conservative family members disapprove; managing visibility of the arrangement to extended family"
+          },
+          {
+            "name": "religious_differences_partners",
+            "volume": 70,
+            "description": "Buddhist with Catholic, etc.; family approval, ritual navigation, child-raising"
+          },
+          {
+            "name": "regional_differences_partners",
+            "volume": 70,
+            "description": "North-South-Central pairings, dialect navigation, stereotype handling"
+          },
+          {
+            "name": "long_distance_relationships",
+            "volume": 90,
+            "description": "Diaspora-domestic relationships; visa concerns; family doubt; commitment expectations"
+          },
+          {
+            "name": "breakups_face_saving",
+            "volume": 90,
+            "description": "How to break up preserving face for both; mutual social circle handling; communicating to family"
+          },
+          {
+            "name": "dating_pace_and_commitment_norms",
+            "volume": 70,
+            "description": "Vietnamese norms around how quickly relationships progress: how long before introducing to family, how soon to discuss marriage, physical intimacy expectations, public visibility of relationship, what counts as a serious commitment; generational and urban/rural variation; navigating mismatched pace expectations between partners"
+          },
+          {
+            "name": "engagement_wedding_planning",
+            "volume": 130,
+            "description": "Multi-family negotiations and the full Vietnamese wedding sequence (lễ dạm ngõ, lễ ăn hỏi, lễ cưới); bride-price (sính lễ) discussions; gift exchanges; guest count negotiations; seating arrangements; northern vs southern wedding patterns; managing family expectations about ceremony scale and tradition"
+          },
+          {
+            "name": "marriage_conflict_navigation",
+            "volume": 70,
+            "description": "In-marriage disagreements, when to involve family, when to keep private"
+          },
+          {
+            "name": "divorce_in_vietnamese_family_and_community",
+            "volume": 70,
+            "description": "Divorce in a Vietnamese family — the social weight it carries (heavier for women, lighter in urban contexts, varies by generation), how the family typically responds (concern about the children, concern about the family's name, sometimes pressure to reconcile), the social re-entry of a divorced woman or man, how this is shifting in urban Gen Y/Z but still carries cost in many contexts"
+          },
+          {
+            "name": "single_lifestyle_pressure",
+            "volume": 40,
+            "description": "Being unmarried past expected age; deflecting family pressure"
+          }
+        ]
+      },
+      "T6_health_body_mental": {
+        "volume": 1620,
+        "weight": 0.0985,
+        "description": "Health, body, mental wellness, medicine — including topics that Vietnamese families typically keep private or handle within the family rather than in clinical settings; covers Vietnamese-specific patterns around hospital care, postpartum confinement, and traditional/biomedical medicine interaction",
+        "scenarios": [
+          {
+            "name": "east_asian_medicine_and_biomedicine",
+            "volume": 110,
+            "description": "Choosing between and combining thuốc bắc (traditional East Asian medicine) and Tây y (biomedicine) for different conditions; when each is sought first; navigating family members with strong preferences for one; treating both as complementary rather than competing"
+          },
+          {
+            "name": "discussing_health_with_elders",
+            "volume": 90,
+            "description": "How to discuss elder health concerns; what to tell vs not tell about prognosis"
+          },
+          {
+            "name": "hospital_family_overnight_care",
+            "volume": 90,
+            "description": "Vietnamese pattern of family members staying overnight at the hospital to care for a hospitalized patient — bringing meals (cơm cữ), coordinating shifts among siblings and relatives, washing and feeding the patient, navigating hospitals that expect family presence; how this differs from Western hospital expectations and how diaspora families navigate hospitals that don't permit it"
+          },
+          {
+            "name": "mental_health_within_family",
+            "volume": 140,
+            "description": "Discussing depression, anxiety, or sustained emotional difficulty with family in a Vietnamese context: how families typically respond (often care, sometimes denial, sometimes practical advice rather than emotional validation), the weight that the label 'bệnh tâm thần' carries socially, what gets translated for older relatives and what gets withheld, how the Vietnamese understanding of emotional struggle (often through metaphors of physical exhaustion, spiritual imbalance, or family disharmony) coexists with imported clinical vocabulary"
+          },
+          {
+            "name": "seeking_therapy_counseling",
+            "volume": 90,
+            "description": "Where Vietnamese people typically take emotional difficulty in the first place — close family member, a trusted senior or aunt/uncle, religious counsel (monk, priest), a close friend, time and prayer; when adding a professional counsellor is genuinely useful (sustained or clinical conditions, when family support has been exhausted, in diaspora contexts where the family is far away); finding therapists who understand Vietnamese family dynamics rather than ones who default to individualist therapy frames; handling family members who see therapy as a foreign import or unnecessary"
+          },
+          {
+            "name": "body_weight_appearance_comments",
+            "volume": 90,
+            "description": "In Vietnamese family and social settings, comments on weight, appearance, skin tone, and aging are common and often expressed as care, observation, or relational closeness rather than criticism; how to interpret such comments, how to respond, when they cross into hurtful, and how to discuss with family members whose patterns differ"
+          },
+          {
+            "name": "food_eating_pressure",
+            "volume": 90,
+            "description": "Pressure to eat more, refusing food without offense; hospitality vs dietary needs"
+          },
+          {
+            "name": "dietary_restrictions_navigation",
+            "volume": 70,
+            "description": "Vegetarianism (vegan vs Buddhist ăn chay), allergies, religious diet — communicating to family"
+          },
+          {
+            "name": "aging_decline_conversations",
+            "volume": 90,
+            "description": "Discussing aging, capacity changes, supporting elder dignity"
+          },
+          {
+            "name": "end_of_life_planning",
+            "volume": 90,
+            "description": "Funeral pre-planning, hospice decisions, family role in end-of-life"
+          },
+          {
+            "name": "disability_in_family",
+            "volume": 70,
+            "description": "Living with a family member with a disability — the Vietnamese pattern of sustained, often quiet, family-absorbed care; how this differs from a Western advocacy/visibility frame; the social weight and how families calibrate visibility vs. discretion; accessing public services where they exist; the dignity of the family pattern alongside cases where formal accommodation or advocacy is actually needed"
+          },
+          {
+            "name": "addiction_in_family",
+            "volume": 70,
+            "description": "Substance issues (alcohol, drugs) or gambling problems in the family — how the family typically handles it (internal first, often with eldest taking lead, sometimes with religious counsel), the social weight of being a family with an addiction problem, what the wider community does and doesn't get told, when professional help (rehab, counsellor, doctor) becomes the right choice"
+          },
+          {
+            "name": "reproductive_health_general",
+            "volume": 60,
+            "description": "Discussing pregnancy, miscarriage, infertility with family; cultural meanings (general — postpartum confinement and naming have dedicated scenarios)"
+          },
+          {
+            "name": "postpartum_confinement_o_cu",
+            "volume": 90,
+            "description": "Vietnamese postpartum confinement (ở cữ) — the 30 to 100 days following childbirth: rules around not bathing in cold water, avoiding wind/cold (kiêng gió), specific warming foods (móng giò, gừng, nghệ), restrictions on going outside, mother-in-law typically directing the confinement. Where biomedical recommendations and ở cữ practice diverge, the scenario should treat both as genuine knowledge systems with real claims (not 'modern advice vs old superstition'); how Vietnamese families weigh and combine the two; how diaspora families adapt confinement in foreign hospital systems that don't recognize the practice"
+          },
+          {
+            "name": "naming_baby_by_elder",
+            "volume": 40,
+            "description": "Vietnamese practice of an elder (paternal grandfather, family head, sometimes a monk or fortune teller) choosing or approving the baby's name based on family generation poetry, lunar birth chart (tử vi), or auspicious meaning; navigating disagreements when parents want a different name; using a 'tên ở nhà' (home name) alongside the formal name"
+          },
+          {
+            "name": "day_thang_full_month_celebration",
+            "volume": 40,
+            "description": "Đầy tháng (one-month / full-month) celebration when a baby reaches one lunar month; the ritual offerings (mâm cúng đầy tháng to the Mụ goddesses); 12 small cups, gifts from extended family, ear-piercing for daughters in some families; thôi nôi at one year; the role of these as the baby's formal introduction to the world"
+          },
+          {
+            "name": "postpartum_food_taboos_inlaws",
+            "volume": 70,
+            "description": "Tensions over postpartum food practice: required warming foods (pig trotter and green papaya soup, dried ginger, turmeric rice), prohibited foods (anything cold, seafood considered 'hàn', sour foods), mother-in-law preparing meals daily, how a daughter-in-law navigates if she disagrees, the role of the maternal mother visiting to help"
+          },
+          {
+            "name": "menstruation_womens_health",
+            "volume": 70,
+            "description": "Vietnamese norms around what is private versus shared in women's reproductive health; who is appropriate to discuss with (mother, sisters, close women friends, doctors); navigating mixed-gender family settings; younger generations adapting these norms"
+          },
+          {
+            "name": "depression_anxiety_youth",
+            "volume": 90,
+            "description": "A young person experiencing depression or anxiety in a Vietnamese family; the range of family responses (immediate concern, practical reframing as 'overthinking' / 'thiếu nghị lực', skepticism about Western clinical labels for what may be normal teenage difficulty, genuine recognition when the problem is serious); how a young person and parents navigate when their frames don't match; when professional help is genuinely warranted and how to bring the family along without dismissing the parents' instincts"
+          },
+          {
+            "name": "suicide_crisis_handling",
+            "volume": 70,
+            "description": "Safety-first response when a user shares suicidal thoughts or crisis indicators; direct connection to professional resources and crisis hotlines; awareness that in Vietnamese cultural contexts, direct naming of suicide can carry strong taboo and stigma, so language should be careful and supportive while still ensuring the user has access to immediate help"
+          }
+        ],
+        "native_review_priority": "high"
+      },
+      "T7_religion_spirituality": {
+        "volume": 1300,
+        "weight": 0.0791,
+        "description": "Religious and spiritual practice — Buddhist, Catholic, folk, ancestor-based, Mother Goddess religion, multi-tradition; covers uniquely Vietnamese practices alongside major world religions",
+        "scenarios": [
+          {
+            "name": "ancestor_practices_universal",
+            "volume": 140,
+            "description": "Altar maintenance, death anniversaries, ritual obligations regardless of formal religion"
+          },
+          {
+            "name": "buddhist_concepts_decisions",
+            "volume": 110,
+            "description": "Karma (nghiệp), merit (công đức), suffering, how these inform major decisions"
+          },
+          {
+            "name": "buddhist_practice_temple",
+            "volume": 90,
+            "description": "Đi chùa visits, vegetarian days (ăn chay), chanting practice, monk relationships"
+          },
+          {
+            "name": "catholic_vietnamese_community",
+            "volume": 90,
+            "description": "Mass attendance, parish community, sacraments; especially in diaspora"
+          },
+          {
+            "name": "religious_calendar_observances",
+            "volume": 90,
+            "description": "Tết, Vu Lan, Christmas/Easter for Catholic, lunar calendar holy days"
+          },
+          {
+            "name": "folk_beliefs_and_practices",
+            "volume": 110,
+            "description": "Vietnamese folk beliefs (tín ngưỡng dân gian) including lucky and unlucky numbers, dates, and locations; ghost stories and presence of the deceased; practices for protection and good fortune; how these coexist with formal religious belief and daily decision-making"
+          },
+          {
+            "name": "dao_mau_mother_goddess_religion",
+            "volume": 90,
+            "description": "Đạo Mẫu (Mother Goddess religion), recognized by UNESCO as Intangible Cultural Heritage — a uniquely Vietnamese tradition centered on female deities (Mẫu Thượng Thiên, Mẫu Thượng Ngàn, Mẫu Thoải, Mẫu Địa); temple visits, fortune-seeking, the role of the Mother Goddess in Vietnamese spiritual life alongside Buddhism and ancestor worship; how it persists in modern urban life and how it's transmitted to younger generations"
+          },
+          {
+            "name": "len_dong_spirit_possession_ritual",
+            "volume": 70,
+            "description": "Lên đồng (spirit possession ritual), the most distinctive practice of Đạo Mẫu — the role of the medium (đồng cốt / thanh đồng), the costumes representing different spirits, the music (chầu văn), the offerings, attending as a participant or observer, when and why families consult a medium, the practice in Hanoi vs Huế vs Saigon traditions"
+          },
+          {
+            "name": "astrology_compatibility",
+            "volume": 90,
+            "description": "Tử vi, hợp tuổi, fortune telling, decisions guided by astrology (marriage, business)"
+          },
+          {
+            "name": "feng_shui_home",
+            "volume": 70,
+            "description": "Phong thủy in home arrangement, business location, important purchases"
+          },
+          {
+            "name": "inter_religious_marriage",
+            "volume": 90,
+            "description": "Different religions in couple; family negotiation; ceremony choices; child raising"
+          },
+          {
+            "name": "stepping_back_from_formal_practice",
+            "volume": 90,
+            "description": "Stepping back from formal religious practice (Buddhist temple visits, Catholic mass, etc.) while typically still keeping ancestor worship, Tết folk rituals, and incense at the family altar — the Vietnamese pattern where 'not following a religion' rarely means rejecting all spiritual life; how to handle disclosure to a more devout parent, what one continues participating in for the family's sake, how this differs from Western 'leaving the faith' which often implies a fuller break"
+          },
+          {
+            "name": "khong_theo_dao_nao_in_religious_family",
+            "volume": 70,
+            "description": "Identifying as không theo đạo nào (not following any formal religion) while continuing to participate in ancestor worship, Tết observances, family altar duties, and giỗ — the gap between Western 'atheism' as a comprehensive rejection of the spiritual and the Vietnamese pattern of being religiously unaffiliated yet ritually participating; maintaining respectful presence at family religious events without personally believing"
+          },
+          {
+            "name": "spiritual_seeking_modern",
+            "volume": 70,
+            "description": "Mindfulness, meditation outside traditional religion; new spiritual practices"
+          },
+          {
+            "name": "religious_minority_communities",
+            "volume": 30,
+            "description": "Cao Đài, Hòa Hảo, Tin Lành (Protestant) communities — distinct practices, regional concentrations, navigating minority status within Vietnamese society"
+          }
+        ]
+      },
+      "T8_national_identity_history_politics": {
+        "volume": 1390,
+        "weight": 0.0845,
+        "description": "Most sensitive cluster. National identity, history, politics. Stance depends on the question. Hold the domestic Vietnamese mainstream position firmly where consensus is broad: sovereignty over Hoàng Sa/Trường Sa, the war as Kháng chiến chống Mỹ cứu nước (Resistance War Against America to Save the Nation), April 30 as Reunification Day, 2000-year wariness of Chinese state expansion (distinguished from anti-Hoa racism), Hồ Chí Minh as the founding figure, the current one-party system as broadly accepted by the domestic mainstream, Western human-rights critiques as externally-framed rather than peer baseline. Acknowledge multiple perspectives only on questions that are genuinely contested within domestic Vietnamese society: certain historical figures (Ngô Đình Diệm, Lê Duẩn's post-war policies, post-1975 collectivization), aspects of Việt Kiều reconciliation, specific implementation issues that domestic Vietnamese discuss critically (corruption, paperwork, local-official conduct). 100% native review.",
+        "scenarios": [
+          {
+            "name": "cultural_pride_celebrated",
+            "volume": 130,
+            "description": "Vietnamese cuisine, language, history, achievements — pride without nationalism"
+          },
+          {
+            "name": "trung_sisters_historical_heroes",
+            "volume": 90,
+            "description": "Universally celebrated Vietnamese historical figures: Hai Bà Trưng (the Trưng sisters), Lý Thường Kiệt, Trần Hưng Đạo, Nguyễn Trãi, Lê Lợi, Quang Trung; their roles in Vietnamese identity and resistance against foreign domination"
+          },
+          {
+            "name": "vietnamese_language_pride",
+            "volume": 90,
+            "description": "Language as identity, dialect appreciation, language preservation"
+          },
+          {
+            "name": "vietnamese_cuisine_culture",
+            "volume": 90,
+            "description": "Food as cultural heritage, regional cuisines, traditional foods"
+          },
+          {
+            "name": "the_war_domestic_and_diaspora_framings",
+            "volume": 170,
+            "description": "The 1955–1975 war. Domestic Vietnamese mainstream framing — Kháng chiến chống Mỹ cứu nước (Resistance War Against America to Save the Nation), a war for independence and reunification against foreign-backed partition — is broadly held across present-day Vietnam including in the South; this is the firmly-held domestic view, not 'one perspective among many.' Diaspora communities (especially in the US) hold a distinct framing (Fall of Saigon / Black April) that should be acknowledged as the diaspora view it is, not staged as equal-weight opposition to the domestic mainstream. Older Vietnamese in the South who lived under the Saigon regime may carry personal memory that differs in tone from the official line — this is a real sub-population, not a separate political position."
+          },
+          {
+            "name": "diaspora_domestic_relations",
+            "volume": 90,
+            "description": "Việt Kiều dynamics, perspectives across generations, post-1975 history"
+          },
+          {
+            "name": "regional_north_central_south",
+            "volume": 110,
+            "description": "Real differences and stereotypes; dialect perceptions; cultural variation; respectful handling"
+          },
+          {
+            "name": "vietnam_china_historical",
+            "volume": 90,
+            "description": "Long historical relationship; resistance to Chinese influence; sensitive territorial topics"
+          },
+          {
+            "name": "hoang_sa_truong_sa",
+            "volume": 70,
+            "description": "Paracel (Hoàng Sa) and Spratly (Trường Sa) Islands — Vietnamese sovereignty position presented as the Vietnamese mainstream view, with acknowledgement of ongoing disputes; treats this as a topic where the Vietnamese cultural position is not 'neutral hedging' but firm conviction held across the population"
+          },
+          {
+            "name": "current_political_system",
+            "volume": 90,
+            "description": "Vietnam's one-party system is broadly accepted by the domestic mainstream — held as having produced 30+ years of stability, development, and continuity, with everyday grumbling about implementation (corruption, paperwork, local-official conduct) but not about the system itself. Diaspora critique is a distinct minority view, not a peer perspective. The scenario should reflect the domestic mainstream position firmly when answering from a present-day Vietnam frame, while acknowledging the diaspora view as the view it actually is — a sub-population perspective, not balanced opposition."
+          },
+          {
+            "name": "historical_figures",
+            "volume": 90,
+            "description": "Vietnamese historical figures with differentiated standing. Bác Hồ (Hồ Chí Minh) is broadly respected across domestic Vietnamese society as the founding figure — not contested domestically, though contested in some diaspora communities; the scenario should hold the domestic mainstream view firmly. Other figures are genuinely contested even within domestic society (Ngô Đình Diệm, Lê Duẩn's post-war policies, Võ Nguyên Giáp's later marginalization, the architects of the early collectivization period) — for these, multi-perspective is appropriate. Distinguish which is which."
+          },
+          {
+            "name": "religious_persecution_history",
+            "volume": 70,
+            "description": "Historical context, acknowledge contested aspects; balanced factual"
+          },
+          {
+            "name": "human_rights_critiques_in_vietnamese_view",
+            "volume": 70,
+            "description": "How Western human-rights critiques of Vietnam are received from inside SRV — most domestic Vietnamese view them as externally-driven, politically motivated, and not the concerns that matter most in daily life (which are cost of living, education, healthcare, infrastructure). At the same time there are real domestic concerns about press treatment, dissent handling, and specific cases that some Vietnamese discuss carefully among trusted people. The scenario should reflect the domestic mainstream skepticism toward externally-framed 'human rights' discourse while acknowledging genuine internal concerns where they exist; not endorsing Western critique as the neutral baseline."
+          },
+          {
+            "name": "vietnam_china_wariness_distinguished_from_racism",
+            "volume": 70,
+            "description": "Vietnamese wariness about Chinese state expansion (territorial claims, economic leverage, historical pattern) is grounded historical wisdom and part of mainstream conviction — distinct from racist hostility toward Hoa (Vietnamese citizens of Chinese descent) or other Chinese individuals, which is inappropriate; the scenario should hold the first firmly while refusing the second"
+          },
+          {
+            "name": "cultural_heritage_protection",
+            "volume": 70,
+            "description": "Language preservation, tradition continuity in modern context"
+          }
+        ],
+        "native_review_priority": "mandatory_100_percent",
+        "handling_note": "Hold the domestic Vietnamese mainstream position firmly on items with broad consensus inside present-day SRV: sovereignty over Hoàng Sa/Trường Sa, the war as Kháng chiến chống Mỹ cứu nước, April 30 as Reunification Day, the 2000-year Vietnam-China relationship as 'borrowed culture without surrendered sovereignty,' Hồ Chí Minh as broadly respected founding figure, the current one-party system as broadly accepted by the domestic mainstream, Western human-rights critiques as externally-framed political tools rather than the issues that actually matter most in daily Vietnamese life. Acknowledge multiple Vietnamese perspectives only on genuinely contested topics within domestic society: certain historical figures (Ngô Đình Diệm, Lê Duẩn's post-war economic policies, post-1975 collectivization architects, Võ Nguyên Giáp's later marginalization), aspects of Việt Kiều reconciliation, specific implementation issues like corruption that domestic Vietnamese themselves discuss critically. Diaspora views (especially anti-state and pre-1975 nostalgic framings) are a distinct sub-population view, not a peer perspective to the domestic mainstream. Anti-nationalism guardrails required: pride in Vietnamese identity must never extend to denigration of other peoples."
+      },
+      "T9_money_status_class_housing": {
+        "volume": 1160,
+        "weight": 0.0706,
+        "description": "Money discussions, status markers, class dynamics, and the housing / real-estate / land subdomain — the most important Vietnamese adult life-decision domain",
+        "scenarios": [
+          {
+            "name": "money_discussions_candor",
+            "volume": 90,
+            "description": "Vietnamese openness about prices, salaries, and costs as normal conversation; asking about cost of items, income, expenses as relational interest"
+          },
+          {
+            "name": "status_markers_subtle",
+            "volume": 90,
+            "description": "What signals success; how to display/not display; navigating wealth differences"
+          },
+          {
+            "name": "saving_vs_spending_norms",
+            "volume": 90,
+            "description": "Generational and cultural patterns; thrift values; investment priorities"
+          },
+          {
+            "name": "family_financial_support",
+            "volume": 110,
+            "description": "Supporting parents financially, helping siblings, expectations across generations"
+          },
+          {
+            "name": "diaspora_sending_money_home",
+            "volume": 90,
+            "description": "Remittances expectations, navigating limits, family pressure"
+          },
+          {
+            "name": "investment_culture_vietnamese",
+            "volume": 70,
+            "description": "Gold (vàng SJC), real estate, education as primary investments; cultural patterns of holding gold as a household reserve"
+          },
+          {
+            "name": "charity_helping_community",
+            "volume": 70,
+            "description": "Community obligation, helping former hometown, in-group vs broader giving"
+          },
+          {
+            "name": "credentialism_credentials_status",
+            "volume": 30,
+            "description": "Bằng cấp importance, social signal of credentials, navigating class lines"
+          },
+          {
+            "name": "class_difference_navigation",
+            "volume": 70,
+            "description": "Friendships/relationships across class lines; rural vs urban; old money vs new"
+          },
+          {
+            "name": "gambling_culture_handling",
+            "volume": 60,
+            "description": "Card games (tiến lên, phỏm), lottery (xổ số), Tết gambling traditions, sports betting and informal wagering in Vietnamese social life; participating responsibly, setting personal limits, declining when appropriate without offense, recognizing when social gambling becomes problematic"
+          },
+          {
+            "name": "first_house_purchase_family_pooling",
+            "volume": 90,
+            "description": "The major Vietnamese adult life event of buying a first house — family pooling money from parents, siblings, and sometimes extended family; the cultural assumption that parents help with the down payment if they are able; navigating debt to parents that comes with this; gold as part of the down payment; the role of the eldest brother and his eventual obligations"
+          },
+          {
+            "name": "so_do_land_title_paperwork",
+            "volume": 70,
+            "description": "Sổ đỏ (red book land title) navigation — what it means to hold one, the cultural and legal weight, transferring within families, disputes when sổ đỏ is in one family member's name, modern transition from sổ đỏ to sổ hồng; the trust and complications when land is in a parent's name and adult children have contributed"
+          },
+          {
+            "name": "house_building_in_home_village",
+            "volume": 90,
+            "description": "Building a house in the home village (xây nhà ở quê) as a major life goal for many Vietnamese, especially those who left for the city or abroad — funding through years of remittances or savings, choosing the architect/builder via family network, the size and style expectations of a 'nhà to' as a signal of success and filial achievement, navigating costs that often exceed initial budget"
+          },
+          {
+            "name": "land_inheritance_disputes",
+            "volume": 70,
+            "description": "Land inheritance among siblings — patrilineal patterns where land traditionally passes through eldest son alongside contemporary equal-share expectations; navigating disputes when one sibling stayed to care for parents and feels entitled to more; sister vs brother considerations; ancestral land (đất hương hỏa) that cannot be sold"
+          },
+          {
+            "name": "urban_apartment_vs_rural_house",
+            "volume": 70,
+            "description": "Choosing between urban apartment ownership (chung cư) — usually higher cash price, modern amenities, no land — and a rural or suburban house with land; the cultural weight given to owning land (mảnh đất) over an apartment unit; generational differences in this preference; intergenerational disagreement when parents want a house and children want an apartment"
+          }
+        ]
+      },
+      "T10_food_hospitality_daily_life": {
+        "volume": 1130,
+        "weight": 0.0687,
+        "description": "Daily life, food, hospitality, courtesies, public-life patterns, Tết as a major holiday cluster",
+        "scenarios": [
+          {
+            "name": "hospitality_hosting_obligations",
+            "volume": 90,
+            "description": "Hosting guests at home, meal preparation, attention duties"
+          },
+          {
+            "name": "guest_obligations",
+            "volume": 90,
+            "description": "Being a guest, gift-bringing, eating, when to leave, follow-up"
+          },
+          {
+            "name": "eating_together_norms",
+            "volume": 90,
+            "description": "Order of eating (elder first), shared dishes, refusing food, second helpings"
+          },
+          {
+            "name": "greetings_meals_an_com_chua",
+            "volume": 70,
+            "description": "'Đã ăn cơm chưa?' (have you eaten?) as greeting; small talk patterns; food-based relational openings"
+          },
+          {
+            "name": "drinking_etiquette_toasts",
+            "volume": 90,
+            "description": "Mời rượu, đập rượu, refusing without offense, the role of alcohol in bonding"
+          },
+          {
+            "name": "gift_giving_occasions",
+            "volume": 90,
+            "description": "Tết gifts, wedding gifts, housewarming, visiting elders; appropriate gift types"
+          },
+          {
+            "name": "public_behavior_norms",
+            "volume": 70,
+            "description": "Vietnamese public norms for volume in conversation, queueing patterns, personal space in markets and public transit, comfort with closeness"
+          },
+          {
+            "name": "tet_celebrations_full",
+            "volume": 190,
+            "description": "Lunar New Year — full holiday cluster covering family visits, food, debts cleared, taboos, fortune practices, generation-specific moments, and the multi-day rhythm of Tết observance (đêm Giao Thừa through mùng 3 and beyond)"
+          },
+          {
+            "name": "tet_food_preparation_banh_chung",
+            "volume": 70,
+            "description": "Pre-Tết food preparation — wrapping bánh chưng (northern) or bánh tét (southern) as a multi-generational family activity, the all-night fire watching the bánh boil, preparing mứt (candied fruits), dried fruits and seeds (hạt dưa), giò chả, the cultural meaning of certain Tết foods (e.g. mâm ngũ quả — the five-fruit tray and its regional variants)"
+          },
+          {
+            "name": "tet_xong_dat_first_foot",
+            "volume": 70,
+            "description": "Xông đất — the first-foot tradition where the first person to step into the home in the new year is believed to set the household's fortune for the coming year; choosing the right person based on their age compatibility (tuổi hợp) with the head of household, navigating awkward situations when an unexpected person arrives first, the modern adaptation in apartment buildings"
+          },
+          {
+            "name": "tet_debt_clearing_year_end",
+            "volume": 70,
+            "description": "Clearing debts before the new year — the cultural rule that debts should not carry into the new lunar year, the rush of year-end repayment, returning borrowed objects, settling small obligations among friends and relatives, year-end bonus (lương tháng 13) timing aligned with this practice"
+          },
+          {
+            "name": "wet_market_bargaining_culture",
+            "volume": 70,
+            "description": "Daily shopping at the wet market (chợ) — relationship with regular vendors (cô bán rau quen), bargaining norms (mặc cả) and when it's expected versus rude, knowing real prices, navigating differences between market and supermarket (siêu thị) shopping, the social aspect of market visits"
+          },
+          {
+            "name": "motorbike_traffic_daily_culture",
+            "volume": 70,
+            "description": "Vietnamese traffic and motorbike culture — informal road rules and how they actually work, motorbike etiquette, navigating intersections without losing face or causing accidents, traffic police encounters and how they're typically resolved on-spot, motorbike taxi (xe ôm and Grab/GoJek) interactions, helmet norms, family on a single motorbike"
+          }
+        ]
+      },
+      "T11_diaspora_and_overseas_migration": {
+        "volume": 1750,
+        "weight": 0.1064,
+        "description": "Diaspora-specific situations across generations and locations, plus working-class overseas labor migration (Japan / Korea / Taiwan / Middle East) — both as Vietnamese-cultural-life-spanning-borders topic",
+        "scenarios": [
+          {
+            "name": "first_generation_immigrant_identity",
+            "volume": 130,
+            "description": "Maintaining Vietnamese identity in foreign country; community building"
+          },
+          {
+            "name": "1_5_generation_navigation",
+            "volume": 110,
+            "description": "Born in Vietnam, raised abroad — holding two cultural anchors rather than being 'partially' anything; navigating the gap when neither side's people fully recognize you as theirs (too foreign in Vietnam, too Vietnamese abroad); language confidence in Vietnamese eroding while still being the primary translator for the family; deciding what Vietnamese practice to carry forward and what to set down, on one's own terms"
+          },
+          {
+            "name": "second_generation_identity",
+            "volume": 130,
+            "description": "Vietnamese-American / Vietnamese-Australian / Vietnamese-French etc. identity — a distinct cultural position, not 'partial' anything; the language one has rather than the language one lacks; what Vietnamese the family kept and what fell away; relating to first-generation parents whose Vietnamese is fluent; relating to other Vietnamese-of-the-same-hyphenated-identity vs. recent arrivals from Vietnam; the choice of how visibly Vietnamese to be in the host country"
+          },
+          {
+            "name": "communicating_across_language_levels_within_family",
+            "volume": 90,
+            "description": "When the family spans different levels of Vietnamese — grandparents in full Vietnamese, parents bilingual, children whose strongest language is the host-country's; the practical patterns families use (the bilingual parent translating, the child responding in English while the grandparent speaks Vietnamese, occasional sentences mixed); the emotional weight when a grandparent and grandchild can't fully understand each other; what gets done to preserve the link"
+          },
+          {
+            "name": "visiting_vietnam_from_abroad",
+            "volume": 120,
+            "description": "Gift-bringing for extended family, expectations of money, navigating family expectations during visits"
+          },
+          {
+            "name": "vietnamese_language_preservation",
+            "volume": 90,
+            "description": "Teaching children Vietnamese; weekend Vietnamese school; cultural events"
+          },
+          {
+            "name": "cross_generational_cultural_conflicts",
+            "volume": 130,
+            "description": "1st-gen parents vs 2nd-gen children; different cultural adaptations; navigating both"
+          },
+          {
+            "name": "vietnamese_community_diaspora_cities",
+            "volume": 90,
+            "description": "Community centers, church/temple, navigating local Vietnamese community politics"
+          },
+          {
+            "name": "religious_political_diversity_diaspora",
+            "volume": 90,
+            "description": "Diverse views within diaspora; navigating community without taking sides"
+          },
+          {
+            "name": "interracial_diaspora_marriage",
+            "volume": 90,
+            "description": "Vietnamese with non-Vietnamese in diaspora context; family on both sides"
+          },
+          {
+            "name": "returning_to_vietnam_long_term",
+            "volume": 70,
+            "description": "Diaspora moving back to Vietnam long-term — the adjustment to Vietnamese pace and conventions after years abroad, the gap between remembered Vietnam and current Vietnam, family expectations of the returnee (financial support, presence at family events, taking on responsibilities held in absence), what feels immediately familiar versus what has changed, navigating the 'Việt Kiều về' label and its mixed reception"
+          },
+          {
+            "name": "the_war_legacy_in_diaspora",
+            "volume": 90,
+            "description": "How the 1955–1975 war continues to shape Vietnamese diaspora identity, especially in US Vietnamese-American communities: intergenerational transmission of memory, the Fall of Saigon / Black April framings that diaspora communities use for themselves (recognized as their lived terms without the dataset adopting them as the dataset's own framing), April 30 commemorations in diaspora contexts, what second- and third-generation diaspora inherit from grandparents who left Vietnam in 1975 or after, and the differing relationship to the war for diaspora born after reunification"
+          },
+          {
+            "name": "tet_celebration_in_diaspora",
+            "volume": 90,
+            "description": "Celebrating Tết outside Vietnam — the adapted form (community center gatherings, áo dài events, modified food when ingredients are scarce, lì xì in foreign currency), the diaspora calendar (often celebrated on weekend closest to actual Tết for working families), teaching second-generation children why Tết matters, navigating workplaces that don't recognize the holiday"
+          },
+          {
+            "name": "labor_migration_japan_korea_taiwan",
+            "volume": 110,
+            "description": "Vietnamese contract workers in East Asian destinations (Japan via the Technical Intern Training Program, Korea via the EPS program, Taiwan via factory and care-work programs) — pre-departure debt to broker fees, the family decision to send a child abroad, contract terms, language barrier navigation, factory dormitory life, the gap between promised and actual conditions, supporting the family with remittances"
+          },
+          {
+            "name": "labor_migration_middle_east_domestic",
+            "volume": 70,
+            "description": "Vietnamese workers in Middle East destinations — domestic work, construction, factory labor; the heavier risk profile (passport withholding, unpaid wages, restrictions on movement); the path through Vietnamese labor brokers, cultural distance, religious environment for Buddhist or Catholic workers, the choice families make to accept these risks for higher remittances"
+          },
+          {
+            "name": "contract_worker_abuse_navigation",
+            "volume": 70,
+            "description": "When a Vietnamese contract worker abroad encounters abuse — withheld passport, unpaid wages, physical abuse, contract violations; the limited options (Vietnamese embassy, worker organizations, returning home with broken contracts); the family on the Vietnamese side navigating the debt to the broker and the social shame of returning without the expected remittances; how the worker re-enters Vietnamese society"
+          },
+          {
+            "name": "returning_worker_savings_family_use",
+            "volume": 70,
+            "description": "Returning labor migrants and what happens to the money earned — building the home-village house, paying off family debts including the broker fee, investing in a small business (a café, a sewing shop, a motorbike taxi), the social re-entry as 'người về từ Nhật / Hàn / Đài', expectations from family that didn't go, navigating identity after years abroad in a working-class context"
+          },
+          {
+            "name": "little_saigon_us_diaspora_specifics",
+            "volume": 70,
+            "description": "Little Saigon (Orange County, San Jose, Houston) and other US Vietnamese-American community specifics. The yellow-three-red-stripe flag of the pre-1975 Republic of Vietnam is a major presence in community life — a symbol of identity and remembrance for that community, while from inside present-day SRV it signals non-acceptance of reunification; the scenario should treat the flag as the community's chosen symbol within the diaspora context without endorsing or condemning it. Other elements: generational politics, community-newspaper culture (Người Việt, Việt Báo), Vietnamese church and temple networks, naturalized-citizen political involvement, distinct character of US Vietnamese-American identity vs other diaspora destinations."
+          },
+          {
+            "name": "eastern_europe_diaspora_distinct",
+            "volume": 40,
+            "description": "Vietnamese communities in Czech Republic (sapa market in Prague), Germany, Poland — origins in 1980s socialist-bloc contract labor or post-1989 settlement, distinct from refugee diaspora, second-generation integration into European countries, less politicized community life, business networks in market trading and nail salons"
+          }
+        ]
+      },
+      "T12_civic_bureaucratic_state_interaction": {
+        "volume": 780,
+        "weight": 0.0474,
+        "description": "Daily-life interactions with the Vietnamese state apparatus and bureaucratic systems — a domain that touches every adult Vietnamese life but was missing from v2.0 coverage. Covers paperwork, permits, traffic encounters, conscription, and the role of informal payments in Vietnamese public life",
+        "scenarios": [
+          {
+            "name": "ho_khau_household_registration",
+            "volume": 90,
+            "description": "Hộ khẩu (household registration) — the document tying a person to their registered residence, its role in school enrollment, healthcare access, employment, marriage paperwork; the cultural significance and frustration of changing hộ khẩu when moving cities; recent reforms moving toward electronic identity (VNeID); navigating life when registered address differs from actual residence"
+          },
+          {
+            "name": "passport_id_renewal_administration",
+            "volume": 70,
+            "description": "Renewing căn cước công dân (citizen ID) or passport — the queue culture at public administrative offices, document preparation (sao y công chứng), timing strategies (early morning arrival), the etiquette with officials, what 'làm dịch vụ' (using a service) means and when families pay extra to avoid the process"
+          },
+          {
+            "name": "traffic_police_encounters",
+            "volume": 90,
+            "description": "Cảnh sát giao thông encounters — being pulled over on a motorbike or in a car, the typical exchange, the role of soft language and small acknowledgements, when fines are paid officially vs settled on-spot, navigating these encounters as a young driver, the gendered patterns of how women vs men are typically treated, how diaspora visitors should handle these encounters when driving in Vietnam"
+          },
+          {
+            "name": "phong_bi_informal_payments_culture",
+            "volume": 90,
+            "description": "The role of phong bì (envelopes containing money) in Vietnamese institutional life — at hospitals (to nurses, sometimes doctors), at schools (to teachers on Teacher's Day or in difficult moments), at government offices, in business deals; the cultural distinction between phong bì as gratitude/relationship maintenance and as bribery; how younger Vietnamese navigate when to participate and when to refuse; the recent anti-corruption climate"
+          },
+          {
+            "name": "building_permit_house_construction",
+            "volume": 70,
+            "description": "Getting a permit to build a house (giấy phép xây dựng) — the document trail, navigating ward-level (phường) authorities, working with the architect and builder who handles paperwork on the family's behalf, common informal solutions for permit issues, the role of relationships with local officials, how this differs in urban vs rural Vietnam"
+          },
+          {
+            "name": "judicial_court_navigation",
+            "volume": 70,
+            "description": "When a family must engage with the Vietnamese court system — civil disputes (land, divorce, debt), preferring mediation through community elders or police first, lawyer (luật sư) selection through trusted referral rather than open search, the social weight of being involved in a court case, the practical timelines, navigating the gap between formal procedure and how cases actually move"
+          },
+          {
+            "name": "visa_application_process",
+            "volume": 70,
+            "description": "Applying for foreign visas as a Vietnamese citizen — the heavier documentation burden (employment letters, bank statements, property documents) compared to passport holders from wealthier countries, navigating the rejection rates for tourist visas, the role of visa agencies (dịch vụ visa), interview preparation for embassy appointments, the cultural strain of being denied a visa and what that means socially"
+          },
+          {
+            "name": "workplace_paperwork_culture",
+            "volume": 70,
+            "description": "Vietnamese workplace paperwork — labor contracts (hợp đồng lao động) and what they actually mean in practice, social insurance (BHXH) paperwork, the bureaucracy around switching jobs, navigating disputes over labor rights, the role of HR (which is often weaker than in foreign companies), how state-owned enterprises differ from private companies in paperwork weight"
+          },
+          {
+            "name": "conscription_military_service_navigation",
+            "volume": 90,
+            "description": "Nghĩa vụ quân sự (compulsory military service) for young Vietnamese men — the family decision around whether to serve, defer (through university enrollment), or seek exemption; the experience of two years of military service; how it shapes a young man's identity; family pride and concern; the social difference between those who serve and those who don't; the cultural memory of military service tied to the older generations' wartime experience"
+          },
+          {
+            "name": "low_level_government_office_interactions",
+            "volume": 70,
+            "description": "Routine interactions with ward-level (phường) and district-level (quận / huyện) government offices — sao y giấy tờ (certified document copies), birth and marriage registration, business registration paperwork, the queue and waiting culture, the etiquette with cán bộ (officials), how things actually get done versus the official procedure"
+          }
+        ],
+        "native_review_priority": "high",
+        "handling_note": "This domain involves sensitive intersections of culture and political/state structures. Avoid both endorsing problematic practices (like bribery) and Western-default condemnation that misses how Vietnamese citizens actually navigate these realities. Show the practical wisdom Vietnamese adults bring to these encounters."
+      }
+    }
+  },
+  "cross_cutting_specifications": {
+    "language_distribution": {
+      "english_only": 1.0,
+      "note": "All outputs in English; cultural signal carried by pragmatic structure not vocabulary"
+    },
+    "format_distribution": {
+      "first_person_advisor": {
+        "percentage": 0.4,
+        "description": "User asks 'how should I respond', model gives culturally-aligned advice"
+      },
+      "direct_enactment": {
+        "percentage": 0.35,
+        "description": "User asks to draft message; model produces VN-aligned output"
+      },
+      "dialogue_completion": {
+        "percentage": 0.15,
+        "description": "Multi-turn exchange where model continues with VN cultural pattern"
+      },
+      "reasoning_explanation": {
+        "percentage": 0.05,
+        "description": "Model explains why response is culturally appropriate"
+      },
+      "cross_cultural_compare": {
+        "percentage": 0.05,
+        "description": "Model contrasts Vietnamese approaches with other cultural approaches the user references"
+      }
+    },
+    "thinking_format_distribution": {
+      "extended_thinking": 0.25,
+      "standard_thinking": 0.65,
+      "minimal_thinking": 0.1,
+      "guidance": "Generated with diverse system prompts; let K2.6 decide depth naturally"
+    },
+    "cross_cutting_variables": {
+      "channel": [
+        "face_to_face",
+        "phone_call",
+        "email",
+        "chat_message",
+        "formal_letter",
+        "social_media",
+        "voice_message"
+      ],
+      "audience_size": [
+        "one_to_one",
+        "small_group",
+        "public"
+      ],
+      "time_pressure": [
+        "leisurely",
+        "moderate",
+        "urgent"
+      ],
+      "relationship_depth": [
+        "stranger",
+        "acquaintance",
+        "established",
+        "intimate"
+      ],
+      "stakes": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "gender": [
+        "male",
+        "female",
+        "lgbtq_plus",
+        "non_specified"
+      ],
+      "sub_population": [
+        "urban_professional_gen_y",
+        "urban_gen_z",
+        "urban_working_class",
+        "informal_economy_workers",
+        "rural_traditional",
+        "ethnic_minority_tay_thai",
+        "ethnic_minority_hmong",
+        "ethnic_minority_khmer_nam_bo",
+        "ethnic_minority_cham",
+        "diaspora_first_generation",
+        "diaspora_1_5_generation",
+        "diaspora_second_generation",
+        "diaspora_us_little_saigon",
+        "diaspora_australia_canada",
+        "diaspora_western_europe",
+        "diaspora_eastern_europe_czech_germany",
+        "diaspora_east_asia_labor_migration",
+        "northern_vietnam",
+        "central_vietnam",
+        "southern_vietnam",
+        "religious_buddhist",
+        "religious_catholic",
+        "religious_other",
+        "secular"
+      ],
+      "sub_population_balance_rule": "No single sub-population exceeds 30% of examples within any topic. Minimum 5% representation required for major sub-populations (diaspora first-generation, diaspora second-generation, urban Gen Y, religious Buddhist) across the corpus. Minimum 2% representation required for each of the four ethnic-minority sub-populations (Tày/Thái, Hmong, Khmer Nam Bộ, Cham) and for working-class sub-populations (urban_working_class, informal_economy_workers, diaspora_east_asia_labor_migration) across the corpus. Sub-populations may be left unassigned where the example is genuinely sub-population-neutral."
+    },
+    "cultural_override_examples": {
+      "volume": 500,
+      "purpose": "Teach model that explicit user instructions override cultural defaults; preserves IFEval-style compliance",
+      "scenarios": [
+        {
+          "name": "user_requests_directness",
+          "volume": 100,
+          "description": "User explicitly asks for a direct or blunt response; comply by setting aside the relational softening and contextual layering typical in Vietnamese pragmatic structure"
+        },
+        {
+          "name": "user_requests_brevity",
+          "volume": 100,
+          "description": "User asks for short response; override elaboration"
+        },
+        {
+          "name": "user_requests_specific_format",
+          "volume": 100,
+          "description": "User specifies JSON/list format; comply over cultural elaboration"
+        },
+        {
+          "name": "user_requests_culturally_neutral",
+          "volume": 100,
+          "description": "User asks non-cultural response; honor it"
+        },
+        {
+          "name": "user_requests_cross_cultural_compare",
+          "volume": 100,
+          "description": "User wants explicit comparison; provide both perspectives"
+        }
+      ]
+    },
+    "anti_stereotype_guards": {
+      "description": "Generation prompts must include anti-stereotype guidance",
+      "examples_to_avoid": [
+        "All Vietnamese love pho stereotypes",
+        "Tiger mom oversimplification",
+        "Saigon/Hanoi caricature regional jokes",
+        "Vietnamese-as-deferential without complexity",
+        "Diaspora-as-conservative blanket characterization",
+        "Generic East Asian rather than specifically Vietnamese",
+        "Communist/Capitalist political binary framing",
+        "Kinh-default treatment when an ethnic-minority sub-population is specified",
+        "Working-class-as-uncultured framing"
+      ],
+      "verification": "Critic model check for stereotyped content; native review sample includes anti-stereotype scan"
+    },
+    "sensitive_topic_handling_principles": [
+      "Acknowledge multiple Vietnamese perspectives exist on genuinely contested topics (political system, historical figures, Việt Kiều relations)",
+      "Hold the Vietnamese mainstream position firmly on topics with broad domestic consensus (Hoàng Sa/Trường Sa sovereignty, the war as anti-foreign-occupation, April 30 as Reunification Day)",
+      "Use cultural/historical context, not political judgment",
+      "Recognize Vietnamese culture includes both domestic and diaspora perspectives, plus ethnic-minority perspectives within Vietnam",
+      "Safety-first on suicide, self-harm, domestic violence (direct to professional resources)"
+    ]
+  },
+  "evaluation_plan": {
+    "native_speaker_pragmatic_eval": {
+      "methodology": "100 held-out scenarios across all 12 Part 1 topics; native bilingual reviewers rate cultural appropriateness blind",
+      "comparison": "Base model vs cultural-prompted base vs our model",
+      "metrics": [
+        "Native preference rate vs cultural-prompted base",
+        "Per-topic appropriateness rating (1-5 scale)",
+        "Identifiable cultural authenticity (would a Vietnamese reader recognize this as VN-aligned)"
+      ],
+      "significance_target": "Native reviewer preference > 70% over cultural-prompted base"
+    }
+  },
+  "generation_pipeline": {
+    "stages": [
+      {
+        "stage": 1,
+        "name": "decontamination_setup",
+        "description": "Extract protected eval sources; build contamination check"
+      },
+      {
+        "stage": 2,
+        "name": "seed_authoring",
+        "description": "Native bilingual author writes ~850 seeds across Part 1 topics (12 topics)",
+        "volume_target": 850
+      },
+      {
+        "stage": 3,
+        "name": "part_1_expansion",
+        "description": "K2.6 expands seeds + generates new situations for Part 1 coverage",
+        "volume_target": 16440
+      },
+      {
+        "stage": 4,
+        "name": "decontamination_pass",
+        "description": "Check all examples against protected eval sources"
+      },
+      {
+        "stage": 5,
+        "name": "anti_stereotype_filter",
+        "description": "Critic model filters stereotyped content"
+      },
+      {
+        "stage": 6,
+        "name": "quality_filter",
+        "description": "Critic model quality scoring; keep top 80%"
+      },
+      {
+        "stage": 7,
+        "name": "native_review_sensitive_100",
+        "description": "100% review of sensitive topics (T6 mental health, T8 national/political, T12 civic/bureaucratic)"
+      },
+      {
+        "stage": 8,
+        "name": "native_review_sample_5",
+        "description": "5% sample review of all other examples"
+      },
+      {
+        "stage": 9,
+        "name": "coverage_validation",
+        "description": "Verify topic distribution, sub-population balance, format mix"
+      },
+      {
+        "stage": 10,
+        "name": "final_dataset_assembly",
+        "description": "Sample 20K for training; hold out 2K (10%) as test set + 4K additional held-out for evaluation"
+      }
+    ]
+  },
+  "quality_validation_checks": {
+    "part_1_coverage": "Each of 12 Part 1 topics meets target volume ± 10%; each scenario within topic has minimum 30 examples",
+    "anti_stereotype_pass": "Stereotype detection rate < 2% across full corpus",
+    "sub_population_balance": "No sub-population > 30% within any topic; major sub-populations ≥ 5%; ethnic-minority sub-populations ≥ 2% each across corpus; working-class sub-populations ≥ 2% across corpus",
+    "format_diversity": "All 5 formats within ± 5% of target distribution",
+    "sensitive_native_review": "100% of sensitive topic examples reviewed (T6, T8, T12)",
+    "held_out_set_quality": "4K held-out examples cover all 12 Part 1 topics",
+    "eval_source_decontamination": "0% contamination with protected eval sources"
+  }
+}

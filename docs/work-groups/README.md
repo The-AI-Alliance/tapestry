@@ -1,0 +1,72 @@
+# Work Groups
+
+This directory organizes Project Tapestry work groups by durable lifecycle responsibility, not by a repeated requirements/engineering split. Each work group owns its requirements discovery, technical exploration, implementation notes, open questions, and delivery artifacts in one place.
+
+The structure is meant to be necessary and sufficient for the current architecture: sovereign data enters the system; base models and sovereign alignment pipelines transform it; evaluation, security, and governance constrain what can ship; infrastructure and deployment make it usable.
+
+## Work group map
+
+| Work group | Directory | Owns |
+| :--------- | :-------- | :--- |
+| Data Governance | [`data-governance/`](data-governance/README.md) | Sovereign data sourcing, licensing, stewardship, residency, provenance, and contribution rights. Currently also contains _derived_ requirements, etc. for data _management_, which may be moved under **Infrastructure & Operations**. |
+| Base Model Training | [`base-model-training/`](base-model-training/README.md) | Adopted-base strategy, consortium training loop, shared-base continued pretraining, aggregation, and transition to consortium-owned bases |
+| Sovereign Alignment | [`sovereign-alignment/`](sovereign-alignment/README.md) | Participant-owned continued pretraining, post-training alignment, instruction tuning, and portability of sovereign layers |
+| Evaluation & Certification | [`evaluation-certification/`](evaluation-certification/README.md) | Capability, cultural alignment, safety, benchmark design, certification criteria, audit evidence, and release gates |
+| Security & Privacy | [`security-privacy/`](security-privacy/README.md) | Privacy tiers, secure aggregation, differential privacy, TEEs, threat models, model-update leakage, and safety-preservation constraints |
+| Infrastructure & Operations | [`infrastructure-operations/`](infrastructure-operations/README.md) | Heterogeneous compute, orchestration, node operations, observability, fault tolerance, platform operations, and cost/accounting plumbing |
+| Deployment & Adoption | [`deployment-adoption/`](deployment-adoption/README.md) | Serving, chat/product harnesses, integration patterns, participant rollout, developer experience, and adoption feedback loops |
+| Governance & Participation | [`governance-participation/`](governance-participation/README.md) | Anti-capture mechanics, contribution credit, decision rights, consortium process, and interfaces with [`../governance/`](../governance/README.md) |
+
+### Technical meeting notes
+
+In addition, some running meetings maintain Google docs for notes. All of them can be found in folders under this [GDrive location](https://drive.google.com/drive/folders/1kyDleaoORp4zzZHk8gw7YzcVU50VUVh0?usp=sharing).
+
+## Lifecycle view
+
+```mermaid
+flowchart LR
+    DataGovernance["Data Governance"]:::base
+    BaseTraining["Base Model Training"]:::collective
+    SovereignAlignment["Sovereign Alignment"]:::sovereign
+    EvaluationCertification["Evaluation &\nCertification"]:::output
+    DeploymentAdoption["Deployment &\nAdoption"]:::industrial
+
+    SecurityPrivacy["Security &\nPrivacy"]:::gate
+    InfrastructureOperations["Infrastructure &\nOperations"]:::infra
+    GovernanceParticipation["Governance &\nParticipation"]:::scope
+
+    DataGovernance --> BaseTraining
+    BaseTraining --> SovereignAlignment
+    SovereignAlignment --> EvaluationCertification
+    EvaluationCertification --> DeploymentAdoption
+
+    SecurityPrivacy -.-> DataGovernance
+    SecurityPrivacy -.-> BaseTraining
+    SecurityPrivacy -.-> SovereignAlignment
+    InfrastructureOperations -.-> BaseTraining
+    InfrastructureOperations -.-> DeploymentAdoption
+    GovernanceParticipation -.-> DataGovernance
+    GovernanceParticipation -.-> EvaluationCertification
+
+    classDef base fill:#2c7da0,stroke:#236a8c,color:#fff,stroke-width:2px
+    classDef collective fill:#1b4965,stroke:#13365a,color:#fff,stroke-width:2px
+    classDef sovereign fill:#5e548e,stroke:#4a4170,color:#fff,stroke-width:2px
+    classDef output fill:#2d6a4f,stroke:#1b4332,color:#fff,stroke-width:2px
+    classDef industrial fill:#bc6c25,stroke:#9a5619,color:#fff,stroke-width:2px
+    classDef gate fill:#b23a48,stroke:#8e2e39,color:#fff,stroke-width:2px
+    classDef infra fill:#546e7a,stroke:#37474f,color:#fff,stroke-width:2px
+    classDef scope fill:#287271,stroke:#1e5a59,color:#fff,stroke-width:2px
+```
+
+*Main pipeline (left to right): data enters, base model improves, sovereign alignment adds community values, evaluation certifies, and the model deploys. Dashed arrows show cross-cutting support from Security & Privacy, Infrastructure & Operations, and Governance & Participation.*
+
+## Charter template
+
+Each work-group README should stay short and concrete:
+
+- **Purpose:** what the group owns.
+- **Why it exists:** the architecture goals, ADRs, pain points, or value propositions that make the group necessary.
+- **Scope:** responsibilities included and explicitly out of scope.
+- **Initial questions:** workshop or research questions the group must resolve.
+- **Early deliverables:** artifacts expected before the work group can be considered operational.
+- **Interfaces:** other work groups it must coordinate with.

@@ -1,0 +1,71 @@
+# [Update] YOUR TITLE
+
+> Edit this template as appropriate. For example, if the PR doesn't contain code, it's okay to delete the content below that is specific to code changes. Please also delete this paragraph!
+
+## Description of the PR
+
+Lead in plain English with **Why** (problem/gap) then **What** (approach and result). Put detailed **How** after that; when a structural overview helps, start the how with one high-level Mermaid (see `AGENTS.md` § Pull request descriptions and `docs/architecture/diagrams/README.md`).
+
+* What problem does it solve or otherwise how does it improve Tapestry? (**Why**)
+* What is the approach, and what do reviewers/users get when this lands? (**What**)
+
+## Related Issues
+
+Related issues or PRs (#number, ...):
+
+## If Code Changes Are Included
+
+### Description of Code Changes
+
+Provide an overview of the most important details about the changes:
+
+* Important files and directories added, modified, or removed under `src/tapestry`, `src/tests`, etc.
+* Important data structures and algorithms used or changed
+* Important third-party libraries used or changed
+
+### Testing Performed
+
+Describe key aspects of automated and/or manual testing of executable code that was performed to validate the changes:
+
+* Unit tests added or modified
+* Integration tests performed
+* Any other relevant testing or validation (including manual testing)
+* The command `make before-pr` completes successfully
+
+### Example Usage
+
+Include an example of how to use the changed function or feature:
+
+* Code snippet demonstrating usage
+* Expected output or results
+
+## Checklist
+
+Confirm that the following have been completed.
+
+- [ ] I have read and understood the [CONTRIBUTING](https://github.com/The-AI-Alliance/community/blob/main/CONTRIBUTING.md) guide.
+
+Ignore (or delete) any of the following check list sections or items that aren't applicable, like the code-related check list items when this is a documentation-only PR:
+
+For code changes:
+
+- [ ] I have tested the code changes in my local development environment.
+- [ ] I have added or modified tests for all code changes.
+- [ ] I have followed the existing code styles and conventions.
+- [ ] I have removed all API keys and other sensitive information.
+- [ ] I have updated any related documentation.
+- [ ] I have confirmed that the command `make before-pr` completes successfully.
+
+For documentation changes, including `docs`:
+
+- [ ] I have followed the existing documentation styles and conventions.
+- [ ] I have included helpful diagrams, screenshots, tables, etc.
+
+### The Tapestry _Microsite_
+
+The content in `website` is for the Tapestry technical _microsite_ ([the-ai-alliance.github.io/tapestry/](https://the-ai-alliance.github.io/tapestry/)). Currently it just links back to the repo's `docs` locations. Eventually, mature content will be copied or migrated from `docs` to this site for easier reading, searching, etc. **Hence, you probably don't need to propose any changes to the `website` directory.**
+
+However, **if** you are proposing `website` changes:
+
+- [ ] I have verified the microsite `make view-local` runs without errors and the changes render as expected.
+- [ ] I have checked that external links (i.e., those going to different domains) have `target="..."` specifications by running `./check-external-links.sh` and fixing any flagged URLs. (This tool doesn't fix missing `target="..."` links itself nor does it verify that the links found are not 404s!)

@@ -8,13 +8,14 @@ from collections.abc import Sequence
 import torch
 from torch import nn
 
-from .node import SovereignTrainingNode
-from .policy import ContributionPolicy
+from .merge import OuterMerge
 from .messages import (
     ConsortiumRoundResult,
     ModelState,
     SovereignModelArtifact,
 )
+from .node import SovereignTrainingNode
+from .policy import ContributionPolicy
 
 
 class ConsortiumCoordinator:
@@ -24,9 +25,11 @@ class ConsortiumCoordinator:
         self,
         base_model: nn.Module,
         contribution_policy: ContributionPolicy | None = None,
+        outer_merge: OuterMerge | None = None,
     ) -> None:
         self.base_model = copy.deepcopy(base_model)
         self.contribution_policy = contribution_policy or ContributionPolicy()
+        self.outer_merge = outer_merge or OuterMerge()
         self.sovereign_artifacts: dict[str, SovereignModelArtifact] = {}
         self._round = 0
 
@@ -55,7 +58,7 @@ class ConsortiumCoordinator:
             local_states_by_node = {
                 contribution.node_id: contribution.local_model_state for contribution in contributions
             }
-            integrated_state = self._apply_weighted_average(local_states_by_node, weights)
+            integrated_state = self.outer_merge.merge(previous_state, local_states_by_node, weights)
             self.base_model.load_state_dict(integrated_state)
 
         return ConsortiumRoundResult(
@@ -65,6 +68,7 @@ class ConsortiumCoordinator:
             accepted_nodes=accepted,
             rejected_nodes=rejected,
             contribution_weights=weights,
+            outer_merge_strategy=self.outer_merge.strategy.value,
         )
 
     @staticmethod
@@ -76,7 +80,7 @@ class ConsortiumCoordinator:
         sample_state = next(iter(local_states_by_node.values()))
         next_state: ModelState = {}
         for name, _base_tensor in sample_state.items():
-            averaged = torch.zeros_like(sample_state[name])
+            averaged = torch.zeros_like(_base_tensor)
             for node_id, weight in weights.items():
                 averaged = averaged + local_states_by_node[node_id][name] * weight
             next_state[name] = averaged

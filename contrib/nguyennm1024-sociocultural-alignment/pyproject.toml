@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "nguyennm1024-sociocultural-alignment"
+version = "0.1.0"
+description = "An experiment with cultural alignment tuning."
+license = { text = "Apache-2.0" }
+requires-python = ">=3.12"
+dependencies = [
+    # --- data synthesis (data_synthesis/) ---
+    "openai>=1.100.0",
+    "python-dotenv>=1.0.0",
+    "datasets>=2.20.0",
+    "huggingface_hub>=0.24.0",
+    # --- training + evaluation (training/, evaluation/) ---
+    "numpy>=1.26.0",
+    "matplotlib>=3.8.0",
+]
+
+[project.optional-dependencies]
+# GPU deps - won't install on Mac, skip for CI tests
+gpu = [
+    "torch>=2.4.0",
+    "transformers>=4.44.0",
+    "peft>=0.12.0",
+    "accelerate>=0.33.0",
+    "vllm>=0.6.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "pylint>=4.0.6",
+    "black>=26.5.1",
+    "ruff>=0.15.22",
+    "ty>=0.0.61",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["consortium", "evaluation", "training"]
