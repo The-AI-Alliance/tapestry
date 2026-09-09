@@ -23,6 +23,8 @@ Project Tapestry is managed on a three-month _milestone_ cycle, offset by one mo
 | Milestone Four                       | M4 | June - August, 2027 |
 | Milestone Five                       | M5 | September - November, 2027 |
 
+---
+
 ### Milestone Zero ("M0")
 
 | :-- | :-- |
@@ -31,7 +33,13 @@ Project Tapestry is managed on a three-month _milestone_ cycle, offset by one mo
 | **Release**   | [v0.1.0-M0]({{site.repo_url}}/releases/tag/v0.1.0-M0){:target="m0-release"} |
 | **Dashboard** | [Tapestry Project - M0]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM0){:target="dash"}
 
-This milestone was labelled "zero", because this period was about initial organization and consortium building. We demonstrated basic concepts of [consortium training]({{site.repo_tech_docs_url}}/reference/training-approaches.md) using two, geographically-distributed &ldquo;sovereign&rdquo; nodes (training clusters) collaborating to train a model. Other work in M0 explored the efficacy of [cultural alignment]({{site.repo_tech_docs_url}}/architecture/decisions/adr-003-cultural-alignment.md) techniques, started defining requirements and work groups for our ambitious data governance and management strategy, and established our development policies and practices.
+Milestone "zero" (M0) was Project Tapestry’s first technical milestone. It was completed September 1, 2026. We used &ldquo;zero”&rdquo;, rather than &ldquo;one&rdquo;, because M0 was about building the consortium, while also pursuing initial goals.
+
+M0 demonstrated basic concepts of [consortium training]({{site.repo_tech_docs_url}}/reference/training-approaches.md) using two, geographically-distributed &ldquo;sovereign&rdquo; nodes (training clusters) collaborating to train a model. Other work in M0 explored the efficacy of [cultural alignment]({{site.repo_tech_docs_url}}/architecture/decisions/adr-003-cultural-alignment.md) techniques, started defining requirements and work groups for our ambitious data governance and management strategy, and established our development policies and practices.
+
+More details are [here](./milestone-zero/).
+
+---
 
 ### Milestone One ("M1")
 
@@ -43,6 +51,8 @@ This milestone was labelled "zero", because this period was about initial organi
 
 M1 is building on the prototype work of M0 to expand the number of sovereign nodes, increase the available compute resources, explore the feasibility and limits of heterogeneous trainings (different hardware and software stacks), beginning building cultural alignment tools and techniques, and implement the first data governance, management, and processing capabilities. A primary goal is to tune an existing open-weights model to create a very capable model targeted at a particular domain and set of use cases.
 
+
+---
 
 ### Milestone Two ("M2")
 
