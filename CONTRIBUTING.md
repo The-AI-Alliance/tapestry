@@ -5,7 +5,7 @@
 ### Direct links:
 
 * Project:
-  * [Dashboard](https://github.com/orgs/The-AI-Alliance/projects/50/views/1?filterQuery=)
+  * [Dashboard](https://github.com/orgs/The-AI-Alliance/projects/50/views/7)
   * [Issues](https://github.com/The-AI-Alliance/tapestry/issues)
   * [Pull requests](https://github.com/The-AI-Alliance/tapestry/pulls)
   * [Discussions](https://github.com/The-AI-Alliance/tapestry/discussions)

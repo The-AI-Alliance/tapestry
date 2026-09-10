@@ -16,8 +16,6 @@ on:
     branches: [ "develop", "main" ]
   pull_request:
     branches: [ "develop", "main" ]
-    paths-ignore:
-      - website/assets/js/just-the-docs.js
   schedule:
     - cron: '27 7 * * 1'
 
@@ -65,6 +63,17 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v7
 
+    # Skip vendored scripts (see vendor-checksums.sha256) — hash-checked
+    # elsewhere, and static analysis on them adds no signal.
+    - name: Generate CodeQL config to skip vendored scripts
+      run: |
+        mkdir -p .github/codeql
+        {
+          echo "paths-ignore:"
+          awk '{print "  - \"" $2 "\""}' vendor-checksums.sha256
+        } > .github/codeql/codeql-config.generated.yml
+        cat .github/codeql/codeql-config.generated.yml
+
     # Add any setup steps before running the `github/codeql-action/init` action.
     # This includes steps like installing compilers or runtimes (`actions/setup-node`
     # or others). This is typically only required for manual builds.
@@ -77,6 +86,7 @@ jobs:
       with:
         languages: ${{ matrix.language }}
         build-mode: ${{ matrix.build-mode }}
+        config-file: ./.github/codeql/codeql-config.generated.yml
         # If you wish to specify custom queries, you can do so here or in a config file.
         # By default, queries listed here will override any specified in a config file.
         # Prefix the list here with "+" to use these queries and those in the config file.

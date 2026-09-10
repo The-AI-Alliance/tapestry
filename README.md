@@ -19,29 +19,30 @@ The rest of this README provides information for contributors and users of this 
 
 ## Contribute to Our First Work Streams
 
-Project Tapestry has big plans. Here are the main areas of development.
+Project Tapestry has big plans. Here are the main areas of current focus. Note that we need help defining requirements, identifying use cases, and writing code for all these areas.
 
-* [LLM Cultural Alignment and Re-alignment](https://github.com/The-AI-Alliance/tapestry/issues/243) - help us develop techniques for cultural alignment, initially based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric. This effort will continue to explore how to shift _cultural alignment_ without compromising general model performance. Prior expertise in evaluation and tuning technologies are especially welcome.
-* [Consortium Training](https://github.com/The-AI-Alliance/tapestry/issues/183) - Tapestry's approach to global model development relies on a balance between centralized and distributed training that preserves use and privacy requirements for datasets. Help us adapt and develop optimal techniques with ideas from both federated learning and the latest LLM pre-training and post-training methods. Prior expertise in large scale LLM training, distributed infrastructure, and federated learning are especially welcome.
-* [Global Training Data Corpus](https://thealliance.ai/projects/tapestry/training-data-proposals) A core thesis of project Tapestry is that bringing together a much more diverse set of data can provide a path to a better frontier base model for all. What unique datasets exist that could be brought to Tapestry model training? They don't have to be fully open; we will work with you to define and enforce appropriate requirements.
-* Your good ideas. Our [contribution mechanism](contrib/#how-to-contribute) provides a way for you to suggest new technologies, solutions to design challenges we face, etc.
+* [LLM Cultural Alignment and Re-alignment](https://github.com/The-AI-Alliance/tapestry/issues/243) - Help us develop techniques for cultural alignment, initially based on the [Inglehart–Welzel Cultural Map](https://en.wikipedia.org/wiki/Inglehart%E2%80%93Welzel_cultural_map_of_the_world) as a metric, with more approaches and metrics to be identified. This effort will continue to explore how to shift _cultural alignment_ without compromising general model performance. Prior expertise in evaluation and tuning technologies are especially welcome, as well as expertise in the ways that current AI models are not well aligned to specific cultures and uses cases in society and business.
+* [Consortium Training](https://github.com/The-AI-Alliance/tapestry/issues/183) - Tapestry's approach to global model development relies on a balance between centralized and distributed training that ensures permissive use and privacy requirements for datasets. Help us adapt and develop optimal techniques with ideas from both federated learning and the latest LLM pre-training and post-training methods. Prior expertise in large scale LLM training, distributed systems and infrastructure, and federated learning are especially welcome. In particular, we are starting to create domain-specific models, and we need expertise in healthcare, finance, industrial technologies, etc.
+* [Data, Responsibly Used](https://github.com/The-AI-Alliance/tapestry/issues/230) - Help us define the requirements and understand the regulations around permissive use and privacy for datasets, then implement support for them.
+	* [Global Training Data Corpus](https://thealliance.ai/projects/tapestry/training-data-proposals)  - A core thesis of project Tapestry is that bringing together a much more diverse set of data can provide a path to a better frontier base model for all. What unique datasets exist that could be brought to Tapestry model training? They don't have to be fully open; we will work with you to define and enforce appropriate requirements.
+* Your good ideas - Our [contribution mechanism](contrib/#how-to-contribute) provides a way for you to suggest new ideas, technologies, and solutions to design challenges we face.
 
 ### Quick Paths
 
 > [!NOTE]
 > Make sure to read [**Getting Involved**](#getting-involved-anchor) below for information on contribution guidelines, etc.
 >
-> We use the [`develop`](https://github.com/The-AI-Alliance/tapestry/tree/develop) branch as our default (integration) branch, reserving `main` for releases.
+> We use the [`develop`](https://github.com/The-AI-Alliance/tapestry/tree/develop) branch as our default (integration) branch, reserving [`main`](https://github.com/The-AI-Alliance/tapestry/tree/main) for releases.
 
 ### Working with the Source Code
 
-Use the [**`Makefile`**](Makefile) targets to run tests and other tools, executables, etc. Our GNU `make` process requires MacOS or Linux to work, although all the Python-based tools can be executed on any platform. Try `make help` for more information and see the [**Development**](#development-anchor) section below.
+We use GNU `make` and [**`Makefile`**](Makefile) targets to run tests and other tools. While this works best on MacOS or Linux, all the Python-based commands can be executed on any platform. We'll show you both ways below. Try `make help` for more information and see the [**Development**](#development-anchor) section below.
 
-The _production_ source code is under the [`src`](src/) directory. The unit tests are under the [`src/tests`](src/tests/) directory. For example, a consortium training prototype is in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md). Try `make consortium-demo` and `make consortium-tests`.
+The _production_ source code is under the [`src`](src/) directory. The automated tests are under the [`src/tests`](src/tests/) directory. For example, a consortium training prototype is in [**`src/tapestry/training/consortium/`**](src/tapestry/training/consortium/README.md). Try `make consortium-demo` and `make consortium-tests`.
 
-There are runnable demos in [**`examples/`**](examples/). The `make consortium-demo` command runs the demo using a script here.
+There are runnable demos in [**`examples/`**](examples/). In fact, the `make consortium-demo` command uses a script in `examples`.
 
-_Contributions_ are in [**`contrib/`**](contrib/), which are PoCs (proofs of concept), experiments, and modules proposed for possible inclusion in the production code. For example, see the contrib. experiment metrics for the consortium prototype in [**`contrib/jneums-consortium-experiment/`**](contrib/jneums-consortium-experiment/README.md). Try `make consortium-experiment`.
+Outside _contributions_ are in [**`contrib/`**](contrib/), which provides a straightforward way for contributors to provide PoCs (proofs of concept), experiments, examples, and modules proposed for possible inclusion in the production code. For example, see the experiment metrics contributed for the consortium training prototype just mentioned in [**`contrib/jneums-consortium-experiment/`**](contrib/jneums-consortium-experiment/README.md). Try `make consortium-experiment`. See [Making Contributions](#making-contributions) below for more details about our contributions process.
 
 ### Working with the Technical Documentation
 
@@ -78,52 +79,36 @@ On Windows:
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-The rest of the steps discussed next are automated using `make`. Try the following:
+The rest of the steps discussed next are automated using `make`. Try _one_ of the following commands, where the second one is executed by `make one-time-setup` (among some other things, like checking if this command has already been executed or not...):
 
 ```shell
 make one-time-setup  # Uses GNU make, so may require MacOS or Linux
+# or use these commands:
+uv venv                     # Create the virtual environment
+source .venv/bin/activate   # Activate the environment: MacOS and Linux
+# .venv\Scripts\activate    # Activate the environment: Windows
+uv pip install -e ".[dev]"  # Install all dependencies
 ```
 
-### Create a Virtual Environment
+We'll follow this pattern below, showing both the `make` command and the main `uv` commands that will be invoked as part of building the `make` target. Most of the `make` targets do other steps, like checking if required tools and directories exist. So, we recommend using the `make` commands if GNU `make` works on your machine. Otherwise, use the `uv` commands shown.
 
-The `one-time-setup` target starts by running the following command.
-
-On macOS/Linux:
-
-```shell
-uv venv
-source .venv/bin/activate
-```
-
-On Windows, use the following instead:
-
-```shell
-uv venv
-.venv\Scripts\activate
-```
-
-### Install Dependencies
-
-The `one-time-setup` target runs the first of the following two commands. You can also run either command manually.
-
-```shell
-uv pip install -e ".[dev]"  # full development dependencies
-uv pip install -e .         # minimum dependencies
-```
+> [!TIP]
+> Use `make -n some_target` to see the commands executed when `some_target` is built,
+> without executing them.
 
 ## Running Tests
 
-We use [pytest](https://docs.pytest.org/) for testing. The easiest way to run the test suite is using `make`:
+We use [pytest](https://docs.pytest.org/) for testing. Using `make`:
 
 ```shell
-make unit-tests   # tests is also defined as an alias for unit-tests.
+make unit-tests   # "tests" is also defined as an alias for "unit-tests".
 ```
 
 This runs `pytest` with coverage reporting, using the following commands:
 
 ```shell
 cd src
-uv run coverage run -m pytest -q -v -s
+uv run coverage run -m pytest -v -s .
 uv run coverage report -m
 ```
 
@@ -136,7 +121,7 @@ We use tools for formatting, linting, and type-checking the code.
 Use _one_ of the following commands to format the Python code with `black`:
 
 ```shell
-make format # makes target "black"
+make format # makes the "black" target
 make black
 uv run black src
 ```
@@ -146,9 +131,9 @@ uv run black src
 Use _one_ of the following commands to lint the Python code with `ruff` and `pylint`:
 
 ```shell
-make lint # makes targets "ruff" and "pylint"
+make lint # makes the "ruff" and "pylint" targets
 make ruff pylint
-# or these two commands:
+# or these TWO commands:
 uv run ruff check src
 uv pylint src
 ```
@@ -165,7 +150,7 @@ uv run ruff check --watch src
 Use _one_ of the following commands to type check the Python code with `ty`:
 
 ```shell
-make type-check # makes target "ty"
+make type-check # makes the "ty" target
 make ty
 uv run ty src
 ```
