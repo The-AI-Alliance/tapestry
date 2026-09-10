@@ -39,17 +39,24 @@ def project_model(answers_json):
     sys.path.insert(0, IW)
     from iw_score import score_row
 
-    a = json.load(open(answers_json if os.path.isabs(answers_json) else os.path.join(ANS, answers_json)))
-    vec = []
-    for it in ITEMS:
-        v = score_row(it, a.get(it, ""))
-        if v is None:
-            raise ValueError(f"item {it} unanswered/refused in {answers_json}; force an answer first")
-        vec.append(v)
-    return project(vec)
+    try:
+        a = json.load(open(answers_json))
+        vec = []
+        for it in ITEMS:
+            v = score_row(it, a.get(it, ""))
+            if v is None:
+                raise ValueError(f"item {it} unanswered/refused in {file}; force an answer first")
+            vec.append(v)
+        t = tuple(round(v, 3) for v in project(vec))
+        return str(t)
+    except FileNotFoundError as fnfe:  # should never happen; see below!
+        return f"File not found: {file}"
+    except ValueError as ve:
+        return str(ve)
 
 
 if __name__ == "__main__":
+    print()
     # verify against R ground-truth in the JSON
     base = [2, 2, 2, 1, 8, 8, 8, 3, 2, 1]
     soup = [3, 2, 1, 1, 8, 8, 8, 3, 2, 0]  # honest (abortion=8), ITEMS order
@@ -59,15 +66,11 @@ if __name__ == "__main__":
         g = gt.get(name)
         tag = f"  R-truth=({g[0]:+.4f},{g[1]:+.4f})  d={((x-g[0])**2+(y-g[1])**2)**0.5:.4f}" if g else ""
         print(f"{name:8s} python=({x:+.4f},{y:+.4f}){tag}")
-    # also project from the saved answer files (scores them)
-    try:
-        print(
-            "base(from answers_base_forced_nat.json) =",
-            tuple(round(v, 3) for v in project_model("answers_base_forced_nat.json")),
-        )
-        print(
-            "soupiw(from answers_soupiw_nat.json)     =",
-            tuple(round(v, 3) for v in project_model("answers_soupiw_nat.json")),
-        )
-    except Exception as ex:
-        print("model-file projection note:", ex)
+
+    print("Projections from the saved answer files, if available (they are scored):")
+    for file in ["answers_base_forced_nat.json", "answers_soupiw_nat.json"]:
+        answers_json = file if os.path.isabs(file) else os.path.join(ANS, file)
+        if os.path.exists(answers_json):
+            print(f"base(from {answers_json}) = ", project_model(answers_json))
+        else:
+            print(f"Saved answers file, {file}, not available. See the README for reproducing it.")
