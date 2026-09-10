@@ -10,6 +10,8 @@ has_children: true
 Welcome to the technical website for **The AI Alliance Project Tapestry**, representing the content from the [technical documentation and code repository]({{site.repo_url}}){:target="repo"} for [Project Tapestry]({{site.tapestry_url}}){:target="aia-tapestry"}.
 
 {: .attention}
+> **News:** We are pleased to announce the completion of our first milestone, _Milestone Zero_ (M0). Read more about it [here]({{site.baseurl}}/announcements/milestone-zero).
+>
 > For a general introduction to Project Tapestry, including its motivations and goals, see the [AI Alliance website Tapestry page]({{site.tapestry_url}}){:target="aia-tapestry"}
 
 ![Project Tapestry Image]({{site.baseurl}}/assets/images/03-tapestry-logo-1000x545.png){: .tapestry-image .float-right}
@@ -18,15 +20,15 @@ The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-proj
 
 **Why this matters:** People will not use models that under perform on their language, legal context, and domain knowledge. And countries, enterprises, and individuals need AI infrastructure they own and control — with guaranteed data residency, the right to exit, and the ability to operate independently. Tapestry addresses both problems simultaneously: sovereignty is the performance strategy, not a trade-off against it.
 
----
+**Join Us!** We are looking for collaborators. See our [contributing]({{site.baseurl}}/contributing) page for details.
+
+This website is for technical contributors. As Project Tapestry evolves, this website will provide links to technical requirements, architecture and design documentation, and implementation source code.
+
 
 {: .note }
-> * **Join Us!** We are looking for collaborators. See our [contributing]({{site.baseurl}}/contributing) page for details.
 > * Use the search box at the top of this page to find specific content.
 > * The links for Capitalized Terms go to [this glossary]({{site.glossary_url}}){:target="_glossary"}. Tapestry-specific terms (e.g., *Consortium training*, *Shared-Base Loop*, *Sovereign Build*) are defined in the [in-repo glossary]({{site.repo_tech_docs_url}}/reference/glossary.md){:target="repo-docs"}.
  
-This website is for technical contributors. As Project Tapestry evolves, this website will provide links to technical requirements, architecture and design documentation, and implementation source code.
-
 ## Contribute to Our First Work Streams
 
 Project Tapestry has big plans. Here are the main areas of current focus.
