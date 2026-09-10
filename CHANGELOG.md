@@ -11,6 +11,7 @@ section with the date (or version) and start a fresh **Unreleased**.
 
 ## [Unreleased]
 
+## [2026-09-09]
 ### Added
 
 - `CHANGELOG.md` following Keep a Changelog conventions
