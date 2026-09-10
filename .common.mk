@@ -405,6 +405,7 @@ ruff-prerequisite ruff-postrequisite::
 ruff-command-default::
 	@echo "${INFO_LABEL}Target ${CODE}ruff${_END}: Running ${CODE}ruff${_END} to lint the code in ${CODE}${SRC_DIR}${_END}."
 	cd ${SRC_DIR} && ${UV_RUN} ruff ${RUFF_ARGS} ${RUFF_OPT_ARGS} .
+
 ruff-watch:: ruff-prerequisite ruff-watch-command-default ruff-postrequisite
 ruff-watch-command-default::
 	@echo "${INFO_LABEL}Target ${CODE}ruff${_END}: Running ${CODE}ruff${_END} to lint the code in ${CODE}${SRC_DIR}${_END} using 'watch' mode."
