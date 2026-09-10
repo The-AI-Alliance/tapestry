@@ -25,7 +25,9 @@ The AI Alliance [launched](https://thealliance.ai/blog/ai-alliance-launches-proj
 This website is for technical contributors. As Project Tapestry evolves, this website will provide links to technical requirements, architecture and design documentation, and implementation source code.
 
 
-{: .note }
+{: .tip }
+> **TIPS:**
+>
 > * Use the search box at the top of this page to find specific content.
 > * The links for Capitalized Terms go to [this glossary]({{site.glossary_url}}){:target="_glossary"}. Tapestry-specific terms (e.g., *Consortium training*, *Shared-Base Loop*, *Sovereign Build*) are defined in the [in-repo glossary]({{site.repo_tech_docs_url}}/reference/glossary.md){:target="repo-docs"}.
  
