@@ -26,10 +26,10 @@ This website is for technical contributors. As Project Tapestry evolves, this we
 
 
 {: .tip }
-> **TIPS:**
+> **Tips:**
 >
 > * Use the search box at the top of this page to find specific content.
-> * The links for Capitalized Terms go to [this glossary]({{site.glossary_url}}){:target="_glossary"}. Tapestry-specific terms (e.g., *Consortium training*, *Shared-Base Loop*, *Sovereign Build*) are defined in the [in-repo glossary]({{site.repo_tech_docs_url}}/reference/glossary.md){:target="repo-docs"}.
+> * Many of the links go to documentation in the repository. Some of the links for Capitalized Terms go to the [AI Alliance Glossary]({{site.glossary_url}}){:target="_glossary"}, while many Tapestry-specific terms are defined in a [separate glossary]({{site.repo_tech_docs_url}}/reference/glossary.md){:target="repo-docs"} in Tapestry's repository.
  
 ## Contribute to Our First Work Streams
 
