@@ -37,7 +37,7 @@ ${CODE}${_END}                        # (Only needed for local viewing of the do
 ${CODE}make run-jekyll${_END}         # Used by ${CODE}view-local${_END}; assumes ${CODE}setup-jekyll${_END} is already "built".
 ${CODE}${_END}                        # Tip: Build this target instead of ${CODE}view-local${_END} to avoid repeating ${CODE}setup-jekyll${_END}.
 ${CODE}${_END}                        # Tip: ${CODE}make JEKYLL_PORT=8000 run-jekyll${_END} uses port 8000 instead of 4000!
-${CODE}make clean-website${_END}      # DElete the temporary directories ${CODE}CLEAN_WEBSITE_DIRS${_END} = ${CODE}${CLEAN_WEBSITE_DIRS}${_END}.
+${CODE}make clean-website${_END}      # Delete the temporary directories ${CODE}CLEAN_WEBSITE_DIRS${_END} = ${CODE}${CLEAN_WEBSITE_DIRS}${_END}.
 
 endef
 

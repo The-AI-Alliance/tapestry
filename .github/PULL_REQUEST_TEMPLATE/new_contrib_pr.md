@@ -1,6 +1,6 @@
 # [New Contribution] YOUR TITLE
 
-> Edit this template as appropriate. For example, if the PR doesn't contain code, it's okay to delete the content below that is specific to code contributions. Please also delete this paragraph!
+> Edit this template as appropriate. For example, if the PR doesn't contain code, it's okay to delete the content below that is specific to code contributions. Please also delete this note!
 
 ## New Contribution Check List
 
@@ -33,7 +33,10 @@ Lead in plain English with **Why** (problem/gap) then **What** (approach and res
 
 ## Related Issues
 
-Related issues or PRs (#number, ...):
+List any related issues or PRs that this submission addresses:
+
+* Issues: (e.g., #123, #456)
+* PRs: (e.g., #789)
 
 ## If Code Is Included
 
