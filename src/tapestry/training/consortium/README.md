@@ -24,6 +24,7 @@ front and center.
 | `policy.py` | `ContributionPolicy`, a minimal quality-floor and anti-capture policy with quality-weighted and equal-influence modes. |
 | `messages.py` | Data classes for sovereign artifacts, contributions, and round results. |
 | `../../../../contrib/jneums-consortium-experiment/` | Contrib experiment runner and metrics helpers that record round metrics and summaries without changing core training logic. |
+| `../../../../contrib/build4me2-contribution-validator/` | Contrib admission-safety validator that checks parameter coverage, shapes, dtypes, finite values, and update magnitude before a contribution reaches the outer merge. |
 
 ## Experiment Runner
 
