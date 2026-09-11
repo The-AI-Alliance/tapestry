@@ -129,15 +129,15 @@ The `do-contrib-before-pr` target mentioned above also uses this command, runnin
 
 ### How to Customize the Quality Checks
 
-You can find examples in most of the `contrib/*` directories. Customization is done by creating a `.custom.mk` file. Here is an example, `contrib/jneums-consortium-experiment/.custom.mk` (at the time of this writing):
+You can find examples in most of the `contrib/*` directories. Customization is done by creating a `.custom.mk` file in your directory. Here is an example, `contrib/jneums-consortium-experiment/.custom.mk` (at the time of this writing):
 
 ```makefile
 override define help_targets_message
-For the consortium-training prototype:
+${HIGHLIGHT}Help for the consortium-training prototype targets:${_END_BOLD}${_END}
 
-${CODE}make consortium-experiment${_END}
-                        # Run deterministic PoC metrics for consortium-training rounds.
-${CODE}make consortium-tests${_END}   # Run only the consortium-training prototype tests.
+${CODE}make consortium-experiment-all${_END} # Make all the following targets.
+${CODE}make consortium-experiment${_END}     # Run deterministic PoC metrics for consortium-training rounds.
+${CODE}make consortium-tests${_END}          # Run only the consortium-training prototype tests.
 endef
 
 # This definition effectively skips the "pylint" and "type-check" targets defined
@@ -147,26 +147,39 @@ pylint-command type-check-command:
   @true
 ```
 
-Two of the supported customization mechanisms are shown here.
+Two of the supported customization mechanisms are shown here. Before we explain them, let's explain the use of strings like `${HIGHLIGHT}...${_END_BOLD}${_END}` and `${CODE}...${_END}` in the `help_targets_message`. These `make` variables provide color highlighting of the output, which you can omit if you want, but they are designed to provide more _pleasing_ output.
 
-But first, note the `${CODE}` and `${_END}` `make` variables used in the help message. They provide color highlighting of the output. `${CODE}` starts a string of highlighting and `${_END}` stops it (returning to normal console output). They make messages more readable, but you can omit them in your help messages. See `../.console-colors.mk` for more details about these and other highlighting definitions. See other message definitions in `../.common.mk` for more examples, as well as the examples below that use `${INFO}`, which behaves similarly to `${CODE}` (it takes affect until `${_END}` is seen) and `${INFO_LABEL}`, which shows a highlighted leading "label", `INFO:`, and immediately resets to the normal output, so `${_END}` isn't necessary.
+`${CODE}` starts a color change for the text that follows and `${_END}` stops it, reverting to the normal console colors. For `${CODE}`, a light green foreground color is used, intended for showing "code" examples, like CLI commands.
+
+`${HIGHLIGHT}` uses blue as the text _background_ color and the console's default background color is used for the text's _foreground_ color. When the colors are reversed like this, we refer to the _scheme_ as "bold"; `${_END_BOLD}` switches the colors, while `${_END}` resets everything back to the default console colors.
+
+> [!TIP]
+> Try these commands to see the colors in action:
+> ```
+> make help
+> make show-colors
+> ```
+
+See `../.console-colors.mk` for more details about these and other highlighting definitions. See other message definitions in `../.common.mk` for more examples, as well as the examples below that use `${INFO}`, which behaves similarly to `${CODE}` (it takes affect until `${_END}` is seen) and `${INFO_LABEL}`, which shows a highlighted leading "label", `INFO:`, and immediately resets to the normal output, so `${_END}` isn't necessary.
 
 #### Help on Custom Targets You Define
 
-We will see below, that you can define targets that can be executed to demonstrate your contribution using the `.targets.mk` file. You provide a brief description of all these commands in `.custom.mk`, where you _override_ the definition of `help_targets_message` as shown here.
+Now back to the two customization features mentioned above.
 
-This message will be printed whenever the user runs `make help-targets` (a target defined in the top level `.common.mk`), along with similar messages for all the other contributions. In this example, there are two program targets defined, `consortium-experiment` and `consortium-tests`.
+In a moment, we will show how you can define custom `make` targets that can be  demonstrate your contribution (defined in a separate `.targets.mk` file). In `.custom.mk`, the definition you provide for `help_targets_message` is a brief description of all these commands. Note the use of the `override` keyword in the definition, which is required.
+
+This message will be printed whenever the user runs `make help-targets` in the repository root directory, along with similar messages for all the other contributions. In this example, there are three program targets defined, `consortium-experiment-all`, `consortium-experiment`, and `consortium-tests`.
 
 > [!NOTE]
-> Note the `override` keyword for the definition for `help_targets_message`. By default, the top-level `.common.mk` provides a default definition, but we override it here to customize it for this particular directory.
+> Note the `override` keyword for the definition for `help_targets_message`. By default, the top-level `.common.mk` provides a default definition, but we _override_ it here to customize it for this particular directory.
 
 Try `make help-targets` in the top-level directory to see all the help messages about targets in contributions, as well as the main code base.
 
 #### Disable Some Quality Checks
 
-The second customization mechanism is shown for `pylint` and `type-check` in the example contribution. These quality targets don't currently pass (and don't really need to pass at this time). Hence, they are _disabled_ by _overriding_ the definitions of the `pylint-command` and `type-check-command` targets to print a warning message (as a reminder to the user), but not actually invoke `pylint` and `type-check`, respectively.
+The second customization mechanism is shown above in `.custom.mk` for _disabling_ two quality checks, `pylint` and `type-check`. These quality targets don't currently pass, nor do they need to pass for this proof of concept. Hence, they are disabled by _overriding_ the definitions of the `pylint-command` and `type-check-command` targets to print a warning message (as a reminder to the user), but not actually invoke `pylint` and `type-check`, respectively.
 
-In the top level `.common.mk`, the `pylint` target is defined as follows (the other quality targets like `type-check` are similar):
+How are these targets used? In the top level `.common.mk`, the `pylint` target is defined as follows (the other quality targets like `type-check` are similar):
 
 ```makefile
 pylint:: pylint-prerequisite pylint-command pylint-postrequisite
@@ -176,16 +189,21 @@ pylint-command::
   uv run pylint ${SRC_DIR}
 ```
 
-Actually, this is _conceptually_ what happens; the implementation is a little more involved. A more sophisticated technique is used to suppress some warnings from `make` about overriding targets like `pylint-command`. If you are interested in the details, read the long comments in `.common.mk` that explain what is done.
+The `pylint-prerequisite` and `pylint-postrequisite` are placeholders, discussed below.
+
+> Actually, this is _conceptually_ what happens; the implementation is a little more sophisticated to suppress some warnings from `make` about overriding targets like `pylint-command`. If you are interested in the details, read the long comments in `.common.mk` that explain how this implemented.
 
 If you don't override the definition of `pylint-command` in your `.custom.mk`, the definition in `.common.mk` will be used to run `pylint` on your code.
 
 > [!NOTE]
-> Anytime you disable a quality check by overriding the definition of `*-command`, please use the _recipe_ shown in the example above, so the warning message is issued for the user's benefit!
+> Anytime you disable a quality check by overriding the definition of `*-command`, please use the _recipe_ shown in the example above, so the warning message is issued as a reminder, for the user's benefit!
+
+> [!TIP]
+> Run the command `make contrib-pylint` to see which contributions disable `pylint` and the reminder message printed for them.
 
 The third and fourth customization mechanisms are "suggested" in the snippet from the top level `.common.mk` above. The `pylint-prerequisite` target does nothing by default, but if you need to do something _before_ `pylint` is invoked, you can add a definition for this target in your `.custom.mk` file. Similarly, `pylint-postrequisite` does nothing by default, but it can be defined to do work after `pylint` finishes, for example, cleaning up temporary files.
 
-Let's look at an example, adapted from `contrib/nguyennm1024-sociocultural-alignment/`, of how a prerequisite hook can be used before tests are run to set up a custom environment in that _contribution_:
+Let's look at an example prerequisite. Suppose your contribution has unit tests, but it needs its own `.venv` Python environment, because of dependencies that aren't needed by the project at a whole. The following example uses a prerequisite hook that runs before the tests to set up the custom environment for your contribution _only_. We assume your dependencies are listed in a `requirements.txt` file:
 
 ```makefile
 unit-tests-prerequisite::
@@ -199,13 +217,11 @@ unit-tests-prerequisite::
     fi
 ```
 
-Recall from above that `SRC_DIR` will be defined to `contrib/nguyennm1024-sociocultural-alignment` in a recursive invocation of `make` for this contribution. The `${INFO_LABEL}` is optional. It renders a bright green `INFO:` prefix, so the messages stand out. Of course, these messages are optional.
-
-In this recipe, `uv` installs some additional dependencies in `contrib/nguyennm1024-sociocultural-alignment/.venv`, used just for this contribution, _before_ any tests are executed by building the `tests-command` target.
+Recall from above that `SRC_DIR` will be defined to be `contrib/<you>-<your-contribution>` in a recursive invocation of `make`. The `${INFO_LABEL}` renders a bright green `INFO:` prefix, so the messages stand out. Of course, such messages are optional, as are the uses of `${INFO_LABEL}`, etc.
 
 ### How to Add Custom Targets
 
-An optional `.targets.mk` in your contribution directory allows you to define custom targets that will be visible to the top-level `make` process. For example, you should consider adding targets to run demonstrations of your contribution. _Also add help messages for them, as mentioned above, defined in `.custom.mk`._
+The fourth customization mechanism uses a separate optional file, `.targets.mk`, in your contribution directory, where you can define custom targets that will be visible to the top-level `make` process. For example, you should consider adding targets to run demonstrations of your contribution. _Also add help messages for them, as mentioned above, in `.custom.mk`._
 
 Here is an example adapted from `contrib/jneums-consortium-experiment/.targets.mk`:
 
@@ -222,7 +238,11 @@ consortium-experiment::
 ```
 
 > [!NOTE]
-> These targets are meant to be built in the top-level directory, not the contribution's directory. Also, when they are built, `${SRC_DIR}`, if used, will refer to the production code's `src` directory. This is different from how this variable is defined when content in `.custom.mk` is used, where it will be defined to be the contribution's root directory.
+> These targets are meant to be built in the top-level directory, not the contribution's directory. Also, when they are built, `${SRC_DIR}`, if used, will refer to the production code's `src` directory. This is different from how this variable is defined when content in `.custom.mk` is used, where it will be defined to be the contribution's root directory. (Apologies for this confusing behavior...)
+
+> [!TIP]
+> * Run `make help-targets` and verify that no other contribution's targets have the same names you want to use. You must pick unique names, since all of them are visible at the top-level `make` invocation.
+> * Don't define targets for running your unit tests. They will be picked up automatically by the global `make unit-tests` command.
 
 Because the `.targets.mk` files are included in the top level `Makefile`, the `.targets.mk` files don't need to include the top level `.common.mk`. The definitions in `.common.mk` will be visible to it.
 
