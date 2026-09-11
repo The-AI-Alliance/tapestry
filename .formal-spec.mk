@@ -34,14 +34,14 @@ endef
 # in .common.mk so `make contrib-formal-spec-install` doesn't redundantly
 # re-run `npm ci` once per contrib/* directory.
 contrib-formal-spec-install::
-	@echo "${WARNING_LABEL}formal-spec-install is shared across the whole repo — run ${CODE}make formal-spec-install${_END} once instead of ${CODE}contrib-formal-spec-install${_END}.${_END}"
+	@echo "${WARNING_LABEL}Target ${CODE}formal-spec-install${_END} is shared across the whole repo. Run ${CODE}make formal-spec-install${_END} once instead of ${CODE}contrib-formal-spec-install${_END}.${_END}"
 
 formal-spec-install::
 	@if [ -f "$(SPEC_TOOLCHAIN_DIR)/package.json" ]; then \
 		echo "${INFO_LABEL}Installing the Quint toolchain in ${CODE}$(SPEC_TOOLCHAIN_DIR)${_END}"; \
 		cd $(SPEC_TOOLCHAIN_DIR) && npm ci; \
 	else \
-		echo "${WARNING_LABEL}No Quint toolchain in ${CODE}$(SPEC_TOOLCHAIN_DIR)${_END} (no package.json) — skipping ${CODE}formal-spec-install${_END}."; \
+		echo "${WARNING_LABEL}No Quint toolchain in ${CODE}$(SPEC_TOOLCHAIN_DIR)${_END} (no ${CODE}package.json${_END} found) — skipping ${CODE}formal-spec-install${_END}."; \
 	fi
 
 formal-spec-verify::

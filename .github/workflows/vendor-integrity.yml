@@ -1,0 +1,27 @@
+name: Vendored script integrity
+
+# Checks vendored script checksums and script classification (see
+# .vendored-scripts.mk). No paths filter — always runs.
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify checksums
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Verify vendored scripts
+        run: make verify-vendored-scripts

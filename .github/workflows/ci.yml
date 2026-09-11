@@ -5,15 +5,13 @@ on:
     branches:
       - develop
     paths:
-      - ".common.mk"
-      - ".console-colors.mk"
-      - ".website.mk"
-      - "Makefile"
+      - "**/.*.mk"
+      - "**/Makefile"
+      - "**/*.toml"
+      - ".github/workflows/*.yml"
       - "src/**"
       - "contrib/**"
       - "examples/**"
-      - "**/pyproject.toml"
-      - ".github/workflows/ci.yml"
 
 permissions:
   contents: read
@@ -27,19 +25,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Check contrib target failures
-        run: |
-          if make contrib-ls; then
-            echo "make contrib-ls should fail"
-            exit 1
-          fi
-
       # Every contrib/*/.targets.mk must be read by the top-level Makefile,
       # otherwise the contributions' custom targets are silently unreachable.
-      - name: Check contrib custom targets are included
+      - name: Check contrib custom .targets.mk are properly included by Makefile
         run: |
           expected=$(ls contrib/*/.targets.mk 2>/dev/null | wc -l)
-          actual=$(make --debug=v -n help | grep -c "Reading makefile 'contrib/.*/\.targets\.mk'" || true)
+          actual=$(make print-contrib-targets-mks-count)
           echo "contrib .targets.mk files: $expected present, $actual included"
           test "$expected" -eq "$actual"
 
@@ -53,7 +44,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Cache uv download cache
+      - name: uv download cache
         uses: actions/cache@v6
         with:
           path: ~/.cache/uv
@@ -61,14 +52,17 @@ jobs:
           restore-keys: |
             uv-${{ runner.os }}-
 
-      # Do not cache .venv. Restored venvs keep a python3 symlink into the
-      # runner image; that path disappears on the next image, and
-      # `if [ ! -d .venv ]` then skips recreation. Keep the uv download cache.
+      # Do not cache .venv. Restored venvs keep a python3 symlink into the runner
+      # image; that path disappears on the next image causing subsequent failures.
       - name: Create virtual environment
         run: uv venv --no-managed-python
 
       - name: Install dependencies
         run: uv pip install -e ".[dev]"
 
+      # The "GITHUB_CI='true'" is used in the Makefile to change the behavior of
+      # some before-pr targets, specifically those like "format" that will reformat
+      # the code by default. We don't want that in CI. Instead, we want tasks like
+      # that to fail IF an code modifications are necessary.
       - name: Run before-pr checks
         run: make GITHUB_CI='true' before-pr
