@@ -47,6 +47,8 @@ the first failure, so one report lists every problem.
 
 | Check | Finding code | Default |
 | :---- | :----------- | :------ |
+| Declared base fingerprint matches this round's base | `base-fingerprint-mismatch` | on, `if-present` |
+| A base fingerprint is declared at all | `base-fingerprint-missing` | off (`require` turns it on) |
 | Every expected tensor is present | `missing-parameter` | on |
 | No tensors the base does not have | `unexpected-parameter` | on |
 | Every value is a `torch.Tensor` | `not-a-tensor` | on |
@@ -66,6 +68,36 @@ the first failure, so one report lists every problem.
 for complex tensors) with overflow-safe scaling, so the numbers are stable
 across dtypes and devices. Statistics for every tensor and for the whole
 contribution are returned even when the contribution is accepted.
+
+## Base-checkpoint fingerprint
+
+A structurally valid update can still be wrong if the node trained from the
+wrong shared base: a node whose sync failed, or that replayed an old
+checkpoint. Its deltas are relative to a base the coordinator no longer holds,
+so merging them corrupts the round without tripping any of the checks above.
+
+`fingerprint_state` computes a deterministic SHA-256 digest of a model state
+(every tensor's name, dtype, shape, and raw bytes, in sorted name order). It is
+independent of dict order, device, and memory layout, and it covers integer
+buffers, bfloat16, scalars, and non-finite values.
+
+- The coordinator's round summary records the fingerprint of the base it
+  published (`GateRoundSummary.base_fingerprint`).
+- A node declares the fingerprint of the base it actually trained from.
+  `FingerprintingNode` does this by wrapping its contribution in
+  `FingerprintedContribution`, a frozen subclass of the core contribution
+  dataclass with one extra field. The core message is untouched; promotion
+  would add the field there.
+- The validator compares the declaration with its reference. A mismatch is a
+  `base-fingerprint-mismatch` finding carrying both digests.
+
+`ValidationLimits.fingerprint_policy` chooses how strict to be: `if-present`
+(default) checks a declaration when there is one, `require` also rejects
+contributions that declare none, and `ignore` skips the check.
+
+This is an honesty check, not a security control. A node that lies about its
+fingerprint is not caught. Signed manifests and authenticated provenance remain
+follow-up work.
 
 Two details matter for real models:
 
@@ -92,12 +124,15 @@ contrib/build4me2-contribution-validator/
 ├── run.py                         # demo: one corrupted node among three
 ├── contribution_validator/
 │   ├── validator.py               # ContributionValidator, validate_contribution
-│   ├── limits.py                  # ValidationLimits, DtypePolicy
+│   ├── limits.py                  # ValidationLimits, DtypePolicy, FingerprintPolicy
 │   ├── findings.py                # report / finding / statistics dataclasses
+│   ├── fingerprint.py             # fingerprint_state, FingerprintedContribution, FingerprintingNode
 │   ├── gate.py                    # ValidatingConsortiumCoordinator (wiring example)
-│   └── faults.py                  # fault injection helpers used by tests and demo
+│   ├── faults.py                  # fault injection helpers used by tests and demo
+│   └── testing.py                 # tiny model and corpus fixtures shared by tests
 └── tests/
-    └── test_validator.py
+    ├── test_validator.py
+    └── test_fingerprint.py
 ```
 
 Read `validator.py` first. `gate.py` shows where the check sits in a round.
@@ -135,10 +170,13 @@ round 1
     - [non-finite] parameter 'embedding.weight' contains 1 NaN or infinite values
 ```
 
-Other faults to try: `--fault missing`, `extra`, `shape`, `float16`, `scaled`.
-Add `--dtype-policy float-compatible` to see `float16` pass, or
-`--max-global-relative-update 0.5` to see `scaled` fail on magnitude. Add
-`--json` to print the full machine-readable reports.
+Other faults to try: `--fault missing`, `extra`, `shape`, `float16`, `scaled`,
+and `stale-base`. Add `--dtype-policy float-compatible` to see `float16` pass,
+or `--max-global-relative-update 0.5` to see `scaled` fail on magnitude.
+`stale-base` is a node that keeps training from the first base it received;
+it passes round 1 and is rejected from round 2 by the fingerprint check.
+`--fingerprint-policy require` rejects any node that declares no fingerprint.
+Add `--json` to print the full machine-readable reports.
 
 ## Using it from code
 
@@ -198,10 +236,18 @@ If the validator is promoted, the same logic is a few lines inside
   the quorum blocks a lone survivor, and when every node is rejected the shared
   base does not change.
 - With well-formed contributions the gated coordinator matches the plain one exactly.
+- Fingerprints are deterministic across dict order, clones, and non-contiguous
+  layouts, and change with any single value, name, dtype, or shape.
+- A matching declared fingerprint passes, a mismatch is rejected with both
+  digests, the policy controls undeclared fingerprints, and the check runs
+  alongside the others. In the gate, a node that trains from a stale base is
+  accepted in round 1 and rejected from round 2, and the summary records each
+  round's base fingerprint.
 
 ## Limitations and follow-ups
 
-- No provenance, identity, signatures, or checkpoint fingerprints. The validator
+- The fingerprint is a self-declaration. There is no identity, signature, or
+  provenance, so a node that misreports its base is not caught. The validator
   trusts that the contribution and the reference state are what they claim to be.
 - No adversarial detection. Magnitude limits catch gross faults, not crafted updates.
 - Limits are global to a round. Per-tensor-group limits (for example embeddings

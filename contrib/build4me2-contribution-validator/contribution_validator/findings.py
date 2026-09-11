@@ -27,6 +27,8 @@ class ValidationFinding:
 class FindingCode:  # pylint: disable=too-few-public-methods
     """Stable identifiers for the checks the validator performs."""
 
+    BASE_FINGERPRINT_MISSING = "base-fingerprint-missing"
+    BASE_FINGERPRINT_MISMATCH = "base-fingerprint-mismatch"
     MISSING_PARAMETER = "missing-parameter"
     UNEXPECTED_PARAMETER = "unexpected-parameter"
     NOT_A_TENSOR = "not-a-tensor"

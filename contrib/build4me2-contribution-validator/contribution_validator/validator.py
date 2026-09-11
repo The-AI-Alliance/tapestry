@@ -27,7 +27,8 @@ from .findings import (
     TensorUpdateStats,
     ValidationFinding,
 )
-from .limits import DtypePolicy, ValidationLimits
+from .fingerprint import declared_base_fingerprint, fingerprint_state
+from .limits import DtypePolicy, FingerprintPolicy, ValidationLimits
 
 
 @dataclass(frozen=True)
@@ -92,23 +93,51 @@ class ContributionValidator:
             )
         self.limits = limits or ValidationLimits()
         self.dtype_policy = DtypePolicy(self.limits.dtype_policy)
+        self.fingerprint_policy = FingerprintPolicy(self.limits.fingerprint_policy)
+        self._reference_fingerprint: str | None = None
 
     @property
     def reference_state(self) -> ModelState:
         """The validator's private snapshot of the shared base."""
         return {name: ref.tensor for name, ref in self._reference.items()}
 
-    def validate(self, contribution: SovereignContribution) -> ContributionValidationReport:
-        """Validate a node's contribution; see :meth:`validate_state`."""
-        return self.validate_state(contribution.node_id, contribution.round_num, contribution.local_model_state)
+    @property
+    def reference_fingerprint(self) -> str:
+        """Fingerprint of the reference state, computed once on first use."""
+        if self._reference_fingerprint is None:
+            self._reference_fingerprint = fingerprint_state(self.reference_state)
+        return self._reference_fingerprint
 
-    def validate_state(self, node_id: str, round_num: int, state: Mapping[str, Any]) -> ContributionValidationReport:
+    def validate(self, contribution: SovereignContribution) -> ContributionValidationReport:
+        """Validate a node's contribution; see :meth:`validate_state`.
+
+        A contribution that declares the fingerprint of the base it trained
+        from (see :class:`~contribution_validator.fingerprint.FingerprintedContribution`)
+        has that declaration checked against the reference.
+        """
+        return self.validate_state(
+            contribution.node_id,
+            contribution.round_num,
+            contribution.local_model_state,
+            base_fingerprint=declared_base_fingerprint(contribution),
+        )
+
+    def validate_state(
+        self,
+        node_id: str,
+        round_num: int,
+        state: Mapping[str, Any],
+        base_fingerprint: str | None = None,
+    ) -> ContributionValidationReport:
         """Validate a raw model state and return a full report.
 
-        All checks run even after the first failure, so the report lists every
-        problem found rather than only the first one.
+        ``base_fingerprint`` is the fingerprint the node declares for the base
+        it trained from, or ``None`` if it declares none. All checks run even
+        after the first failure, so the report lists every problem found
+        rather than only the first one.
         """
-        findings: list[ValidationFinding] = list(self._check_coverage(state))
+        findings: list[ValidationFinding] = list(self._check_fingerprint(base_fingerprint))
+        findings.extend(self._check_coverage(state))
         layer_stats: dict[str, TensorUpdateStats] = {}
 
         for name in self._reference:
@@ -130,6 +159,29 @@ class ContributionValidator:
             layer_stats=layer_stats,
             global_stats=global_stats,
         )
+
+    def _check_fingerprint(self, base_fingerprint: str | None) -> list[ValidationFinding]:
+        if self.fingerprint_policy is FingerprintPolicy.IGNORE:
+            return []
+        if base_fingerprint is None:
+            if self.fingerprint_policy is FingerprintPolicy.REQUIRE:
+                return [
+                    ValidationFinding(
+                        code=FindingCode.BASE_FINGERPRINT_MISSING,
+                        message="contribution does not declare the fingerprint of the base it trained from",
+                        details={"expected": self.reference_fingerprint},
+                    )
+                ]
+            return []
+        if base_fingerprint == self.reference_fingerprint:
+            return []
+        return [
+            ValidationFinding(
+                code=FindingCode.BASE_FINGERPRINT_MISMATCH,
+                message="contribution was trained from a different shared base than this round's",
+                details={"expected": self.reference_fingerprint, "declared": base_fingerprint},
+            )
+        ]
 
     def _check_coverage(self, state: Mapping[str, Any]) -> list[ValidationFinding]:
         expected = set(self._reference)

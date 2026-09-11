@@ -16,7 +16,12 @@ import torch
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from contribution_validator import ValidatingConsortiumCoordinator, ValidationLimits
+from contribution_validator import (
+    FingerprintingNode,
+    StaleBaseNode,
+    ValidatingConsortiumCoordinator,
+    ValidationLimits,
+)
 from contribution_validator.faults import (
     Fault,
     FaultInjectingNode,
@@ -45,6 +50,9 @@ FAULTS: dict[str, Fault] = {
     "scaled": scale_parameters,
 }
 
+# Not a state fault: the node trains from a stale base and says so honestly.
+STALE_BASE = "stale-base"
+
 DOMAIN_CORPORA: dict[str, list[str]] = {
     "vietnam": [
         "Vietnamese public services require local legal context.",
@@ -65,7 +73,7 @@ def _encode(texts: list[str]) -> list[list[int]]:
     return [[token % 128 for token in text.encode("utf-8")] for text in texts]
 
 
-def _build_nodes(model: TinyCausalModel, faulty_node: str, fault: Fault | None) -> list[SovereignTrainingNode]:
+def _build_nodes(model: TinyCausalModel, faulty_node: str, fault: str | None) -> list[SovereignTrainingNode]:
     nodes: list[SovereignTrainingNode] = []
     for node_id, texts in DOMAIN_CORPORA.items():
         common: dict[str, Any] = {
@@ -77,10 +85,12 @@ def _build_nodes(model: TinyCausalModel, faulty_node: str, fault: Fault | None) 
             "local_epochs": 1,
             "lr": 0.01,
         }
-        if fault is not None and node_id == faulty_node:
-            nodes.append(FaultInjectingNode(fault=fault, **common))
+        if fault is None or node_id != faulty_node:
+            nodes.append(FingerprintingNode(**common))
+        elif fault == STALE_BASE:
+            nodes.append(StaleBaseNode(**common))
         else:
-            nodes.append(SovereignTrainingNode(**common))
+            nodes.append(FaultInjectingNode(fault=FAULTS[fault], **common))
     return nodes
 
 
@@ -90,9 +100,13 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=7, help="Random seed for model init and local training.")
     parser.add_argument(
         "--fault",
-        choices=sorted(FAULTS),
+        choices=sorted([*FAULTS, STALE_BASE]),
         default="nan",
-        help="Corruption applied to one node's contribution before it reaches the coordinator.",
+        help=(
+            "Corruption applied to one node's contribution before it reaches the coordinator. "
+            "'stale-base' makes the node train from an old base instead, which the fingerprint check "
+            "catches from round 2 on."
+        ),
     )
     parser.add_argument("--no-fault", action="store_true", help="Run with all contributions well formed.")
     parser.add_argument(
@@ -119,6 +133,12 @@ def _parse_args() -> argparse.Namespace:
         default=None,
         help="Reject a contribution if any tensor's update norm exceeds this fraction of its base norm.",
     )
+    parser.add_argument(
+        "--fingerprint-policy",
+        choices=["if-present", "require", "ignore"],
+        default="if-present",
+        help="Whether contributions must declare the fingerprint of the base they trained from.",
+    )
     parser.add_argument("--json", action="store_true", help="Print full validation reports as JSON.")
     return parser.parse_args()
 
@@ -130,6 +150,7 @@ def main() -> None:
 
     limits = ValidationLimits(
         dtype_policy=args.dtype_policy,
+        fingerprint_policy=args.fingerprint_policy,
         max_global_relative_update=args.max_global_relative_update,
         max_layer_relative_update=args.max_layer_relative_update,
     )
@@ -139,7 +160,7 @@ def main() -> None:
         contribution_policy=ContributionPolicy(quality_floor=0.5, max_node_weight=0.6),
         limits=limits,
     )
-    fault = None if args.no_fault else FAULTS[args.fault]
+    fault = None if args.no_fault else args.fault
     nodes = _build_nodes(model, args.faulty_node, fault)
 
     print(f"limits: {limits}")
@@ -149,7 +170,9 @@ def main() -> None:
     for _ in range(args.rounds):
         result = coordinator.run_round(nodes)
         reports = coordinator.validation_reports[result.round_num]
-        print(f"\nround {result.round_num}")
+        print(
+            f"\nround {result.round_num}  base {coordinator.round_summaries[result.round_num].base_fingerprint[:19]}..."
+        )
         print(f"  accepted: {result.accepted_nodes}")
         print(f"  rejected: {result.rejected_nodes}")
         print(f"  weights:  { {k: round(v, 3) for k, v in result.contribution_weights.items()} }")
