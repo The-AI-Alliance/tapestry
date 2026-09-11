@@ -1,0 +1,118 @@
+@import "./custom/custom";
+
+// The following trick is from
+// https://christianoliff.com/blog/styling-external-links-with-an-icon-in-css/
+// It automatically adds the "external link" glyph
+// at the end of all non-relative URLs. This DOES NOT
+// cause them to be opened in separate windows; for that
+// the anchor tag has to contain a target="foo".
+div.main-content a[href^="http"]::after,
+div.main-content a[href^="https://"]::after,
+div.main-content a[href^="mailto:"]::after
+{
+  content: "";
+  width: 11px;
+  height: 11px;
+  margin-left: 4px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='currentColor' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M8.636 3.5a.5.5 0 0 0-.5-.5H1.5A1.5 1.5 0 0 0 0 4.5v10A1.5 1.5 0 0 0 1.5 16h10a1.5 1.5 0 0 0 1.5-1.5V7.864a.5.5 0 0 0-1 0V14.5a.5.5 0 0 1-.5.5h-10a.5.5 0 0 1-.5-.5v-10a.5.5 0 0 1 .5-.5h6.636a.5.5 0 0 0 .5-.5z'/%3E%3Cpath fill-rule='evenodd' d='M16 .5a.5.5 0 0 0-.5-.5h-5a.5.5 0 0 0 0 1h3.793L6.146 9.146a.5.5 0 1 0 .708.708L15 1.707V5.5a.5.5 0 0 0 1 0v-5z'/%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  display: inline-block;
+}
+
+// Add the class "no-glyph" to links where you don't want the glyph added,
+// like images that are links.
+div.main-content a[href^="http"].no-glyph::after,
+div.main-content a[href^="https://"].no-glyph::after,
+div.main-content a[href^="mailto:"].no-glyph::after
+{
+  background-image: none  !important ;
+  width: 0px !important;
+}
+
+// This doesn't actually work. Instead, the child-page ToC
+// just uses the child.url, but NOT child.url | absolute.url.
+// This causes the generated links to be relative, whereas 
+// for some reason when child.url | absolute.url is used,
+// the absolute.url wins and a full URL is inserted.
+div.child-pages-toc a[href^="http://example.com"]::after
+div.child-pages-toc a[href^="https://example.com"]::after
+{
+  display: none !important;
+}
+
+.disabled {
+  background-color: grey;
+  opacity: 0.5;
+}
+
+.bold {
+  font-weight: bold
+}
+
+// A "box" around that can be used for a different kind of callout.
+div.callout-box {
+  background: #F0F0F8;
+  margin: 5px;
+  padding: 5px;
+  border: 1px solid #8080F8;
+}
+
+// Similar to div.callout-box
+table, th, td {
+  // background: #F0F0F8;
+  // margin: 5px;
+  padding: 5px;
+  // border: 2px solid #8080F8;
+}
+td {
+  background: #F0F0F8;
+}
+
+// Center divs and images
+div.centered {
+  text-align: center;
+}
+img.centered {
+  margin: auto; 
+  display: block
+} 
+
+// Style figure captions
+p.caption {
+  font-size: 80%;
+  font-style: italic;
+}
+
+.resizer { display:flex; margin:0; padding:0; resize:both; overflow:hidden }
+.resizer > .resized { flex-grow:1; margin:0; padding:0; border:0 }
+
+form.form-dataset-table {
+}
+th.form-dataset-table-label {
+  text-align: right;
+}
+td.form-dataset-table-value {
+  text-align: left;
+  width: 100%;
+}
+td.form-dataset-table-value-shorter {
+  text-align: left;
+  width: 90%;
+}
+input.form-dataset-table-input {
+  width: 100%;
+}
+input.form-dataset-table-file-input {
+
+}
+input.form-dataset-table-checkbox {
+  text-align: left;
+}
+select.form-dataset-table-value {
+  background-color: blue;
+}
+select.form-dataset-table-value {
+  background-color: blue;
+}
