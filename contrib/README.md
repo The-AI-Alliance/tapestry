@@ -232,7 +232,7 @@ Here is an example adapted from `contrib/jneums-consortium-experiment/.targets.m
 CONSORTIUM_EXPERIMENT_DIR := contrib/jneums-consortium-experiment
 
 consortium-experiment::
-  @echo "${INFO} Running the consortium-training experiment metrics... ${_END}"
+  @echo "${INFO}Running the consortium-training experiment metrics...${_END}"
   PYTHONPATH="${PWD}/${SRC_DIR}:${PWD}/${CONSORTIUM_EXPERIMENT_DIR}" uv run python ${CONSORTIUM_EXPERIMENT_DIR}/run.py
 
 ...
