@@ -31,7 +31,7 @@ This website is for technical contributors. As Project Tapestry evolves, this we
 > * Use the search box at the top of this page to find specific content.
 > * Many of the links go to documentation in the repository. Some of the links for Capitalized Terms go to the [AI Alliance Glossary]({{site.glossary_url}}){:target="_glossary"}, while many Tapestry-specific terms are defined in a [separate glossary]({{site.repo_tech_docs_url}}/reference/glossary.md){:target="repo-docs"} in Tapestry's repository.
  
-## Contribute to Our First Work Streams
+## Contribute to Our Work Streams
 
 Project Tapestry has big plans. Here are the main areas of current focus.
 
@@ -45,12 +45,12 @@ Project Tapestry has big plans. Here are the main areas of current focus.
 
 Tapestry is designed with data sovereignty requirements first and foremost, leading to new approaches for distributed model training to build world-class foundation models, as well as support tuning domain-specific models using sensitive data with carefully governed access.
 
-The following work groups are provisional. [Participation is welcome!]({{site.baseurl}}/contributing)
+The following work groups are provisional. As they grow, some will split into smaller, more focused groups. [Participation is welcome!]({{site.baseurl}}/contributing)
 
 | Work Group | Focus |
 | :--------- | :---- |
 | [Base Model Training]({{site.repo_tech_docs_url}}/work-groups/base-model-training/){:target="repo-docs"} | Own the shared model capability path: selecting or adopting an initial open-weights base, defining how [consortium training]({{site.repo_tech_docs_url}}/reference/training-approaches.md) improves shared weights, and planning the transition toward consortium-owned base models when the project has sufficient compute, data, and operational maturity. |
-| [Data Governance]({{site.repo_tech_docs_url}}/work-groups/data-governance/){:target="repo-docs"} | Define how sovereign data can participate in Tapestry without surrendering control. This group owns data sourcing, licensing, stewardship, residency constraints, provenance, contribution rights, and data-quality expectations for national, cultural, industrial, and institutional participants. |
+| [Data Governance]({{site.repo_tech_docs_url}}/work-groups/data-governance/){:target="repo-docs"} | Define how sovereign data can participate in Tapestry without surrendering control. This group owns data sourcing, licensing, stewardship, residency constraints, provenance, contribution rights, and data-quality expectations for national, cultural, industrial, and institutional participants. It will also oversee the engineering required to meet these requirements. |
 | [Deployment and Adoption]({{site.repo_tech_docs_url}}/work-groups/deployment-adoption/){:target="repo-docs"} | Ensure Tapestry-derived models become usable systems, not just trained weights. This group owns serving patterns, product harnesses, integration guidance, participant rollout, developer experience, and adoption feedback loops. |
 | [Evaluation Certification]({{site.repo_tech_docs_url}}/work-groups/evaluation-certification/){:target="repo-docs"} | Define the evidence that Tapestry models, pipelines, and participants must produce before claims of capability, sovereignty, cultural alignment, safety, or certification are accepted. |
 | [Governance and Participation]({{site.repo_tech_docs_url}}/work-groups/governance-participation/){:target="repo-docs"} | Translate Tapestry's governance principles into operating mechanics for work groups, participants, contributions, decisions, certification processes, and anti-capture safeguards. |
