@@ -62,7 +62,7 @@ M1 is building on the prototype work of M0 to expand the number of sovereign nod
 | **Release**   | TBD |
 | **Dashboard** | [Tapestry Project - M1]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM2){:target="dash"}
 
-In the M2 time frame, we plan to complete an end-to-end, production quality and globally-distributed training and post-training infrastructure and software stack, with further progress on building domain-specific and culturally-specific models, based on open-weight models. We also plan to complete preparation for training our own foundation models &ldquo;from scratch&rdquo; and to begin that process.
+In the M2 time frame, we plan to complete an end-to-end, production quality and globally-distributed training and post-training infrastructure stack, with further progress on building domain-specific and culturally-specific models, based on open-weight models. We also plan to complete preparation for training our own foundation models &ldquo;from scratch&rdquo;.
 
 ---
 
