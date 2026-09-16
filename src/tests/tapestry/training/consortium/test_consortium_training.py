@@ -1,9 +1,5 @@
 """Tests for the consortium-training proof of concept."""
 
-# pylint: disable=wrong-import-position
-
-from __future__ import annotations
-
 import sys
 from pathlib import Path
 
@@ -11,7 +7,7 @@ import pytest
 import torch
 from torch import nn
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[4]))
+from hypothesis import given, settings, strategies as st
 
 from tapestry.training.consortium import (
     ConsortiumCoordinator,
@@ -23,6 +19,9 @@ from tapestry.training.consortium import (
     TinyCausalModel,
 )
 
+from tests.test_utils.hypothesis.models import (
+    tiny_causal_models
+)
 
 def _model() -> nn.Module:
     return TinyCausalModel(vocab_size=64, hidden_size=16)
@@ -35,20 +34,25 @@ def _corpus(offset: int = 0) -> list[list[int]]:
         [3 + offset, 4 + offset, 5 + offset, 6 + offset],
     ]
 
-
-def test_sovereign_node_returns_artifact_and_local_model_state() -> None:
+@settings(deadline=400)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
+@given(tiny_causal_models(
+    min_vocab_size=16, max_vocab_size=64,
+    min_hidden_size=2, max_hidden_size=4,
+))
+def test_sovereign_node_returns_artifact_and_local_model_state(model) -> None:
+# def test_sovereign_node_returns_artifact_and_local_model_state() -> None:
     """A node keeps a sovereign model artifact and shares its local weight vector."""
     torch.manual_seed(0)
     node = SovereignTrainingNode(
         node_id="vn-node",
         jurisdiction="Vietnam",
-        model=_model(),
-        sovereign_corpus=_corpus(),
+        model=model,
+        sovereign_corpus=_corpus(0),
         quality_score=0.82,
         local_epochs=1,
         lr=0.01,
     )
-    base_state = {k: v.clone() for k, v in _model().state_dict().items()}
+    base_state = {k: v.clone() for k, v in model.state_dict().items()}
 
     result = node.run_sovereign_cycle(round_num=1, base_state=base_state)
 
@@ -62,21 +66,40 @@ def test_sovereign_node_returns_artifact_and_local_model_state() -> None:
     assert any(not torch.equal(result.contribution.local_model_state[name], base_state[name]) for name in base_state)
 
 
-def test_contribution_policy_applies_quality_floor_and_capture_cap() -> None:
-    """Governed weighting drops weak updates and caps dominant nodes."""
-    policy = ContributionPolicy(quality_floor=0.7, max_node_weight=0.6)
-
-    weights = policy.weights(
-        {
-            "strong": 0.95,
-            "dominant": 5.0,
-            "weak": 0.4,
-        }
+def quality_floors(min_value: float = 0.0, max_value: float = 0.5):
+    return st.floats(min_value=min_value, max_value=max_value)
+def max_node_weights(min_value: float = 0.5, max_value: float = 1.0):
+    return st.floats(min_value=min_value, max_value=max_value)
+def weights_maps(
+        min_size: int = 2, max_size: int = 10,
+        min_key_size: int = 1, max_key_size: int = 10,
+        min_key_value: float = 0.01, max_key_value: float = 1.0,
+    ):
+    return st.dictionaries(
+        st.text(min_size=min_key_size, max_size=max_key_size),  # keys
+        st.floats(min_value=min_key_value, max_value=max_key_value),    # values
+        min_size=min_size,
+        max_size=max_size,
     )
 
-    assert "weak" not in weights
-    assert weights["dominant"] <= 0.6
-    assert sum(weights.values()) == pytest.approx(1.0)
+@given(quality_floors(), max_node_weights(), weights_maps())
+def test_contribution_policy_applies_quality_floor_and_capture_cap(quality_floor, max_node_weight, weights_map) -> None:
+    """Governed weighting drops weak updates and caps dominant nodes."""
+    policy = ContributionPolicy(quality_floor=quality_floor, max_node_weight=max_node_weight)
+    weights = policy.weights(weights_map)
+
+    assert len(weights) <= len(weights_map)  # Some may have been filtered.
+    if len(weights):    # At least some survived filtering
+        for key in weights.keys():
+            if weights_map[key] < quality_floor:
+                assert key not in weights, str(weights)
+            elif max_node_weight*len(weights) > 1.0: 
+                # The max_node_weight won't be observed if there are too few weights after quality filtering!
+                assert weights[key] <= max_node_weight, str(weights)
+        assert sum(weights.values()) == pytest.approx(1.0), str(weights)
+    else:   # All were filtered. Confirm this is valid.
+        for value in weights_map.values():
+            assert value <= quality_floor
 
 
 def test_equal_contribution_policy_ignores_quality_magnitude_after_floor() -> None:

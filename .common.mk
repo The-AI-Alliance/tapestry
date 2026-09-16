@@ -166,6 +166,8 @@ ${HIGHLIGHT}Quick help for this make process - General Targets:${_END_BOLD}${_EN
 ${CODE}make all${_END}                # Makes the ${CODE}help${_END} and ${CODE}print-info${_END} targets.
 ${CODE}make help${_END}               # Prints this output.
 ${CODE}make print-info${_END}         # Print the current values of some make and environment variables.
+${CODE}make foo-watch${_END}          # Rerun ${CODE}make foo${_END} whenever any files are changed.
+${CODE}${_END}                        # See also the custom ${CODE}*-watch${_END} targets below.
 
 ${HIGHLIGHT}Working with the code:${_END_BOLD}${_END}
 
@@ -476,6 +478,27 @@ list:
 	@cd ${SRC_DIR} && ls -al ${LIST_FILTER}
 pwd:
 	@cd ${SRC_DIR} && echo "Currently in directory: ${CODE}$$(pwd)${_END}"
+
+.PHONY: list pwd watch
+
+# Some explicit *-watch targets are defined above in this file for shell commands
+# with `--watch` flags, which continually rerun when files change. The following
+# %-watch target pattern provides similar behavior for arbitrary make targets. For
+# example, to keep running the unit tests as you edit the files, use:
+#   make unit-tests-watch
+
+%-watch:
+	@while true; do \
+        $(MAKE) ${@:%-watch=%}; \
+        echo "${TIP}Hit CTRL-c to exit...${_END}"; \
+        fswatch --one-event --recursive --extended \
+        	--include '\.mk$$' \
+  			--exclude '\.coverage' \
+  			--exclude '\.hypothesis' \
+  			--exclude '__pycache__' \
+  			--exclude '\..*_cache' \
+        	. || exit 0; \
+    done
 
 .PHONY: one-time-setup clean-setup uninstall-uv
 .PHONY: force-setup force-one-time-setup rm-venv
