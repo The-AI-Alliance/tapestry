@@ -490,9 +490,10 @@ pwd:
 %-watch:
 	@while true; do \
         $(MAKE) ${@:%-watch=%}; \
-        echo "${TIP}Hit CTRL-c to exit...${_END}"; \
+        echo "${HIGHLIGHT}Use CTRL-c TWICE to exit...${_END_BOLD}${_END}"; \
         fswatch --one-event --recursive --extended \
         	--include '\.mk$$' \
+  			--exclude '\.git' \
   			--exclude '\.coverage' \
   			--exclude '\.hypothesis' \
   			--exclude '__pycache__' \

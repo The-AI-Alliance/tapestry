@@ -16,12 +16,35 @@ from tapestry.training.consortium import (
     TinyCausalModel,
 )
 
+def quality_floors(min_value = 0.0, max_value = 0.9):
+    return st.floats(min_value=min_value, max_value=max_value, allow_nan=False)
+
+def max_node_weights(min_value = 0.1, max_value = 1.0):
+    return st.floats(min_value=min_value, max_value=max_value, allow_nan=False)
+
+def node_ids(
+        min_size = 1,
+        max_size = 12,
+        alphabet = st.characters(whitelist_categories=("Ll", "Lu", "Nd"))):
+    return st.text(min_size=min_size, max_size=max_size, alphabet=alphabet)
+
+def scores(min_value = 0.0, max_value = 10.0, allow_nan = False, allow_infinity = False):
+    return st.floats(min_value=min_value, max_value=max_value, allow_nan=allow_nan, allow_infinity=allow_infinity)
+
+def quality_score_maps(
+        node_ids = node_ids(),
+        scores   = scores(),
+        min_size = 1,
+        max_size = 12):
+    """Dictionaries mapping node IDs to non-negative quality scores."""
+    return st.dictionaries(node_ids, scores, min_size=min_size, max_size=max_size)
+
 
 def tiny_causal_models(
-    min_vocab_size: int = 32,
-    max_vocab_size: int = 1028,
-    min_hidden_size: int = 2,
-    max_hidden_size: int = 16,
+    min_vocab_size  = 32,
+    max_vocab_size  = 1028,
+    min_hidden_size = 2,
+    max_hidden_size = 16,
 ):
     """
     A Hypothesis strategy for generating `TinyCausalModel` instances.

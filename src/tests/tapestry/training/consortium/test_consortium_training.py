@@ -1,5 +1,6 @@
 """Tests for the consortium-training proof of concept."""
 
+import copy
 import sys
 from pathlib import Path
 
@@ -19,8 +20,13 @@ from tapestry.training.consortium import (
     TinyCausalModel,
 )
 
-from tests.test_utils.hypothesis.models import (
-    tiny_causal_models
+from tests.test_utils.hypothesis.strategies import (
+    max_node_weights,
+    node_ids,
+    quality_floors,
+    scores,
+    tiny_causal_models,
+    quality_score_maps,
 )
 
 def _model() -> nn.Module:
@@ -34,13 +40,12 @@ def _corpus(offset: int = 0) -> list[list[int]]:
         [3 + offset, 4 + offset, 5 + offset, 6 + offset],
     ]
 
-@settings(deadline=400)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
+@settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
 @given(tiny_causal_models(
-    min_vocab_size=16, max_vocab_size=64,
+    min_vocab_size=64, max_vocab_size=256,
     min_hidden_size=2, max_hidden_size=4,
 ))
 def test_sovereign_node_returns_artifact_and_local_model_state(model) -> None:
-# def test_sovereign_node_returns_artifact_and_local_model_state() -> None:
     """A node keeps a sovereign model artifact and shares its local weight vector."""
     torch.manual_seed(0)
     node = SovereignTrainingNode(
@@ -66,23 +71,7 @@ def test_sovereign_node_returns_artifact_and_local_model_state(model) -> None:
     assert any(not torch.equal(result.contribution.local_model_state[name], base_state[name]) for name in base_state)
 
 
-def quality_floors(min_value: float = 0.0, max_value: float = 0.5):
-    return st.floats(min_value=min_value, max_value=max_value)
-def max_node_weights(min_value: float = 0.5, max_value: float = 1.0):
-    return st.floats(min_value=min_value, max_value=max_value)
-def weights_maps(
-        min_size: int = 2, max_size: int = 10,
-        min_key_size: int = 1, max_key_size: int = 10,
-        min_key_value: float = 0.01, max_key_value: float = 1.0,
-    ):
-    return st.dictionaries(
-        st.text(min_size=min_key_size, max_size=max_key_size),  # keys
-        st.floats(min_value=min_key_value, max_value=max_key_value),    # values
-        min_size=min_size,
-        max_size=max_size,
-    )
-
-@given(quality_floors(), max_node_weights(), weights_maps())
+@given(quality_floors(), max_node_weights(), quality_score_maps())
 def test_contribution_policy_applies_quality_floor_and_capture_cap(quality_floor, max_node_weight, weights_map) -> None:
     """Governed weighting drops weak updates and caps dominant nodes."""
     policy = ContributionPolicy(quality_floor=quality_floor, max_node_weight=max_node_weight)
@@ -92,47 +81,65 @@ def test_contribution_policy_applies_quality_floor_and_capture_cap(quality_floor
     if len(weights):    # At least some survived filtering
         for key in weights.keys():
             if weights_map[key] < quality_floor:
-                assert key not in weights, str(weights)
+                assert key not in weights
             elif max_node_weight*len(weights) > 1.0: 
                 # The max_node_weight won't be observed if there are too few weights after quality filtering!
-                assert weights[key] <= max_node_weight, str(weights)
-        assert sum(weights.values()) == pytest.approx(1.0), str(weights)
+                assert weights[key] < max_node_weight or weights[key] == pytest.approx(max_node_weight)
+        assert sum(weights.values()) == pytest.approx(1.0)
     else:   # All were filtered. Confirm this is valid.
         for value in weights_map.values():
             assert value <= quality_floor
 
-
-def test_equal_contribution_policy_ignores_quality_magnitude_after_floor() -> None:
+@given(quality_floors())
+def test_equal_contribution_policy_ignores_quality_magnitude_after_floor(quality_floor) -> None:
     """The equal MVP option gives every accepted participant the same influence."""
-    policy = ContributionPolicy(quality_floor=0.7, weighting=ContributionWeighting.EQUAL)
+    policy = ContributionPolicy(quality_floor=quality_floor, weighting=ContributionWeighting.EQUAL)
 
-    weights = policy.weights(
-        {
-            "strong": 0.95,
-            "dominant": 5.0,
-            "weak": 0.4,
-        }
-    )
+    def adjust(x, delta):
+        x = quality_floor + delta
+        x = x if x <= 1.0 else 1.0
+        x = x if x >= 0.0 else 0.0
+        return x
 
-    assert "weak" not in weights
-    assert weights == {
-        "strong": pytest.approx(0.5),
-        "dominant": pytest.approx(0.5),
+    dominant = adjust(quality_floor,  0.01)
+    weak     = adjust(quality_floor, -0.01)
+    init_weights = {
+        "strong": 0.95,
+        "dominant": dominant,
+        "weak": weak,
     }
+    weights = policy.weights(init_weights)
+
+    if quality_floor > 0.0:
+        assert weights == {
+            "strong":   pytest.approx(0.5, abs=1e-5),
+            "dominant": pytest.approx(0.5, abs=1e-5),
+        }
+    else:
+        assert weights == {
+            "strong":   pytest.approx(0.33333, abs=1e-5),
+            "dominant": pytest.approx(0.33333, abs=1e-5),
+            "weak":     pytest.approx(0.33333, abs=1e-5),
+        }
 
 
-def test_coordinator_maintains_n_plus_one_model_outcome() -> None:
+@settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
+@given(tiny_causal_models(
+    min_vocab_size=64, max_vocab_size=256,
+    min_hidden_size=2, max_hidden_size=4,
+))
+def test_coordinator_maintains_n_plus_one_model_outcome(model) -> None:
     """One evolved base plus one sovereign artifact per node are retained."""
     torch.manual_seed(1)
     coordinator = ConsortiumCoordinator(
-        base_model=_model(),
+        base_model=model,
         contribution_policy=ContributionPolicy(quality_floor=0.1),
     )
     nodes = [
         SovereignTrainingNode(
             node_id="vietnam",
             jurisdiction="Vietnam",
-            model=_model(),
+            model=model,
             sovereign_corpus=_corpus(0),
             quality_score=0.9,
             local_epochs=1,
@@ -141,7 +148,7 @@ def test_coordinator_maintains_n_plus_one_model_outcome() -> None:
         SovereignTrainingNode(
             node_id="swiss",
             jurisdiction="Switzerland",
-            model=_model(),
+            model=copy.deepcopy(model),
             sovereign_corpus=_corpus(10),
             quality_score=0.8,
             local_epochs=1,
