@@ -1,19 +1,16 @@
 """Property-based and unit tests for ContributionPolicy."""
 
 import pytest
-from hypothesis import given, settings, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 from tapestry.training.consortium import ContributionPolicy, ContributionWeighting
-
-from tests.test_utils.hypothesis.strategies import (
+from tests.test_utils.hypothesis.model_strategies import (
     max_node_weights,
     node_ids,
     quality_floors,
-    scores,
-    tiny_causal_models,
     quality_score_maps,
 )
-
 
 # ---------------------------------------------------------------------------
 # Constructor validation

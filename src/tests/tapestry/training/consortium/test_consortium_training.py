@@ -1,14 +1,10 @@
 """Tests for the consortium-training proof of concept."""
 
 import copy
-import sys
-from pathlib import Path
 
 import pytest
 import torch
-from torch import nn
-
-from hypothesis import given, settings, strategies as st
+from hypothesis import given, settings
 
 from tapestry.training.consortium import (
     ConsortiumCoordinator,
@@ -17,20 +13,13 @@ from tapestry.training.consortium import (
     OuterMerge,
     OuterMergeStrategy,
     SovereignTrainingNode,
-    TinyCausalModel,
 )
-
-from tests.test_utils.hypothesis.strategies import (
+from tests.test_utils.hypothesis.model_strategies import (
     max_node_weights,
-    node_ids,
     quality_floors,
-    scores,
-    tiny_causal_models,
     quality_score_maps,
+    tiny_causal_models,
 )
-
-def _model() -> nn.Module:
-    return TinyCausalModel(vocab_size=64, hidden_size=16)
 
 
 def _corpus(offset: int = 0) -> list[list[int]]:
@@ -40,11 +29,16 @@ def _corpus(offset: int = 0) -> list[list[int]]:
         [3 + offset, 4 + offset, 5 + offset, 6 + offset],
     ]
 
+
 @settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
-@given(tiny_causal_models(
-    min_vocab_size=64, max_vocab_size=256,
-    min_hidden_size=2, max_hidden_size=4,
-))
+@given(
+    tiny_causal_models(
+        min_vocab_size=64,
+        max_vocab_size=256,
+        min_hidden_size=2,
+        max_hidden_size=4,
+    )
+)
 def test_sovereign_node_returns_artifact_and_local_model_state(model) -> None:
     """A node keeps a sovereign model artifact and shares its local weight vector."""
     torch.manual_seed(0)
@@ -78,17 +72,18 @@ def test_contribution_policy_applies_quality_floor_and_capture_cap(quality_floor
     weights = policy.weights(weights_map)
 
     assert len(weights) <= len(weights_map)  # Some may have been filtered.
-    if len(weights):    # At least some survived filtering
-        for key in weights.keys():
+    if len(weights):  # At least some survived filtering
+        for key in weights:
             if weights_map[key] < quality_floor:
                 assert key not in weights
-            elif max_node_weight*len(weights) > 1.0: 
+            elif max_node_weight * len(weights) > 1.0:
                 # The max_node_weight won't be observed if there are too few weights after quality filtering!
                 assert weights[key] < max_node_weight or weights[key] == pytest.approx(max_node_weight)
         assert sum(weights.values()) == pytest.approx(1.0)
-    else:   # All were filtered. Confirm this is valid.
+    else:  # All were filtered. Confirm this is valid.
         for value in weights_map.values():
             assert value <= quality_floor
+
 
 @given(quality_floors())
 def test_equal_contribution_policy_ignores_quality_magnitude_after_floor(quality_floor) -> None:
@@ -97,12 +92,12 @@ def test_equal_contribution_policy_ignores_quality_magnitude_after_floor(quality
 
     def adjust(x, delta):
         x = quality_floor + delta
-        x = x if x <= 1.0 else 1.0
-        x = x if x >= 0.0 else 0.0
+        x = min(x, 1.0)
+        x = max(x, 0.0)
         return x
 
-    dominant = adjust(quality_floor,  0.01)
-    weak     = adjust(quality_floor, -0.01)
+    dominant = adjust(quality_floor, 0.01)
+    weak = adjust(quality_floor, -0.01)
     init_weights = {
         "strong": 0.95,
         "dominant": dominant,
@@ -112,22 +107,26 @@ def test_equal_contribution_policy_ignores_quality_magnitude_after_floor(quality
 
     if quality_floor > 0.0:
         assert weights == {
-            "strong":   pytest.approx(0.5, abs=1e-5),
+            "strong": pytest.approx(0.5, abs=1e-5),
             "dominant": pytest.approx(0.5, abs=1e-5),
         }
     else:
         assert weights == {
-            "strong":   pytest.approx(0.33333, abs=1e-5),
+            "strong": pytest.approx(0.33333, abs=1e-5),
             "dominant": pytest.approx(0.33333, abs=1e-5),
-            "weak":     pytest.approx(0.33333, abs=1e-5),
+            "weak": pytest.approx(0.33333, abs=1e-5),
         }
 
 
 @settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
-@given(tiny_causal_models(
-    min_vocab_size=64, max_vocab_size=256,
-    min_hidden_size=2, max_hidden_size=4,
-))
+@given(
+    tiny_causal_models(
+        min_vocab_size=64,
+        max_vocab_size=256,
+        min_hidden_size=2,
+        max_hidden_size=4,
+    )
+)
 def test_coordinator_maintains_n_plus_one_model_outcome(model) -> None:
     """One evolved base plus one sovereign artifact per node are retained."""
     torch.manual_seed(1)
@@ -243,17 +242,26 @@ def test_momentum_delta_outer_merge_accumulates_outer_velocity() -> None:
     assert second["weight"].item() == pytest.approx(2.5)
 
 
-def test_low_quality_contribution_does_not_update_shared_base() -> None:
+@settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
+@given(
+    tiny_causal_models(
+        min_vocab_size=64,
+        max_vocab_size=256,
+        min_hidden_size=2,
+        max_hidden_size=4,
+    )
+)
+def test_low_quality_contribution_does_not_update_shared_base(model) -> None:
     """A round with no accepted contributions leaves the shared base unchanged."""
     torch.manual_seed(2)
     coordinator = ConsortiumCoordinator(
-        base_model=_model(),
+        base_model=model,
         contribution_policy=ContributionPolicy(quality_floor=0.95),
     )
     weak_node = SovereignTrainingNode(
         node_id="weak",
         jurisdiction="Test",
-        model=_model(),
+        model=copy.deepcopy(model),
         sovereign_corpus=_corpus(),
         quality_score=0.5,
         local_epochs=1,

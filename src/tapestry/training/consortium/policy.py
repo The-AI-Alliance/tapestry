@@ -40,9 +40,7 @@ class ContributionPolicy:  # pylint: disable=too-few-public-methods
 
     def weights(self, quality_scores: dict[str, float]) -> dict[str, float]:
         """Return normalized contribution weights for accepted nodes."""
-        accepted = {
-            node_id: score for node_id, score in quality_scores.items() if score >= self.quality_floor
-        }
+        accepted = {node_id: score for node_id, score in quality_scores.items() if score >= self.quality_floor}
         if not accepted:
             return {}
 
