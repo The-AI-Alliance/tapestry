@@ -247,7 +247,7 @@ help-command-%::
 do-help-command::
 	$(info ${${LABEL}_LABEL}Help on ${CODE}${CMD}${_END}:)
 	$(info $(if ${help-command-${CMD}-message},${help-command-${CMD}-message},${no-help-for-command-message}))
-	@true
+	@echo
 
 help-targets:: help-top-level-targets-prefix help-top-level-targets help-formal-spec help-vendored-scripts contrib-custom-program-help
 	@true  # for some reason, this needs to be here to avoid some undesirable, extra output
@@ -479,33 +479,36 @@ list:
 pwd:
 	@cd ${SRC_DIR} && echo "Currently in directory: ${CODE}$$(pwd)${_END}"
 
-.PHONY: list pwd watch
+.PHONY: list pwd
 
 # Some explicit *-watch targets are defined above in this file for shell commands
 # with `--watch` flags, which continually rerun when files change. The following
 # %-watch target pattern provides similar behavior for arbitrary make targets. For
 # example, to keep running the unit tests as you edit the files, use:
 #   make unit-tests-watch
+# NOTE: The sleep command is used to allow two CTRL-c invocations to successfully
+# interrupt the loop!
 
-%-watch:
+%-watch: command-check-fswatch
 	@while true; do \
         $(MAKE) ${@:%-watch=%}; \
         echo "${HIGHLIGHT}Use CTRL-c TWICE to exit...${_END_BOLD}${_END}"; \
         fswatch --one-event --recursive --extended \
-        	--include '\.mk$$' \
-  			--exclude '\.git' \
-  			--exclude '\.coverage' \
-  			--exclude '\.hypothesis' \
-  			--exclude '__pycache__' \
-  			--exclude '\..*_cache' \
-        	. || exit 0; \
+            --include '\.mk$$' \
+            --exclude '\.git' \
+            --exclude '\.coverage' \
+            --exclude '\.hypothesis' \
+            --exclude '__pycache__' \
+            --exclude '\..*_cache' \
+            . || exit 0; \
+        sleep 1; \
     done
 
-.PHONY: one-time-setup clean-setup uninstall-uv
+.PHONY: one-time-setup clean-setup uninstall-uv install-dev-dependencies install-brew-commands
 .PHONY: force-setup force-one-time-setup rm-venv
-.PHONY: command-check-uv uv-venv install-dev-dependencies install-requirements-txt-dependencies
+.PHONY: command-check-uv uv-venv install-requirements-txt-dependencies
 
-setup one-time-setup:: install-uv uv-venv install-dev-dependencies
+setup one-time-setup:: install-brew-commands uv-venv install-dev-dependencies
 force-setup force-one-time-setup:: rm-venv contrib-rm-venv setup
 rm-venv::
 	rm -rf .venv
@@ -519,15 +522,23 @@ install-dev-dependencies::
 install-requirements-txt-dependencies::
 	uv pip install --requirements requirements.txt
 
-# Check if a command is installed. If not, try to provide help on installing it.
-# If make is invoked by the || clause, we unset MAKEFLAGS to hack around suppressing
-# a warning about a potentially-undefined variable used in the targets
-# help-command-not-installed and  help-command-$$cmd.
+install-brew-commands:: install-uv install-fswatch # install-jq
+	@command -v jq > /dev/null || ( \
+	echo "${TIP_LABEL}The ${CODE}jq${_END} command is recommended for analyzing JSON files, but we don't install it automatically." && \
+	echo "${TIP_LABEL}If you want to install it, run the command ${CODE}make install-jq${_END}." )
+
+# Check if a command is installed. If not and brew is installed, try that. If brew isn't
+# installed or it fails to work, try to provide help on installing the command.
 install-%::
 	@cmd=${@:install-%=%} && command -v $$cmd > /dev/null && \
 		echo "${INFO_LABEL}Command ${CODE}$$cmd${_END} is already installed." || \
-		${MAKE} MAKEFLAGS= CMD=$$cmd LABEL=WARNING help-command-not-installed help-command-$$cmd
-		@true
+		${MAKE} do-brew-install-$$cmd
+
+do-brew-install-%::
+	@cmd=${@:do-brew-install-%=%} && command -v brew > /dev/null && \
+		echo "Using HomeBrew to install $$cmd:" && brew install $$cmd || \
+		echo "${WARNING_LABEL}${CODE}HomeBrew${_END} is not installed, so we can't install ${CODE}$$cmd${_END}. Attempting to provide help..." && \
+		${MAKE} LABEL=WARNING help-command-$$cmd && exit 1
 
 uv-venv:: command-check-uv
 	@test -d .venv && echo "${INFO_LABEL}directory ${CODE}.venv${_END} already exists; not running ${CODE}uv venv${_END}." || uv venv
@@ -541,8 +552,6 @@ uninstall-uv::
 
 command-check-uv::
 	@command -v uv > /dev/null || ! ${MAKE} help-command-uv
-
-install-jq:: help-command-jq
 
 %-error:
 	$(info ${ERROR}${@:%-error=%} - Error ${_END})
@@ -562,8 +571,15 @@ endef
 
 help-command-uvx-message = ${help-command-uv-message}
 
+
+define help-command-fswatch-message
+The command ${CODE}fswatch${_END} is required for most of the ${CODE}%-watch${_END} targets to work.
+See its website, ${CODE}https://emcrisostomo.github.io/fswatch/${_END} for details.
+For example, if you have HomeBrew installed, run ${CODE}brew install fswatch${_END}.
+endef
+
 define help-command-jq-message
-${INFO_LABEL}The CLI command ${CODE}jq${_END} is useful, but not required, for processing JSON file.
+${INFO_LABEL}The CLI command ${CODE}jq${_END} is recommended, but not required, for processing JSON file.
 ${INFO_LABEL}See ${CODE}https://jqlang.org/download/${_END} for installation instructions.
 endef
 
