@@ -44,24 +44,24 @@ Out of scope for M1:
 	3. Research papers, white papers, blog posts, etc.
 	4. Open-source training platform for the whole work flow.
 
-#200 comment links feeding these requirements: [1](#comment-links), [3](#comment-links)
+#200 comment links feeding these requirements: [1,3](#comment-links))
 
 ## Several Suggestions Were Made
 
 * A model that supports a specific under-served language. (comment links: [2](#comment-links))
 	* For example, Vietnamese, native Indian languages and dialects, Thai.
 * A domain-specific model for the following possible domains:
-	* Finance (links: [1](#comment-links), [2](#comment-links))
+	* Finance (links: [1-2](#comment-links))
 		* For example, fraud detection.
-	* Healthcare (links: )
-	* Education (links: [1](#comment-links), [2](#comment-links))
+	* Healthcare (links: [6-8](#comment-links))
+	* Education (links: [1-2](#comment-links))
 		* Generally good for teaching and culturally aligned.
 	* Government and public service (links: [2](#comment-links))
 		* For example, a model could specialize in searching and analyzing local government news and helping users understand policy documents, navigate forms, and access public services.
 	* Industrial (links: [1](#comment-links))
 		* Past examples built by Alliance members include [SemiKong](https://arxiv.org/abs/2411.13802) and [Llamarine](https://arxiv.org/abs/2503.00203).
 
-While we have to pick one target domain and set of use cases, due to resource limitations, if we have interested experts in other domains, they can lay the ground work for subsequent models in their domains.
+While we have to pick one target domain and set of use cases, due to resource limitations, if we have interested experts in other domains, they can lay the groundwork for subsequent models in their domains.
 
 A separate _dimension_ is how much the domain model is culturally aligned and specific vs. independent of those concerns.
 
@@ -85,7 +85,7 @@ For the target domain, we need to identify the following:
 
 ## Example Detailed Use Cases for Healthcare
 
-Several detailed use cases where subsequently suggested in healthcare as possible targets, or at least they had the goal of stimulating discussion on specific, non-trivial, yet tractable problems to address.
+Several detailed use cases were subsequently suggested in healthcare as possible targets, or at least they had the goal of stimulating discussion on specific, non-trivial, yet tractable problems to address.
 
 Healthcare is an appealing target because it is _difficult_. It has significant data privacy requirements, but if Tapestry can meet them while utilizing that data responsibly, it would provide a major step forward in responsible AI.
 
@@ -96,7 +96,7 @@ Healthcare is an appealing target because it is _difficult_. It has significant 
 * **Literature and public clinical QA data sets:** E.g., MedQuAD. carry essentially none of the risks carried by real patient data.
 * **Synthetic and anonymized real data:** Good stand-ins for protected data, like EHRs, if created reliably.
 
-(links: [4](#comment-links), [5](#comment-links))
+(links: [4-5](#comment-links))
 
 <a id="proposal-1"></a>
 
@@ -134,6 +134,8 @@ If the endemic regions have extensive records of occurrences of these disease, u
 
 * Pick one or two specific diseases.
 * Pick one or two specific specialties.
+
+(links: [6](#comment-links))
 
 <a id="proposal-2"></a>
 
@@ -180,7 +182,7 @@ Find local data sets that reflect these cultural norms. The same _notes_ apply h
 
 ### Generalizations
 
-The above two use cases where inspired form the following, more-generalize suggestions.
+The above two use cases where inspired by the following, earlier, more-general suggestions.
 
 #### Tune an Open Healthcare-oriented Model to Improve Its Cultural Alignment for 1+ Cultures
 
@@ -194,7 +196,7 @@ For example, use MedGemma. Measure if the resulting model appears better for cul
 
 Data considerations: What data sources are best for this alignment, e.g., public epidemiological databases and regional health surveillance data, versus institution-specific records? That distinction matters for both feasibility and for how we would want to validate the results (public epidemiological data would need to stay current given regional disease prevalence shifts, while institutional data would need de-identification and independent review board (IRB) review, depending on the source.
 
-(links: [7](#comment-links), [8](#comment-links))
+(links: [7-8](#comment-links))
 
 ##### Tune an Open Healthcare-oriented Model to Improve Its Utility at Analyzing Healthcare Records
 
@@ -207,7 +209,7 @@ For example, use MedGemma. Measure if the resulting model appears better for ana
 
 Data considerations: If the record analysis and related-test suggestion tuning draws on real institutional records (even aggregated/statistical, as noted for differential privacy), that would need IRB approval at the collaborating institution. Given the concerns about the M1 timeline, it might be worth clarifying up front which of these use cases assumes real patient records (even anonymized) versus synthetic/public data only, since that changes the approval timeline substantially.
 
-(links: [7](#comment-links), [8](#comment-links))
+(links: [7-8](#comment-links))
 
 ## When Do We Need to Decide?
 
@@ -222,7 +224,9 @@ Do we need to decide now?
 * The sooner we decide, the sooner we can begin necessary preliminary work, like lining up the data sources and domain experts we need.
 * It can be frustrating to keep discussing an idea and not moving to a decision...
 
-### Comment Links:
+## Comment Links:
+
+The links above refer to these items, which are links to the actual comments in issue 200.
 
 1. [Initial description from Anthony Annunziata](https://github.com/The-AI-Alliance/tapestry/issues/200#issue-4989842561)
 2. [Comment from Hunter Hector](https://github.com/The-AI-Alliance/tapestry/issues/200#issuecomment-5547216421)
