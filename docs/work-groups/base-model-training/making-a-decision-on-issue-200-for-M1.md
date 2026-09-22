@@ -120,7 +120,10 @@ If the endemic regions have extensive records of occurrences of these disease, u
 * A focused, tangible solution for M1.
 * The spread of tropical diseases is a growing, widely-recognized problem.
 * Any sovereign data sets could be used for training by the corresponding local sovereign node.
-* We have a possible source of patient data from a set of charity hospitals in India through ClinicaMind, an Alliance member organization.
+* We have a possible source of patient data from a set of charity hospitals in India through ClinicaMind, an Alliance member organization. Some unanswered questions:
+    * What IRB/ethics review is needed to access this data, if any has been done already?
+    * Is the data already de-identified/anonymized, or would that need to happen as part of our pipeline?
+    * What kind of data would this actually be, structured fields (diagnosis codes, demographics, lab values), unstructured clinical notes, or both? That changes both the governance requirements and the technical approach significantly.
 * The solution does not require significant instruction or agent training, because prompting with responses will be the dominant modality, not workflows. Hence, the use case is an easier improvement to make to a model.
 * Supports text-only or multi-modal enhancement.
 
@@ -172,6 +175,7 @@ Find local data sets that reflect these cultural norms. The same _notes_ apply h
 * Is the assumption valid that existing models are poorly aligned culturally? Do local healthcare providers perceive a problem? These questions need confirmation.
 * Gaining access to any healthcare related data sets will be challenging, in part due to natural caution by owners of such data.
 * Generating synthetic data for this use case won't be feasible.
+* If the definition of "local" is _all of India_ for example, that would be an enormous amount of diversity to cover. Near term, we would probably pick one region and its one, most-common language.
 
 #### Variations
 
