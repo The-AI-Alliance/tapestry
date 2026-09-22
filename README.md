@@ -63,40 +63,62 @@ For repo layout, conventions, and where to find implementation code, see [**`AGE
 
 ## Setting Up for Development
 
-This project uses [`uv`](https://docs.astral.sh/uv/) for Python package management.
+This project uses [`uv`](https://docs.astral.sh/uv/) for Python package management and [GNU `make`](https://www.gnu.org/software/make/) for running commands. GNU `make` is included with Linux and MacOS distributions. If you are on Windows, try using [Make for Windows](https://gnuwin32.sourceforge.net/packages/make.htm).
 
-### Install uv
+If you can't use GNU `make`, you can run the underlying `uv` commands directly, as discussed below.
 
-On macOS/Linux:
+If you can run GNU `make`, run the following command:
+
+```shell
+make one-time-setup
+```
+
+This command will install [`uv`](https://docs.astral.sh/uv/) and [`fswatch`](https://emcrisostomo.github.io/fswatch/) (discussed [below](#development-tasks)), if they aren't already installed _and_ you have [HomeBrew](https://brew.sh/) installed. Then the target will install the project's Python library dependencies.
+
+If the command worked successfully, you can skip to [**Development Tasks**](#development-tasks). Otherwise, install `uv`, `fswatch`, and the Python dependencies as follows.
+
+### Install `uv`
+
+If you don't have `uv` installed already and you don't have [HomeBrew](https://brew.sh/) installed, run one of the following commands:
+
+**Linux/MacOS:**
 
 ```shell
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-On Windows:
+**Windows:**
 
 ```shell
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-The rest of the steps discussed next are automated using `make`. Try _one_ of the following commands, where the second one is executed by `make one-time-setup` (among some other things, like checking if this command has already been executed or not...):
+### Install `fswatch`
+
+Install the cross-platform `fswatch` as described on its [website](https://emcrisostomo.github.io/fswatch/).
+
+### Install the Python Dependencies
+
+After `uv` is installed, run these commands to complete the setup of your Python environment:
 
 ```shell
-make one-time-setup  # Uses GNU make, so may require MacOS or Linux
-# or use these commands:
 uv venv                     # Create the virtual environment
 source .venv/bin/activate   # Activate the environment: MacOS and Linux
 # .venv\Scripts\activate    # Activate the environment: Windows
 uv pip install -e ".[dev]"  # Install all dependencies
 ```
 
-We'll follow this pattern below, showing both the `make` command and the main `uv` commands that will be invoked as part of building the `make` target. Most of the `make` targets do other steps, like checking if required tools and directories exist. So, we recommend using the `make` commands if GNU `make` works on your machine. Otherwise, use the `uv` commands shown.
+## Development Tasks
+
+This section discusses the common _quality_ checks automated using `make` targets, along with the `uv` commands invoked. An "umbrella" target `before-pr` invokes all of them as a gate for pull requests (see [Before You Submit a PR](#before-you-submit-a-pr)).
+
+We will show both the GNU `make` command for a task, followed by the corresponding `uv` commands that are invoked as part of building the `make` target. Note that most of the `make` targets also do some other steps, like checking if required tools and directories exist. We recommend using the `make` commands if at all possible.
 
 > [!TIP]
-> Use `make -n some_target` to see the commands executed when `some_target` is built,
-> without executing them.
+> 1. Use `make -n some_target` to see the command invocations used when `some_target` is built, without executing those commands.
+> 2. _All_ the `make` targets have a `*-watch` variant, which will keep invoking the commands as files are saved. However, when a command has its own built-in watch feature, like `ruff` and `ty` (discussed below), that feature is used. Otherwise, for all other `make` targets (for example, `unit-tests`), the CLI command [`fswatch`](https://emcrisostomo.github.io/fswatch/), which we installed above, is used in an "infinite" loop to watch the file system and invoke the make target when changes are detected. `fswatch` supports almost all platforms, including Windows.
 
-## Running Tests
+### Running Tests
 
 We use [pytest](https://docs.pytest.org/) for testing. Using `make`:
 
@@ -112,10 +134,6 @@ uv run coverage run -m pytest -v -s .
 uv run coverage report -m
 ```
 
-## Code Formatting and Quality Checks
-
-We use tools for formatting, linting, and type-checking the code.
-
 ### Code Formatting
 
 Use _one_ of the following commands to format the Python code with `black`:
@@ -123,8 +141,17 @@ Use _one_ of the following commands to format the Python code with `black`:
 ```shell
 make format # makes the "black" target
 make black
-uv run black src
 ```
+
+This runs `black` to format your code. Here are the equivalent commands (assuming you start back at the repo root directory, the parent of `src`):
+
+```shell
+cd src
+uv run black .
+```
+
+> [!NOTE]
+> Since `black` may modify your code, make sure you commit any changes made. When `black` is invoked as part of the PR `before-pr` target, a flag is used to check if this target is being built by the PR process itself or just locally on your machine. When used in the actual PR process, `black` won't modify the code. Instead, it will fail if it _wants_ to modify your code.
 
 ### Linting
 
@@ -133,16 +160,23 @@ Use _one_ of the following commands to lint the Python code with `ruff` and `pyl
 ```shell
 make lint # makes the "ruff" and "pylint" targets
 make ruff pylint
-# or these TWO commands:
-uv run ruff check src
-uv pylint src
 ```
 
-There is also a "watch" option for `ruff` that keeps it running as you fix mistakes and save the files. Use _one_ of the following commands:
+Or use these commands:
+
+```shell
+cd src
+uv run ruff check --fix  .
+uv run pylint --recursive=y --ignore=.venv --ignore-pattern='.*cache.*'  .
+```
+
+There is also a `--watch` CLI option for `ruff` that keeps it running as you fix mistakes and save the files. We have a custom `make` target for this purpose. Use _one_ of the following command choices:
 
 ```shell
 make ruff-watch
-uv run ruff check --watch src
+# Or use the following:
+cd src
+uv run ruff check --watch .
 ```
 
 ### Type Checking
@@ -152,30 +186,38 @@ Use _one_ of the following commands to type check the Python code with `ty`:
 ```shell
 make type-check # makes the "ty" target
 make ty
-uv run ty src
 ```
 
-There is also a "watch" option that keeps `ty` running as you fix mistakes and save the files. Use _one_ of the following commands:
+Or use these commands:
+
+```shell
+cd src
+uv run ty .
+```
+
+Like `ruff`, `ty` also has a `--watch` CLI option that keeps `ty` running as you fix mistakes and save the files. We have a custom `make` target for this purpose. Use _one_ of the following command choices:
 
 ```shell
 make type-check-watch
-uv run ty --watch src
+# Or use the following:
+cd src
+uv run ty --watch .
 ```
 
 ## Making Contributions
 
 > [!NOTE]
-> Make sure to read the general guidance in [**Getting Involved**](#getting-involved-anchor) below before submitting a PR.
+> Your contributions are most welcome! Make sure to read the general guidance in [**Getting Involved**](#getting-involved-anchor) below before submitting a PR.
 
 ### _Where_ to Create Your Contribution
 
-If you are enhancing existing code, make the changes under `src`, and when appropriate, the top-level `Makefile` and `.common.mk`.
+If you are enhancing existing code, make the changes under `src`, and when appropriate, the top-level `Makefile` and supporting `.*.mk` files.
 
 However, for everything else, including proofs of concept (PoCs), experiments, proposed additions, etc., create them under [`contrib`](contrib/README.md), the staging area for new contributions. The `contrib` [`README`](contrib/README.md) describes the requirements you must follow for new contributions.
 
-For example, the common _quality check_ `make` targets, like `tests`, `lint`, etc. are also run for all the contributions. However, your contribution may not (yet) be production ready, so it might fail some of those checks. While you _should_ try to submit production-ready work, we don't want to discourage idea submissions. So, there is a straightforward mechanism to customize or disable any of these checks for contribution code, as needed.
+For example, the common _quality check_ `make` targets, like `tests`, `lint`, etc. are also run for all the contributions. However, your contribution may not (yet) be production ready, so it might fail some of those checks. While you _should_ try to submit production-ready work, we don't want to discourage idea submissions. So, there is a straightforward mechanism to customize or disable any of these checks for contribution code, as needed. The `contrib` [`README`](contrib/README.md) has the details.
 
-### Before You Submit a PR...
+### Before You Submit a PR
 
 Before submitting a PR, make sure the `make` target `before-pr` passes cleanly:
 
@@ -192,7 +234,7 @@ make before-pr-top       # The top-level code only.
 make before-pr-contrib   # The contrib/* code only.
 ```
 
-You can run a specific quality target on one or more contributions as follows. Let's suppose there is a `contrib/foo` contribution and we want to run `make format`, as an example:
+You can run a specific quality target on one or more contributions as follows. Let's suppose there is a `contrib/foo` contribution and you want to run `make format` on it:
 
 ```shell
 # Make "format" just for "contrib/foo"
@@ -228,7 +270,7 @@ tapestry/
 │           └── training/
 ```
 
-In addition, the [`docs`](docs/), discussed above, holds all technical documentation, and [`website`](website/), discussed below, holds the project technical website content.
+In addition, [`docs`](docs/) (discussed above) holds all technical documentation, and [`website`](website/) (discussed below) holds the project technical website content.
 
 <a id="getting-involved-anchor"></a>
 
@@ -247,7 +289,7 @@ You can also join one or more work groups that are being organized to identify r
 > [!IMPORTANT]
 > Code and documentation contributions happen here on GitHub.  **Organizational participation in the Tapestry consortium starts with a Letter of Intent (LOI), which is handled by the AI Alliance, not through this repo.**
 
-If your organization wants to join the Tapestry consortium and it intends to contribute data, compute, people, or funding, please email <a href="mailto:kbhatta@thealliance.ai?subject=Project Tapestry LOI">Kaushik Bhatta</a> to request the LOI.
+If your organization wants to join the Tapestry consortium and it intends to contribute data, compute, people, or funding, please email <a href="mailto:kbhatta@thealliance.ai?subject=Project Tapestry LOI">Kaushik Bhatta</a> for more information.
 
 ### Licenses
 
