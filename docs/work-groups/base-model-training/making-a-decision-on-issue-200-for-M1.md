@@ -11,6 +11,7 @@ I have attempted to organize and summarize the discussion in [#200](https://gith
 * Of the possible target domains, healthcare is an appealing choice because of the protected data challenges, although meeting them in M1 would be difficult.
 * No matter the choice made, we need to identify specific use cases to target, corresponding training and tuning data, domain experts for validation, and automated evaluations for ensuring efficacy.
 * Two detailed healthcare use cases have been proposed, [A Better Healthcare Model for Spreading Tropical Diseases](#proposal-1) and [A Better Healthcare Model for Local Conditions](#proposal-2). Variations of these proposals were also suggested.
+* A concrete cybersecurity use case was also proposed, [Collaborative Threat Intelligence Across Organizational Boundaries](#collaborative-threat-intelligence-across-organizational-boundaries).
 * There are pros and cons to making a decision right now:
 	* **Pros:** The sooner we decide, the sooner we can begin the preliminary work, like lining up the data sources and domain experts we need. Also, it can be frustrating to keep debating a decision.
 	* **Cons:** Since we don't have the compute resources yet that we need, we can't start tuning yet anyway.
@@ -54,6 +55,7 @@ Out of scope for M1:
 	* Finance (links: [1-2](#comment-links))
 		* For example, fraud detection.
 	* Healthcare (links: [6-8](#comment-links))
+	* Cybersecurity (links: [12](#comment-links))
 	* Education (links: [1-2](#comment-links))
 		* Generally good for teaching and culturally aligned.
 	* Government and public service (links: [2](#comment-links))
@@ -160,12 +162,28 @@ Adapt (using a combination of CPT, SFT, and RL) an existing healthcare model lik
 
 Find local data sets that reflect these cultural norms. The same _notes_ apply here that were listed in Proposal 1 above.
 
+We have received information about two potential data sets already.
+
+One is from a set of charity hospitals in India, connected to us through AI Alliance member company, ClinicaMind. This data may already be cleaned and suitable for use, solving a major responsible use concern.
+
+The second potential data source is DATAI (University of Navarra) and its affiliated hospital (CUN), suggested by Rubén Armañanzas, who is affiliated with both. Rubén made the following specific specific suggestions (link: [11](#comment-links)):
+
+**Task:** extracting diagnoses from Spanish clinical notes and assigning ICD-10 codes. Clinical Spanish is underrepresented in medical LLM training, and coding has external ground truth, which complements QA-style evaluation.
+
+**Fit with the goals:** Spain would add a second culture alongside India (goal 3). CUN is a natural candidate for the private derivative (goal 4) once governance and ethics approvals allow. We are not proposing to use real records in M1.
+
+**What we can contribute now, with public or synthetic data only:**
+1. **Benchmark:** a synthetic Spanish clinical set covering about 91% of ICD-10-CM categories (paper forthcoming). It was generated through a commercial LLM API whose terms rule out training on it, so it is for evaluation only.
+2. **Evidence on the gap:** Spanish clinical encoders at roughly 0.8 micro F1 on CodiEsp drop to roughly 0.2 on this set. We can run MedGemma and the #210 candidates on both.
+3. **Training data recipe:** synthetic data is feasible for records tasks. We propose regenerating an equivalent corpus with a permissively licensed open-weight model, with full provenance, as releasable training data.
+4. **Evaluation:** calibrated abstention and risk-coverage analysis as acceptance criteria (happy to help in #204). CUN clinicians could review a random sample of outputs, given their time constraints.
+
 #### Advantages
 
 * A focused, tangible solution for M1.
 * Very well aligned to a Tapestry core goal, which is better tools and models for cultural alignment.
 * Local healthcare providers may find the gap described negatively impacts their work (true??).
-* We have a possible source of patient data from a set of charity hospitals in India through ClinicaMind, an Alliance member organization.
+* We have at least two potential sources of relevant data, discussed above.
 * Any sovereign data sets could be used for training by the corresponding local sovereign node.
 * An _initial_ solution does not require significant instruction or agent training, because prompting with responses will be a good modality to target first, saving  workflows and agent scenarios for later.
 * Primarily text-only.
@@ -202,7 +220,7 @@ Data considerations: What data sources are best for this alignment, e.g., public
 
 (links: [7-8](#comment-links))
 
-##### Tune an Open Healthcare-oriented Model to Improve Its Utility at Analyzing Healthcare Records
+#### Tune an Open Healthcare-oriented Model to Improve Its Utility at Analyzing Healthcare Records
 
 For example, use MedGemma. Measure if the resulting model appears better for analyzing healthcare records, possibly in these areas:
 
@@ -214,6 +232,61 @@ For example, use MedGemma. Measure if the resulting model appears better for ana
 Data considerations: If the record analysis and related-test suggestion tuning draws on real institutional records (even aggregated/statistical, as noted for differential privacy), that would need IRB approval at the collaborating institution. Given the concerns about the M1 timeline, it might be worth clarifying up front which of these use cases assumes real patient records (even anonymized) versus synthetic/public data only, since that changes the approval timeline substantially.
 
 (links: [7-8](#comment-links))
+
+## Example Detailed Use Cases for Other Domains
+
+A detailed cybersecurity use case was also proposed:
+
+### Collaborative Threat Intelligence Across Organizational Boundaries
+
+Each organization typically runs a locally trained model on local incidents. The use case of federated learning (FL) is to generalize a single model to acquire knowledge about attack patterns that occur elsewhere. Due to jurisdictional data privacy requirements (e.g. GDPR) and the protection of trade secrets, it's unlikely that datasets can go to a centralized model for training. The opposite is likely to be true: a model that goes to the datasets in distributed locations and return to center with new capabilities. FL has a strong use case in preserving these requirements while gaining the desired capabilities.
+
+#### Solution
+
+Train a shared intrusion-/anomaly-detection model across a federation of sovereign nodes using FL, so raw logs never leave the node. Each node trains locally on its own telemetry and contributes only encrypted model updates. A federated aggregator combines them into a global model that every node pulls back down.
+
+#### Advantages
+
+- Strong native fit for Tapestry, re: federated sovereign node architecture.
+- A focused, tangible M1 target: intrusion/anomaly detection is a well-scoped supervised (or semi-supervised) classification task, not an open-ended agent/workflow problem.
+- Dataset availability: public, labeled intrusion datasets are downloadable today, so we can prototype the full loop before negotiating access to any partner's real logs.
+
+#### Disadvantages
+
+- FL introduces its own attack surface: model-inversion / gradient leakage, membership inference, colluding nodes, and update/model poisoning (including backdoors).
+- The privacy-utility cost is non-trivial and must be tuned.
+- Synthetic datasets have limited credibility. For further stages, real partner data will be required.
+
+#### Sample Experiment Design
+
+- Goal: measure whether FL across N simulated nodes beats N independent local models on intrusion detection, and quantify the accuracy cost of each privacy tier.
+- Data: start from public, labeled intrusion datasets. Partition into shards across a number of nodes, giving each node a skewed attack type mix to introduce regional asymmetry.
+- Task and Model: binary detection first, then multi-class attack-type; a single small shared architecture across nodes as nodes stay comparable.
+- Comparison Conditions: (1) per-node local-only baseline, (2) centralized "pool all data" upper bound, (3) basic FedAvg. etc.
+- Metrics: detection metrics, privacy, communication cost, latency, etc.
+- Adversarial probe: inject 1-2 poisoning / backdoor nodes and a gradient-inversion attacker. Check whether robust aggregation holds up.
+- Success criteria: FL lands within a few points of the centralized upper bound and clearly above local-only, at a privacy tier whose measured leakage sits below an agreed threshold.
+
+#### References:
+
+- [Federated Learning in Cybersecurity: Privacy-PreservingCollaborative Models for Threat IntelligenceAcrossGeopolitically Sensitive Organizational Boundaries](https://ijarpr.com/uploads/V2ISSUE7/IJARPR0712.pdf?v=2)
+- [Federated Learning-Driven Cybersecurity Framework for IoT Networks with PrivacyPreserving and Real-Time Threat Detection Capabilities](https://arxiv.org/pdf/2502.10599)
+- [Federated Learning for Cybersecurity: A Privacy-Preserving Approach](https://www.mdpi.com/2076-3417/15/12/6878)
+
+(link: [12](#comment-links))
+
+## Notes on the Implementation Approach
+
+So far, we have assumed we would create a tuned model with some combination of continued pretraining and post training with supervised fine tuning and reinforcement learning. There are some alternative approaches that have been suggested, taking a more application-level approach.
+
+### Federated learning over RAGs
+
+*Federated learning over RAGs* is an attractive option if we want to focus on post-training:
+
+- Flower.ai has already looked into this use case: [https://flower.ai/docs/examples/fedrag.html](https://flower.ai/docs/examples/fedrag.html)
+- [https://github.com/rui-ye/FedLLM-Bench](https://github.com/rui-ye/FedLLM-Bench)
+
+(links: [10](#comment-links))
 
 ## When Do We Need to Decide?
 
@@ -241,3 +314,6 @@ The links above refer to these items, which are links to the actual comments in 
 7. [Comment from Dean Wampler](https://github.com/The-AI-Alliance/tapestry/issues/200#issuecomment-5637408580)
 8. [Comment from Anisha](https://github.com/The-AI-Alliance/tapestry/issues/200#issuecomment-5647864200)
 9. [Comment from Dean](https://github.com/The-AI-Alliance/tapestry/issues/200#issuecomment-5680219673)
+10. [Comment from Maneesh](https://github.com/The-AI-Alliance/tapestry/issues/200#issuecomment-5778810910)
+11. [Comment from Rubén Armañanzas](https://github.com/The-AI-Alliance/tapestry/issues/200#issuecomment-5774346211)
+12. [Comment from Elaine Chan](https://github.com/The-AI-Alliance/tapestry/issues/200#issuecomment-5778998091)
