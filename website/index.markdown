@@ -7,7 +7,7 @@ has_children: true
 
 # Project Tapestry: Technical Website
 
-Welcome to the technical website for **The AI Alliance Project Tapestry**, representing the content from the [technical documentation and code repository]({{site.repo_url}}){:target="repo"} for [Project Tapestry]({{site.tapestry_url}}){:target="aia-tapestry"}.
+Welcome to the technical website for **The AI Alliance Project Tapestry**, representing the content from the [technical documentation and code repository]({{site.repo_url}}){:target="repo"} for Project Tapestry. See also the [Project Tapestry]({{site.tapestry_url}}){:target="aia-tapestry"} page on the [AI Alliance website]({{site.ai_alliance_url}}){:target="aia"}.
 
 {: .attention}
 > **News:** We are pleased to announce the completion of our first milestone, _Milestone Zero_ (M0). Read more about it [here]({{site.baseurl}}/announcements/milestone-zero).
