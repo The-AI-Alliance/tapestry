@@ -22,13 +22,14 @@ It addresses pain points around frontier cost, reusable consortium training infr
 - Shared-base continued pretraining on eligible participant contributions.
 - Contribution weighting and shared-model update policies.
 - Research agenda for heterogeneous, high-latency training at frontier scale. (Issues TBD)
+- Deciding on the first domain-specific tuned model for M1. See [Making a Decision on #200: the M1 Domain-specific Model to Build](making-a-decision-on-issue-200-for-M1.md), for [Issue #200](https://github.com/The-AI-Alliance/tapestry/issues/200).
 
 Out of scope: participant-specific alignment layers, serving/product integration, and detailed privacy mechanisms.
 
 ## Initial questions
 
 - Which open-weights base should Tapestry start from, and what makes it replaceable? Discussed further in [Base Model Selection](base-model-selection.md).
-- What is the first credible scale target for consortium training experiments?
+- What is the first credible scale target for consortium training experiments? (see [Issue #200](https://github.com/The-AI-Alliance/tapestry/issues/200))
 - How often should nodes contribute local model weight vectors, and who decides the cadence?
 - How are contributions weighted without creating a governance capture vector?
 
@@ -38,6 +39,7 @@ Out of scope: participant-specific alignment layers, serving/product integration
 - A consortium training experiment plan with target model sizes and node assumptions. ([Issue #24](https://github.com/The-AI-Alliance/tapestry/issues/24))
 - Aggregation-policy options for technical review.
 - Infrastructure requirements for heterogeneous compute and observability. ([Issue #26](https://github.com/The-AI-Alliance/tapestry/issues/26))
+- A first, domain-specific tuned model. ([Issue #200](https://github.com/The-AI-Alliance/tapestry/issues/200))
 
 ## Interfaces
 
