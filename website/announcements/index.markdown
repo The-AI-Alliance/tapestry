@@ -60,7 +60,7 @@ M1 is building on the prototype work of M0 to expand the number of sovereign nod
 | **Dates**     | December, 2026 - February, 2027 |
 | **Details**   | TBD |
 | **Release**   | TBD |
-| **Dashboard** | [Tapestry Project - M1]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM2){:target="dash"}
+| **Dashboard** | [Tapestry Project - M2]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM2){:target="dash"}
 
 In the M2 time frame, we plan to complete an end-to-end, production quality and globally-distributed training and post-training infrastructure stack, with further progress on building domain-specific and culturally-specific models, based on open-weight models. We also plan to complete preparation for training our own foundation models &ldquo;from scratch&rdquo;.
 
