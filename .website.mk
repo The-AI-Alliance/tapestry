@@ -9,6 +9,23 @@ CLEAN_DIRS   += ${CLEAN_WEBSITE_DIRS}
 # Override when running `make view-local` using e.g., `JEKYLL_PORT=8000 make view-local`
 JEKYLL_PORT  ?= 4000
 
+# github-pages currently supports Ruby 3, but not Ruby 4. Prefer an installed
+# Homebrew Ruby 3 when the default interpreter is outside that range.
+RUBY_BIN     ?= $(shell \
+	if ruby -e 'exit RUBY_VERSION.start_with?("3.")' >/dev/null 2>&1; then \
+		command -v ruby; \
+	else \
+		candidate=; \
+		for formula in ruby@3.4 ruby@3.3 ruby@3.2 ruby@3.1; do \
+			prefix=$$(brew --prefix $${formula} 2>/dev/null) && \
+				test -x "$${prefix}/bin/ruby" && { candidate="$${prefix}/bin/ruby"; break; }; \
+		done; \
+		[ -n "$${candidate}" ] && printf '%s' "$${candidate}" || command -v ruby; \
+	fi)
+GEM_BIN      ?= ${RUBY_BIN} -S gem
+BUNDLE_BIN   ?= ${RUBY_BIN} -S bundle
+JEKYLL_BIN   ?= ${RUBY_BIN} -S jekyll
+
 ifndef WEBSITE_DIR
 $(error ${ERROR}There is no ${WEBSITE_DIR} directory!${_END_BOLD}${_END})
 endif
@@ -34,6 +51,8 @@ ${CODE}${_END}                        # Makes the targets ${CODE}setup-jekyll${_
 ${CODE}${_END}                        # Tip: ${CODE}make JEKYLL_PORT=8000 view-local${_END} uses port 8000 instead of 4000!
 ${CODE}make setup-jekyll${_END}       # Install Jekyll. Make sure Ruby is installed.
 ${CODE}${_END}                        # (Only needed for local viewing of the document.)
+${CODE}${_END}                        # Uses Ruby 3 automatically when Homebrew has ruby@3.x installed.
+${CODE}${_END}                        # Override with ${CODE}RUBY_BIN=/path/to/ruby make view-local${_END} if needed.
 ${CODE}make run-jekyll${_END}         # Used by ${CODE}view-local${_END}; assumes ${CODE}setup-jekyll${_END} is already "built".
 ${CODE}${_END}                        # Tip: Build this target instead of ${CODE}view-local${_END} to avoid repeating ${CODE}setup-jekyll${_END}.
 ${CODE}${_END}                        # Tip: ${CODE}make JEKYLL_PORT=8000 run-jekyll${_END} uses port 8000 instead of 4000!
@@ -50,6 +69,7 @@ print-info-website::
 	@echo "  ${DARK_GREEN}Website files:${_END}      ${CODE}${WEBSITE_DIR}${_END}"
 	@echo "  ${DARK_GREEN}SITE_DIR:${_END}           ${CODE}${SITE_DIR}${_END}"
 	@echo "  ${DARK_GREEN}JEKYLL_PORT:${_END}        ${CODE}${JEKYLL_PORT}${_END} (when viewing locally: ${CODE}http://localhost:${JEKYLL_PORT}${_END})"
+	@echo "  ${DARK_GREEN}RUBY_BIN:${_END}            ${CODE}${RUBY_BIN}${_END}"
 
 .PHONY: all-website clean-website view-pages view-local
 .PHONY: view-pages view-local setup-jekyll run-jekyll run-jekyll-message
@@ -74,30 +94,38 @@ run-jekyll: clean-website
 	@echo "Once you see the ${CODE}http://127.0.0.1:${JEKYLL_PORT}/${_END} URL printed, open it with command+click..."
 	@echo
 	cd ${WEBSITE_DIR} && \
-		bundle exec jekyll serve --port ${JEKYLL_PORT} --baseurl '' --incremental || \
+		${BUNDLE_BIN} exec ${JEKYLL_BIN} serve --port ${JEKYLL_PORT} --baseurl '' --incremental || \
 		${MAKE} jekyll-error
 
-setup-jekyll:: ruby-installed-check ruby-gem-installation bundle-command-check bundle-installation
+setup-jekyll:: ruby-installed-check ruby-version-check ruby-gem-installation bundle-command-check bundle-installation
 
-.PHONY: ruby-installed-check ruby-gem-installation bundle-command-check bundle-installation
+.PHONY: ruby-installed-check ruby-version-check ruby-gem-installation bundle-command-check bundle-installation
 .PHONY: jekyll-error ruby-missing-error gem-missing-error gem-error bundle-error bundle-missing-error
 
 ruby-gem-installation::
-	@command -v jekyll > /dev/null && \
-	  echo "${INFO_LABEL}jekyll already installed." || \
+	@${JEKYLL_BIN} --version > /dev/null 2>&1 && \
+	  echo "${INFO_LABEL}jekyll already installed for ${RUBY_BIN}." || \
 	  { echo "${NOTE}Installing Ruby gems...${_END}"; \
-	    gem install jekyll bundler jemoji || ${MAKE} gem-error; }
+	    ${GEM_BIN} install jekyll bundler jemoji || ${MAKE} gem-error; }
 
 bundle-installation::
-	bundle install || ${MAKE} bundle-error
-	bundle update html-pipeline || ${MAKE} bundle-error
+	${BUNDLE_BIN} install || ${MAKE} bundle-error
+	${BUNDLE_BIN} update html-pipeline || ${MAKE} bundle-error
 
 ruby-installed-check:
-	@command -v ruby > /dev/null || ${MAKE} ruby-missing-error
-	@command -v gem  > /dev/null || ${MAKE} gem-missing-error
+	@test -x "${RUBY_BIN}" || command -v "${RUBY_BIN}" > /dev/null 2>&1 || ${MAKE} ruby-missing-error
+
+ruby-version-check:
+	@ruby_version=$$(${RUBY_BIN} -e 'print RUBY_VERSION'); \
+	case "$${ruby_version}" in \
+	  3.*) ;; \
+	  *) echo "${ERROR}Ruby 3 is required for github-pages, but ${RUBY_BIN} is Ruby $${ruby_version}.${_END}"; \
+	     echo "Install it with ${CODE}brew install ruby@3.3${_END}, then retry ${CODE}make view-local${_END}."; \
+	     exit 1;; \
+	esac
 
 bundle-command-check:
-	@command -v bundle > /dev/null || \
+	@${BUNDLE_BIN} --version > /dev/null 2>&1 || \
 		${MAKE} bundle-missing-error
 
 # NOTE: We call make to run these %-error targets, because if you try

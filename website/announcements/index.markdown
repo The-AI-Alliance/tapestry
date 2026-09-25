@@ -30,7 +30,7 @@ Project Tapestry is managed on a three-month _milestone_ cycle, offset by one mo
 | :-- | :-- |
 | **Dates**     | June - August, 2026 |
 | **Details**   | [Milestone Zero - M0](./milestone-zero/) |
-| **Release**   | [v0.1.0-M0]({{site.repo_url}}/releases/tag/v0.1.0-M0){:target="m0-release"} |
+| **Release**   | [v0.1.0-M0]({{site.repo_url}}/releases/tag/V0.1.0-M0){:target="m0-release"} |
 | **Dashboard** | [Tapestry Project - M0]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM0){:target="dash"}
 
 Milestone "zero" (M0) was Project Tapestry’s first technical milestone. It was completed September 1, 2026. We used &ldquo;zero”&rdquo;, rather than &ldquo;one&rdquo;, because M0 was about building the consortium, while also pursuing initial goals.

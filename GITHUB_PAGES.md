@@ -33,6 +33,7 @@ Install a recent version of Ruby 3. Note that on MacOS, the default Ruby install
 > ```shell
 > brew install ruby@3.3.5
 > ```
+> `make view-local` automatically uses an installed Homebrew `ruby@3.x` when the default `ruby` is version 4. You can also select one explicitly with `RUBY_BIN=/path/to/ruby make view-local`.
 > If you need to use multiple versions of Ruby for your work, consider 
 > using a tool like `chruby` or others discussed on the [Ruby installation](https://www.ruby-lang.org/en/documentation/installation/)web page.
 
