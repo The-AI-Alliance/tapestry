@@ -18,6 +18,6 @@ If you have any questions or concerns about this effort, please contact us at [c
 
 ## Other AI Alliance Information
 
-* [More About the AI Alliance](https://www.thealliance.ai/about){:target="ai-alliance"}
+* [More About the AI Alliance](https://www.thealliance.ai/){:target="aia"}
 * [Contact Us](mailto:contact@thealliance.ai?subject=Questions about the AI Alliance) (email)
 * Follow us on [LinkedIn](https://www.linkedin.com/company/the-aialliance/){:target="linkedin"} and [Bluesky](https://bsky.app/profile/aialliance.bsky.social){:target="bluesky"}
