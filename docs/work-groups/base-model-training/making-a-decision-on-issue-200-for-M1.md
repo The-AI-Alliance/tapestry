@@ -10,7 +10,7 @@ I have attempted to organize and summarize the discussion in [#200](https://gith
 * The M1 model should be uniquely useful, even though time and resources preclude it being a comprehensive solution for the target domain.
 * Of the possible target domains, healthcare is an appealing choice because of the protected data challenges, although meeting them in M1 would be difficult.
 * No matter the choice made, we need to identify specific use cases to target, corresponding training and tuning data, domain experts for validation, and automated evaluations for ensuring efficacy.
-* Two detailed healthcare use cases have been proposed, [A Better Healthcare Model for Spreading Tropical Diseases](#proposal-1) and [A Better Healthcare Model for Local Conditions](#proposal-2). Variations of these proposals were also suggested.
+* Two detailed healthcare use cases have been proposed, [A Better Healthcare Model for Spreading Tropical Diseases](#proposal-1) and [A Better Healthcare Model for Local Conditions](#proposal-2), plus a more generic use case, [A "Hyper-local" Workflow Model](#proposal-3). Variations of these proposals were also suggested.
 * A concrete cybersecurity use case was also proposed, [Collaborative Threat Intelligence Across Organizational Boundaries](#collaborative-threat-intelligence-across-organizational-boundaries).
 * There are pros and cons to making a decision right now:
 	* **Pros:** The sooner we decide, the sooner we can begin the preliminary work, like lining up the data sources and domain experts we need. Also, it can be frustrating to keep debating a decision.
@@ -87,7 +87,7 @@ For the target domain, we need to identify the following:
 
 ## Example Detailed Use Cases for Healthcare
 
-Several detailed use cases were subsequently suggested in healthcare as possible targets, or at least they had the goal of stimulating discussion on specific, non-trivial, yet tractable problems to address.
+Several detailed use cases were subsequently suggested in healthcare as possible targets, or at least they had the goal of stimulating discussion on specific, non-trivial, yet tractable problems to address. One of the use cases discussed next targets healthcare, but it is easily generalized to other domains.
 
 Healthcare is an appealing target because it is _difficult_. It has significant data privacy requirements, but if Tapestry can meet them while utilizing that data responsibly, it would provide a major step forward in responsible AI.
 
@@ -202,9 +202,46 @@ The second potential data source is DATAI (University of Navarra) and its affili
 
 (links: [6](#comment-links))
 
-### Generalizations
 
-The above two use cases where inspired by the following, earlier, more-general suggestions.
+<a id="proposal-3"></a>
+
+### Proposal 3: A "Hyper-local" Workflow Model
+
+#### Problem
+
+This idea was suggested in a conversation between Dean Wampler by David Sarabia, the CEO and founder of ClinicaMind, a healthcare AI company. David said that one of the biggest challenges for clinics is improving the efficiency of their highly-customized workflows. The example he used is a neurologist who specializes in migraines. There are general-purpose workflows available for diagnosing and treating general neurology presentations, but a specialist will often want to skip steps that are not relevant to the specialty or the clinic's optimized workflow. A related problem is extracting just the information the provider needs, e.g., right before seeing a patient and having just a few minutes to refresh his or her memory about the patient's history. All the information is available, but often in formats and behind UIs that are slow and tedious to use.
+
+Hence, a real benefit in healthcare would be an AI system that is easy to customize for local, optimized work flows. Of course, this would not be limited to healthcare, as many professions have similar needs. For this to be effective, it would be necessary for the system to be able to learn by observing users at work, refined with natural language instructions, and no AI expertise required.
+
+#### Solution
+
+Adapt (using a combination of CPT, SFT, and RL) an existing model that is good at reasoning and instruction following. It is not certain that the model chosen needs to be already tuned for the domain, like healthcare, although this should be investigated.
+
+#### Advantages
+
+* A focused, tangible, yet very generalizable solution for M1.
+* Very well aligned to a Tapestry core goal, which is better tools and models for non-AI specialists to easily adopt AI to their specific, local conditions and requirements.
+* We have validation from a healthcare industry expert that this is widespread need for healthcare providers.
+* The training work could be done completely with synthetic data.
+* ClinicaMind may have neurology clinic customers who would be willing to use the system to create a local, working implementation, goal #4 in [Goals](#goals) above.
+* Because this would be a human-driven tool that automates time-consuming productivity steps, it would be a relatively safe use of AI in a healthcare setting.
+
+#### Disadvantages
+
+* Even an _initial_ solution requires significant instruction following and reasoning capabilities.
+* Even an _initial_ solution requires agent integration for interacting with EHR and other systems, etc.
+* A multimodal model may be necessary to be truly effective.
+* Even if one or more clinics are willing to try the system, it may take too long to implement for our M1 time frame.
+* While using synthetic data and "fake" EHR systems are sufficient for our training needs, ensuring they accurately represent real data and systems is not trivial.
+
+#### Variations
+
+* Pick another domain workflow.
+
+
+### Generalizations and Other Ideas
+
+The first two use cases above were inspired by the next two, more-general suggestions made earlier in the #200 discussion. The third use case above was suggested in a more recent conversation (as described above).
 
 #### Tune an Open Healthcare-oriented Model to Improve Its Cultural Alignment for 1+ Cultures
 

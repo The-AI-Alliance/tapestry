@@ -314,4 +314,4 @@ The website sources are written in Markdown, etc. and are found in the [`website
 
 ----
 
-_Project Tapestry is an initiative of the AI Alliance Innovation Association, a 501(c)(6) non-profit._
+_Project Tapestry is an initiative of the AI Alliance Innovation Association._
