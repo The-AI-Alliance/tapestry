@@ -45,3 +45,9 @@ max-line-length = 120
 
 [tool.pylint.main]
 init-hook = "import sys" #; sys.path.insert(0, 'src')"
+
+# We aren't (currently) using pyrefly for type checking, but the plugin
+# for IDEs, like VSCode, is often installed. The following allows pyrefly
+# to find dependencies, for those circumstances.
+[tool.pyrefly]
+search_path = [".venv/lib/python3.12/site-packages"]

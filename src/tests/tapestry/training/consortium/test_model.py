@@ -8,7 +8,6 @@ from hypothesis import strategies as st
 from tapestry.training.consortium import TinyCausalModel
 from tests.test_utils.hypothesis.model_strategies import tiny_causal_models
 
-
 # ---------------------------------------------------------------------------
 # Constructor / structural tests
 # ---------------------------------------------------------------------------
