@@ -29,9 +29,15 @@ This work group traces to [Phase 2 pain points](../../architecture/2-pain-points
 - [Data governance requirements](data-governance-requirements.md), including coverage of:
     - A data-tier taxonomy for Tapestry participants.
 	- A list of blocked-data scenarios where raw data must never leave a sovereign boundary (including through model memorization!).
+	- Mapping to a _shared responsibility model_. See [AI Shared Responsibility Considerations](ai-shared-responsibility-considerations.md), which contains notes on how a _responsibility model_ maps to various aspects of data management. It is proposed to refine and incorporate those concepts into the governance requirements.
+
 - Derived [data management requirements](data-management-requirements.md).
 	- A minimum dataset card template.
 	- Requirements handed to [Security & Privacy](../security-privacy/) and [Infrastructure & Operations](../infrastructure-operations/).
+
+### Other Documents Here
+
+* [AI Shared Responsibility Considerations](ai-shared-responsibility-considerations.md) contains notes on how a _responsibility model_ maps to various aspects of data management. It is proposed to incorporate those concepts into the governance requirements.
 
 ## Interfaces
 
