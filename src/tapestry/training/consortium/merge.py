@@ -33,7 +33,7 @@ class OuterMerge:  # pylint: disable=too-few-public-methods
         outer_lr: float = 1.0,
         outer_momentum: float = 0.0,
     ) -> None:
-        self.strategy = OuterMergeStrategy(strategy)
+        self.strategy: OuterMergeStrategy = OuterMergeStrategy(strategy)
         if outer_lr <= 0.0:
             raise ValueError("outer_lr must be positive")
         if not 0.0 <= outer_momentum < 1.0:
@@ -44,8 +44,8 @@ class OuterMerge:  # pylint: disable=too-few-public-methods
             raise ValueError("outer_momentum is only active for momentum-delta")
         if self.strategy is OuterMergeStrategy.MOMENTUM_DELTA and outer_momentum == 0.0:
             raise ValueError("momentum-delta requires outer_momentum > 0")
-        self.outer_lr = outer_lr
-        self.outer_momentum = outer_momentum
+        self.outer_lr: float = outer_lr
+        self.outer_momentum: float = outer_momentum
         self._velocity: ModelState = {}
 
     def merge(
