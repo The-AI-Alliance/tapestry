@@ -16,6 +16,7 @@ from tapestry.training.consortium import (
     TinyCausalModel,
 )
 from tests.test_utils.hypothesis.model_strategies import (
+    make_corpus,
     quality_floors,
     tiny_causal_models,
 )
@@ -32,19 +33,12 @@ def _model() -> TinyCausalModel:
     return TinyCausalModel(vocab_size=_VOCAB, hidden_size=_HIDDEN)
 
 
-def _corpus(offset: int = 0) -> list[list[int]]:
-    return [
-        [1 + offset, 2 + offset, 3 + offset, 4 + offset],
-        [2 + offset, 3 + offset, 4 + offset, 5 + offset],
-    ]
-
-
 def _node(node_id: str, quality_score: float, corpus_offset: int = 0) -> SovereignTrainingNode:
     return SovereignTrainingNode(
         node_id=node_id,
         jurisdiction="Test",
         model=_model(),
-        sovereign_corpus=_corpus(corpus_offset),
+        sovereign_corpus=make_corpus(corpus_offset),
         quality_score=quality_score,
         local_epochs=1,
         lr=0.01,
@@ -291,7 +285,7 @@ def test_round_result_structure_invariants(model, quality_floor):
             node_id="p",
             jurisdiction="T",
             model=copy.deepcopy(model),
-            sovereign_corpus=_corpus(0),
+            sovereign_corpus=make_corpus(0),
             quality_score=quality_floor + 0.05,
             local_epochs=1,
             lr=0.01,
@@ -300,7 +294,7 @@ def test_round_result_structure_invariants(model, quality_floor):
             node_id="q",
             jurisdiction="T",
             model=copy.deepcopy(model),
-            sovereign_corpus=_corpus(5),
+            sovereign_corpus=make_corpus(5),
             quality_score=max(quality_floor - 0.05, 0.0),
             local_epochs=1,
             lr=0.01,

@@ -15,19 +15,12 @@ from tapestry.training.consortium import (
     SovereignTrainingNode,
 )
 from tests.test_utils.hypothesis.model_strategies import (
+    make_corpus,
     max_node_weights,
     quality_floors,
     quality_score_maps,
     tiny_causal_models,
 )
-
-
-def _corpus(offset: int = 0) -> list[list[int]]:
-    return [
-        [1 + offset, 2 + offset, 3 + offset, 4 + offset],
-        [2 + offset, 3 + offset, 4 + offset, 5 + offset],
-        [3 + offset, 4 + offset, 5 + offset, 6 + offset],
-    ]
 
 
 @settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
@@ -46,7 +39,7 @@ def test_sovereign_node_returns_artifact_and_local_model_state(model) -> None:
         node_id="vn-node",
         jurisdiction="Vietnam",
         model=model,
-        sovereign_corpus=_corpus(0),
+        sovereign_corpus=make_corpus(0),
         quality_score=0.82,
         local_epochs=1,
         lr=0.01,
@@ -139,7 +132,7 @@ def test_coordinator_maintains_n_plus_one_model_outcome(model) -> None:
             node_id="vietnam",
             jurisdiction="Vietnam",
             model=model,
-            sovereign_corpus=_corpus(0),
+            sovereign_corpus=make_corpus(0),
             quality_score=0.9,
             local_epochs=1,
             lr=0.01,
@@ -148,7 +141,7 @@ def test_coordinator_maintains_n_plus_one_model_outcome(model) -> None:
             node_id="swiss",
             jurisdiction="Switzerland",
             model=copy.deepcopy(model),
-            sovereign_corpus=_corpus(10),
+            sovereign_corpus=make_corpus(10),
             quality_score=0.8,
             local_epochs=1,
             lr=0.01,
@@ -262,7 +255,7 @@ def test_low_quality_contribution_does_not_update_shared_base(model) -> None:
         node_id="weak",
         jurisdiction="Test",
         model=copy.deepcopy(model),
-        sovereign_corpus=_corpus(),
+        sovereign_corpus=make_corpus(),
         quality_score=0.5,
         local_epochs=1,
         lr=0.01,
