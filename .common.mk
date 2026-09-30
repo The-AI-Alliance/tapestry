@@ -103,7 +103,7 @@ RUFF_OPT_ARGS            ?=
 TY_OPT_ARGS              ?=
 BLACK_OPT_ARGS           ?=
 
-PYLINT_ARGS              := --recursive=y --ignore=.venv --ignore-pattern='.*cache.*'
+PYLINT_ARGS              := --recursive=y --ignore=.venv --ignore-patterns='.*cache.*'
 TY_ARGS                  := check
 # Some of the *_ARGS have different settings for CI...
 ifeq (${GITHUB_CI},)
