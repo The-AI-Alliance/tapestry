@@ -34,15 +34,13 @@ class ContributionPolicy:  # pylint: disable=too-few-public-methods
             raise ValueError("quality_floor must be non-negative")
         if not 0.0 < max_node_weight <= 1.0:
             raise ValueError("max_node_weight must be in (0, 1]")
-        self.quality_floor = quality_floor
-        self.max_node_weight = max_node_weight
-        self.weighting = ContributionWeighting(weighting)
+        self.quality_floor: float = quality_floor
+        self.max_node_weight: float = max_node_weight
+        self.weighting: ContributionWeighting = ContributionWeighting(weighting)
 
     def weights(self, quality_scores: dict[str, float]) -> dict[str, float]:
         """Return normalized contribution weights for accepted nodes."""
-        accepted = {
-            node_id: score for node_id, score in quality_scores.items() if score >= self.quality_floor and score > 0.0
-        }
+        accepted = {node_id: score for node_id, score in quality_scores.items() if score >= self.quality_floor}
         if not accepted:
             return {}
 
@@ -69,7 +67,7 @@ class ContributionPolicy:  # pylint: disable=too-few-public-methods
             for node_id in over_cap:
                 capped[node_id] = self.max_node_weight
                 remaining_mass -= self.max_node_weight
-                remaining.pop(node_id)
+                _ = remaining.pop(node_id)
 
             if not remaining:
                 break
@@ -81,7 +79,19 @@ class ContributionPolicy:  # pylint: disable=too-few-public-methods
             capped = {node_id: weight / total for node_id, weight in capped.items()}
         return capped
 
+    def __eq__(self, other):
+        if isinstance(other, ContributionPolicy):
+            return (
+                self.quality_floor == other.quality_floor
+                and self.max_node_weight == other.max_node_weight
+                and self.weighting == other.weighting
+            )
+        return False
+
     @staticmethod
     def _normalize(scores: dict[str, float]) -> dict[str, float]:
         total = sum(scores.values())
+        if total == 0.0:
+            equal = 1.0 / len(scores)
+            return {node_id: equal for node_id in scores}
         return {node_id: score / total for node_id, score in scores.items()}

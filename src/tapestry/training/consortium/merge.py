@@ -25,6 +25,13 @@ class OuterMerge:  # pylint: disable=too-few-public-methods
     learning rate. ``momentum-delta`` adds a small ordinary outer momentum
     buffer. These strategies are scaffolding for comparing merge formulas, not a
     claim about training quality or DiLoCo-equivalent optimization.
+
+    Args:
+        strategy: OuterMergeStrategy | str. Defaults to `OuterMergeStrategy.WEIGHTED_AVERAGE`.
+        outer_lr: float. Defaults to 1.0. Ignored for `OuterMergeStrategy.WEIGHTED_AVERAGE`.
+        outer_momentum: float. Defaults to 0.0. Ignored unless the strategy is `OuterMergeStrategy.MOMENTUM_DELTA`.
+
+
     """
 
     def __init__(
@@ -33,19 +40,15 @@ class OuterMerge:  # pylint: disable=too-few-public-methods
         outer_lr: float = 1.0,
         outer_momentum: float = 0.0,
     ) -> None:
-        self.strategy = OuterMergeStrategy(strategy)
-        if outer_lr <= 0.0:
-            raise ValueError("outer_lr must be positive")
-        if not 0.0 <= outer_momentum < 1.0:
-            raise ValueError("outer_momentum must be in [0, 1)")
-        if self.strategy is OuterMergeStrategy.WEIGHTED_AVERAGE and outer_lr != 1.0:
-            raise ValueError("outer_lr is only active for delta merge strategies")
-        if self.strategy is not OuterMergeStrategy.MOMENTUM_DELTA and outer_momentum != 0.0:
-            raise ValueError("outer_momentum is only active for momentum-delta")
-        if self.strategy is OuterMergeStrategy.MOMENTUM_DELTA and outer_momentum == 0.0:
-            raise ValueError("momentum-delta requires outer_momentum > 0")
-        self.outer_lr = outer_lr
-        self.outer_momentum = outer_momentum
+        self.strategy: OuterMergeStrategy = OuterMergeStrategy(strategy)
+        if self.strategy is not OuterMergeStrategy.WEIGHTED_AVERAGE and outer_lr <= 0.0:
+            raise ValueError(f"Expect outer_lr > 0.0 for strategy {self.strategy}. outer_lr = {outer_lr}")
+        if self.strategy is OuterMergeStrategy.MOMENTUM_DELTA and (outer_momentum <= 0.0 or outer_momentum >= 1.0):
+            raise ValueError(
+                f"OuterMergeStrategy.MOMENTUM_DELTA requires outer_momentum > 0 and < 1.0. Value = {outer_momentum}"
+            )
+        self.outer_lr: float = outer_lr
+        self.outer_momentum: float = outer_momentum
         self._velocity: ModelState = {}
 
     def merge(
