@@ -54,7 +54,6 @@ def test_forward_output_shape_matches_vocab_size(model):
     st.integers(min_value=1, max_value=8),
     st.integers(min_value=1, max_value=16),
 )
-# @settings(deadline=None)
 def test_forward_output_shape_varies_with_batch_and_seq(model, batch, seq):
     """Output shape tracks (batch, seq, vocab_size) across all sizes."""
     ids = torch.randint(0, model.embedding.num_embeddings, (batch, seq))

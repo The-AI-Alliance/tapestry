@@ -63,6 +63,26 @@ def test_quality_weights_exclude_below_floor(quality_floor, max_node_weight, sco
             assert node_id not in weights
 
 
+@given(quality_floors(), max_node_weights(), quality_score_maps())
+def test_contribution_policy_applies_quality_floor_and_capture_cap(quality_floor, max_node_weight, weights_map) -> None:
+    """Governed weighting drops weak updates and caps dominant nodes."""
+    policy = ContributionPolicy(quality_floor=quality_floor, max_node_weight=max_node_weight)
+    weights = policy.weights(weights_map)
+
+    assert len(weights) <= len(weights_map)  # Some may have been filtered.
+    if len(weights):  # At least some survived filtering
+        for key in weights:
+            if weights_map[key] < quality_floor:
+                assert key not in weights
+            elif max_node_weight * len(weights) > 1.0:
+                # The max_node_weight won't be observed if there are too few weights after quality filtering!
+                assert weights[key] < max_node_weight or weights[key] == pytest.approx(max_node_weight)
+        assert sum(weights.values()) == pytest.approx(1.0)
+    else:  # All were filtered. Confirm this is valid.
+        for value in weights_map.values():
+            assert value <= quality_floor
+
+
 @given(
     st.dictionaries(
         node_ids(),
@@ -111,6 +131,39 @@ def test_quality_output_keys_are_subset_of_input(quality_floor, max_node_weight,
 # ---------------------------------------------------------------------------
 # Equal-weighting properties
 # ---------------------------------------------------------------------------
+
+
+@given(quality_floors())
+def test_equal_contribution_policy_ignores_quality_magnitude_after_floor(quality_floor) -> None:
+    """The equal MVP option gives every accepted participant the same influence."""
+    policy = ContributionPolicy(quality_floor=quality_floor, weighting=ContributionWeighting.EQUAL)
+
+    def adjust(x, delta):
+        x = quality_floor + delta
+        x = min(x, 1.0)
+        x = max(x, 0.0)
+        return x
+
+    dominant = adjust(quality_floor, 0.01)
+    weak = adjust(quality_floor, -0.01)
+    init_weights = {
+        "strong": 0.95,
+        "dominant": dominant,
+        "weak": weak,
+    }
+    weights = policy.weights(init_weights)
+
+    if quality_floor > 0.0:
+        assert weights == {
+            "strong": pytest.approx(0.5, abs=1e-5),
+            "dominant": pytest.approx(0.5, abs=1e-5),
+        }
+    else:
+        assert weights == {
+            "strong": pytest.approx(0.33333, abs=1e-5),
+            "dominant": pytest.approx(0.33333, abs=1e-5),
+            "weak": pytest.approx(0.33333, abs=1e-5),
+        }
 
 
 @given(quality_floors(), quality_score_maps())

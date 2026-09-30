@@ -4,12 +4,13 @@ import copy
 
 import pytest
 import torch
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from tapestry.training.consortium import (
     ConsortiumCoordinator,
     ContributionPolicy,
+    ContributionWeighting,
     OuterMerge,
     OuterMergeStrategy,
     SovereignTrainingNode,
@@ -114,7 +115,7 @@ def test_shared_base_state_keys_match_model_state_dict(model):
 
 
 @given(consortium_coordinators(), st.integers(min_value=1, max_value=5))
-# @settings(deadline=None)
+@settings(deadline=None)
 def test_round_num_increments_with_each_run_round(coordinator, num_rounds):
     """ConsortiumCoordinator.run_round increments round_num on every call."""
     torch.manual_seed(0)
@@ -131,7 +132,6 @@ def test_round_num_increments_with_each_run_round(coordinator, num_rounds):
 
 
 @given(consortium_coordinators())
-# @settings(deadline=None)
 def test_accepted_and_rejected_partition_all_nodes(coordinator):
     """accepted_nodes and rejected_nodes together cover every input node exactly once."""
     torch.manual_seed(1)
@@ -148,27 +148,6 @@ def test_accepted_and_rejected_partition_all_nodes(coordinator):
     all_node_ids = {n.node_id for n in nodes}
     assert set(result.accepted_nodes) | set(result.rejected_nodes) == all_node_ids
     assert set(result.accepted_nodes) & set(result.rejected_nodes) == set()
-
-
-# @given(quality_floors(min_value=0.0, max_value=0.8))
-# @settings(deadline=None)
-# def test_accepted_and_rejected_partition_all_nodes(quality_floor):
-#     """accepted_nodes and rejected_nodes together cover every input node exactly once."""
-#     torch.manual_seed(1)
-#     coordinator = ConsortiumCoordinator(
-#         base_model=_model(),
-#         contribution_policy=ContributionPolicy(quality_floor=quality_floor),
-#     )
-#     nodes = [
-#         _node("above", quality_score=quality_floor + 0.1, corpus_offset=0),
-#         _node("below", quality_score=max(quality_floor - 0.1, 0.0), corpus_offset=5),
-#     ]
-
-#     result = coordinator.run_round(nodes)
-
-#     all_node_ids = {n.node_id for n in nodes}
-#     assert set(result.accepted_nodes) | set(result.rejected_nodes) == all_node_ids
-#     assert set(result.accepted_nodes) & set(result.rejected_nodes) == set()
 
 
 # ---------------------------------------------------------------------------
@@ -207,7 +186,7 @@ def test_contribution_weights_sum_to_one_when_non_empty(coordinator):
 
 
 # ---------------------------------------------------------------------------
-# Base model update behaviour
+# Base model update behavior
 # ---------------------------------------------------------------------------
 
 
@@ -219,10 +198,6 @@ def test_contribution_weights_sum_to_one_when_non_empty(coordinator):
 def test_all_rejected_leaves_shared_base_unchanged(coordinator):
     """When no node is accepted, the shared base must be identical before and after."""
     torch.manual_seed(4)
-    # coordinator = ConsortiumCoordinator(
-    #     base_model=_model(),
-    #     contribution_policy=ContributionPolicy(quality_floor=0.99),
-    # )
     weak_quality = coordinator.contribution_policy.quality_floor - 0.05
     result = coordinator.run_round(
         [
@@ -240,10 +215,6 @@ def test_all_rejected_leaves_shared_base_unchanged(coordinator):
 def test_accepted_nodes_update_shared_base(coordinator):
     """When at least one node is accepted, the base must change after the round."""
     torch.manual_seed(5)
-    # coordinator = ConsortiumCoordinator(
-    #     base_model=_model(),
-    #     contribution_policy=ContributionPolicy(quality_floor=0.0),
-    # )
     result = coordinator.run_round(
         [
             _node(node_id="strong", model=coordinator.base_model, quality_score=0.9),
@@ -257,16 +228,80 @@ def test_accepted_nodes_update_shared_base(coordinator):
     )
 
 
+@given(
+    consortium_coordinators(
+        contribution_policies=lambda: contribution_policies(quality_floors=lambda: quality_floors(min_value=0.1))
+    )
+)
+def test_low_quality_contribution_does_not_update_shared_base(coordinator):
+    """A round with no accepted contributions leaves the shared base unchanged."""
+    torch.manual_seed(2)
+    weak_node = _node(
+        node_id="weak",
+        jurisdiction="Test",
+        model=coordinator.base_model,
+        quality_score=coordinator.contribution_policy.quality_floor - 0.1,
+    )
+
+    result = coordinator.run_round([weak_node])
+
+    assert not result.accepted_nodes
+    assert result.rejected_nodes == ["weak"]
+    assert all(
+        torch.equal(
+            result.previous_base_state[name],
+            result.shared_base_state[name],
+        )
+        for name in result.shared_base_state
+    )
+
+
 # ---------------------------------------------------------------------------
 # Sovereign artifact accumulation
 # ---------------------------------------------------------------------------
 
 
 @given(consortium_coordinators())
+def test_coordinator_maintains_n_plus_one_model_outcomes(coordinator) -> None:
+    """One evolved base plus one sovereign artifact per node are retained."""
+    torch.manual_seed(1)
+    nodes = [
+        _node(
+            node_id="vietnam",
+            jurisdiction="Vietnam",
+            model=coordinator.base_model,
+            quality_score=coordinator.contribution_policy.quality_floor,
+        ),
+        _node(
+            node_id="swiss",
+            jurisdiction="Switzerland",
+            model=coordinator.base_model,
+            quality_score=coordinator.contribution_policy.quality_floor,
+            corpus_offset=10,
+        ),
+    ]
+
+    result = coordinator.run_round(nodes)
+
+    assert result.round_num == 1
+    assert result.outer_merge_strategy == coordinator.outer_merge.strategy
+    assert set(result.accepted_nodes) == {"vietnam", "swiss"}
+    assert len(coordinator.sovereign_artifacts) == 2
+    assert set(coordinator.sovereign_artifacts) == {"vietnam", "swiss"}
+    assert coordinator.shared_base_state
+    assert any(
+        not torch.equal(
+            result.previous_base_state[name],
+            result.shared_base_state[name],
+        )
+        for name in result.shared_base_state
+    )
+
+
+@given(consortium_coordinators())
 def test_sovereign_artifacts_accumulate_across_rounds(coordinator):
     """Each run_round stores an artifact per node; subsequent rounds add to the dict."""
     torch.manual_seed(6)
-    # coordinator = ConsortiumCoordinator(base_model=_model())
 
     _ = coordinator.run_round(
         [
@@ -287,7 +322,6 @@ def test_sovereign_artifacts_accumulate_across_rounds(coordinator):
 def test_sovereign_artifact_is_overwritten_on_repeat_node(coordinator):
     """A second round for the same node replaces its artifact entry, not appends."""
     torch.manual_seed(7)
-    # coordinator = ConsortiumCoordinator(base_model=_model())
 
     _ = coordinator.run_round(
         [
@@ -316,10 +350,6 @@ def test_sovereign_artifact_is_overwritten_on_repeat_node(coordinator):
 def test_result_reports_correct_outer_merge_strategy(coordinator):
     """outer_merge_strategy in the result must match the configured merge strategy."""
     torch.manual_seed(8)
-    # coordinator = ConsortiumCoordinator(
-    #     base_model=_model(),
-    #     outer_merge=OuterMerge(strategy=OuterMergeStrategy.DELTA, outer_lr=0.5),
-    # )
     result = coordinator.run_round(
         [
             _node(model=coordinator.base_model, quality_score=0.9),
@@ -329,40 +359,64 @@ def test_result_reports_correct_outer_merge_strategy(coordinator):
 
 
 # ---------------------------------------------------------------------------
+# Weighting modes produce different integration results
+# ---------------------------------------------------------------------------
+
+
+def test_weighting_modes_produce_different_integration_results() -> None:
+    """The current experiment setup can compare quality-weighted and equal influence policies."""
+    local_states = {
+        "strong": {"weight": torch.tensor([2.0])},
+        "dominant": {"weight": torch.tensor([10.0])},
+    }
+    quality_weights = ContributionPolicy(weighting="quality").weights(
+        {
+            "strong": 1.0,
+            "dominant": 3.0,
+        }
+    )
+    equal_weights = ContributionPolicy(weighting=ContributionWeighting.EQUAL).weights(
+        {
+            "strong": 1.0,
+            "dominant": 3.0,
+        }
+    )
+
+    previous_state = {"weight": torch.tensor([0.0])}
+    merge = OuterMerge()
+    quality_state = merge.merge(previous_state, local_states, quality_weights)
+    equal_state = merge.merge(previous_state, local_states, equal_weights)
+
+    assert quality_weights["dominant"] > equal_weights["dominant"]
+    assert quality_state["weight"].item() == pytest.approx(8.0)
+    assert equal_state["weight"].item() == pytest.approx(6.0)
+
+
+# ---------------------------------------------------------------------------
 # Hypothesis: structural invariants across model sizes
 # ---------------------------------------------------------------------------
 
 
 @given(consortium_coordinators())
-# @settings(deadline=None)
 def test_round_result_structure_invariants(coordinator):
     """ConsortiumRoundResult structural invariants hold across generated model sizes."""
     torch.manual_seed(0)
-    # coordinator = ConsortiumCoordinator(
-    #     base_model=model,
-    #     contribution_policy=ContributionPolicy(quality_floor=quality_floor),
-    # )
     quality_floor = coordinator.contribution_policy.quality_floor
     model_copy_1 = copy.deepcopy(coordinator.base_model)
     model_copy_2 = copy.deepcopy(coordinator.base_model)
     nodes = [
-        SovereignTrainingNode(
+        _node(
             node_id="p",
             jurisdiction="T",
             model=model_copy_1,
-            sovereign_corpus=make_corpus(0),
             quality_score=quality_floor + 0.05,
-            local_epochs=1,
-            lr=0.01,
         ),
-        SovereignTrainingNode(
+        _node(
             node_id="q",
             jurisdiction="T",
             model=model_copy_2,
-            sovereign_corpus=make_corpus(5),
+            corpus_offset=5,
             quality_score=max(quality_floor - 0.05, 0.0),
-            local_epochs=1,
-            lr=0.01,
         ),
     ]
 

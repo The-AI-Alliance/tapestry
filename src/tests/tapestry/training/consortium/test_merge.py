@@ -6,58 +6,14 @@ from hypothesis import given
 from hypothesis import strategies as st
 
 from tapestry.training.consortium import OuterMerge, OuterMergeStrategy
-from tests.test_utils.hypothesis.model_strategies import outer_merges
-
-# ---------------------------------------------------------------------------
-# Local strategies
-# ---------------------------------------------------------------------------
-
-# Finite float tensors with a controlled range to avoid inf/nan arithmetic.
-_TENSOR_ELEMENTS = st.floats(min_value=-1e3, max_value=1e3, allow_nan=False, allow_infinity=False)
-
-# Small positive outer learning rates.
-_OUTER_LRS = st.floats(min_value=1e-3, max_value=4.0, allow_nan=False)
-
-# Valid outer momentum values (strictly between 0 and 1).
-_OUTER_MOMENTUMS = st.floats(min_value=1e-3, max_value=0.99, allow_nan=False)
-
-# Node IDs: short unique ASCII strings.
-_NODE_IDS = st.text(
-    min_size=1,
-    max_size=8,
-    alphabet=st.characters(whitelist_categories=("Ll", "Lu")),
+from tests.test_utils.hypothesis.model_strategies import (
+    learning_rates,
+    momenta,
+    outer_merges,
+    parameter_names,
+    tensor_elements,
+    uniform_weights,
 )
-
-# Parameter names: short ASCII strings.
-_PARAM_NAMES = st.text(
-    min_size=1,
-    max_size=8,
-    alphabet=st.characters(whitelist_categories=("Ll", "Lu", "Nd")),
-)
-
-
-def model_states(param_names: list[str], size: int):
-    """Strategy: a ModelState dict with fixed param names and 1-D tensors of `size` elements."""
-    return st.fixed_dictionaries(
-        {name: st.lists(_TENSOR_ELEMENTS, min_size=size, max_size=size).map(torch.tensor) for name in param_names}
-    )
-
-
-def multi_node_states(param_names: list[str], size: int, min_nodes: int = 1, max_nodes: int = 4):
-    """Strategy: dict[node_id -> ModelState], all sharing the same param_names and size."""
-    return st.dictionaries(
-        _NODE_IDS,
-        model_states(param_names, size),
-        min_size=min_nodes,
-        max_size=max_nodes,
-    )
-
-
-def uniform_weights(node_ids: list[str]) -> dict[str, float]:
-    """Equal weight for every node in a list."""
-    w = 1.0 / len(node_ids)
-    return {nid: w for nid in node_ids}
-
 
 # ---------------------------------------------------------------------------
 # Constructor validation
@@ -156,7 +112,7 @@ def test_weighted_average_ignores_previous_state():
 
 
 @given(
-    param_names=st.lists(_PARAM_NAMES, min_size=1, max_size=4, unique=True),
+    param_names=st.lists(parameter_names(), min_size=1, max_size=4, unique=True),
     size=st.integers(min_value=1, max_value=8),
 )
 def test_weighted_average_output_keys_match_local_state_keys(param_names, size):
@@ -168,7 +124,7 @@ def test_weighted_average_output_keys_match_local_state_keys(param_names, size):
 
 
 @given(
-    param_names=st.lists(_PARAM_NAMES, min_size=1, max_size=4, unique=True),
+    param_names=st.lists(parameter_names(), min_size=1, max_size=4, unique=True),
     size=st.integers(min_value=1, max_value=8),
     n_nodes=st.integers(min_value=1, max_value=5),
 )
@@ -184,7 +140,7 @@ def test_weighted_average_output_shapes_match_input_shapes(param_names, size, n_
 
 
 @given(
-    param_names=st.lists(_PARAM_NAMES, min_size=1, max_size=3, unique=True),
+    param_names=st.lists(parameter_names(), min_size=1, max_size=3, unique=True),
     size=st.integers(min_value=1, max_value=6),
     n_nodes=st.integers(min_value=2, max_value=5),
 )
@@ -250,10 +206,25 @@ def test_delta_outer_lr_scales_the_update():
 # ---------------------------------------------------------------------------
 
 
+def test_delta_outer_merge_applies_scaled_weighted_delta() -> None:
+    """Delta merge applies weighted node deltas to the previous base."""
+    previous_state = {"weight": torch.tensor([4.0])}
+    local_states = {
+        "a": {"weight": torch.tensor([6.0])},
+        "b": {"weight": torch.tensor([10.0])},
+    }
+    merge = OuterMerge(strategy=OuterMergeStrategy.DELTA, outer_lr=0.5)
+
+    merged = merge.merge(previous_state, local_states, {"a": 0.25, "b": 0.75})
+
+    # Weighted delta is 0.25 * 2 + 0.75 * 6 = 5.0; outer_lr applies half.
+    assert merged["weight"].item() == pytest.approx(6.5)
+
+
 @given(
-    param_names=st.lists(_PARAM_NAMES, min_size=1, max_size=4, unique=True),
+    param_names=st.lists(parameter_names(), min_size=1, max_size=4, unique=True),
     size=st.integers(min_value=1, max_value=8),
-    outer_lr=_OUTER_LRS,
+    outer_lr=learning_rates(),
 )
 def test_delta_output_keys_match_previous_state_keys(param_names, size, outer_lr):
     """Delta merge output keys must match previous_state, not just local_states."""
@@ -265,9 +236,9 @@ def test_delta_output_keys_match_previous_state_keys(param_names, size, outer_lr
 
 
 @given(
-    param_names=st.lists(_PARAM_NAMES, min_size=1, max_size=4, unique=True),
+    param_names=st.lists(parameter_names(), min_size=1, max_size=4, unique=True),
     size=st.integers(min_value=1, max_value=8),
-    outer_lr=_OUTER_LRS,
+    outer_lr=learning_rates(),
     n_nodes=st.integers(min_value=1, max_value=5),
 )
 def test_delta_output_shapes_match_previous_state_shapes(param_names, size, outer_lr, n_nodes):
@@ -283,8 +254,8 @@ def test_delta_output_shapes_match_previous_state_shapes(param_names, size, oute
 
 @given(
     size=st.integers(min_value=1, max_value=8),
-    outer_lr=_OUTER_LRS,
-    delta=_TENSOR_ELEMENTS,
+    outer_lr=learning_rates(),
+    delta=tensor_elements(),
 )
 def test_delta_single_node_result_matches_analytic_formula(size, outer_lr, delta):
     """Single-node delta merge: result = previous + delta * outer_lr, elementwise."""
@@ -346,19 +317,13 @@ def test_momentum_delta_velocity_persists_across_merge_instances():
     assert m2_first["w"].item() == pytest.approx(1.0)
 
 
-# ---------------------------------------------------------------------------
-# MOMENTUM_DELTA — Hypothesis properties
-# ---------------------------------------------------------------------------
-
-
 @given(
-    param_names=st.lists(_PARAM_NAMES, min_size=1, max_size=4, unique=True),
+    param_names=st.lists(parameter_names(), min_size=1, max_size=4, unique=True),
     size=st.integers(min_value=1, max_value=8),
-    outer_lr=_OUTER_LRS,
-    outer_momentum=_OUTER_MOMENTUMS,
+    outer_lr=learning_rates(),
+    outer_momentum=momenta(),
     n_rounds=st.integers(min_value=1, max_value=4),
 )
-# @settings(deadline=None)
 def test_momentum_delta_output_keys_and_shapes_stable_across_rounds(
     param_names, size, outer_lr, outer_momentum, n_rounds
 ):
@@ -377,6 +342,23 @@ def test_momentum_delta_output_keys_and_shapes_stable_across_rounds(
             assert state[name].shape == torch.zeros(size).shape
 
 
+def test_momentum_delta_outer_merge_accumulates_outer_velocity() -> None:
+    """Momentum merge carries an ordinary outer momentum buffer across rounds."""
+    previous_state = {"weight": torch.tensor([0.0])}
+    local_states = {"a": {"weight": torch.tensor([1.0])}}
+    merge = OuterMerge(
+        strategy=OuterMergeStrategy.MOMENTUM_DELTA,
+        outer_lr=1.0,
+        outer_momentum=0.5,
+    )
+
+    first = merge.merge(previous_state, local_states, {"a": 1.0})
+    second = merge.merge(first, {"a": {"weight": torch.tensor([2.0])}}, {"a": 1.0})
+
+    assert first["weight"].item() == pytest.approx(1.0)
+    assert second["weight"].item() == pytest.approx(2.5)
+
+
 # ---------------------------------------------------------------------------
 # Cross-strategy structural invariants (Hypothesis)
 # ---------------------------------------------------------------------------
@@ -384,7 +366,7 @@ def test_momentum_delta_output_keys_and_shapes_stable_across_rounds(
 
 @given(
     strategy=st.sampled_from([OuterMergeStrategy.WEIGHTED_AVERAGE, OuterMergeStrategy.DELTA]),
-    param_names=st.lists(_PARAM_NAMES, min_size=1, max_size=4, unique=True),
+    param_names=st.lists(parameter_names(), min_size=1, max_size=4, unique=True),
     size=st.integers(min_value=1, max_value=8),
     n_nodes=st.integers(min_value=1, max_value=4),
 )

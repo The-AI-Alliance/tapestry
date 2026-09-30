@@ -230,7 +230,6 @@ def test_latest_artifact_is_replaced_on_second_cycle(node):
 
 
 @given(sovereign_training_nodes(), st.integers(min_value=1, max_value=10))
-# @settings(deadline=None)
 def test_round_num_propagated_to_contribution(node, round_num):
     """Whatever round_num is passed, the contribution records it exactly."""
     torch.manual_seed(0)
@@ -244,7 +243,6 @@ def test_round_num_propagated_to_contribution(node, round_num):
 
 
 @given(sovereign_training_nodes())
-# @settings(deadline=None)
 def test_cycle_result_structure_invariants_across_model_sizes(node):
     """Structural invariants hold regardless of model size or number of local epochs."""
     torch.manual_seed(0)

@@ -4,6 +4,8 @@ Hypothesis is a Python property-based testing framework.
 https://hypothesis.readthedocs.io/en/latest/
 """
 
+import torch
+
 from hypothesis import strategies as st
 from tapestry.training.consortium import (
     ConsortiumCoordinator,
@@ -24,8 +26,41 @@ def max_node_weights(min_value=0.1, max_value=1.0):
     return st.floats(min_value=min_value, max_value=max_value, allow_nan=False)
 
 
-def node_ids(min_size=1, max_size=12, alphabet=lambda: st.characters(whitelist_categories=("Ll", "Lu", "Nd"))):
-    return st.text(min_size=min_size, max_size=max_size, alphabet=alphabet())
+# Node IDs: short unique ASCII strings.
+def node_ids(min_size=1, max_size=8):
+    return st.text(
+        min_size=min_size, max_size=max_size, alphabet=st.characters(whitelist_categories=("Ll", "Lu", "Nd"))
+    )
+
+
+# Parameter names: short ASCII strings.
+def parameter_names(min_size=1, max_size=8):
+    return st.text(
+        min_size=min_size, max_size=max_size, alphabet=st.characters(whitelist_categories=("Ll", "Lu", "Nd"))
+    )
+
+
+def model_states(param_names: list[str], size: int):
+    """Strategy: a ModelState dict with fixed param names and 1-D tensors of `size` elements."""
+    return st.fixed_dictionaries(
+        {name: st.lists(tensor_elements(), min_size=size, max_size=size).map(torch.tensor) for name in param_names}
+    )
+
+
+def multi_node_states(param_names: list[str], size: int, min_nodes: int = 1, max_nodes: int = 4):
+    """Strategy: dict[node_id -> ModelState], all sharing the same param_names and size."""
+    return st.dictionaries(
+        node_ids(),
+        model_states(param_names, size),
+        min_size=min_nodes,
+        max_size=max_nodes,
+    )
+
+
+def uniform_weights(node_ids: list[str]) -> dict[str, float]:
+    """Equal weight for every node in a list."""
+    w = 1.0 / len(node_ids)
+    return {nid: w for nid in node_ids}
 
 
 def scores(min_value=0.0, max_value=10.0, allow_nan=False, allow_infinity=False):
@@ -53,12 +88,18 @@ def local_epochs(min_value=1, max_value=10):
     return st.integers(min_value=min_value, max_value=max_value)
 
 
-def learning_rates(min_value=0.01, max_value=10.0):
-    return st.floats(min_value=min_value, max_value=max_value)
+def learning_rates(min_value=1e-3, max_value=4.0):
+    return st.floats(min_value=min_value, max_value=max_value, allow_nan=False)
 
 
-def momenta(min_value=0.01, max_value=0.99):
-    return st.floats(min_value=min_value, max_value=max_value)
+# Valid momentum values (strictly between 0 and 1).
+def momenta(min_value=1e-3, max_value=0.99):
+    return st.floats(min_value=min_value, max_value=max_value, allow_nan=False)
+
+
+# Finite float tensors with a controlled range to avoid inf/nan arithmetic.
+def tensor_elements(min_value=-1e3, max_value=1e3):
+    return st.floats(min_value=min_value, max_value=max_value, allow_nan=False, allow_infinity=False)
 
 
 def batch_sizes(min_value=1, max_value=16):
