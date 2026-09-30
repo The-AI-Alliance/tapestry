@@ -23,7 +23,7 @@ from tests.test_utils.hypothesis.model_strategies import (
 )
 
 
-@settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
+# @settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
 @given(
     tiny_causal_models(
         min_vocab_size=64,
@@ -32,6 +32,7 @@ from tests.test_utils.hypothesis.model_strategies import (
         max_hidden_size=4,
     )
 )
+@settings(deadline=None)
 def test_sovereign_node_returns_artifact_and_local_model_state(model) -> None:
     """A node keeps a sovereign model artifact and shares its local weight vector."""
     torch.manual_seed(0)
@@ -111,7 +112,7 @@ def test_equal_contribution_policy_ignores_quality_magnitude_after_floor(quality
         }
 
 
-@settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
+# @settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
 @given(
     tiny_causal_models(
         min_vocab_size=64,
@@ -209,15 +210,6 @@ def test_delta_outer_merge_applies_scaled_weighted_delta() -> None:
     assert merged["weight"].item() == pytest.approx(6.5)
 
 
-def test_outer_merge_rejects_inactive_parameters() -> None:
-    """Inactive outer-merge settings are rejected instead of silently reported."""
-    with pytest.raises(ValueError, match="outer_lr is only active"):
-        OuterMerge(strategy=OuterMergeStrategy.WEIGHTED_AVERAGE, outer_lr=0.5)
-
-    with pytest.raises(ValueError, match="outer_momentum is only active"):
-        OuterMerge(strategy=OuterMergeStrategy.DELTA, outer_momentum=0.5)
-
-
 def test_momentum_delta_outer_merge_accumulates_outer_velocity() -> None:
     """Momentum merge carries an ordinary outer momentum buffer across rounds."""
     previous_state = {"weight": torch.tensor([0.0])}
@@ -235,7 +227,7 @@ def test_momentum_delta_outer_merge_accumulates_outer_velocity() -> None:
     assert second["weight"].item() == pytest.approx(2.5)
 
 
-@settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
+# @settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
 @given(
     tiny_causal_models(
         min_vocab_size=64,

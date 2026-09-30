@@ -79,6 +79,15 @@ class ContributionPolicy:  # pylint: disable=too-few-public-methods
             capped = {node_id: weight / total for node_id, weight in capped.items()}
         return capped
 
+    def __eq__(self, other):
+        if isinstance(other, ContributionPolicy):
+            return (
+                self.quality_floor == other.quality_floor
+                and self.max_node_weight == other.max_node_weight
+                and self.weighting == other.weighting
+            )
+        return False
+
     @staticmethod
     def _normalize(scores: dict[str, float]) -> dict[str, float]:
         total = sum(scores.values())

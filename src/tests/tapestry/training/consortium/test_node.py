@@ -1,7 +1,5 @@
 """Unit and property-based tests for SovereignTrainingNode."""
 
-import copy
-
 import pytest
 import torch
 from hypothesis import given, settings
@@ -12,7 +10,6 @@ from tests.test_utils.hypothesis.model_strategies import (
     a_sovereign_corpus,
     a_tiny_causal_model,
     empty_sovereign_corpuses,
-    make_corpus,
     one_element_sovereign_corpuses,
     one_tiny_causal_model,
     sovereign_training_nodes,
@@ -22,6 +19,7 @@ from tests.test_utils.hypothesis.model_strategies import (
 # ---------------------------------------------------------------------------
 # Shared test helpers
 # ---------------------------------------------------------------------------
+
 
 def _node(
     node_id: str = "test-node",
@@ -42,12 +40,15 @@ def _node(
         lr=lr,
     )
 
+
 def _base_state(model: TinyCausalModel) -> dict:
     return {k: v.clone() for k, v in model.state_dict().items()}
+
 
 # ---------------------------------------------------------------------------
 # Constructor tests
 # ---------------------------------------------------------------------------
+
 
 @given(tiny_causal_models())
 def test_constructor_deep_copies_model(model):
@@ -60,10 +61,12 @@ def test_constructor_deep_copies_model(model):
     for tensor in node.model.state_dict().values():
         assert tensor.max().item() != pytest.approx(999.0)
 
+
 @given(sovereign_training_nodes())
 def test_constructor_latest_artifact_is_none_before_cycle(node):
     """latest_artifact is None until run_sovereign_cycle is called."""
     assert node.latest_artifact is None
+
 
 @given(empty_sovereign_corpuses(), one_tiny_causal_model())
 def test_empty_corpus_raises(corpus, model):
@@ -71,17 +74,21 @@ def test_empty_corpus_raises(corpus, model):
     with pytest.raises(ValueError, match="sovereign_corpus must contain at least one"):
         _node(sovereign_corpus=corpus, model=model)
 
+
 @given(one_element_sovereign_corpuses(), one_tiny_causal_model())
 def test_single_token_sequence_raises(corpus, model):
     """A corpus of one-token sequences raises ValueError (no next-token target possible)."""
     with pytest.raises(ValueError, match="at least 2 tokens"):
         _node(sovereign_corpus=corpus, model=model)
 
+
 # ---------------------------------------------------------------------------
 # SovereignCycleResult structure
 # ---------------------------------------------------------------------------
 
+
 @given(sovereign_training_nodes())
+@settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
 def test_cycle_result_contains_artifact_and_contribution(node):
     """run_sovereign_cycle returns a SovereignCycleResult with both sub-objects."""
     torch.manual_seed(0)
@@ -89,6 +96,7 @@ def test_cycle_result_contains_artifact_and_contribution(node):
 
     assert result.artifact is not None
     assert result.contribution is not None
+
 
 @given(sovereign_training_nodes())
 def test_artifact_fields_match_node_metadata(node):
@@ -100,6 +108,7 @@ def test_artifact_fields_match_node_metadata(node):
     assert result.artifact.jurisdiction == node.jurisdiction
     assert result.artifact.stage == "continued_pretraining"
 
+
 @given(sovereign_training_nodes(), st.integers(min_value=1, max_value=10))
 def test_contribution_fields_match_node_metadata(node, round_num):
     """The contribution carries the node's id, round number, and quality score."""
@@ -110,6 +119,7 @@ def test_contribution_fields_match_node_metadata(node, round_num):
     assert result.contribution.round_num == round_num
     assert result.contribution.quality_score == pytest.approx(node.quality_score)
 
+
 @given(sovereign_training_nodes())
 def test_contribution_model_state_keys_match_base_state(node):
     """The contribution's local_model_state has the same parameter names as the base."""
@@ -119,6 +129,7 @@ def test_contribution_model_state_keys_match_base_state(node):
 
     assert set(result.contribution.local_model_state) == set(base)
 
+
 @given(sovereign_training_nodes())
 def test_artifact_model_state_keys_match_base_state(node):
     """The artifact's model_state has the same parameter names as the base."""
@@ -127,6 +138,7 @@ def test_artifact_model_state_keys_match_base_state(node):
     result = node.run_sovereign_cycle(round_num=1, base_state=base)
 
     assert set(result.artifact.model_state) == set(base)
+
 
 @given(sovereign_training_nodes())
 def test_artifact_and_contribution_share_same_state(node):
@@ -140,6 +152,7 @@ def test_artifact_and_contribution_share_same_state(node):
             result.contribution.local_model_state[name],
         )
 
+
 @given(sovereign_training_nodes())
 def test_artifact_and_contribution_metrics_contains_loss(node):
     """metrics on the artifact includes a 'loss' key after training."""
@@ -147,6 +160,7 @@ def test_artifact_and_contribution_metrics_contains_loss(node):
     result = node.run_sovereign_cycle(round_num=1, base_state=_base_state(node.model))
     assert "loss" in result.artifact.metrics
     assert "loss" in result.contribution.metrics
+
 
 @given(sovereign_training_nodes())
 def test_contribution_token_count_is_positive(node):
@@ -160,6 +174,7 @@ def test_contribution_token_count_is_positive(node):
 # Training actually modifies weights
 # ---------------------------------------------------------------------------
 
+
 @given(sovereign_training_nodes())
 def test_local_training_changes_weights_from_base(node):
     """After run_sovereign_cycle, at least one parameter differs from the starting base."""
@@ -167,10 +182,8 @@ def test_local_training_changes_weights_from_base(node):
     base = _base_state(node.model)
     result = node.run_sovereign_cycle(round_num=1, base_state=base)
 
-    assert any(
-        not torch.equal(result.contribution.local_model_state[name], base[name])
-        for name in base
-    )
+    assert any(not torch.equal(result.contribution.local_model_state[name], base[name]) for name in base)
+
 
 @given(sovereign_training_nodes())
 def test_base_state_not_mutated_by_cycle(node):
@@ -189,12 +202,14 @@ def test_base_state_not_mutated_by_cycle(node):
 # latest_artifact updated after cycle
 # ---------------------------------------------------------------------------
 
+
 @given(sovereign_training_nodes())
 def test_latest_artifact_is_set_after_cycle(node):
     """latest_artifact holds the most recent artifact after the first cycle."""
     torch.manual_seed(0)
     result = node.run_sovereign_cycle(round_num=1, base_state=_base_state(node.model))
     assert node.latest_artifact is result.artifact
+
 
 @given(sovereign_training_nodes())
 def test_latest_artifact_is_replaced_on_second_cycle(node):
@@ -213,6 +228,7 @@ def test_latest_artifact_is_replaced_on_second_cycle(node):
 # round_num is propagated correctly
 # ---------------------------------------------------------------------------
 
+
 @given(sovereign_training_nodes(), st.integers(min_value=1, max_value=10))
 # @settings(deadline=None)
 def test_round_num_propagated_to_contribution(node, round_num):
@@ -225,6 +241,7 @@ def test_round_num_propagated_to_contribution(node, round_num):
 # ---------------------------------------------------------------------------
 # Property: structural invariants across model sizes and corpora
 # ---------------------------------------------------------------------------
+
 
 @given(sovereign_training_nodes())
 # @settings(deadline=None)
@@ -259,8 +276,9 @@ def test_cycle_result_structure_invariants_across_model_sizes(node):
 # Property: After cycles, updated artifacts and local model state available.
 # ---------------------------------------------------------------------------
 
+
 @given(sovereign_training_nodes())
-# @settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
+@settings(deadline=None)  # For some reason, sometimes this test exceeds the default 300ms for hypothesis.
 def test_sovereign_node_returns_artifact_and_local_model_state(node):
     """A node keeps a sovereign model artifact and shares its local weight vector."""
     torch.manual_seed(0)
@@ -274,5 +292,6 @@ def test_sovereign_node_returns_artifact_and_local_model_state(node):
     assert result.contribution.round_num == 1
     assert result.contribution.quality_score == pytest.approx(node.quality_score)
     assert set(result.contribution.local_model_state) == set(base_state)
-    assert any(not torch.equal(result.contribution.local_model_state[name], base_state[name]) for name in base_state)
-
+    assert any(
+        not torch.equal(result.contribution.local_model_state[name], base_state[name]) for name in base_state
+    ), f"{result.contribution.local_model_state} =?= {base_state}"

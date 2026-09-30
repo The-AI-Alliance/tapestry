@@ -6,6 +6,11 @@ https://hypothesis.readthedocs.io/en/latest/
 
 from hypothesis import strategies as st
 from tapestry.training.consortium import (
+    ConsortiumCoordinator,
+    ContributionPolicy,
+    ContributionWeighting,
+    OuterMerge,
+    OuterMergeStrategy,
     SovereignTrainingNode,
     TinyCausalModel,
 )
@@ -14,33 +19,51 @@ from tapestry.training.consortium import (
 def quality_floors(min_value=0.0, max_value=0.9):
     return st.floats(min_value=min_value, max_value=max_value, allow_nan=False)
 
+
 def max_node_weights(min_value=0.1, max_value=1.0):
     return st.floats(min_value=min_value, max_value=max_value, allow_nan=False)
+
 
 def node_ids(min_size=1, max_size=12, alphabet=lambda: st.characters(whitelist_categories=("Ll", "Lu", "Nd"))):
     return st.text(min_size=min_size, max_size=max_size, alphabet=alphabet())
 
+
 def scores(min_value=0.0, max_value=10.0, allow_nan=False, allow_infinity=False):
     return st.floats(min_value=min_value, max_value=max_value, allow_nan=allow_nan, allow_infinity=allow_infinity)
+
 
 def quality_score_maps(node_ids=node_ids, scores=scores, min_size=1, max_size=12):
     """Dictionaries mapping node IDs to non-negative quality scores."""
     return st.dictionaries(node_ids(), scores(), min_size=min_size, max_size=max_size)
 
+
 def jurisdictions(min_size=1, max_size=12):
     return st.text(min_size=min_size, max_size=max_size)
+
 
 def normalized_scores(min_value=0.0, max_value=1.0, allow_nan=False, allow_infinity=False):
     return scores(min_value=min_value, max_value=max_value, allow_nan=allow_nan, allow_infinity=allow_infinity)
 
+
 def corpus_offsets(min_value=0, max_value=10):
     return st.integers(min_value=min_value, max_value=max_value)
+
 
 def local_epochs(min_value=1, max_value=10):
     return st.integers(min_value=min_value, max_value=max_value)
 
-def learning_rates(min_value=0.01, max_value=0.1):
+
+def learning_rates(min_value=0.01, max_value=10.0):
     return st.floats(min_value=min_value, max_value=max_value)
+
+
+def momenta(min_value=0.01, max_value=0.99):
+    return st.floats(min_value=min_value, max_value=max_value)
+
+
+def batch_sizes(min_value=1, max_value=16):
+    return st.integers(min_value=min_value, max_value=max_value)
+
 
 def make_corpus(offset: int = 0) -> list[list[int]]:
     return [
@@ -49,17 +72,22 @@ def make_corpus(offset: int = 0) -> list[list[int]]:
         [3 + offset, 4 + offset, 5 + offset, 6 + offset],
     ]
 
+
 def sovereign_corpuses(corpus_offsets=corpus_offsets):
     return corpus_offsets().map(lambda offset: make_corpus(offset))
 
+
 a_sovereign_corpus = make_corpus()
-an_empty_sovereign_corpus=[]
+an_empty_sovereign_corpus = []
+
 
 def empty_sovereign_corpuses():
     return st.just(an_empty_sovereign_corpus)
 
-def one_element_sovereign_corpuses(element = 1):
+
+def one_element_sovereign_corpuses(element=1):
     return st.just([[element]])
+
 
 def tiny_causal_models(
     min_vocab_size=32,
@@ -79,39 +107,127 @@ def tiny_causal_models(
     Returns:
         A strategy for `TinyCausalModel` instances.
     """
-    return st.tuples(
-        st.integers(min_value=min_vocab_size, max_value=max_vocab_size),
-        st.integers(min_value=min_hidden_size, max_value=max_hidden_size),
-    ).map(lambda tup: TinyCausalModel(vocab_size=tup[0], hidden_size=tup[1]))
+    return st.builds(
+        TinyCausalModel,
+        vocab_size=st.integers(min_value=min_vocab_size, max_value=max_vocab_size),
+        hidden_size=st.integers(min_value=min_hidden_size, max_value=max_hidden_size),
+    )  # .map(lambda tup: TinyCausalModel(vocab_size=tup[0], hidden_size=tup[1]))
 
-a_tiny_causal_model = TinyCausalModel(32,2)
+
+a_tiny_causal_model = TinyCausalModel(32, 2)
+
 
 def one_tiny_causal_model():
     return st.just(a_tiny_causal_model)
 
+
 def sovereign_training_nodes(
-    models = tiny_causal_models,
-    node_ids = node_ids,
-    jurisdictions = jurisdictions,
-    quality_scores = normalized_scores,
-    sovereign_corpus = sovereign_corpuses,
-    local_epochs = local_epochs,
-    learning_rates = learning_rates,
+    node_ids=node_ids,
+    jurisdictions=jurisdictions,
+    models=tiny_causal_models,
+    sovereign_corpuses=sovereign_corpuses,
+    quality_scores=normalized_scores,
+    local_epochs=local_epochs,
+    learning_rates=learning_rates,
+    batch_sizes=batch_sizes,
 ):
-    return st.tuples(
-        models(),
-        node_ids(),
-        jurisdictions(),
-        quality_scores(),
-        corpus_offsets(),
-        local_epochs(),
-        learning_rates(),
-    ).map(lambda tup: SovereignTrainingNode(
-        model=tup[0],
-        node_id=tup[1],
-        jurisdiction=tup[2],
-        sovereign_corpus=make_corpus(tup[3]),
-        quality_score=tup[4],
-        local_epochs=tup[5],
-        lr=tup[6],
-    ))
+    return st.builds(
+        SovereignTrainingNode,
+        node_id=node_ids(),
+        jurisdiction=jurisdictions(),
+        model=models(),
+        sovereign_corpus=sovereign_corpuses(),
+        quality_score=quality_scores(),
+        local_epochs=local_epochs(),
+        lr=learning_rates(),
+        batch_size=batch_sizes(),
+    )
+
+
+def contribution_weightings():
+    return st.sampled_from(
+        [
+            ContributionWeighting.QUALITY,
+            ContributionWeighting.EQUAL,
+        ]
+    )
+
+
+def contribution_policies(
+    quality_floors=quality_floors,
+    max_node_weights=max_node_weights,
+    contribution_weightings=contribution_weightings,
+):
+    return st.builds(
+        ContributionPolicy,
+        quality_floor=quality_floors(),
+        max_node_weight=max_node_weights(),
+        weighting=contribution_weightings(),
+    )
+
+
+def outer_merge_strategies():
+    return st.sampled_from(
+        [
+            OuterMergeStrategy.WEIGHTED_AVERAGE,
+            OuterMergeStrategy.DELTA,
+            OuterMergeStrategy.MOMENTUM_DELTA,
+        ]
+    )
+
+
+def weighted_average_outer_merges():
+    return st.just(
+        OuterMerge(
+            strategy=OuterMergeStrategy.WEIGHTED_AVERAGE,
+            outer_lr=1.0,
+            outer_momentum=0.0,
+        )
+    )
+
+
+def delta_outer_merges(
+    outer_learning_rates=learning_rates,
+):
+    return st.builds(
+        OuterMerge,
+        strategy=st.just(OuterMergeStrategy.DELTA),
+        outer_lr=outer_learning_rates(),
+        outer_momentum=st.just(0.0),
+    )
+
+
+def momentum_delta_outer_merges(
+    outer_learning_rates=learning_rates,
+    outer_momenta=momenta,
+):
+    return st.builds(
+        OuterMerge,
+        strategy=st.just(OuterMergeStrategy.MOMENTUM_DELTA),
+        outer_lr=outer_learning_rates(),
+        outer_momentum=momenta(),
+    )
+
+
+def outer_merges(
+    outer_learning_rates=learning_rates,
+    outer_momenta=momenta,
+):
+    return st.one_of(
+        weighted_average_outer_merges(),
+        delta_outer_merges(outer_learning_rates=outer_learning_rates),
+        momentum_delta_outer_merges(outer_learning_rates=outer_learning_rates, outer_momenta=outer_momenta),
+    )
+
+
+def consortium_coordinators(
+    models=tiny_causal_models,
+    contribution_policies=contribution_policies,
+    outer_merges=outer_merges,
+):
+    return st.builds(
+        ConsortiumCoordinator,
+        base_model=models(),
+        contribution_policy=contribution_policies(),
+        outer_merge=outer_merges(),
+    )

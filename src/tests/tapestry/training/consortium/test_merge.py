@@ -2,10 +2,11 @@
 
 import pytest
 import torch
-from hypothesis import given, settings
+from hypothesis import given
 from hypothesis import strategies as st
 
 from tapestry.training.consortium import OuterMerge, OuterMergeStrategy
+from tests.test_utils.hypothesis.model_strategies import outer_merges
 
 # ---------------------------------------------------------------------------
 # Local strategies
@@ -38,10 +39,7 @@ _PARAM_NAMES = st.text(
 def model_states(param_names: list[str], size: int):
     """Strategy: a ModelState dict with fixed param names and 1-D tensors of `size` elements."""
     return st.fixed_dictionaries(
-        {
-            name: st.lists(_TENSOR_ELEMENTS, min_size=size, max_size=size).map(torch.tensor)
-            for name in param_names
-        }
+        {name: st.lists(_TENSOR_ELEMENTS, min_size=size, max_size=size).map(torch.tensor) for name in param_names}
     )
 
 
@@ -66,39 +64,27 @@ def uniform_weights(node_ids: list[str]) -> dict[str, float]:
 # ---------------------------------------------------------------------------
 
 
-def test_non_positive_outer_lr_raises():
-    with pytest.raises(ValueError, match="outer_lr must be positive"):
-        OuterMerge(strategy=OuterMergeStrategy.DELTA, outer_lr=0.0)
+@given(st.floats(min_value=-1.0, max_value=0.0))
+def test_non_positive_outer_lr_raises_for_delta_and_momentum_delta_merge_strategy(outer_lr):
+    for strat in [OuterMergeStrategy.DELTA, OuterMergeStrategy.MOMENTUM_DELTA]:
+        with pytest.raises(ValueError, match=f"Expect outer_lr > 0.0 for strategy {strat}"):
+            OuterMerge(strategy=strat, outer_lr=outer_lr)
 
 
-def test_negative_outer_lr_raises():
-    with pytest.raises(ValueError, match="outer_lr must be positive"):
-        OuterMerge(strategy=OuterMergeStrategy.DELTA, outer_lr=-0.5)
+@given(st.floats(min_value=-1.0, max_value=1.0))
+def test_outer_lr_ignored_for_weighted_average_merge_strategy(outer_lr):
+    _ = OuterMerge(strategy=OuterMergeStrategy.WEIGHTED_AVERAGE, outer_lr=outer_lr)
 
 
-def test_outer_momentum_at_one_raises():
-    with pytest.raises(ValueError, match="outer_momentum must be in"):
-        OuterMerge(strategy=OuterMergeStrategy.MOMENTUM_DELTA, outer_momentum=1.0)
-
-
-def test_outer_momentum_above_one_raises():
-    with pytest.raises(ValueError, match="outer_momentum must be in"):
-        OuterMerge(strategy=OuterMergeStrategy.MOMENTUM_DELTA, outer_momentum=1.5)
+@given(st.floats(min_value=1.0, max_value=10.0))
+def test_outer_momentum_at_greater_than_or_equal_to_one_raises(outer_momentum):
+    with pytest.raises(ValueError, match="OuterMergeStrategy.MOMENTUM_DELTA requires outer_momentum > 0 and < 1.0."):
+        OuterMerge(strategy=OuterMergeStrategy.MOMENTUM_DELTA, outer_momentum=outer_momentum)
 
 
 def test_momentum_delta_requires_nonzero_momentum():
-    with pytest.raises(ValueError, match="momentum-delta requires outer_momentum"):
+    with pytest.raises(ValueError, match="OuterMergeStrategy.MOMENTUM_DELTA requires outer_momentum"):
         OuterMerge(strategy=OuterMergeStrategy.MOMENTUM_DELTA, outer_momentum=0.0)
-
-
-def test_outer_lr_inactive_on_weighted_average_raises():
-    with pytest.raises(ValueError, match="outer_lr is only active"):
-        OuterMerge(strategy=OuterMergeStrategy.WEIGHTED_AVERAGE, outer_lr=0.5)
-
-
-def test_outer_momentum_inactive_on_delta_raises():
-    with pytest.raises(ValueError, match="outer_momentum is only active"):
-        OuterMerge(strategy=OuterMergeStrategy.DELTA, outer_lr=1.0, outer_momentum=0.5)
 
 
 def test_invalid_strategy_string_raises():
@@ -119,6 +105,11 @@ def test_strategy_string_alias_delta():
 def test_strategy_string_alias_momentum_delta():
     merge = OuterMerge(strategy="momentum-delta", outer_lr=0.5, outer_momentum=0.9)
     assert merge.strategy is OuterMergeStrategy.MOMENTUM_DELTA
+
+
+@given(outer_merges())
+def test_outer_merges_hypothesis_strategy_generates_valid_outer_merges(outer_merge):
+    pass  # Any exceptions thrown during construction of outer_merge would be a failure.
 
 
 # ---------------------------------------------------------------------------
@@ -367,7 +358,7 @@ def test_momentum_delta_velocity_persists_across_merge_instances():
     outer_momentum=_OUTER_MOMENTUMS,
     n_rounds=st.integers(min_value=1, max_value=4),
 )
-@settings(deadline=None)
+# @settings(deadline=None)
 def test_momentum_delta_output_keys_and_shapes_stable_across_rounds(
     param_names, size, outer_lr, outer_momentum, n_rounds
 ):
