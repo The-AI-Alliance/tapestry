@@ -239,7 +239,7 @@ Adapt (using a combination of CPT, SFT, and RL) an existing model that is good a
 * Pick another domain workflow.
 
 
-### Generalizations and Other Ideas
+### Generalizations and Other Ideas for Healthcare
 
 The first two use cases above were inspired by the next two, more-general suggestions made earlier in the #200 discussion. The third use case above was suggested in a more recent conversation (as described above).
 
@@ -312,6 +312,28 @@ Train a shared intrusion-/anomaly-detection model across a federation of soverei
 
 (link: [12](#comment-links))
 
+### Industrial Operations: Maintenance, Troubleshooting, Operating Procedures and Technical Knowledge
+
+One additional angle for the Industrial AI Model option could be a sovereign model focused on industrial operations: maintenance, troubleshooting, operating procedures and technical knowledge.
+
+Pascal Gautier is currently developing `OrchestrAI` at Pascal Robotics, an orchestration layer designed to route AI workloads between cloud, local and on-premise execution according to cost, latency, quality and sovereignty constraints.
+
+What makes the industrial use case interesting for Tapestry is that much of the valuable data — maintenance logs, local procedures, machine documentation, incident history, production knowledge — is proprietary and often cannot reasonably be centralized.
+
+A Tapestry-style sovereign node architecture could therefore be particularly relevant: each industrial site could adapt a shared base using local data while retaining control of its raw datasets.
+
+For an initial M1-scale experiment, the scope could remain deliberately modest and text-first:
+- industrial troubleshooting / maintenance assistance;
+- grounding in technical procedures and documentation;
+- multilingual industrial knowledge;
+- evaluation of task quality together with provenance and sovereignty constraints.
+
+Private industrial data would not be necessary for the first PoC; public or synthetic datasets could establish the pipeline first. Longer term, this could naturally connect to digital twins and Physical AI, but I would keep those outside the first experiment.
+
+Pascal offered to contribute a small use-case / evaluation specification if this direction is useful to the group.
+
+(link: [13](#comment-links))
+
 ## Notes on the Implementation Approach
 
 So far, we have assumed we would create a tuned model with some combination of continued pretraining and post training with supervised fine tuning and reinforcement learning. There are some alternative approaches that have been suggested, taking a more application-level approach.
@@ -331,7 +353,7 @@ Do we need to decide now?
 
 **No:**
 
-* Since we don't have the compute resources yet that we need, we can't start tuning yet, so we can take some more time to decide on a target.
+* Since we do not currently have the compute resources that we need, we can't start tuning yet, so we can take some more time to decide on a target.
 
 **Yes:**
 
@@ -354,3 +376,4 @@ The links above refer to these items, which are links to the actual comments in 
 10. [Comment from Maneesh](https://github.com/The-AI-Alliance/tapestry/issues/200#issuecomment-5778810910)
 11. [Comment from Rubén Armañanzas](https://github.com/The-AI-Alliance/tapestry/issues/200#issuecomment-5774346211)
 12. [Comment from Elaine Chan](https://github.com/The-AI-Alliance/tapestry/issues/200#issuecomment-5778998091)
+13: [Comment by Pascal Gautier](https://github.com/The-AI-Alliance/tapestry/issues/200#issuecomment-5930442599)
