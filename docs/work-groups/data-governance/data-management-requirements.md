@@ -5,15 +5,15 @@
 | Status      | Draft                  |
 | Confidence  | Medium (3/5)           |
 | Created     | June 27, 2026          |
-| Last Update | August 28, 2026        |
-| Versions    | V0.1 - August 28, 2026 |
+| Last Update | September 14, 2026     |
+| Versions    | V0.2 - September 14, 2026 |
 
 > [!NOTE]
 > The requirements in this document are _derived_ in part from the [Data Governance Requirements](data-governance-requirements.md), because they bridge those high-level requirements to the architecture, design, and implementation details needed to meet them. (This document also covers other data-related requirements.) Some terms are defined in that document.
 >
 > Because architecture through implementation requirements are covered here, these requirements overlap with the concerns of the [Infrastructure & Operations](../infrastructure-operations/) work group. We may choose to move these requirements under that group, but for now, it is more convenient to work with them in tandem with the governance requirements.
 
-This document supports issue [#27](https://github.com/The-AI-Alliance/tapestry/issues/27) by defining the first iteration ("V0.1") of the data management requirements for managing datasets used in Tapestry training, tuning, alignment, and evaluation work. It focuses on what the infrastructure must make possible before the project chooses specific tools.
+This document supports issue [#232](https://github.com/The-AI-Alliance/tapestry/issues/232) by defining the second iteration ("V0.2") of the data management requirements for datasets used in Tapestry training, tuning, alignment, and evaluation work. It defines the minimum interfaces and enforcement points an implementation must provide without selecting a storage, catalog, or policy product.
 
 ## Scope of This Document
 
@@ -53,6 +53,67 @@ This document supports issue [#27](https://github.com/The-AI-Alliance/tapestry/i
 | DM:10 | All data access API activity is logged in a way that supports auditing. | DG:7 | Public summaries, consortium-private review artifacts, and participant-private logs must be separable. |
 | DM:11 | The data access API integrates with Tapestry policy enforcement tools. | DG:8 | Reviewers need to know which version of a dataset supported a model or claim. |
 | DM:12 | Deliver an MVP that works with local files, manifests, and documented attestations. | N/A | Early work should be useful before the full consortium platform exists. |
+| DM:13 | Authenticate every user, service, and participant node and preserve that identity in data events. | DG:7,9,11 | Authorization and audit records are only useful when actions have a stable accountable identity. |
+| DM:14 | Separate policy decisions from enforcement and record the policy version and decision used for each request. | DG:8,9,12 | Participants must be able to inspect why access was allowed or denied and reproduce the decision later. |
+| DM:15 | Dispatch processing only to locations and runtimes allowed by the artifact's residency and use constraints. | DG:3,5,6,12 | Scheduling is an enforcement boundary for sovereign and restricted data. |
+| DM:16 | Reject manifests with missing required governance fields, unknown artifact versions, or weaker output restrictions. | DG:3,5,13,14 | Invalid metadata must fail before a job can read protected data. |
+| DM:17 | Support artifact withdrawal by blocking new access and identifying active jobs, replicas, caches, and descendants. | DG:9,15 | Withdrawal cannot be enforced without an inventory of current and downstream use. |
+| DM:18 | Produce visibility-filtered audit exports without changing the underlying event history. | DG:7 | Public and consortium reports must not leak participant-private details. |
+
+## Required Service Boundaries
+
+V0.2 defines logical interfaces rather than deployment units. An implementation may combine them, but the responsibilities must remain testable independently.
+
+| Boundary | Responsibility | Minimum result |
+| :------- | :------------- | :------------- |
+| Catalog | Resolve an immutable artifact version and its visible metadata. | A versioned record or an explicit not-found/forbidden result. |
+| Policy decision | Evaluate identity, purpose, location, time, and artifact restrictions. | Allow or deny with policy version and reason codes. |
+| Data access | Read or write through the approved path. | A scoped access grant tied to the decision and request. |
+| Processing dispatch | Place work in an allowed participant boundary and runtime. | A job record linked to inputs, outputs, policy decision, and location. |
+| Lineage | Record transformations and parent-child relationships. | A traversable graph from an output to its source versions and jobs. |
+| Audit export | Filter immutable events for an authorized audience. | Public, consortium-private, or participant-private evidence. |
+| Withdrawal | Stop future use and enumerate affected activity. | Blocked access plus an impact report for active and derived artifacts. |
+
+## Manifest Validation
+
+The MVP must validate a manifest before any data access. Validation is ordered so that a rejected request does not reveal metadata the caller is not allowed to see:
+
+1. Authenticate the caller and participant context.
+2. Resolve the artifact identifier and requested immutable version.
+3. Check whether the caller may discover that artifact.
+4. Validate required governance metadata and approval state.
+5. Evaluate purpose, location, time, and requested operation against policy.
+6. Verify that declared output restrictions are at least as strict as all inputs.
+7. Issue a short-lived, least-privilege access grant and record the decision.
+
+The result must use stable reason codes suitable for automated gates. Human-readable text may add context, but automation must not depend on matching prose.
+
+## Event and Lineage Contract
+
+Every accepted or denied access request and every processing transition must record:
+
+- event identifier and timestamp;
+- authenticated actor, service, and participant boundary;
+- action and outcome, including stable reason codes;
+- artifact identifier and immutable version, subject to visibility rules;
+- purpose, processing location, and policy version;
+- approval or exception reference, when applicable;
+- job identifier and parent/output artifact links for transformations; and
+- integrity evidence for the event, such as a digest or signed envelope.
+
+Events are append-only. Corrections create a new event that references the superseded record rather than silently replacing history.
+
+## Withdrawal Workflow
+
+Given an artifact version, the implementation must be able to:
+
+1. Deny new access immediately after the withdrawal becomes effective.
+2. Find active jobs and decide whether each must stop, quarantine output, or continue under an approved exception.
+3. Find replicas, caches, exported copies, and derived artifacts known to the system.
+4. Assign deletion, quarantine, or review actions to the responsible participant boundary.
+5. Record completion evidence without requiring private details to become consortium-visible.
+
+The system must preserve historical evidence that an artifact was previously used while preventing that history from acting as a new access path.
 
 ## Core Data Model Features
 
@@ -123,6 +184,8 @@ For the first implementation pass, prefer a lightweight workflow:
 4. Allow participant-private details to remain outside the repository.
 5. Use manifests, hashes, and attestations for local-only datasets.
 6. Export structured evidence that evaluation and release-gate checks can read.
+
+The MVP is complete when automated tests demonstrate one allowed open-data request, one denied purpose mismatch, one local-only dispatch, one restriction-preserving transformation, one visibility-filtered audit export, and one withdrawal impact report.
 
 This path lets Tapestry start governing data before adopting a full data catalog or distributed data platform.
 
