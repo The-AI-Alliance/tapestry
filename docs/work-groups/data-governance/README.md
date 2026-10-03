@@ -8,6 +8,8 @@ For our purposes, _data_ also includes artifacts like model weights and delivera
 
 [Data Governance Requirements](data-governance-requirements.md) explores the details.
 
+The [Open Data Spaces assessment](open-data-spaces-assessment.md) evaluates a standards-based interoperability option for implementing these requirements and recommends a bounded prototype before adopting its middleware.
+
 > [!NOTE]
 > When considering how to implement governance requirements, _derived requirements_ for data management emerge that focus on architecture, design, and implementation details. _We consider these requirements the responsibility of the [Infrastructure & Operations](../infrastructure-operations/) work group._
 >
@@ -47,4 +49,3 @@ This work group traces to [Phase 2 pain points](../../architecture/2-pain-points
 - **Evaluation & Certification:** audit evidence for data sovereignty claims.
 - **Governance & Participation:** contribution credit and benefit-sharing rules.
 - **Infrastructure & Operations:** how these requirements are implemented.
-
