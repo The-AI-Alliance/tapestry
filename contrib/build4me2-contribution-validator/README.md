@@ -209,6 +209,20 @@ smallest number of nodes you are willing to let move the shared base; when
 fewer survive, the round leaves the base untouched and the summary records
 `quorum_met=False`.
 
+`summary_sink` and `retain_rounds` control what happens to each round's
+summary. The summary is stored, old rounds beyond the limit are evicted, and
+then the sink is called, so an audit log receives every round while memory
+stays bounded. A sink that raises stops the round, and the summary is still
+held in memory for the caller to write once the sink is repaired; write it
+before running another round, or a tight `retain_rounds` may evict it. The limit is
+validated on assignment as well as at construction, because a value below one
+would silently disable eviction. Both options default to the original
+behaviour: nothing is written out and every round is kept.
+
+The summary records what the gate decided about the contributions. It is
+written before the outer merge, so it does not assert that the merge itself
+succeeded.
+
 If the validator is promoted, the same logic is a few lines inside
 `ConsortiumCoordinator.run_round` and `gate.py` goes away.
 
@@ -261,5 +275,7 @@ If the validator is promoted, the same logic is a few lines inside
   would otherwise fail inside aggregation.
 - The quorum is a count, not a share of declared members. A policy that knows
   the consortium roster could express "at least half of the members" instead.
-- Round summaries accumulate in memory for the life of the coordinator. Long
-  runs should persist them to an audit sink and drop old rounds.
+- Round summaries are kept in memory for the life of the coordinator unless
+  `retain_rounds` bounds them. The default keeps every round, which is fine
+  for short runs; a long run should set a limit and pass a `summary_sink` so
+  the record survives eviction.

@@ -21,6 +21,7 @@ from contribution_validator import (
     ContributionValidator,
     DtypePolicy,
     FindingCode,
+    GateRoundSummary,
     ValidatingConsortiumCoordinator,
     ValidationLimits,
     validate_contribution,
@@ -653,3 +654,106 @@ def test_gate_matches_plain_coordinator_when_all_contributions_are_valid() -> No
     assert plain_result.accepted_nodes == gated_result.accepted_nodes
     assert plain_result.contribution_weights == gated_result.contribution_weights
     _assert_same(plain_result.shared_base_state, gated_result.shared_base_state)
+
+
+def test_gate_keeps_every_round_summary_by_default() -> None:
+    """The original behaviour is unchanged: nothing is written out and nothing is dropped."""
+    torch.manual_seed(12)
+    coordinator = ValidatingConsortiumCoordinator(_model())
+    nodes = [_node("a", 0), _node("b", 10)]
+
+    for _ in range(5):
+        coordinator.run_round(nodes)
+
+    assert sorted(coordinator.round_summaries) == [1, 2, 3, 4, 5]
+    assert coordinator.summary_sink is None
+    assert coordinator.retain_rounds is None
+
+
+def test_gate_hands_every_round_summary_to_the_sink() -> None:
+    """A caller-provided sink receives each round's summary, in order, as it happens."""
+    torch.manual_seed(13)
+    written: list[GateRoundSummary] = []
+    coordinator = ValidatingConsortiumCoordinator(_model(), summary_sink=written.append)
+    nodes = [_node("a", 0), _node("b", 10)]
+
+    for _ in range(3):
+        coordinator.run_round(nodes)
+
+    assert [summary.round_num for summary in written] == [1, 2, 3]
+    assert all(summary.admitted_nodes == ["a", "b"] for summary in written)
+    assert written[0] is coordinator.round_summaries[1]
+
+
+def test_gate_retains_only_the_most_recent_rounds() -> None:
+    """``retain_rounds`` bounds memory, dropping the oldest summaries first."""
+    torch.manual_seed(14)
+    coordinator = ValidatingConsortiumCoordinator(_model(), retain_rounds=2)
+    nodes = [_node("a", 0), _node("b", 10)]
+
+    for _ in range(5):
+        coordinator.run_round(nodes)
+
+    assert sorted(coordinator.round_summaries) == [4, 5]
+    assert sorted(coordinator.validation_reports) == [4, 5]
+    assert coordinator.round_summaries[5].round_num == 5
+
+
+def test_gate_sink_is_the_complete_record_under_a_tight_retention_limit() -> None:
+    """Keeping one round in memory still gives the sink every round."""
+    torch.manual_seed(15)
+    written: list[int] = []
+    coordinator = ValidatingConsortiumCoordinator(
+        _model(), summary_sink=lambda summary: written.append(summary.round_num), retain_rounds=1
+    )
+    nodes = [_node("a", 0)]
+
+    for _ in range(4):
+        coordinator.run_round(nodes)
+
+    assert written == [1, 2, 3, 4]
+    assert sorted(coordinator.round_summaries) == [4]
+
+
+def test_gate_rejects_a_retention_limit_below_one() -> None:
+    """A limit below one would disable eviction and let summaries grow without bound."""
+    with pytest.raises(ValueError):
+        ValidatingConsortiumCoordinator(_model(), retain_rounds=0)
+    with pytest.raises(ValueError):
+        ValidatingConsortiumCoordinator(_model(), retain_rounds=-1)
+
+
+def test_gate_rejects_a_retention_limit_assigned_after_construction() -> None:
+    """The limit is validated on assignment, so eviction cannot be disabled later."""
+    torch.manual_seed(17)
+    coordinator = ValidatingConsortiumCoordinator(_model(), retain_rounds=2)
+
+    with pytest.raises(ValueError):
+        coordinator.retain_rounds = 0
+
+    assert coordinator.retain_rounds == 2
+    for _ in range(5):
+        coordinator.run_round([_node("a", 0)])
+    assert sorted(coordinator.round_summaries) == [4, 5]
+
+
+def test_gate_sink_failure_stops_the_round() -> None:
+    """A sink that raises is not swallowed, so a lost audit record cannot go unnoticed."""
+    torch.manual_seed(16)
+
+    def failing_sink(_summary: GateRoundSummary) -> None:
+        raise OSError("audit sink unavailable")
+
+    coordinator = ValidatingConsortiumCoordinator(_model(), summary_sink=failing_sink)
+    base_before = coordinator.shared_base_state
+
+    with pytest.raises(OSError):
+        coordinator.run_round([_node("a", 0)])
+
+    # The sink runs before the outer merge, so an unrecorded round never moves the shared base.
+    _assert_same(base_before, coordinator.shared_base_state)
+
+    # The round is still recorded in memory, so the caller can repair the sink
+    # and write it rather than losing it.
+    assert sorted(coordinator.round_summaries) == [1]
+    assert coordinator.round_summaries[1].admitted_nodes == ["a"]
