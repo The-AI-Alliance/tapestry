@@ -3,7 +3,7 @@ name = "tapestry"
 version = "0.1.0"
 description = "The Python code for Project Tapestry"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14,<3.15"  # Torch doesn't support 3.15+
 dependencies = [
     "torch>=2.14.1",
     "numpy>=2.5.4",
