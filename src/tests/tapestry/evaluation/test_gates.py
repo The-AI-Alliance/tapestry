@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
+
 import pytest
 
 from tapestry.evaluation import (
@@ -12,10 +14,72 @@ from tapestry.evaluation import (
     EvaluationGate,
     EvaluationResult,
     GateStatus,
+    IntervalPolicy,
     benchmark_config_hash,
 )
 
 # pylint: disable=missing-class-docstring,missing-function-docstring
+
+
+def _interval_spec(higher_is_better=True):
+    return BenchmarkSpec(
+        benchmark_id="x",
+        name="Example",
+        kind=BenchmarkKind.CAPABILITY,
+        metric="accuracy",
+        config=BenchmarkConfig("v1", "rev", "prompt"),
+        threshold=0.7,
+        higher_is_better=higher_is_better,
+        interval_policy=IntervalPolicy("bootstrap", 0.95, {"resamples": "1000"}),
+    )
+
+
+@pytest.mark.parametrize(
+    "higher,lower,upper,expected",
+    [
+        (True, 0.7, 0.8, GateStatus.PASS),
+        (True, 0.6, 0.7, GateStatus.INDETERMINATE),
+        (True, 0.5, 0.6, GateStatus.FAIL),
+        (False, 0.6, 0.7, GateStatus.PASS),
+        (False, 0.7, 0.8, GateStatus.INDETERMINATE),
+        (False, 0.8, 0.9, GateStatus.FAIL),
+        (True, None, None, GateStatus.INDETERMINATE),
+        (False, 0.5, None, GateStatus.INDETERMINATE),
+        (True, None, 0.9, GateStatus.INDETERMINATE),
+        (True, 0.7, 0.7, GateStatus.PASS),
+        (False, 0.7, 0.7, GateStatus.PASS),
+    ],
+)
+def test_interval_decision_boundary_and_missing_bounds(higher, lower, upper, expected):
+    gate = EvaluationGate([_interval_spec(higher)])
+    result = EvaluationResult("x", 0.7, lower_bound=lower, upper_bound=upper)
+    decision = gate.decide_bundle(_bundle(gate, [result]))
+    assert decision.findings[0].status == expected
+    assert decision.passed == (expected == GateStatus.PASS)
+    assert bool(decision.blocking_findings) == (expected != GateStatus.PASS)
+
+
+@pytest.mark.parametrize("lower,upper", [(0.8, 0.7), (float("nan"), 1.0), (0.0, float("inf"))])
+def test_invalid_interval_is_rejected(lower, upper):
+    with pytest.raises(ValueError):
+        EvaluationResult("x", 0.7, lower_bound=lower, upper_bound=upper)
+
+
+def test_interval_configuration_hash_and_legacy_hash():
+    interval = _interval_spec()
+    scalar = replace(interval, interval_policy=None)
+    assert benchmark_config_hash([scalar]) == "70c0f8a997014d5b67c3b71dae94eb0b2afbbda55878e67867bcc48262700c63"
+    assert benchmark_config_hash([interval]) != benchmark_config_hash([scalar])
+    changed_method = replace(interval, interval_policy=IntervalPolicy("other", 0.95, {"resamples": "1000"}))
+    changed_level = replace(interval, interval_policy=IntervalPolicy("bootstrap", 0.9, {"resamples": "1000"}))
+    changed_settings = replace(interval, interval_policy=IntervalPolicy("bootstrap", 0.95, {"resamples": "2000"}))
+    assert len({benchmark_config_hash([s]) for s in (interval, changed_method, changed_level, changed_settings)}) == 4
+
+
+def test_scalar_default_ignores_valid_bounds():
+    gate = EvaluationGate([replace(_interval_spec(), interval_policy=None)])
+    result = EvaluationResult("x", 0.8, lower_bound=0.5, upper_bound=0.9)
+    assert gate.decide([result]).passed
 
 
 def _config(
