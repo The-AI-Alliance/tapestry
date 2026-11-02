@@ -10,6 +10,7 @@ from tapestry.evaluation.gates import (
     GateDecision,
     GateFinding,
     GateStatus,
+    IntervalPolicy,
     benchmark_config_hash,
 )
 from tapestry.evaluation.plan import (
@@ -34,6 +35,7 @@ __all__ = [
     "GateDecision",
     "GateFinding",
     "GateStatus",
+    "IntervalPolicy",
     "benchmark_config_hash",
     "required_kind_summary",
 ]

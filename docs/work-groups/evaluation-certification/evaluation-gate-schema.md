@@ -24,6 +24,12 @@ certification work a stable result contract to target.
 
 The current schema version is `evaluation-gate/v1`. Bundles that still declare `m0-evaluation-gate/v1` remain valid as a legacy alias for the original M0 contract.
 
+## Optional interval decisions
+
+By default the gate compares the point score to the threshold, and existing scalar configuration hashes stay unchanged. A benchmark can instead declare `IntervalPolicy(method, confidence_level, settings)` on its `BenchmarkSpec`; the conservative interval policy and its declared method, confidence level, and settings become part of the config hash. The runner supplies `lower_bound` and `upper_bound` on each `EvaluationResult`. The gate does not calculate or validate the statistical provenance of the interval; the runner is responsible for the declared method.
+
+For higher-is-better metrics, an interval passes when its lower bound is at least the threshold and fails when its upper bound is strictly below the threshold. For lower-is-better metrics, an interval passes when its upper bound is at most the threshold and fails when its lower bound is strictly above the threshold. An interval crossing or touching the threshold from the failing side is indeterminate; a degenerate interval equal to the threshold passes. Missing either bound is also indeterminate. An indeterminate finding blocks release without claiming a measured failure. Non-finite or reversed bounds raise `ValueError`, including for scalar decisions when bounds are provided.
+
 ## Example
 
 ```python
