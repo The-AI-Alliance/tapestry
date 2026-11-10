@@ -13,7 +13,7 @@ def train(msg: Message, context: Context) -> Message:
     t0 = time.time()
     arrays = msg.content["arrays"]
     # Measure without deserializing to numpy: transport is what we're testing.
-    nbytes = sum(len(arr.data) for arr in arrays.values()) # ty: ignore[unresolved-attribute]
+    nbytes = sum(len(arr.data) for arr in arrays.values()) # ty: ignore[missing-union-attribute]
     t1 = time.time()
     print(
         f"SPIKE client: received {nbytes / 1e9:.3f} GB " f"(handler_start_unix={t0:.3f}, counted at {t1:.3f})",

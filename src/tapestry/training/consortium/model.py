@@ -14,6 +14,6 @@ class TinyCausalModel(nn.Module):
         self.embedding = nn.Embedding(vocab_size, hidden_size)
         self.proj = nn.Linear(hidden_size, vocab_size)
 
-    def forward(self, input_ids: torch.Tensor) -> torch.Tensor:  # ty: ignore[invalid-mutable-override]
+    def forward(self, input_ids: torch.Tensor) -> torch.Tensor:
         """Return next-token logits for ``(batch, sequence)`` token ids."""
         return self.proj(self.embedding(input_ids))
