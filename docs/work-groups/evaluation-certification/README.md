@@ -24,6 +24,13 @@ Out of scope: implementing training or serving stacks, deciding governance repre
 - How should cultural alignment be measured without flattening culture into simplistic benchmark scores?
 - Which evaluations are global baseline gates, and which are participant-specific?
 - What evidence should be public, private to the consortium, or retained only by the participant?
+- How do we evaluate how well an evaluation actually works? ("Who evaluates the evaluator?")
+  * Safety guardrail performance, in general?
+  * Safety guardrail performance in specific cultural, language, and use case contexts?
+  * Can open weight models be used for (traditional) Trust & Safety use cases like abuse detection, content moderation, investigations?
+  * Benchmark accuracy if domain experts weren't involved in their creation?
+  * How can a data catalog support the collection and vetting of community-provided data sets that are abuse-related, which are vital for trust and safety?
+  * Can we trust machine evaluation of evaluations?
 
 ## Early deliverables
 
