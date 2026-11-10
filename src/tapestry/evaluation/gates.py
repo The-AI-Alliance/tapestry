@@ -39,6 +39,26 @@ class GateStatus(str, Enum):
     INVALID = "invalid"
     MISSING = "missing"
     UNEXPECTED = "unexpected"
+    INDETERMINATE = "indeterminate"
+
+
+_BLOCKING_STATUSES = frozenset({GateStatus.FAIL, GateStatus.INVALID, GateStatus.MISSING, GateStatus.INDETERMINATE})
+
+
+@dataclass(frozen=True)
+class IntervalPolicy:
+    """Declared runner method for a conservative interval decision."""
+
+    method: str
+    confidence_level: float
+    settings: Mapping[str, str] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        _require_text("method", self.method)
+        _require_finite("confidence_level", self.confidence_level)
+        if not 0 < self.confidence_level < 1:
+            raise ValueError("confidence_level must be between 0 and 1")
+        object.__setattr__(self, "settings", _freeze_metadata(self.settings))
 
 
 @dataclass(frozen=True)
@@ -79,6 +99,7 @@ class BenchmarkSpec:  # pylint: disable=too-many-instance-attributes
     threshold: float
     higher_is_better: bool = True
     required: bool = True
+    interval_policy: IntervalPolicy | None = None
 
     def __post_init__(self) -> None:
         _require_text("benchmark_id", self.benchmark_id)
@@ -101,10 +122,18 @@ class EvaluationResult:
     benchmark_id: str
     score: float
     metadata: Mapping[str, str] = field(default_factory=dict)
+    lower_bound: float | None = None
+    upper_bound: float | None = None
 
     def __post_init__(self) -> None:
         _require_text("benchmark_id", self.benchmark_id)
         _require_finite("score", self.score)
+        if self.lower_bound is not None:
+            _require_finite("lower_bound", self.lower_bound)
+        if self.upper_bound is not None:
+            _require_finite("upper_bound", self.upper_bound)
+        if self.lower_bound is not None and self.upper_bound is not None and self.lower_bound > self.upper_bound:
+            raise ValueError("lower_bound must not exceed upper_bound")
         object.__setattr__(self, "metadata", _freeze_metadata(self.metadata))
 
 
@@ -153,11 +182,7 @@ class GateDecision:
     @property
     def blocking_findings(self) -> list[GateFinding]:
         """Findings that prevent the gate from passing."""
-        return [
-            finding
-            for finding in self.findings
-            if finding.status in {GateStatus.FAIL, GateStatus.INVALID, GateStatus.MISSING}
-        ]
+        return [finding for finding in self.findings if finding.status in _BLOCKING_STATUSES]
 
 
 class EvaluationGate:
@@ -204,15 +229,20 @@ class EvaluationGate:
                     )
                 continue
 
-            passed = spec.accepts(result.score)
-            status = GateStatus.PASS if passed else GateStatus.FAIL
+            if spec.interval_policy is None:
+                passed = spec.accepts(result.score)
+                status = GateStatus.PASS if passed else GateStatus.FAIL
+                message = _score_message(spec, result.score, passed)
+            else:
+                status = _interval_status(spec, result)
+                message = f"{benchmark_id} interval decision: {status.value}"
             findings.append(
                 GateFinding(
                     benchmark_id=benchmark_id,
                     status=status,
                     score=result.score,
                     threshold=spec.threshold,
-                    message=_score_message(spec, result.score, passed),
+                    message=message,
                 )
             )
 
@@ -226,7 +256,7 @@ class EvaluationGate:
                 )
             )
 
-        blocking = any(finding.status in {GateStatus.FAIL, GateStatus.MISSING} for finding in findings)
+        blocking = any(finding.status in _BLOCKING_STATUSES for finding in findings)
         return GateDecision(passed=not blocking, findings=findings)
 
     def decide_bundle(self, bundle: EvaluationBundle) -> GateDecision:
@@ -258,8 +288,9 @@ class EvaluationGate:
 
 def benchmark_config_hash(specs: Iterable[BenchmarkSpec]) -> str:
     """Return a stable SHA-256 digest for benchmark gate specs."""
-    payload = [
-        {
+    payload = []
+    for spec in sorted(specs, key=lambda item: item.benchmark_id):
+        item = {
             "benchmark_id": spec.benchmark_id,
             "config": spec.config.to_hash_payload(),
             "higher_is_better": spec.higher_is_better,
@@ -269,13 +300,36 @@ def benchmark_config_hash(specs: Iterable[BenchmarkSpec]) -> str:
             "required": spec.required,
             "threshold": spec.threshold,
         }
-        for spec in sorted(specs, key=lambda item: item.benchmark_id)
-    ]
+        if spec.interval_policy is not None:
+            item["interval_policy"] = {
+                "decision": "conservative_interval",
+                "method": spec.interval_policy.method,
+                "confidence_level": spec.interval_policy.confidence_level,
+                "settings": dict(spec.interval_policy.settings),
+            }
+        payload.append(item)
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
 
 
 _SUPPORTED_SCHEMA_VERSIONS = frozenset({SCHEMA_VERSION, *LEGACY_SCHEMA_VERSIONS})
+
+
+def _interval_status(spec: BenchmarkSpec, result: EvaluationResult) -> GateStatus:
+    lower, upper = result.lower_bound, result.upper_bound
+    if lower is None or upper is None:
+        return GateStatus.INDETERMINATE
+    if spec.higher_is_better:
+        if lower >= spec.threshold:
+            return GateStatus.PASS
+        if upper < spec.threshold:
+            return GateStatus.FAIL
+    else:
+        if upper <= spec.threshold:
+            return GateStatus.PASS
+        if lower > spec.threshold:
+            return GateStatus.FAIL
+    return GateStatus.INDETERMINATE
 
 
 def _score_message(spec: BenchmarkSpec, score: float, passed: bool) -> str:
