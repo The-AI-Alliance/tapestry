@@ -16,7 +16,7 @@ from .fingerprint import (
     fingerprint_state,
     with_base_fingerprint,
 )
-from .gate import GateRoundSummary, ValidatingConsortiumCoordinator
+from .gate import GateRoundSummary, ValidatingConsortiumCoordinator, read_round_summaries
 from .limits import DtypePolicy, FingerprintPolicy, ValidationLimits
 from .validator import ContributionValidator, validate_contribution
 
@@ -38,6 +38,7 @@ __all__ = [
     "declared_base_fingerprint",
     "fingerprint_model",
     "fingerprint_state",
+    "read_round_summaries",
     "validate_contribution",
     "with_base_fingerprint",
 ]

@@ -21,9 +21,9 @@ from contribution_validator import (
     ContributionValidator,
     DtypePolicy,
     FindingCode,
-    GateRoundSummary,
     ValidatingConsortiumCoordinator,
     ValidationLimits,
+    read_round_summaries,
     validate_contribution,
 )
 from contribution_validator.faults import (
@@ -37,6 +37,7 @@ from contribution_validator.faults import (
     scale_parameters,
 )
 from contribution_validator.testing import base_state as _base_state
+from contribution_validator.testing import last_summary as _summary
 from contribution_validator.testing import tiny_model as _model
 from contribution_validator.testing import toy_corpus as _corpus
 
@@ -517,11 +518,11 @@ def test_gate_excludes_corrupted_node_and_records_reports() -> None:
     assert result.accepted_nodes == ["clean-a", "clean-b"]
     assert result.rejected_nodes == ["corrupt"]
     assert "corrupt" not in result.contribution_weights
-    reports = coordinator.validation_reports[1]
+    reports = _summary(coordinator).reports
     assert set(reports) == {"clean-a", "clean-b", "corrupt"}
     assert not reports["corrupt"].accepted
     assert reports["corrupt"].finding_codes == (FindingCode.NON_FINITE,)
-    summary = coordinator.round_summaries[1]
+    summary = _summary(coordinator)
     assert summary.validation_rejected_nodes == ["corrupt"]
     assert summary.admitted_nodes == ["clean-a", "clean-b"]
     assert summary.quorum_met
@@ -570,7 +571,7 @@ def test_gate_separates_validation_rejections_from_policy_rejections() -> None:
 
     assert result.accepted_nodes == ["clean"]
     assert set(result.rejected_nodes) == {"weak", "corrupt"}
-    summary = coordinator.round_summaries[1]
+    summary = _summary(coordinator)
     assert summary.validation_rejected_nodes == ["corrupt"]
     assert summary.admitted_nodes == ["clean", "weak"]
 
@@ -599,7 +600,7 @@ def test_gate_quorum_blocks_a_lone_survivor_from_owning_the_base() -> None:
     assert not result.accepted_nodes
     assert not result.contribution_weights
     assert set(result.rejected_nodes) == {"survivor", "b", "c"}
-    summary = coordinator.round_summaries[1]
+    summary = _summary(coordinator)
     assert summary.admitted_nodes == ["survivor"]
     assert summary.validation_rejected_nodes == ["b", "c"]
     assert not summary.quorum_met
@@ -635,7 +636,7 @@ def test_gate_matches_plain_coordinator_for_a_model_with_a_non_finite_buffer() -
     gated_result = gated.run_round(_nodes())
 
     assert gated_result.accepted_nodes == plain_result.accepted_nodes == ["a", "b"]
-    assert gated.round_summaries[1].validation_rejected_nodes == []
+    assert _summary(gated).validation_rejected_nodes == []
     _assert_same(plain_result.shared_base_state, gated_result.shared_base_state)
 
 
@@ -656,104 +657,69 @@ def test_gate_matches_plain_coordinator_when_all_contributions_are_valid() -> No
     _assert_same(plain_result.shared_base_state, gated_result.shared_base_state)
 
 
-def test_gate_keeps_every_round_summary_by_default() -> None:
-    """The original behaviour is unchanged: nothing is written out and nothing is dropped."""
+def test_gate_keeps_only_the_latest_summary_in_memory() -> None:
+    """Memory holds one summary however many rounds run, and nothing is written without a path."""
     torch.manual_seed(12)
     coordinator = ValidatingConsortiumCoordinator(_model())
-    nodes = [_node("a", 0), _node("b", 10)]
+    with pytest.raises(AssertionError):
+        _summary(coordinator)
 
-    for _ in range(5):
-        coordinator.run_round(nodes)
+    for _ in range(3):
+        coordinator.run_round([_node("a", 0), _node("b", 10)])
 
-    assert sorted(coordinator.round_summaries) == [1, 2, 3, 4, 5]
-    assert coordinator.summary_sink is None
-    assert coordinator.retain_rounds is None
+    assert coordinator.summary_path is None
+    assert _summary(coordinator).round_num == 3
 
 
-def test_gate_hands_every_round_summary_to_the_sink() -> None:
-    """A caller-provided sink receives each round's summary, in order, as it happens."""
+def test_gate_appends_every_round_summary_to_the_file(tmp_path: Path) -> None:
+    """Each round adds one JSON line, and reading the file back gives every round in order."""
     torch.manual_seed(13)
-    written: list[GateRoundSummary] = []
-    coordinator = ValidatingConsortiumCoordinator(_model(), summary_sink=written.append)
+    path = tmp_path / "gate-summaries.jsonl"
+    coordinator = ValidatingConsortiumCoordinator(_model(), summary_path=path)
     nodes = [_node("a", 0), _node("b", 10)]
 
     for _ in range(3):
         coordinator.run_round(nodes)
 
-    assert [summary.round_num for summary in written] == [1, 2, 3]
-    assert all(summary.admitted_nodes == ["a", "b"] for summary in written)
-    assert written[0] is coordinator.round_summaries[1]
+    summaries = read_round_summaries(path)
+    assert [summary["round_num"] for summary in summaries] == [1, 2, 3]
+    assert summaries[-1] == _summary(coordinator).to_dict()
+    assert summaries[0]["admitted_nodes"] == ["a", "b"]
+    assert summaries[0]["reports"]["a"]["accepted"]
 
 
-def test_gate_retains_only_the_most_recent_rounds() -> None:
-    """``retain_rounds`` bounds memory, dropping the oldest summaries first."""
+def test_gate_summary_file_is_strict_json_for_a_non_finite_contribution(tmp_path: Path) -> None:
+    """A NaN update is recorded as null, so the file never holds tokens strict JSON parsers reject."""
     torch.manual_seed(14)
-    coordinator = ValidatingConsortiumCoordinator(_model(), retain_rounds=2)
-    nodes = [_node("a", 0), _node("b", 10)]
-
-    for _ in range(5):
-        coordinator.run_round(nodes)
-
-    assert sorted(coordinator.round_summaries) == [4, 5]
-    assert sorted(coordinator.validation_reports) == [4, 5]
-    assert coordinator.round_summaries[5].round_num == 5
-
-
-def test_gate_sink_is_the_complete_record_under_a_tight_retention_limit() -> None:
-    """Keeping one round in memory still gives the sink every round."""
-    torch.manual_seed(15)
-    written: list[int] = []
-    coordinator = ValidatingConsortiumCoordinator(
-        _model(), summary_sink=lambda summary: written.append(summary.round_num), retain_rounds=1
+    path = tmp_path / "gate-summaries.jsonl"
+    coordinator = ValidatingConsortiumCoordinator(_model(), summary_path=path)
+    corrupt = FaultInjectingNode(
+        node_id="corrupt",
+        jurisdiction="Corrupt",
+        model=_model(),
+        sovereign_corpus=_corpus(20),
+        quality_score=0.9,
+        local_epochs=1,
+        lr=0.01,
+        fault=inject_nan,
     )
-    nodes = [_node("a", 0)]
 
-    for _ in range(4):
-        coordinator.run_round(nodes)
+    coordinator.run_round([_node("a", 0), corrupt])
 
-    assert written == [1, 2, 3, 4]
-    assert sorted(coordinator.round_summaries) == [4]
-
-
-def test_gate_rejects_a_retention_limit_below_one() -> None:
-    """A limit below one would disable eviction and let summaries grow without bound."""
-    with pytest.raises(ValueError):
-        ValidatingConsortiumCoordinator(_model(), retain_rounds=0)
-    with pytest.raises(ValueError):
-        ValidatingConsortiumCoordinator(_model(), retain_rounds=-1)
+    line = path.read_text(encoding="utf-8").strip()
+    json.loads(line, parse_constant=lambda token: pytest.fail(f"non-standard JSON token {token}"))
+    assert read_round_summaries(path)[0]["validation_rejected_nodes"] == ["corrupt"]
 
 
-def test_gate_rejects_a_retention_limit_assigned_after_construction() -> None:
-    """The limit is validated on assignment, so eviction cannot be disabled later."""
-    torch.manual_seed(17)
-    coordinator = ValidatingConsortiumCoordinator(_model(), retain_rounds=2)
-
-    with pytest.raises(ValueError):
-        coordinator.retain_rounds = 0
-
-    assert coordinator.retain_rounds == 2
-    for _ in range(5):
-        coordinator.run_round([_node("a", 0)])
-    assert sorted(coordinator.round_summaries) == [4, 5]
-
-
-def test_gate_sink_failure_stops_the_round() -> None:
-    """A sink that raises is not swallowed, so a lost audit record cannot go unnoticed."""
+def test_gate_write_failure_stops_the_round_before_the_merge(tmp_path: Path) -> None:
+    """If the summary cannot be written, the shared base is left unchanged."""
     torch.manual_seed(16)
-
-    def failing_sink(_summary: GateRoundSummary) -> None:
-        raise OSError("audit sink unavailable")
-
-    coordinator = ValidatingConsortiumCoordinator(_model(), summary_sink=failing_sink)
+    coordinator = ValidatingConsortiumCoordinator(_model(), summary_path=tmp_path / "missing-dir" / "summaries.jsonl")
     base_before = coordinator.shared_base_state
 
     with pytest.raises(OSError):
         coordinator.run_round([_node("a", 0)])
 
-    # The sink runs before the outer merge, so an unrecorded round never moves the shared base.
     _assert_same(base_before, coordinator.shared_base_state)
-
-    # The round is still recorded in memory, so the caller can repair the sink
-    # and write it rather than losing it.
-    assert sorted(coordinator.round_summaries) == [1]
-    assert coordinator.round_summaries[1].admitted_nodes == ["a"]
+    # The decision is still in memory, so the caller can write it once storage is fixed.
+    assert _summary(coordinator).admitted_nodes == ["a"]

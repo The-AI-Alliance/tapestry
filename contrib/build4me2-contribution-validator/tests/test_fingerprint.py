@@ -29,6 +29,7 @@ from contribution_validator import (
     with_base_fingerprint,
 )
 from contribution_validator.testing import base_state as _base_state
+from contribution_validator.testing import last_summary as _summary
 from contribution_validator.testing import tiny_model as _model
 from contribution_validator.testing import toy_corpus as _corpus
 
@@ -207,13 +208,13 @@ def test_gate_records_the_round_fingerprint_and_rejects_a_stale_base_node() -> N
 
     first = coordinator.run_round(nodes)
     assert first.accepted_nodes == ["fresh", "stale"]
-    first_summary = coordinator.round_summaries[1]
+    first_summary = _summary(coordinator)
     assert first_summary.base_fingerprint == fingerprint_state(first.previous_base_state)
 
     second = coordinator.run_round(nodes)
     assert second.accepted_nodes == ["fresh"]
     assert second.rejected_nodes == ["stale"]
-    second_summary = coordinator.round_summaries[2]
+    second_summary = _summary(coordinator)
     assert second_summary.base_fingerprint == fingerprint_state(second.previous_base_state)
     assert second_summary.base_fingerprint != first_summary.base_fingerprint
     assert second_summary.validation_rejected_nodes == ["stale"]
@@ -234,4 +235,4 @@ def test_gate_require_policy_rejects_nodes_that_do_not_declare() -> None:
     strict = ValidatingConsortiumCoordinator(_model(), limits=ValidationLimits(fingerprint_policy="require"))
     result = strict.run_round([plain_node])
     assert result.rejected_nodes == ["plain"]
-    assert strict.round_summaries[1].reports["plain"].finding_codes == (FindingCode.BASE_FINGERPRINT_MISSING,)
+    assert _summary(strict).reports["plain"].finding_codes == (FindingCode.BASE_FINGERPRINT_MISSING,)

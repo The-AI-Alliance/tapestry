@@ -10,8 +10,12 @@ module goes away.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+import json
+import os
+from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 from torch import nn
 
@@ -46,14 +50,32 @@ class GateRoundSummary:
     min_admitted_nodes: int
     reports: dict[str, ContributionValidationReport]
 
+    def to_dict(self) -> dict[str, Any]:
+        """Return a strict-JSON-serializable representation of the summary."""
+        return {
+            "round_num": self.round_num,
+            "base_fingerprint": self.base_fingerprint,
+            "validation_rejected_nodes": list(self.validation_rejected_nodes),
+            "admitted_nodes": list(self.admitted_nodes),
+            "quorum_met": self.quorum_met,
+            "min_admitted_nodes": self.min_admitted_nodes,
+            "reports": {node_id: report.to_dict() for node_id, report in self.reports.items()},
+        }
+
+
+def read_round_summaries(path: str | os.PathLike[str]) -> list[dict[str, Any]]:
+    """Load the summaries a gate appended to ``path``, oldest round first."""
+    with Path(path).open(encoding="utf-8") as summary_file:
+        return [json.loads(line) for line in summary_file if line.strip()]
+
 
 class ValidatingConsortiumCoordinator(ConsortiumCoordinator):
     """Coordinator that admits only validated contributions to the outer merge.
 
     Nodes whose contribution fails validation never reach the contribution
     policy or the merge. They appear in ``ConsortiumRoundResult.rejected_nodes``
-    alongside policy rejections; ``round_summaries`` tells the two apart and
-    keeps every per-node report so acceptance is recorded and repeatable.
+    alongside policy rejections; ``last_summary`` tells the two apart and keeps
+    every per-node report for the round just run.
 
     ``min_admitted_nodes`` is a quorum. Validation rejections shrink the set of
     nodes the policy weights, and ``ContributionPolicy.max_node_weight`` is
@@ -61,13 +83,11 @@ class ValidatingConsortiumCoordinator(ConsortiumCoordinator):
     full weight. When fewer nodes than the quorum survive validation, the round
     does not touch the shared base.
 
-    Each round's summary is stored, old rounds beyond ``retain_rounds`` are
-    evicted, and the summary is then handed to ``summary_sink``, so a caller
-    can write it to an audit log and keep the record beyond the life of the
-    coordinator. Both options default to the original behaviour: nothing is
-    written anywhere and every summary is kept, which is fine for short runs
-    but grows without limit over a long one, because each summary holds a
-    report per node and per-tensor statistics within each report.
+    Only the latest summary is kept in memory. When ``summary_path`` is given,
+    every round's summary is appended to that file as one line of JSON before
+    the outer merge, so the full record lives on disk and can be loaded with
+    ``read_round_summaries``. If the write fails, the round stops before the
+    shared base changes, so no merged round goes unrecorded.
     """
 
     def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
@@ -77,54 +97,27 @@ class ValidatingConsortiumCoordinator(ConsortiumCoordinator):
         outer_merge: OuterMerge | None = None,
         limits: ValidationLimits | None = None,
         min_admitted_nodes: int = 1,
-        summary_sink: Callable[[GateRoundSummary], None] | None = None,
-        retain_rounds: int | None = None,
+        summary_path: str | os.PathLike[str] | None = None,
     ) -> None:
         super().__init__(base_model, contribution_policy, outer_merge)
         if min_admitted_nodes < 1:
             raise ValueError("min_admitted_nodes must be at least 1")
         self.limits = limits or ValidationLimits()
         self.min_admitted_nodes = min_admitted_nodes
-        self.summary_sink = summary_sink
-        self.retain_rounds = retain_rounds
-        self.round_summaries: dict[int, GateRoundSummary] = {}
-
-    @property
-    def retain_rounds(self) -> int | None:
-        """How many recent round summaries to keep, or ``None`` to keep every one."""
-        return self._retain_rounds
-
-    @retain_rounds.setter
-    def retain_rounds(self, value: int | None) -> None:
-        """Reject limits below one on every assignment, since they would disable eviction."""
-        if value is not None and value < 1:
-            raise ValueError("retain_rounds must be at least 1, or None to keep every round")
-        self._retain_rounds = value
-
-    @property
-    def validation_reports(self) -> dict[int, dict[str, ContributionValidationReport]]:
-        """Per-round, per-node validation reports still held in memory."""
-        return {round_num: summary.reports for round_num, summary in self.round_summaries.items()}
+        self.summary_path = Path(summary_path) if summary_path is not None else None
+        self.last_summary: GateRoundSummary | None = None
 
     def _record(self, summary: GateRoundSummary) -> None:
-        """Store a summary, evict any beyond the retention limit, then hand it to the sink.
+        """Keep the summary as ``last_summary`` and append it to ``summary_path``, if set.
 
-        Storing first means a sink that raises does not also destroy the
-        in-memory record, so the caller can repair the sink and write it. The
-        summary just stored is the newest, so eviction never removes the one
-        the sink is about to receive.
-
-        The summary records what the gate decided about the contributions. It
-        is written before the outer merge runs, so it does not assert that the
-        merge succeeded.
+        JSON Lines lets each round append one line instead of rewriting the
+        whole file. The summary records what the gate decided; it is written
+        before the outer merge, so it does not assert that the merge succeeded.
         """
-        self.round_summaries[summary.round_num] = summary
-        if self.retain_rounds is not None:
-            excess = len(self.round_summaries) - self.retain_rounds
-            for round_num in sorted(self.round_summaries)[: max(excess, 0)]:
-                del self.round_summaries[round_num]
-        if self.summary_sink is not None:
-            self.summary_sink(summary)
+        self.last_summary = summary
+        if self.summary_path is not None:
+            with self.summary_path.open("a", encoding="utf-8") as summary_file:
+                summary_file.write(json.dumps(summary.to_dict()) + "\n")
 
     def run_round(self, nodes: Sequence[SovereignTrainingNode]) -> ConsortiumRoundResult:
         """Run one consortium cycle, validating each contribution before merge."""
