@@ -10,8 +10,12 @@ module goes away.
 
 from __future__ import annotations
 
+import json
+import os
 from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import Path
+from typing import Any
 
 from torch import nn
 
@@ -46,14 +50,32 @@ class GateRoundSummary:
     min_admitted_nodes: int
     reports: dict[str, ContributionValidationReport]
 
+    def to_dict(self) -> dict[str, Any]:
+        """Return a strict-JSON-serializable representation of the summary."""
+        return {
+            "round_num": self.round_num,
+            "base_fingerprint": self.base_fingerprint,
+            "validation_rejected_nodes": list(self.validation_rejected_nodes),
+            "admitted_nodes": list(self.admitted_nodes),
+            "quorum_met": self.quorum_met,
+            "min_admitted_nodes": self.min_admitted_nodes,
+            "reports": {node_id: report.to_dict() for node_id, report in self.reports.items()},
+        }
+
+
+def read_round_summaries(path: str | os.PathLike[str]) -> list[dict[str, Any]]:
+    """Load the summaries a gate appended to ``path``, oldest round first."""
+    with Path(path).open(encoding="utf-8") as summary_file:
+        return [json.loads(line) for line in summary_file if line.strip()]
+
 
 class ValidatingConsortiumCoordinator(ConsortiumCoordinator):
     """Coordinator that admits only validated contributions to the outer merge.
 
     Nodes whose contribution fails validation never reach the contribution
     policy or the merge. They appear in ``ConsortiumRoundResult.rejected_nodes``
-    alongside policy rejections; ``round_summaries`` tells the two apart and
-    keeps every per-node report so acceptance is recorded and repeatable.
+    alongside policy rejections; ``last_summary`` tells the two apart and keeps
+    every per-node report for the round just run.
 
     ``min_admitted_nodes`` is a quorum. Validation rejections shrink the set of
     nodes the policy weights, and ``ContributionPolicy.max_node_weight`` is
@@ -61,29 +83,41 @@ class ValidatingConsortiumCoordinator(ConsortiumCoordinator):
     full weight. When fewer nodes than the quorum survive validation, the round
     does not touch the shared base.
 
-    Summaries accumulate for the life of the coordinator. Long runs should
-    persist and drop them periodically.
+    Only the latest summary is kept in memory. When ``summary_path`` is given,
+    every round's summary is appended to that file as one line of JSON before
+    the outer merge, so the full record lives on disk and can be loaded with
+    ``read_round_summaries``. If the write fails, the round stops before the
+    shared base changes, so no merged round goes unrecorded.
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         base_model: nn.Module,
         contribution_policy: ContributionPolicy | None = None,
         outer_merge: OuterMerge | None = None,
         limits: ValidationLimits | None = None,
         min_admitted_nodes: int = 1,
+        summary_path: str | os.PathLike[str] | None = None,
     ) -> None:
         super().__init__(base_model, contribution_policy, outer_merge)
         if min_admitted_nodes < 1:
             raise ValueError("min_admitted_nodes must be at least 1")
         self.limits = limits or ValidationLimits()
         self.min_admitted_nodes = min_admitted_nodes
-        self.round_summaries: dict[int, GateRoundSummary] = {}
+        self.summary_path = Path(summary_path) if summary_path is not None else None
+        self.last_summary: GateRoundSummary | None = None
 
-    @property
-    def validation_reports(self) -> dict[int, dict[str, ContributionValidationReport]]:
-        """Per-round, per-node validation reports."""
-        return {round_num: summary.reports for round_num, summary in self.round_summaries.items()}
+    def _record(self, summary: GateRoundSummary) -> None:
+        """Keep the summary as ``last_summary`` and append it to ``summary_path``, if set.
+
+        JSON Lines lets each round append one line instead of rewriting the
+        whole file. The summary records what the gate decided; it is written
+        before the outer merge, so it does not assert that the merge succeeded.
+        """
+        self.last_summary = summary
+        if self.summary_path is not None:
+            with self.summary_path.open("a", encoding="utf-8") as summary_file:
+                summary_file.write(json.dumps(summary.to_dict()) + "\n")
 
     def run_round(self, nodes: Sequence[SovereignTrainingNode]) -> ConsortiumRoundResult:
         """Run one consortium cycle, validating each contribution before merge."""
@@ -99,14 +133,16 @@ class ValidatingConsortiumCoordinator(ConsortiumCoordinator):
         reports = {contribution.node_id: validator.validate(contribution) for contribution in contributions}
         admitted = [contribution for contribution in contributions if reports[contribution.node_id].accepted]
         quorum_met = len(admitted) >= self.min_admitted_nodes
-        self.round_summaries[self._round] = GateRoundSummary(
-            round_num=self._round,
-            base_fingerprint=validator.reference_fingerprint,
-            validation_rejected_nodes=[c.node_id for c in contributions if not reports[c.node_id].accepted],
-            admitted_nodes=[contribution.node_id for contribution in admitted],
-            quorum_met=quorum_met,
-            min_admitted_nodes=self.min_admitted_nodes,
-            reports=reports,
+        self._record(
+            GateRoundSummary(
+                round_num=self._round,
+                base_fingerprint=validator.reference_fingerprint,
+                validation_rejected_nodes=[c.node_id for c in contributions if not reports[c.node_id].accepted],
+                admitted_nodes=[contribution.node_id for contribution in admitted],
+                quorum_met=quorum_met,
+                min_admitted_nodes=self.min_admitted_nodes,
+                reports=reports,
+            )
         )
         if not quorum_met:
             admitted = []

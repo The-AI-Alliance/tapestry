@@ -7,6 +7,8 @@ import torch
 from tapestry.training.consortium import TinyCausalModel
 from tapestry.training.consortium.messages import ModelState
 
+from .gate import GateRoundSummary, ValidatingConsortiumCoordinator
+
 
 def tiny_model(seed: int = 0) -> TinyCausalModel:
     """A seeded tiny model so tests are deterministic."""
@@ -26,3 +28,10 @@ def toy_corpus(offset: int = 0) -> list[list[int]]:
 def base_state(seed: int = 0) -> ModelState:
     """A cloned state dict of :func:`tiny_model`."""
     return {name: tensor.clone() for name, tensor in tiny_model(seed).state_dict().items()}
+
+
+def last_summary(coordinator: ValidatingConsortiumCoordinator) -> GateRoundSummary:
+    """The summary of the round ``coordinator`` just ran, failing if there is none."""
+    if coordinator.last_summary is None:
+        raise AssertionError("the coordinator has not run a round yet")
+    return coordinator.last_summary
