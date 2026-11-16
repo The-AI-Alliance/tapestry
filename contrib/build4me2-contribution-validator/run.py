@@ -140,6 +140,12 @@ def _parse_args() -> argparse.Namespace:
         help="Whether contributions must declare the fingerprint of the base they trained from.",
     )
     parser.add_argument("--json", action="store_true", help="Print full validation reports as JSON.")
+    parser.add_argument(
+        "--summary-path",
+        type=Path,
+        default=None,
+        help="Append each round's gate summary to this file as one line of JSON.",
+    )
     return parser.parse_args()
 
 
@@ -159,6 +165,7 @@ def main() -> None:
         model,
         contribution_policy=ContributionPolicy(quality_floor=0.5, max_node_weight=0.6),
         limits=limits,
+        summary_path=args.summary_path,
     )
     fault = None if args.no_fault else args.fault
     nodes = _build_nodes(model, args.faulty_node, fault)
@@ -169,10 +176,11 @@ def main() -> None:
 
     for _ in range(args.rounds):
         result = coordinator.run_round(nodes)
-        reports = coordinator.validation_reports[result.round_num]
-        print(
-            f"\nround {result.round_num}  base {coordinator.round_summaries[result.round_num].base_fingerprint[:19]}..."
-        )
+        summary = coordinator.last_summary
+        if summary is None:
+            raise RuntimeError("run_round finished without recording a gate summary")
+        reports = summary.reports
+        print(f"\nround {result.round_num}  base {summary.base_fingerprint[:19]}...")
         print(f"  accepted: {result.accepted_nodes}")
         print(f"  rejected: {result.rejected_nodes}")
         print(f"  weights:  { {k: round(v, 3) for k, v in result.contribution_weights.items()} }")
