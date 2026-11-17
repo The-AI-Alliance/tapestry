@@ -78,6 +78,21 @@ def _trained_state() -> ModelState:
     return _node().run_sovereign_cycle(1, _base_state()).contribution.local_model_state
 
 
+def _relative_update_state() -> tuple[ModelState, ModelState]:
+    """Base and contribution matching the relative updates in issue #274."""
+    base = {
+        "embedding.weight": torch.ones(2, 2, dtype=torch.float64),
+        "proj.weight": torch.full((2, 2), 2.0, dtype=torch.float64),
+        "proj.bias": torch.full((2,), 4.0, dtype=torch.float64),
+    }
+    state = {
+        "embedding.weight": base["embedding.weight"] * 1.036,
+        "proj.weight": base["proj.weight"] * 1.986,
+        "proj.bias": base["proj.bias"] * 2.059,
+    }
+    return base, state
+
+
 def _snapshot(state: ModelState) -> ModelState:
     return {name: tensor.clone() for name, tensor in state.items()}
 
@@ -237,6 +252,125 @@ def test_magnitude_limits_pass_for_ordinary_updates() -> None:
         ValidationLimits(max_global_relative_update=1.0, max_layer_relative_update=1.0),
     )
     assert report.accepted
+
+
+def test_group_relative_update_limits_match_the_issue_example() -> None:
+    """Per-group limits can tighten the embedding and loosen the projections."""
+    base, state = _relative_update_state()
+    limits = ValidationLimits(
+        max_layer_relative_update=0.5,
+        layer_relative_update_groups=(
+            ("embedding.*", 0.05),
+            ("proj.*", 2.0),
+        ),
+    )
+
+    report = validate_contribution(base, _contribution(state), limits)
+
+    assert report.accepted
+    assert report.layer_stats["embedding.weight"].relative_l2 == pytest.approx(0.036, abs=1e-9)
+    assert report.layer_stats["proj.weight"].relative_l2 == pytest.approx(0.986, abs=1e-9)
+    assert report.layer_stats["proj.bias"].relative_l2 == pytest.approx(1.059, abs=1e-9)
+
+
+def test_group_relative_limit_records_the_matched_pattern() -> None:
+    """A group rejection carries the rule that produced it."""
+    base, state = _relative_update_state()
+    limits = ValidationLimits(
+        max_layer_relative_update=0.5,
+        layer_relative_update_groups=(("proj.*", 1.0),),
+    )
+
+    report = validate_contribution(base, _contribution(state), limits)
+
+    assert report.finding_codes == (FindingCode.LAYER_RELATIVE_UPDATE_TOO_LARGE,)
+    finding = report.findings[0]
+    assert finding.tensor_name == "proj.bias"
+    assert finding.details["matched_pattern"] == "proj.*"
+    assert finding.details["limit"] == 1.0
+
+
+def test_group_relative_limit_applies_when_the_single_value_is_disabled() -> None:
+    """A group rule works even when the global fallback is None."""
+    base, state = _relative_update_state()
+    limits = ValidationLimits(
+        max_layer_relative_update=None,
+        layer_relative_update_groups=(("embedding.*", 0.01),),
+    )
+
+    report = validate_contribution(base, _contribution(state), limits)
+
+    assert report.finding_codes == (FindingCode.LAYER_RELATIVE_UPDATE_TOO_LARGE,)
+    assert report.findings[0].tensor_name == "embedding.weight"
+    assert report.findings[0].details["matched_pattern"] == "embedding.*"
+
+
+def test_group_relative_limit_prefers_exact_names() -> None:
+    """An exact tensor name wins even when a broad pattern comes first."""
+    limits = ValidationLimits(
+        max_layer_relative_update=0.5,
+        layer_relative_update_groups=(("*", 0.01), ("proj.bias", 2.0)),
+    )
+
+    assert limits.layer_relative_update_limit("proj.bias") == (2.0, "proj.bias")
+    assert limits.layer_relative_update_limit("proj.weight") == (0.01, "*")
+
+
+def test_group_relative_limit_uses_the_first_matching_pattern() -> None:
+    """Patterns are checked in declaration order."""
+    first = ValidationLimits(
+        max_layer_relative_update=0.5,
+        layer_relative_update_groups=(("proj.*", 1.0), ("*.bias", 2.0)),
+    )
+    second = ValidationLimits(
+        max_layer_relative_update=0.5,
+        layer_relative_update_groups=(("*.bias", 2.0), ("proj.*", 1.0)),
+    )
+
+    assert first.layer_relative_update_limit("proj.bias") == (1.0, "proj.*")
+    assert second.layer_relative_update_limit("proj.bias") == (2.0, "*.bias")
+
+
+def test_group_relative_limit_falls_back_to_the_single_value() -> None:
+    """Unmatched tensors keep the existing single-value behavior."""
+    limits = ValidationLimits(
+        max_layer_relative_update=0.5,
+        layer_relative_update_groups=(("embedding.*", 0.05),),
+    )
+
+    assert limits.layer_relative_update_limit("embedding.weight") == (0.05, "embedding.*")
+    assert limits.layer_relative_update_limit("proj.weight") == (0.5, None)
+
+
+def test_single_value_relative_limit_finding_has_no_group_pattern() -> None:
+    """A fallback rejection keeps its existing details shape."""
+    base, state = _relative_update_state()
+    limits = ValidationLimits(max_layer_relative_update=0.01)
+
+    report = validate_contribution(base, _contribution(state), limits)
+
+    finding = next(
+        finding
+        for finding in report.findings
+        if finding.code == FindingCode.LAYER_RELATIVE_UPDATE_TOO_LARGE and finding.tensor_name == "embedding.weight"
+    )
+    assert "matched_pattern" not in finding.details
+
+
+@pytest.mark.parametrize(
+    "groups",
+    [
+        (("embedding.*", -1.0),),
+        (("embedding.*", float("nan")),),
+        (("", 1.0),),
+        ((123, 1.0),),
+        (("embedding.*",),),
+    ],
+)
+def test_invalid_group_relative_limits_are_rejected(groups: Any) -> None:
+    """Misconfigured group rules fail when the limits are built."""
+    with pytest.raises(ValueError):
+        ValidationLimits(layer_relative_update_groups=groups)
 
 
 def test_all_findings_are_reported_not_only_the_first() -> None:

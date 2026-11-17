@@ -59,7 +59,7 @@ the first failure, so one report lists every problem.
 | No finite value that overflows when cast into the base dtype | `value-overflows-base-dtype` | on |
 | The update itself is measurable in float64 | `update-not-measurable` | on |
 | Per-tensor update L2 norm within a limit | `layer-update-too-large` | off |
-| Per-tensor update norm relative to the base tensor norm | `layer-relative-update-too-large` | off |
+| Per-tensor update norm relative to the base tensor norm | `layer-relative-update-too-large` | off, or per group |
 | Largest single-parameter change within a limit | `abs-delta-too-large` | off |
 | Global update L2 norm within a limit | `global-update-too-large` | off |
 | Global update norm relative to the global base norm | `global-relative-update-too-large` | off |
@@ -112,6 +112,27 @@ Two details matter for real models:
 Magnitude limits are off by default because sensible values depend on the model
 and on the local training recipe. They are meant to be set from observed
 per-round statistics once a consortium has a few rounds of history.
+
+`max_layer_relative_update` can also be set per group of tensors. Pass an
+ordered tuple of `(pattern, limit)` pairs:
+
+```python
+limits = ValidationLimits(
+    max_layer_relative_update=0.5,
+    layer_relative_update_groups=(
+        ("embedding.*", 0.05),
+        ("proj.*", 2.0),
+    ),
+)
+```
+
+Exact tensor names are checked before patterns. Patterns use case-sensitive
+`fnmatch` syntax and are checked in tuple order; `*` also matches `.`, so
+`*.bias` matches `proj.bias`. A matching group rule replaces the single value
+for that tensor, so it can loosen as well as tighten the limit. When a group
+rule rejects a tensor, the finding's `details` include `matched_pattern`. Only
+the relative-update limit has group overrides for now; the other per-layer
+limits remain global.
 
 ## Layout
 
