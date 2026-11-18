@@ -334,19 +334,33 @@ class ContributionValidator:
         )
 
     def _check_layer_limits(self, stats: TensorUpdateStats) -> list[ValidationFinding]:
+        relative_limit, matched_pattern = self.limits.layer_relative_update_limit(stats.name)
         checks = (
-            (FindingCode.LAYER_UPDATE_TOO_LARGE, "delta_l2", stats.delta_l2, self.limits.max_layer_update_norm),
+            (
+                FindingCode.LAYER_UPDATE_TOO_LARGE,
+                "delta_l2",
+                stats.delta_l2,
+                self.limits.max_layer_update_norm,
+                None,
+            ),
             (
                 FindingCode.LAYER_RELATIVE_UPDATE_TOO_LARGE,
                 "relative_l2",
                 stats.relative_l2,
-                self.limits.max_layer_relative_update,
+                relative_limit,
+                matched_pattern,
             ),
-            (FindingCode.ABS_DELTA_TOO_LARGE, "max_abs_delta", stats.max_abs_delta, self.limits.max_abs_delta),
+            (
+                FindingCode.ABS_DELTA_TOO_LARGE,
+                "max_abs_delta",
+                stats.max_abs_delta,
+                self.limits.max_abs_delta,
+                None,
+            ),
         )
         return [
-            self._limit_finding(code, metric, measured, limit, stats.name)
-            for code, metric, measured, limit in checks
+            self._limit_finding(code, metric, measured, limit, stats.name, pattern)
+            for code, metric, measured, limit, pattern in checks
             if limit is not None and measured is not None and measured > limit
         ]
 
@@ -367,15 +381,23 @@ class ContributionValidator:
         ]
 
     @staticmethod
-    def _limit_finding(
-        code: str, metric: str, measured: float, limit: float, tensor_name: str | None
+    def _limit_finding(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        code: str,
+        metric: str,
+        measured: float,
+        limit: float,
+        tensor_name: str | None,
+        matched_pattern: str | None = None,
     ) -> ValidationFinding:
         scope = f"parameter {tensor_name!r}" if tensor_name else "contribution"
+        details: dict[str, Any] = {"metric": metric, "measured": measured, "limit": limit}
+        if matched_pattern is not None:
+            details["matched_pattern"] = matched_pattern
         return ValidationFinding(
             code=code,
             message=f"{scope} {metric} of {measured:.6g} exceeds the limit of {limit:.6g}",
             tensor_name=tensor_name,
-            details={"metric": metric, "measured": measured, "limit": limit},
+            details=details,
         )
 
     def _aggregate(self, layer_stats: Mapping[str, TensorUpdateStats]) -> GlobalUpdateStats:
