@@ -50,7 +50,7 @@ Tapestry's foundational decision ([TAP-001](../architecture/decisions/adr-001-co
 | **Safety alignment** | Consortium (shared) | Baseline safety properties (preservation through CPT is open question DG6) |
 | **Sovereign layers** | Each participating member | Cultural alignment, domain fit, instruction norms — data stays local |
 
-The ratio starts at roughly **80/20** centralized-to-sovereign and shifts toward sovereign over time as the consortium matures. (This is develop's current framing — not a fixed "70/30" split.)
+The ratio starts at roughly **80/20** centralized-to-sovereign and shifts toward sovereign over time as the consortium matures. (This is development's current framing — not a fixed "70/30" split.)
 
 ---
 

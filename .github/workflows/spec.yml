@@ -5,7 +5,7 @@ name: Spec coherence (Quint)
 on:
   push:
     branches:
-      - develop
+      - main
     paths:
       - "spec/**"
       - "package.json"
@@ -14,7 +14,7 @@ on:
       - ".github/workflows/spec.yml"
   pull_request:
     branches:
-      - develop
+      - main
     paths:
       - "spec/**"
       - "package.json"

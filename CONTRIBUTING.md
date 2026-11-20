@@ -65,9 +65,9 @@ The details for how to structure this code are described in [`contrib/README.md`
 
 Make sure you and your coding agent do the following:
 
-1. Read our general [contributing guidelines](https://github.com/The-AI-Alliance/tapestry/blob/develop/CONTRIBUTING.md).
-2. Read how new contributions are supposed to be structured, as discussed in the top-level [`README.md`](https://github.com/The-AI-Alliance/tapestry), the section on [Making Contributions](https://github.com/The-AI-Alliance/tapestry#making-contributions), and with additional details in [`contrib/README.md`](https://github.com/The-AI-Alliance/tapestry/blob/develop/contrib/README.md).
-3. Follow our [DCO requirement](https://github.com/The-AI-Alliance/tapestry/blob/develop/CONTRIBUTING.md#developer-certificate-of-origin-dco) for all code commits.
+1. Read our general [contributing guidelines](https://github.com/The-AI-Alliance/tapestry/blob/main/CONTRIBUTING.md).
+2. Read how new contributions are supposed to be structured, as discussed in the top-level [`README.md`](https://github.com/The-AI-Alliance/tapestry), the section on [Making Contributions](https://github.com/The-AI-Alliance/tapestry#making-contributions), and with additional details in [`contrib/README.md`](https://github.com/The-AI-Alliance/tapestry/blob/main/contrib/README.md).
+3. Follow our [DCO requirement](https://github.com/The-AI-Alliance/tapestry/blob/main/CONTRIBUTING.md#developer-certificate-of-origin-dco) for all code commits.
 4. Remove the AI slop in Python and other source files.
 5. When creating a pull request (PR), do not quote the whole content of the PR in its description.
 6. Make sure you run `make before-pr` locally and that it passes successfully. (Some steps may modify your code. Be sure to commit those modifications, too.)

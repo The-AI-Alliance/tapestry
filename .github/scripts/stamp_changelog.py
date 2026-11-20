@@ -1,4 +1,4 @@
-"""Stamp the CHANGELOG's Unreleased section with a date when main is cut.
+"""Stamp the CHANGELOG's Unreleased section with a date when a release is cut.
 
 Configured by ../workflows/changelog.yml (see issue #143). Idempotent:
 
@@ -7,7 +7,8 @@ Configured by ../workflows/changelog.yml (see issue #143). Idempotent:
 - Otherwise, rename the section to ``## [YYYY-MM-DD]`` and insert a fresh
   empty ``## [Unreleased]`` above it, per keepachangelog conventions and
   the flow documented at the top of CHANGELOG.md (entries accumulate on
-  ``develop``; the section gets stamped when ``main`` is cut).
+  ``main``; the section gets stamped when a release branch, e.g.,
+  ``M0-release-branch``is cut).
 
 Exit codes: 0 = stamped (file modified), 78 = nothing to stamp (neutral),
 1 = CHANGELOG.md missing or has no Unreleased section.

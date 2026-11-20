@@ -31,7 +31,7 @@ tapestry_url: https://thealliance.ai/projects/tapestry
 glossary_url: https://the-ai-alliance.github.io/glossary
 
 repo_url: https://github.com/The-AI-Alliance/tapestry
-repo_tech_docs_url: https://github.com/The-AI-Alliance/tapestry/tree/develop/docs
+repo_tech_docs_url: https://github.com/The-AI-Alliance/tapestry/tree/main/docs
 repo_project_dashboard_url: https://github.com/orgs/The-AI-Alliance/projects/50/views/7
 
 # Regression tests
@@ -132,7 +132,7 @@ copyright_years: 2025-2026
 gh_edit_link: true # show or hide edit this page link
 gh_edit_link_text: "Edit this page on GitHub"
 gh_edit_repository: "https://github.com/The-AI-Alliance/tapestry" # the github URL for your repo
-gh_edit_branch: "develop" # the branch that your docs are served from
+gh_edit_branch: "main"    # the branch that your docs are served from
 gh_edit_source: "website" # the source that your files originate from
 gh_edit_view_mode: "tree" # "tree" or "edit" if you want the user to jump into the editor immediately
 

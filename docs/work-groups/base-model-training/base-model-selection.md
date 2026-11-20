@@ -250,7 +250,7 @@ Here are preliminary tuning results showing a 26% improvement:
 
 Here is the final, different representation at the end of the tuning experiment showing a 45% improvement:
 
-<img width="1600" height="885" alt="Image" src="https://github.com/The-AI-Alliance/tapestry/blob/develop/contrib/nguyennm1024-sociocultural-alignment/figures/iw_cultural_map.png" />
+<img width="1600" height="885" alt="Image" src="https://github.com/The-AI-Alliance/tapestry/blob/main/contrib/nguyennm1024-sociocultural-alignment/figures/iw_cultural_map.png" />
 
 | Model | Distance to Vietnam (Inglehart-Welzel) | Capability (full MMLU, n=14,042, zero-shot) |
 | :---- | :-------------------------------------- | :------------------------------------------- |
@@ -277,7 +277,7 @@ The performance data is sourced from the [Onyx Open Source LLM Leaderboard](http
 
 ## Appendix 2: Training-data Transparency (Supplementary Consideration)
 
-The transparency of the training data set used for each model is not a BMS requirement but a separate strategic input drawn from the work group's companion survey, [The State of Open Weight Models](state-of-open-weight-model-training.md), whose stated purpose is to inform Tapestry's training direction rather than to gate model choice. It matters mainly for [_Phase 2_](https://github.com/The-AI-Alliance/tapestry/blob/develop/docs/reference/ARCHITECTURE.md#the-sovereign-build-phase-2), training a base model from scratch, where a partner whose data engineering is legible is worth more than its benchmark score alone. [The State of Open Weight Models](state-of-open-weight-model-training.md) survey sorts the field into three descriptive tiers:
+The transparency of the training data set used for each model is not a BMS requirement but a separate strategic input drawn from the work group's companion survey, [The State of Open Weight Models](state-of-open-weight-model-training.md), whose stated purpose is to inform Tapestry's training direction rather than to gate model choice. It matters mainly for [_Phase 2_](https://github.com/The-AI-Alliance/tapestry/blob/main/docs/reference/ARCHITECTURE.md#the-sovereign-build-phase-2), training a base model from scratch, where a partner whose data engineering is legible is worth more than its benchmark score alone. [The State of Open Weight Models](state-of-open-weight-model-training.md) survey sorts the field into three descriptive tiers:
 
 | Tier | Families |
 | :--- | :------- |

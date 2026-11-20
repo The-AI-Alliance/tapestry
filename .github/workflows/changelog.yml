@@ -1,10 +1,10 @@
 # Stamp CHANGELOG.md when main is cut (issue #143, second half).
 #
-# When a release lands on main, the accumulated "## [Unreleased]" entries
-# get stamped with the cut date and a fresh empty Unreleased section starts.
-# The stamp is proposed as a small PR against develop (the integration
-# branch) rather than pushed directly: it stays reviewable, and the next
-# main cut carries it. If Unreleased is empty, the workflow does nothing.
+# When a release lands on a release branch, the accumulated "## [Unreleased]"
+# entries get stamped with the cut date and a fresh empty Unreleased section
+# starts. The stamp is proposed as a small PR against the integration branch
+# `main`, rather than pushed directly: it stays reviewable, and the next
+# cut carries it. If Unreleased is empty, the workflow does nothing.
 #
 # Injection surface: none — no github.event.* text reaches a run: block;
 # the only dynamic value is a runner-computed UTC date.
@@ -24,10 +24,10 @@ jobs:
   stamp:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout develop
+      - name: Checkout main
         uses: actions/checkout@v7
         with:
-          ref: develop
+          ref: main
 
       - name: Set up Python
         uses: actions/setup-python@v7
@@ -63,7 +63,7 @@ jobs:
           git commit -s -m "Stamp CHANGELOG Unreleased section as ${date_today}"
           git push origin "$branch"
           gh pr create \
-            --base develop \
+            --base main \
             --head "$branch" \
             --title "Stamp CHANGELOG Unreleased as ${date_today}" \
             --body "Automated stamp: \`main\` was cut, so the accumulated Unreleased entries get their date and a fresh Unreleased section starts. See #143."

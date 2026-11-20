@@ -33,8 +33,8 @@ See also the [full list of AI Alliance projects](https://the-ai-alliance.github.
 
 ## Other Notes on Contributing
 
-The sources for this website are in the GitHub repo's [`website`]({{site.repo_url}}/tree/develop/website){:target="repo-website"} directory.
+The sources for this website are in the GitHub repo's [`website`]({{site.repo_url}}/tree/main/website){:target="repo-website"} directory.
 
 Notice that every page on this website has an _Edit this page on GitHub_ link to the corresponding location for the page in the GitHub repo, making it easy to view a page, then go straight to the source, make edits, and submit a PR! This is the best way to help us fix typos and make other small improvements.
 
-This documentation is built with [GitHub Pages](https://pages.github.com/){:target="github-pages"}, which uses [Jekyll](https://github.com/jekyll/jekyll){:target="gh-jekyll"} to serve the website. We use the [Just the Docs](https://just-the-docs.github.io/just-the-docs/){:target="just-the-docs"} Jekyll theme. See the repo file [`GITHUB_PAGES.md`]({{site.repo_url}}/tree/develop/GITHUB_PAGES.md){:target="_blank"} for more information, including how you can run the website locally to test any changes.
+This documentation is built with [GitHub Pages](https://pages.github.com/){:target="github-pages"}, which uses [Jekyll](https://github.com/jekyll/jekyll){:target="gh-jekyll"} to serve the website. We use the [Just the Docs](https://just-the-docs.github.io/just-the-docs/){:target="just-the-docs"} Jekyll theme. See the repo file [`GITHUB_PAGES.md`]({{site.repo_url}}/tree/main/GITHUB_PAGES.md){:target="_blank"} for more information, including how you can run the website locally to test any changes.
