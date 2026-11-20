@@ -32,7 +32,7 @@ Project Tapestry has big plans. Here are the main areas of current focus. Note t
 > [!NOTE]
 > Make sure to read [**Getting Involved**](#getting-involved-anchor) below for information on contribution guidelines, etc.
 >
-> We use the [`main`](https://github.com/The-AI-Alliance/tapestry/tree/main) branch as our default integration branch. Releases use custom branches with the naming convention `*-release-branch`, e.g., `M0-release-branch`. Those branches are also tagged, `V0.1.0-M0` and `M0`.
+> We use the [`main`](https://github.com/The-AI-Alliance/tapestry/tree/main) branch as our default integration branch. Releases use custom branches with the naming convention `*-release-branch`, e.g., `M0-release-branch`. Those branches are also tagged, `V0.1.0-M0` and `M0`, for example.
 
 ### Working with the Source Code
 

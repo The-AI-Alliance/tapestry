@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "jneums-flower-wan-spike"
-version = "0.1.0"
+version = "0.2.0-alpha"
 description = "Spike: round-trip a 2B-parameter weight payload through a Flower SuperLink over a real WAN (issue #70 de-risk)"
 license = { text = "Apache-2.0" }
 requires-python = ">=3.14"

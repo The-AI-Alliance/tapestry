@@ -14,7 +14,7 @@ name: Changelog stamp
 on:
   push:
     branches:
-      - main
+      - M1-release-branch
 
 permissions:
   contents: write
