@@ -29,6 +29,10 @@ class FindingCode:  # pylint: disable=too-few-public-methods
 
     BASE_FINGERPRINT_MISSING = "base-fingerprint-missing"
     BASE_FINGERPRINT_MISMATCH = "base-fingerprint-mismatch"
+    MANIFEST_MISSING = "manifest-missing"
+    MANIFEST_SIGNER_UNKNOWN = "manifest-signer-unknown"
+    MANIFEST_SIGNATURE_INVALID = "manifest-signature-invalid"
+    MANIFEST_MISMATCH = "manifest-mismatch"
     MISSING_PARAMETER = "missing-parameter"
     UNEXPECTED_PARAMETER = "unexpected-parameter"
     NOT_A_TENSOR = "not-a-tensor"

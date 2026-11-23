@@ -17,6 +17,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import torch
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 
 from tapestry.training.consortium.messages import ModelState, SovereignContribution
 
@@ -29,6 +30,7 @@ from .findings import (
 )
 from .fingerprint import declared_base_fingerprint, fingerprint_state
 from .limits import DtypePolicy, FingerprintPolicy, ValidationLimits
+from .manifest import member_key_roster, verify_manifest
 
 
 @dataclass(frozen=True)
@@ -73,11 +75,25 @@ class ContributionValidator:
     the nodes started from as ``reference_state``. The validator keeps its own
     copy of that state, so later changes to the caller's tensors do not affect
     validation.
+
+    With ``member_keys``, a roster of each member's Ed25519 public key, every
+    contribution must carry a manifest signed by its sender for ``round_num``,
+    the round this validator checks (see :mod:`contribution_validator.manifest`).
+    Without it, manifests are not checked.
     """
 
-    def __init__(self, reference_state: ModelState, limits: ValidationLimits | None = None) -> None:
+    def __init__(
+        self,
+        reference_state: ModelState,
+        limits: ValidationLimits | None = None,
+        *,
+        member_keys: Mapping[str, Ed25519PublicKey] | None = None,
+        round_num: int | None = None,
+    ) -> None:
         if not reference_state:
             raise ValueError("reference_state must contain at least one tensor")
+        if member_keys is not None and round_num is None:
+            raise ValueError("round_num is required with member_keys, so manifests are checked against the round")
         self._reference: dict[str, _ReferenceTensor] = {}
         for name, tensor in reference_state.items():
             if not isinstance(tensor, torch.Tensor):
@@ -95,6 +111,8 @@ class ContributionValidator:
         self.dtype_policy = DtypePolicy(self.limits.dtype_policy)
         self.fingerprint_policy = FingerprintPolicy(self.limits.fingerprint_policy)
         self._reference_fingerprint: str | None = None
+        self._member_keys = member_key_roster(member_keys) if member_keys is not None else None
+        self._round_num = round_num
 
     @property
     def reference_state(self) -> ModelState:
@@ -113,13 +131,15 @@ class ContributionValidator:
 
         A contribution that declares the fingerprint of the base it trained
         from (see :class:`~contribution_validator.fingerprint.FingerprintedContribution`)
-        has that declaration checked against the reference.
+        has that declaration checked against the reference. When the validator
+        holds member keys, the contribution's signed manifest is checked first.
         """
-        return self.validate_state(
+        return self._validate(
             contribution.node_id,
             contribution.round_num,
             contribution.local_model_state,
-            base_fingerprint=declared_base_fingerprint(contribution),
+            declared_base_fingerprint(contribution),
+            self._check_manifest(contribution),
         )
 
     def validate_state(
@@ -135,8 +155,23 @@ class ContributionValidator:
         it trained from, or ``None`` if it declares none. All checks run even
         after the first failure, so the report lists every problem found
         rather than only the first one.
+
+        A raw state has no manifest, so this raises ``ValueError`` when the
+        validator holds member keys; use :meth:`validate` instead.
         """
-        findings: list[ValidationFinding] = list(self._check_fingerprint(base_fingerprint))
+        if self._member_keys is not None:
+            raise ValueError("this validator requires signed manifests; validate the contribution with validate()")
+        return self._validate(node_id, round_num, state, base_fingerprint, [])
+
+    def _validate(  # pylint: disable=too-many-arguments,too-many-positional-arguments
+        self,
+        node_id: str,
+        round_num: int,
+        state: Mapping[str, Any],
+        base_fingerprint: str | None,
+        manifest_findings: list[ValidationFinding],
+    ) -> ContributionValidationReport:
+        findings = [*manifest_findings, *self._check_fingerprint(base_fingerprint)]
         findings.extend(self._check_coverage(state))
         layer_stats: dict[str, TensorUpdateStats] = {}
 
@@ -159,6 +194,12 @@ class ContributionValidator:
             layer_stats=layer_stats,
             global_stats=global_stats,
         )
+
+    def _check_manifest(self, contribution: SovereignContribution) -> list[ValidationFinding]:
+        # The constructor never sets member keys without a round; testing both narrows the types.
+        if self._member_keys is None or self._round_num is None:
+            return []
+        return verify_manifest(contribution, self._member_keys, self._round_num, self.reference_fingerprint)
 
     def _check_fingerprint(self, base_fingerprint: str | None) -> list[ValidationFinding]:
         if self.fingerprint_policy is FingerprintPolicy.IGNORE:

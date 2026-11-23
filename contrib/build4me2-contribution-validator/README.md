@@ -35,9 +35,9 @@ contributions produced by different nodes and hardware.
 
 The validator is an **admission-safety layer**. A contribution that passes is
 admissible for aggregation. It is **not** proven trustworthy: these checks do
-not detect adversarial model poisoning, backdoors, or subtle drift, and they say
-nothing about provenance or identity. Base-checkpoint fingerprints, signed
-manifests, provenance records, and anomaly detection remain follow-up work.
+not detect adversarial model poisoning, backdoors, or subtle drift. Signed
+manifests prove which member sent a contribution, not that its claims are true.
+Provenance records and anomaly detection remain follow-up work.
 
 ## What it checks
 
@@ -47,6 +47,10 @@ the first failure, so one report lists every problem.
 
 | Check | Finding code | Default |
 | :---- | :----------- | :------ |
+| A signed manifest comes with the contribution | `manifest-missing` | off (`member_keys` turns on all four manifest checks) |
+| The sender has a key in the roster | `manifest-signer-unknown` | off |
+| The signature verifies with the sender's key (not edited, not signed by someone else) | `manifest-signature-invalid` | off |
+| The signed manifest matches the contribution, this round, and this round's base | `manifest-mismatch` | off |
 | Declared base fingerprint matches this round's base | `base-fingerprint-mismatch` | on, `if-present` |
 | A base fingerprint is declared at all | `base-fingerprint-missing` | off (`require` turns it on) |
 | Every expected tensor is present | `missing-parameter` | on |
@@ -96,8 +100,8 @@ buffers, bfloat16, scalars, and non-finite values.
 contributions that declare none, and `ignore` skips the check.
 
 This is an honesty check, not a security control. A node that lies about its
-fingerprint is not caught. Signed manifests and authenticated provenance remain
-follow-up work.
+fingerprint is not caught here; [signed manifests](#signed-manifests) bind the
+declaration to the sender.
 
 Two details matter for real models:
 
@@ -134,6 +138,43 @@ rule rejects a tensor, the finding's `details` include `matched_pattern`. Only
 the relative-update limit has group overrides for now; the other per-layer
 limits remain global.
 
+## Signed manifests
+
+The fingerprint check trusts what a node declares. Signed manifests bind that
+declaration, and the weights it comes with, to the sender's key.
+
+A `ContributionManifest` names the sender's `node_id`, the round, the base
+fingerprint, the fingerprint of the contributed tensors, and the quality score
+and token count the contribution policy weights on. `sign_contribution` signs
+its canonical encoding (compact JSON with sorted keys and a format tag) with the
+node's Ed25519 private key. `SigningNode` does this for every contribution it
+sends.
+
+Give the gate a roster that maps each member's `node_id` to its Ed25519 public
+key:
+
+```python
+coordinator = ValidatingConsortiumCoordinator(model, member_keys={"india": india_public_key, ...})
+```
+
+With a roster, a contribution is admitted only if its manifest verifies and
+matches what arrived. Otherwise it gets one of the four `manifest-*` findings
+in [What it checks](#what-it-checks); a `manifest-mismatch` names the field
+that differs in `details["field"]`. The first three manifest checks stop at the
+first failure, because a manifest that does not verify says nothing
+trustworthy. The other checks still run.
+
+A manifest signed for an earlier round is a `manifest-mismatch` on
+`round_num`, so a recorded contribution cannot be replayed, even in a round
+whose base has not changed. Without a roster, manifests are not checked and
+nothing else changes. A standalone `ContributionValidator` takes the same
+`member_keys` together with the `round_num` it checks, and `validate_state`
+refuses to run with a roster, because a raw state has no manifest.
+
+A signature proves who made a claim, not that the claim is true. A member that
+trains from the wrong base and signs the correct digest is still admitted, but
+the false claim now carries its signature. The roster is trusted as given.
+
 ## Layout
 
 ```
@@ -148,12 +189,14 @@ contrib/build4me2-contribution-validator/
 │   ├── limits.py                  # ValidationLimits, DtypePolicy, FingerprintPolicy
 │   ├── findings.py                # report / finding / statistics dataclasses
 │   ├── fingerprint.py             # fingerprint_state, FingerprintedContribution, FingerprintingNode
+│   ├── manifest.py                # ContributionManifest, sign_contribution, SigningNode, verify_manifest
 │   ├── gate.py                    # ValidatingConsortiumCoordinator (wiring example)
 │   ├── faults.py                  # fault injection helpers used by tests and demo
 │   └── testing.py                 # tiny model and corpus fixtures shared by tests
 └── tests/
     ├── test_validator.py
-    └── test_fingerprint.py
+    ├── test_fingerprint.py
+    └── test_manifest.py
 ```
 
 Read `validator.py` first. `gate.py` shows where the check sits in a round.
@@ -277,12 +320,26 @@ If the validator is promoted, the same logic is a few lines inside
   alongside the others. In the gate, a node that trains from a stale base is
   accepted in round 1 and rejected from round 2, and the summary records each
   round's base fingerprint.
+- With a roster, a member's signed contribution is accepted. An unsigned
+  contribution, an unknown sender, an impersonated or edited manifest, weights
+  or a quality score changed after signing, and a manifest replayed in a later
+  round are each rejected with their own finding, without raising on a
+  manifest that cannot be encoded. In the gate, an impersonator is rejected and
+  recorded in the summary while the other members merge.
 
 ## Limitations and follow-ups
 
-- The fingerprint is a self-declaration. There is no identity, signature, or
-  provenance, so a node that misreports its base is not caught. The validator
-  trusts that the contribution and the reference state are what they claim to be.
+- The fingerprint is a self-declaration. Signed manifests make it
+  attributable to the member that signed it, but a member that misreports its
+  base is still not caught. The validator trusts that the reference state is
+  what it claims to be.
+- The roster of member keys is fixed for the coordinator's life and trusted as
+  given. Distributing, rotating, and revoking keys belongs with the central node
+  work (#114), and carrying manifests between nodes with the message protocol
+  (#126, #282).
+- The signed bytes are Python's JSON encoding with sorted keys. A node written
+  in another language would have to reproduce them exactly; a standard
+  canonical form belongs with the message protocol (#282).
 - No adversarial detection. Magnitude limits catch gross faults, not crafted updates.
 - Limits are global to a round. Per-tensor-group limits (for example embeddings
   versus attention) would be a natural next step once there is data to set them.

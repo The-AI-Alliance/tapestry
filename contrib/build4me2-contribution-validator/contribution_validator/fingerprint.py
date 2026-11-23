@@ -11,8 +11,8 @@ coordinator actually published for the round, which catches a node that
 started from a stale or otherwise wrong base.
 
 This is an honesty check, not a security control. A node that lies about its
-fingerprint is not caught here; that needs signed manifests, which remain
-follow-up work.
+fingerprint is not caught here; signed manifests
+(:mod:`contribution_validator.manifest`) bind the declaration to the sender.
 """
 
 from __future__ import annotations
