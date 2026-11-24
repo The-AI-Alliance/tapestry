@@ -1,6 +1,6 @@
 {
   "name": "tapestry-spec",
-  "version": "0.1.0",
+  "version": "0.2.0-alpha",
   "private": true,
   "description": "Quint formal specifications for Tapestry's load-bearing invariants (INV-1 pilot: contrib/luzanikita-formal-spec/consortium).",
   "devDependencies": {
