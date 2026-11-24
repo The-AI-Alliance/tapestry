@@ -27,17 +27,26 @@ policy checks each have different responsibilities.
 | Policy integration | Some gates are not scores; they are allow/deny decisions over evidence and metadata. |
 | Low adoption friction | MVP tooling should work with Python, `uv`, local files, and CI-scale tests. |
 
-## Candidate Tool Roles
+## Candidate Tools
 
-| Tool or approach | Best fit | Tapestry use | Watchouts |
-| :--------------- | :------- | :----------- | :-------- |
+| Tool or approach | Best fit | Tapestry use | Cautions |
+| :--------------- | :------- | :----------- | :------- |
 | [Unitxt](https://www.unitxt.ai/en/latest/) | Task and benchmark packaging | Define reusable cultural, safety, capability, and domain evaluation tasks with consistent data/task/operator structure. | May require wrapper conventions for participant-private data and consortium-only artifacts. |
 | [lm-evaluation-harness](https://www.eleuther.ai/projects/large-language-model-evaluation) | Broad LLM benchmark execution | Run established capability and regression suites so alignment work can be checked against common baselines. | Standard benchmarks do not prove cultural alignment or sovereignty claims by themselves. |
 | [AI Alliance Evaluation Reference Stack](https://the-ai-alliance.github.io/eval-ref-stack/) | Reference architecture for evaluation systems | Align Tapestry's evaluation flow with adjacent AI Alliance evaluation patterns. | Needs mapping from general evaluation architecture to Tapestry-specific claim classes. |
 | [Evaluation Is for Everyone](https://the-ai-alliance.github.io/trust-safety-evals/) | Evaluation process framing | Keep evaluation accessible to work groups and participants, not only benchmark specialists. | Process guidance still needs concrete Tapestry artifacts and gates. |
 | [granite.trust.policy-tools](https://github.com/ibm-granite/granite.trust.policy-tools/) | Policy-oriented trust checks | Explore machine-readable trust and safety policy checks for model or release evidence. | Fit should be validated against Tapestry's claim classes before adoption. |
 | [Open Policy Agent](https://www.openpolicyagent.org/) | General policy decision engine | Evaluate release gates over structured evidence, such as data-residency status, required benchmark presence, or approval metadata. | OPA decides over facts supplied to it; it does not generate evaluation evidence. |
+| [every_eval_ever](github.com/evaleval/every_eval_ever){:target="_blank"} | "Every Eval Ever is a shared schema and crowdsourced eval database. It defines a standardized metadata format for storing AI evaluation results — from leaderboard scrapes and research papers to local evaluation runs — so that results from different frameworks can be compared, reproduced, and reused." | Capture our evaluations in this format. | |
 | Tapestry-specific templates | Claim and evidence records | Use dataset cards, release-gate checklists, and evaluation matrices for Tapestry-only claims. | Templates need automation hooks to avoid becoming stale paperwork. |
+
+More general tools with evaluation features:
+
+| Tool or approach | Best fit | Tapestry use | Cautions |
+| :--------------- | :------- | :----------- | :------- |
+| [Skillberry](https://github.com/skillberry-ai){:target="_blank"} | [Rubrica](https://github.com/skillberry-ai/rubrica){:target="_blank"}, a skill-based test suite generator, and [simulation-harness](https://github.com/skillberry-ai/simulation-harness){:target="_blank"}, for simulating real-world environments. Other tools support different aspects of developing agents. | Use for building complete applications? | ? |
+| [AWS Emulator](https://www.allthingsdistributed.com/2026/11/aws-emulator-and-the-engineers-job-when-agents-write-the-code.html){:target="_blank"} | Similar features to Skillberry's simulator | | |
+
 
 ## Suggested MVP Stack
 
