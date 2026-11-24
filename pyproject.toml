@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.14,<3.15"  # Torch doesn't support 3.15+
 dependencies = [
     "torch>=2.15.0",
-    "numpy>=2.5.4",
+    "numpy>=2.5.5",
     "pathspec>=1.1.1",
 ]
 
