@@ -51,3 +51,9 @@ Out of scope: implementing training or serving stacks, deciding governance repre
 - **Security & Privacy:** privacy and safety evidence.
 - **Governance & Participation:** certification process and dispute handling.
 - **Deployment & Adoption:** user feedback as evaluation signal.
+
+## Some References
+
+* [AI Shared Responsibility](https://aisharedresponsibility.com/), especially for security concerns. See also the [tools](https://aisharedresponsibility.com/tools/).
+* [Testing Generative AI Application](https://the-ai-alliance.github.io/ai-application-testing/) ([repo](https://github.com/The-AI-Alliance/ai-application-testing/)). An Alliance project that focuses on principles and techniques for application testing.
+
