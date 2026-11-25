@@ -8,6 +8,7 @@ dependencies = [
     "torch>=2.15.0",
     "numpy>=2.5.5",
     "pathspec>=1.1.1",
+    "cryptography>=50.0.2",
 ]
 
 [project.optional-dependencies]

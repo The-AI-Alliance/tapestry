@@ -12,11 +12,12 @@ from __future__ import annotations
 
 import json
 import os
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PublicKey
 from torch import nn
 
 from tapestry.training.consortium import (
@@ -29,6 +30,7 @@ from tapestry.training.consortium import (
 
 from .findings import ContributionValidationReport
 from .limits import ValidationLimits
+from .manifest import member_key_roster
 from .validator import ContributionValidator
 
 
@@ -88,6 +90,11 @@ class ValidatingConsortiumCoordinator(ConsortiumCoordinator):
     the outer merge, so the full record lives on disk and can be loaded with
     ``read_round_summaries``. If the write fails, the round stops before the
     shared base changes, so no merged round goes unrecorded.
+
+    ``member_keys`` maps each member's ``node_id`` to its Ed25519 public key.
+    When it is given, a contribution is admitted only with a manifest its
+    sender signed for the current round; see
+    :mod:`contribution_validator.manifest`.
     """
 
     def __init__(  # pylint: disable=too-many-arguments,too-many-positional-arguments
@@ -98,6 +105,7 @@ class ValidatingConsortiumCoordinator(ConsortiumCoordinator):
         limits: ValidationLimits | None = None,
         min_admitted_nodes: int = 1,
         summary_path: str | os.PathLike[str] | None = None,
+        member_keys: Mapping[str, Ed25519PublicKey] | None = None,
     ) -> None:
         super().__init__(base_model, contribution_policy, outer_merge)
         if min_admitted_nodes < 1:
@@ -106,6 +114,7 @@ class ValidatingConsortiumCoordinator(ConsortiumCoordinator):
         self.min_admitted_nodes = min_admitted_nodes
         self.summary_path = Path(summary_path) if summary_path is not None else None
         self.last_summary: GateRoundSummary | None = None
+        self.member_keys = member_key_roster(member_keys) if member_keys is not None else None
 
     def _record(self, summary: GateRoundSummary) -> None:
         """Keep the summary as ``last_summary`` and append it to ``summary_path``, if set.
@@ -122,7 +131,9 @@ class ValidatingConsortiumCoordinator(ConsortiumCoordinator):
     def run_round(self, nodes: Sequence[SovereignTrainingNode]) -> ConsortiumRoundResult:
         """Run one consortium cycle, validating each contribution before merge."""
         previous_state = self.shared_base_state
-        validator = ContributionValidator(previous_state, self.limits)
+        validator = ContributionValidator(
+            previous_state, self.limits, member_keys=self.member_keys, round_num=self._round + 1
+        )
         self._round += 1
 
         cycle_results = [node.run_sovereign_cycle(self._round, previous_state) for node in nodes]
