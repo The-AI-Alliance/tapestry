@@ -71,7 +71,7 @@ PRs with code require the command `make before-pr` to pass. This command runs th
 make SRC_DIR=contrib/<my_github_user_name>-<feature_name> --include-dir=contrib/<my_github_user_name>-<feature_name> format ruff pylint type-check unit-tests
 ```
 
-See the details in [`contrib/README.md`](https://github.com/The-AI-Alliance/tapestry/blob/develop/contrib/README.md#the-project-wide-make-processes), which also tells you how to disable any of these checks as necessary.
+See the details in [`contrib/README.md`](https://github.com/The-AI-Alliance/tapestry/blob/main/contrib/README.md#the-project-wide-make-processes), which also tells you how to disable any of these checks as necessary.
 
 ## Checklist
 

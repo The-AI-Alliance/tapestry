@@ -68,7 +68,7 @@ layout: table_wrappers
         {% include nav.html pages=site.html_pages %}
       {% endif %}
     </nav>
-    <footer class="site-footer">
+    <footer class="site-footer use-external-link-glyphs">
       {% if site.show_footer == "side_bar" or  site.show_footer == "both" %}
         {% if site.last_edit_timestamp or site.gh_edit_link %}
           {% if
@@ -80,7 +80,7 @@ layout: table_wrappers
           %}
             <div class="d-flex mt-2">
               <p class="text-small text-grey-dk-000 mb-0">
-                <a href="{{ site.gh_edit_repository }}/{{site.gh_edit_view_mode}}/{{site.gh_edit_branch}}/{{site.gh_edit_source}}/{{ page.path }}" id="edit-this-page" target="_blank">{{ site.gh_edit_link_text }}</a>
+                <a href="{{site.gh_edit_repository}}/{{site.gh_edit_view_mode}}/{{site.gh_edit_branch}}/{{site.gh_edit_source}}/{{ page.path }}" id="edit-this-page" target="_blank">{{site.gh_edit_link_text}}</a>
               </p>
             </div>
           {% endif %}
@@ -90,10 +90,12 @@ layout: table_wrappers
                 {% if site.last_version %}
                   Version: <span class="d-inline-block">{{ site.last_version }}</span>
                 {% endif %}
+              </p>
+              <p class="text-small text-grey-dk-000 mb-0 mr-2">
                 {% if page.last_modified_date %}
-                  Page last modified: <span class="d-inline-block">{{ page.last_modified_date | date: site.last_edit_time_format }}</span>.
+                  Page last modified: <span class="d-inline-block">{{ page.last_modified_date | date: site.last_edit_time_format }}</span>
                 {% elsif site.last_modified_date %}
-                  Site last modified: <span class="d-inline-block">{{ site.last_modified_date | date: site.last_edit_time_format }}</span>.
+                  Site last modified: <span class="d-inline-block">{{ site.last_modified_date | date: site.last_edit_time_format }}</span>
                 {% endif %}
               </p>
             </div>
@@ -103,7 +105,7 @@ layout: table_wrappers
       <p>
         Copyright &copy; {{ site.copyright_years }}, <a href="https://www.thealliance.ai" target="_aia">The AI Alliance</a>.
       </p>
-      <p xmlns:cc="http://creativecommons.org/ns#" >This work is licensed under <a href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""></a>
+      <p xmlns:cc="http://creativecommons.org/ns#" >This work is licensed under <a href="https://creativecommons.org/licenses/by/4.0/?ref=chooser-v1" target="_blank" class="no-glyph" rel="license noopener noreferrer" style="display:inline-block;">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" alt=""><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" alt=""></a>
       </p> 
       <p>
         This site uses <a href="https://github.com/jekyll" target="_jekyll_org">Jekyll</a> and <a href="https://github.com/just-the-docs/just-the-docs" target="_just_the_docs">Just the Docs</a>, a documentation theme.
@@ -184,7 +186,7 @@ layout: table_wrappers
           </nav>
         {% endif %}
       {% endunless %}
-      <div id="main-content" class="main-content" role="main">
+      <div id="main-content" class="main-content use-external-link-glyphs" role="main">
         {% if site.heading_anchors != false %}
           {% include vendor/anchor_headings.html html=content beforeHeading="true" anchorBody="<svg viewBox=\"0 0 16 16\" aria-hidden=\"true\"><use xlink:href=\"#svg-link\"></use></svg>" anchorClass="anchor-heading" anchorAttrs="aria-labelledby=\"%html_id%\"" %}
         {% else %}

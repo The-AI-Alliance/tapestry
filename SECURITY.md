@@ -22,8 +22,7 @@ Please allow reasonable time for a fix before any public disclosure.
 ## Supported Versions
 
 Project Tapestry is pre-release: there are no supported release versions yet.
-Security reports are evaluated against the [`develop`](https://github.com/The-AI-Alliance/tapestry/tree/develop)
-integration branch and `main`.
+Security reports are evaluated against the [`main`](https://github.com/The-AI-Alliance/tapestry/tree/main) integration branch.
 
 ## Security Documentation
 

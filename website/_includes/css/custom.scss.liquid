@@ -6,9 +6,9 @@
 // at the end of all non-relative URLs. This DOES NOT
 // cause them to be opened in separate windows; for that
 // the anchor tag has to contain a target="foo".
-div.main-content a[href^="http"]::after,
-div.main-content a[href^="https://"]::after,
-div.main-content a[href^="mailto:"]::after
+.use-external-link-glyphs a[href^="http"]::after,
+.use-external-link-glyphs a[href^="https://"]::after,
+.use-external-link-glyphs a[href^="mailto:"]::after
 {
   content: "";
   width: 11px;
@@ -23,9 +23,9 @@ div.main-content a[href^="mailto:"]::after
 
 // Add the class "no-glyph" to links where you don't want the glyph added,
 // like images that are links.
-div.main-content a[href^="http"].no-glyph::after,
-div.main-content a[href^="https://"].no-glyph::after,
-div.main-content a[href^="mailto:"].no-glyph::after
+.use-external-link-glyphs a[href^="http"].no-glyph::after,
+.use-external-link-glyphs a[href^="https://"].no-glyph::after,
+.use-external-link-glyphs a[href^="mailto:"].no-glyph::after
 {
   background-image: none  !important ;
   width: 0px !important;

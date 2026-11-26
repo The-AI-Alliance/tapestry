@@ -16,12 +16,14 @@ Project Tapestry is managed on a three-month _milestone_ cycle, offset by one mo
 
 | Name | Abbrev. | Dates |
 | :--- | :------ | :---- |
-| [Milestone Zero](#milestone-zero-m0) | M0 | June - August, 2026 |
-| [Milestone One](#milestone-one-m1)   | M1 | September - November, 2026 |
-| [Milestone Two](#milestone-two-m2)   | M2 | December, 2026 - February, 2027 |
-| Milestone Three                      | M3 | March - May, 2027 |
-| Milestone Four                       | M4 | June - August, 2027 |
-| Milestone Five                       | M5 | September - November, 2027 |
+| [Milestone Zero](#milestone-zero-m0) | M0 | June - September, 2026 |
+| [Milestone One](#milestone-one-m1)   | M1 | September - December, 2026 |
+| [Milestone Two](#milestone-two-m2)   | M2 | January, 2027 - March, 2027 |
+| Milestone Three                      | M3 | April - June, 2027 |
+| Milestone Four                       | M4 | July - September, 2027 |
+| Milestone Five                       | M5 | October - December, 2027 |
+
+(M0 ended after September 1<sup>st</sup>, after which M1 started.)
 
 ---
 
@@ -30,7 +32,7 @@ Project Tapestry is managed on a three-month _milestone_ cycle, offset by one mo
 | :-- | :-- |
 | **Dates**     | June - August, 2026 |
 | **Details**   | [Milestone Zero - M0](./milestone-zero/) |
-| **Release**   | [v0.1.0-M0]({{site.repo_url}}/releases/tag/V0.1.0-M0){:target="m0-release"} |
+| **Release**   | [V0.1.0-M0]({{site.repo_url}}/releases/tag/V0.1.0-M0){:target="m0-release"} |
 | **Dashboard** | [Tapestry Project - M0]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM0){:target="dash"}
 
 Milestone "zero" (M0) was Project Tapestry’s first technical milestone. It was completed September 1, 2026. We used &ldquo;zero”&rdquo;, rather than &ldquo;one&rdquo;, because M0 was about building the consortium, while also pursuing initial goals.
@@ -44,7 +46,7 @@ More details are [here](./milestone-zero/).
 ### Milestone One ("M1")
 
 | :-- | :-- |
-| **Dates**     | September - November, 2026 |
+| **Dates**     | September - December, 2026 |
 | **Details**   | TBD |
 | **Release**   | TBD |
 | **Dashboard** | [Tapestry Project - M1]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM1){:target="dash"}
@@ -57,7 +59,7 @@ M1 is building on the prototype work of M0 to expand the number of sovereign nod
 ### Milestone Two ("M2")
 
 | :-- | :-- |
-| **Dates**     | December, 2026 - February, 2027 |
+| **Dates**     | January, 2027 - March, 2027 |
 | **Details**   | TBD |
 | **Release**   | TBD |
 | **Dashboard** | [Tapestry Project - M2]({{site.repo_project_dashboard_url}}?filterQuery=milestone%3AM2){:target="dash"}
