@@ -31,6 +31,7 @@ Out of scope: choosing certification criteria, defining cultural alignment metho
 
 - MVP node architecture and setup checklist.
 - [Infrastructure requirements](infrastructure-requirements.md).
+- [Signed contribution manifests](signed-contribution-manifests.md), for model-update admission.
 - Training orchestration and observability requirements.
 - Data management plan.
 - Artifact and model-distribution plan.
